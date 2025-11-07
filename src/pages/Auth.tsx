@@ -3,10 +3,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -37,11 +37,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <Link to="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center">
-            <Sparkles className="w-7 h-7 text-white" />
-          </div>
-          <span className="text-2xl font-bold text-foreground">HealthBook</span>
+        <Link to="/" className="flex items-center justify-center mb-8">
+          <img src={logo} alt="HealthBook Logo" className="h-12" />
         </Link>
 
         <Card className="p-8 border-border bg-card shadow-large">

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar, Clock, Shield, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const Index = () => {
   return (
@@ -9,11 +10,8 @@ const Index = () => {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-foreground">HealthBook</span>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="HealthBook Logo" className="h-10" />
           </div>
           <div className="flex items-center gap-4">
             <Link to="/doctors">
@@ -163,11 +161,8 @@ const Index = () => {
       <footer className="py-12 bg-muted/30 border-t border-border">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-foreground">HealthBook</span>
+            <div className="flex items-center gap-3 mb-4 md:mb-0">
+              <img src={logo} alt="HealthBook Logo" className="h-8" />
             </div>
             <p className="text-muted-foreground">© 2024 HealthBook. Your health, our priority.</p>
           </div>

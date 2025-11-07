@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, Search, MapPin, Star, Calendar } from "lucide-react";
+import { Search, MapPin, Star, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import logo from "@/assets/logo.png";
 
 const doctors = [
   {
@@ -89,11 +90,8 @@ const Doctors = () => {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-foreground">HealthBook</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="HealthBook Logo" className="h-10" />
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/patient-dashboard">

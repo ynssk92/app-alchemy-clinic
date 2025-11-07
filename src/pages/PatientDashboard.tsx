@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Sparkles, Calendar, Clock, Award, TrendingUp, FileText, User } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo.png";
 
 const PatientDashboard = () => {
   const appointments = [
@@ -42,11 +43,8 @@ const PatientDashboard = () => {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-gradient-primary rounded-xl flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-xl font-bold text-foreground">HealthBook</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="HealthBook Logo" className="h-10" />
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/doctors">
