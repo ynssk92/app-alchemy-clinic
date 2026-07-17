@@ -17,30 +17,30 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 182 84% 45%;
+    --primary: 230 60% 34%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 158 64% 52%;
+    --secondary: 220 70% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 12 92% 65%;
+    --accent: 210 90% 60%;
     --accent-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 30% 96%;
+    --muted-foreground: 220 15% 45%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 182 84% 45%;
+    --border: 220 30% 90%;
+    --input: 220 30% 90%;
+    --ring: 230 60% 34%;
 
     --radius: 0.75rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(182 84% 45%), hsl(158 64% 52%));
-    --gradient-accent: linear-gradient(135deg, hsl(12 92% 65%), hsl(28 92% 65%));
-    --gradient-hero: linear-gradient(135deg, hsl(182 84% 45% / 0.1), hsl(158 64% 52% / 0.1));
+    --gradient-primary: linear-gradient(135deg, hsl(230 60% 34%), hsl(220 70% 55%));
+    --gradient-accent: linear-gradient(135deg, hsl(210 90% 60%), hsl(220 70% 55%));
+    --gradient-hero: linear-gradient(135deg, hsl(230 60% 34% / 0.1), hsl(220 70% 55% / 0.1));
     
     --shadow-soft: 0 2px 8px hsl(222 47% 11% / 0.08);
     --shadow-medium: 0 4px 16px hsl(222 47% 11% / 0.12);
@@ -59,13 +59,13 @@ All colors MUST be HSL.
     --popover: 222 47% 15%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 182 84% 55%;
+    --primary: 220 70% 60%;
     --primary-foreground: 222 47% 11%;
 
-    --secondary: 158 64% 62%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 230 60% 50%;
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 12 92% 70%;
+    --accent: 210 90% 65%;
     --accent-foreground: 222 47% 11%;
 
     --muted: 217 33% 17%;
@@ -76,7 +76,7 @@ All colors MUST be HSL.
 
     --border: 217 33% 17%;
     --input: 217 33% 17%;
-    --ring: 182 84% 55%;
+    --ring: 220 70% 60%;
   }
 }
 
