@@ -4,34 +4,55 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { user, isAdmin, loading } = useAuth();
+  const [busy, setBusy] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: "",
   });
 
-  const handleLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!loading && user) {
+      navigate(isAdmin ? "/admin" : "/patient-dashboard", { replace: true });
+    }
+  }, [user, isAdmin, loading, navigate]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Logged in successfully!");
-    setTimeout(() => navigate("/patient-dashboard"), 1000);
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginData.email,
+      password: loginData.password,
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Signed in!");
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (signupData.password !== signupData.confirmPassword) {
-      toast.error("Passwords don't match");
-      return;
-    }
-    toast.success("Account created successfully!");
-    setTimeout(() => navigate("/patient-dashboard"), 1000);
+    setBusy(true);
+    const { error } = await supabase.auth.signUp({
+      email: signupData.email,
+      password: signupData.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/patient-dashboard`,
+        data: { full_name: signupData.name },
+      },
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Account created! You're signed in.");
   };
 
   return (
@@ -52,26 +73,18 @@ const Auth = () => {
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <Label htmlFor="login-email">Email</Label>
-                  <Input
-                    id="login-email"
-                    type="email"
-                    required
+                  <Input id="login-email" type="email" required
                     value={loginData.email}
-                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  />
+                    onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} />
                 </div>
                 <div>
                   <Label htmlFor="login-password">Password</Label>
-                  <Input
-                    id="login-password"
-                    type="password"
-                    required
+                  <Input id="login-password" type="password" required
                     value={loginData.password}
-                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  />
+                    onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} />
                 </div>
-                <Button type="submit" className="w-full mt-6">
-                  Login
+                <Button type="submit" className="w-full mt-6" disabled={busy}>
+                  {busy ? "Signing in..." : "Login"}
                 </Button>
               </form>
             </TabsContent>
@@ -80,49 +93,24 @@ const Auth = () => {
               <form onSubmit={handleSignup} className="space-y-4">
                 <div>
                   <Label htmlFor="signup-name">Full Name</Label>
-                  <Input
-                    id="signup-name"
-                    required
+                  <Input id="signup-name" required
                     value={signupData.name}
-                    onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
-                  />
+                    onChange={(e) => setSignupData({ ...signupData, name: e.target.value })} />
                 </div>
                 <div>
                   <Label htmlFor="signup-email">Email</Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    required
+                  <Input id="signup-email" type="email" required
                     value={signupData.email}
-                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
-                  />
+                    onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} />
                 </div>
                 <div>
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    required
+                  <Label htmlFor="signup-password">Password (min 6 chars)</Label>
+                  <Input id="signup-password" type="password" required minLength={6}
                     value={signupData.password}
-                    onChange={(e) =>
-                      setSignupData({ ...signupData, password: e.target.value })
-                    }
-                  />
+                    onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} />
                 </div>
-                <div>
-                  <Label htmlFor="signup-confirm">Confirm Password</Label>
-                  <Input
-                    id="signup-confirm"
-                    type="password"
-                    required
-                    value={signupData.confirmPassword}
-                    onChange={(e) =>
-                      setSignupData({ ...signupData, confirmPassword: e.target.value })
-                    }
-                  />
-                </div>
-                <Button type="submit" className="w-full mt-6">
-                  Create Account
+                <Button type="submit" className="w-full mt-6" disabled={busy}>
+                  {busy ? "Creating..." : "Create Account"}
                 </Button>
               </form>
             </TabsContent>
