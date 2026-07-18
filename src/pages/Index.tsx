@@ -3,10 +3,16 @@ import { Card } from "@/components/ui/card";
 import { Calendar, Clock, Shield, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import { Seo } from "@/components/Seo";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="HealthBook — Book Healthcare Appointments in Seconds"
+        description="Find and book appointments with verified doctors instantly. Manage your health records, get reminders, and take control of your care."
+        path="/"
+      />
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">

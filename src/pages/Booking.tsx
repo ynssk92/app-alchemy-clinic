@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
+import { Seo } from "@/components/Seo";
 
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
@@ -63,6 +64,11 @@ const Booking = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Book an Appointment — HealthBook"
+        description="Choose a doctor, pick a date and time, and confirm your appointment in seconds."
+        path="/booking"
+      />
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">

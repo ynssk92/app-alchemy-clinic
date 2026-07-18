@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
+import { Seo } from "@/components/Seo";
 
 type Appt = {
   id: string;
@@ -37,6 +38,11 @@ const PatientDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Your Dashboard — HealthBook"
+        description="Track your health score, upcoming appointments, and achievements in your HealthBook dashboard."
+        path="/patient-dashboard"
+      />
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
@@ -57,6 +63,7 @@ const PatientDashboard = () => {
             <p className="text-lg text-muted-foreground">Here's your health overview</p>
           </div>
 
+          <h2 className="sr-only">Health Overview</h2>
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <Card className="p-6 border-border bg-card">
               <div className="flex items-center justify-between mb-4">

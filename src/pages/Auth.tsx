@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
+import { Seo } from "@/components/Seo";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -57,10 +58,17 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+      <Seo
+        title="Sign In or Sign Up — HealthBook"
+        description="Access your HealthBook account to book appointments, manage records, and track your care."
+        path="/auth"
+      />
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center mb-8">
           <img src={logo} alt="HealthBook Logo" className="h-12" />
         </Link>
+
+        <h1 className="text-3xl font-bold text-center text-foreground mb-6">Sign in to HealthBook</h1>
 
         <Card className="p-8 border-border bg-card shadow-large">
           <Tabs defaultValue="login" className="w-full">
