@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
+import { Seo } from "@/components/Seo";
 
 type Doctor = {
   id: string;
@@ -44,6 +45,17 @@ const Doctors = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Seo
+        title="Find Doctors — HealthBook"
+        description="Browse verified healthcare professionals by name or specialty and book an appointment in seconds."
+        path="/doctors"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Doctor Directory",
+          url: "https://app-alchemy-clinic.lovable.app/doctors",
+        }}
+      />
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
@@ -63,8 +75,10 @@ const Doctors = () => {
             Browse our network of verified healthcare professionals
           </p>
           <div className="max-w-2xl mx-auto relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-            <Input type="text" placeholder="Search by doctor name or specialty..."
+            <label htmlFor="doctor-search" className="sr-only">Search doctors</label>
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" aria-hidden="true" />
+            <Input id="doctor-search" type="search" placeholder="Search by doctor name or specialty..."
+              aria-label="Search by doctor name or specialty"
               className="pl-12 h-14 text-lg shadow-medium"
               value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
@@ -73,6 +87,7 @@ const Doctors = () => {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
+          <h2 className="sr-only">Available Doctors</h2>
           {loading ? (
             <div className="text-center py-20 text-muted-foreground">Loading doctors...</div>
           ) : filtered.length === 0 ? (
