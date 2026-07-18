@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Upload, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -99,37 +99,152 @@ const AdminDoctors = () => {
     load();
   };
 
+  // ---- Bulk edit ----
+  const [bulk, setBulk] = useState(false);
+  const [drafts, setDrafts] = useState<Record<string, { full_name: string; avatar_url: string | null }>>({});
+  const [bulkUploading, setBulkUploading] = useState<string | null>(null);
+  const [savingBulk, setSavingBulk] = useState(false);
+
+  const startBulk = () => {
+    const d: Record<string, any> = {};
+    rows.forEach((r) => (d[r.id] = { full_name: r.full_name, avatar_url: r.avatar_url }));
+    setDrafts(d);
+    setBulk(true);
+  };
+  const cancelBulk = () => { setBulk(false); setDrafts({}); };
+
+  const bulkUpload = async (id: string, file: File) => {
+    setBulkUploading(id);
+    try {
+      const ext = file.name.split(".").pop() || "png";
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("doctor-avatars").upload(path, file);
+      if (upErr) throw upErr;
+      const { data, error: urlErr } = await supabase.storage.from("doctor-avatars")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (urlErr) throw urlErr;
+      setDrafts((p) => ({ ...p, [id]: { ...p[id], avatar_url: data.signedUrl } }));
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setBulkUploading(null);
+    }
+  };
+
+  const saveBulk = async () => {
+    setSavingBulk(true);
+    const changed = rows.filter((r) => {
+      const d = drafts[r.id];
+      return d && (d.full_name !== r.full_name || (d.avatar_url || null) !== (r.avatar_url || null));
+    });
+    if (changed.length === 0) {
+      toast.info("No changes to save");
+      setSavingBulk(false);
+      return;
+    }
+    let ok = 0;
+    for (const r of changed) {
+      const d = drafts[r.id];
+      const { error } = await supabase.from("doctors")
+        .update({ full_name: d.full_name.trim(), avatar_url: d.avatar_url || null })
+        .eq("id", r.id);
+      if (!error) ok++;
+    }
+    toast.success(`Updated ${ok} of ${changed.length} doctors`);
+    setSavingBulk(false);
+    setBulk(false);
+    setDrafts({});
+    load();
+  };
+
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 gap-3 flex-wrap">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-1">Doctors</h1>
           <p className="text-muted-foreground">Manage the doctor directory</p>
         </div>
-        <Button onClick={openNew}><Plus className="w-4 h-4 mr-2" />Add Doctor</Button>
+        <div className="flex items-center gap-2">
+          {bulk ? (
+            <>
+              <Button variant="outline" onClick={cancelBulk} disabled={savingBulk}>
+                <X className="w-4 h-4 mr-2" />Cancel
+              </Button>
+              <Button onClick={saveBulk} disabled={savingBulk}>
+                {savingBulk ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                Save All
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={startBulk} disabled={rows.length === 0}>
+                <ListChecks className="w-4 h-4 mr-2" />Bulk Edit
+              </Button>
+              <Button onClick={openNew}><Plus className="w-4 h-4 mr-2" />Add Doctor</Button>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="grid gap-4">
-        {rows.map((d) => (
-          <Card key={d.id} className="p-4 flex items-center gap-4 border-border bg-card">
-            <img src={d.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.id}`}
-              className="w-14 h-14 rounded-lg bg-muted" alt="" />
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <h3 className="font-bold">{d.full_name}</h3>
-                {d.specialties?.name && <Badge variant="secondary">{d.specialties.name}</Badge>}
-                {d.is_available ? <Badge>Available</Badge> : <Badge variant="outline">Unavailable</Badge>}
+      {bulk ? (
+        <Card className="p-4 border-border bg-card">
+          <p className="text-sm text-muted-foreground mb-4">
+            Edit names and photos below, then click <span className="font-medium text-foreground">Save All</span>.
+          </p>
+          <div className="divide-y divide-border">
+            {rows.map((d) => {
+              const draft = drafts[d.id] || { full_name: d.full_name, avatar_url: d.avatar_url };
+              return (
+                <div key={d.id} className="py-3 flex items-center gap-3">
+                  <img
+                    src={draft.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.id}`}
+                    className="w-12 h-12 rounded-lg object-cover bg-muted flex-shrink-0" alt=""
+                  />
+                  <Input
+                    value={draft.full_name}
+                    onChange={(e) =>
+                      setDrafts((p) => ({ ...p, [d.id]: { ...draft, full_name: e.target.value } }))
+                    }
+                    className="flex-1 min-w-0"
+                  />
+                  <label>
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={(e) => e.target.files?.[0] && bulkUpload(d.id, e.target.files[0])} />
+                    <div className="flex items-center gap-2 px-3 py-2 border border-border rounded-md cursor-pointer hover:bg-muted text-sm">
+                      {bulkUploading === d.id
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : <Upload className="w-4 h-4" />}
+                      <span>Photo</span>
+                    </div>
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {rows.map((d) => (
+            <Card key={d.id} className="p-4 flex items-center gap-4 border-border bg-card">
+              <img src={d.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${d.id}`}
+                className="w-14 h-14 rounded-lg bg-muted object-cover" alt="" />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold">{d.full_name}</h3>
+                  {d.specialties?.name && <Badge variant="secondary">{d.specialties.name}</Badge>}
+                  {d.is_available ? <Badge>Available</Badge> : <Badge variant="outline">Unavailable</Badge>}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {d.clinics?.name || "No clinic"} • {d.experience_years || 0} years
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                {d.clinics?.name || "No clinic"} • {d.experience_years || 0} years
-              </p>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => openEdit(d)}><Pencil className="w-4 h-4" /></Button>
-            <Button size="sm" variant="outline" onClick={() => remove(d.id)}><Trash2 className="w-4 h-4" /></Button>
-          </Card>
-        ))}
-        {rows.length === 0 && <p className="text-muted-foreground text-center py-8">No doctors yet.</p>}
-      </div>
+              <Button size="sm" variant="outline" onClick={() => openEdit(d)}><Pencil className="w-4 h-4" /></Button>
+              <Button size="sm" variant="outline" onClick={() => remove(d.id)}><Trash2 className="w-4 h-4" /></Button>
+            </Card>
+          ))}
+          {rows.length === 0 && <p className="text-muted-foreground text-center py-8">No doctors yet.</p>}
+        </div>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-lg">
