@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -28,6 +28,28 @@ const AdminDoctors = () => {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<any>(empty);
+  const [uploading, setUploading] = useState(false);
+
+  const uploadAvatar = async (file: File) => {
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "png";
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("doctor-avatars").upload(path, file, {
+        cacheControl: "3600", upsert: false,
+      });
+      if (upErr) throw upErr;
+      const { data, error: urlErr } = await supabase.storage.from("doctor-avatars")
+        .createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      if (urlErr) throw urlErr;
+      setForm((f: any) => ({ ...f, avatar_url: data.signedUrl }));
+      toast.success("Image uploaded");
+    } catch (e: any) {
+      toast.error(e.message || "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const load = async () => {
     const { data } = await supabase.from("doctors")
@@ -134,7 +156,24 @@ const AdminDoctors = () => {
               <div><Label>Experience (years)</Label><Input type="number" value={form.experience_years} onChange={(e) => setForm({ ...form, experience_years: +e.target.value })} /></div>
               <div><Label>Rating</Label><Input type="number" step="0.1" min="0" max="5" value={form.rating} onChange={(e) => setForm({ ...form, rating: +e.target.value })} /></div>
             </div>
-            <div><Label>Avatar URL</Label><Input value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} /></div>
+            <div>
+              <Label>Doctor Photo</Label>
+              <div className="flex items-center gap-3 mt-2">
+                {form.avatar_url && (
+                  <img src={form.avatar_url} alt="" className="w-16 h-16 rounded-lg object-cover border border-border" />
+                )}
+                <label className="flex-1">
+                  <input type="file" accept="image/*" className="hidden"
+                    onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])} />
+                  <div className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-border rounded-lg cursor-pointer hover:bg-muted transition">
+                    {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                    <span className="text-sm">{uploading ? "Uploading..." : "Upload image"}</span>
+                  </div>
+                </label>
+              </div>
+              <Input className="mt-2" placeholder="…or paste image URL"
+                value={form.avatar_url} onChange={(e) => setForm({ ...form, avatar_url: e.target.value })} />
+            </div>
             <div><Label>Bio</Label><Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} /></div>
             <div className="flex items-center gap-2">
               <Switch checked={form.is_available} onCheckedChange={(v) => setForm({ ...form, is_available: v })} />
