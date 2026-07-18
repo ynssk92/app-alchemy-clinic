@@ -2,14 +2,19 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, ShieldOff, Trash2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Shield, ShieldOff, Trash2, Mail, Check, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type P = { id: string; full_name: string | null; phone: string | null; created_at: string; roles: string[] };
+type Invite = { id: string; email: string; claimed_at: string | null; created_at: string };
 
 const AdminPatients = () => {
   const [rows, setRows] = useState<P[]>([]);
+  const [invites, setInvites] = useState<Invite[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [busy, setBusy] = useState(false);
 
   const load = async () => {
     const { data: profiles } = await supabase.from("profiles").select("id, full_name, phone, created_at").order("created_at", { ascending: false });
@@ -19,6 +24,9 @@ const AdminPatients = () => {
       rmap.set(r.user_id, [...(rmap.get(r.user_id) || []), r.role]);
     });
     setRows((profiles || []).map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] })));
+
+    const { data: inv } = await supabase.from("admin_invites").select("*").order("created_at", { ascending: false });
+    setInvites((inv || []) as Invite[]);
   };
 
   useEffect(() => { load(); }, []);
@@ -44,10 +52,73 @@ const AdminPatients = () => {
     load();
   };
 
+  const sendInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const email = inviteEmail.trim().toLowerCase();
+    if (!email) return;
+    setBusy(true);
+    const { error } = await supabase.from("admin_invites").insert({ email });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Invite added. They'll become admin on next sign-in / signup.");
+    setInviteEmail("");
+    load();
+  };
+
+  const revokeInvite = async (id: string) => {
+    const { error } = await supabase.from("admin_invites").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Invite removed");
+    load();
+  };
+
   return (
     <div>
       <h1 className="text-3xl font-bold text-foreground mb-1">Patients & Users</h1>
       <p className="text-muted-foreground mb-8">All registered users. Grant or revoke admin here.</p>
+
+      <Card className="p-6 mb-8 border-border bg-card">
+        <div className="flex items-center gap-2 mb-4">
+          <Mail className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold">Admin Invites</h2>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Add an email here to automatically promote that user to admin — whether they already have an account or sign up later.
+        </p>
+        <form onSubmit={sendInvite} className="flex gap-2 mb-6">
+          <Input
+            type="email"
+            placeholder="person@example.com"
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+            required
+          />
+          <Button type="submit" disabled={busy}>
+            {busy ? "Adding..." : "Invite as Admin"}
+          </Button>
+        </form>
+
+        <div className="space-y-2">
+          {invites.map((i) => (
+            <div key={i.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/40">
+              <div className="flex-1">
+                <div className="font-medium">{i.email}</div>
+                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                  {i.claimed_at ? (
+                    <><Check className="w-3 h-3 text-green-600" /> Claimed {new Date(i.claimed_at).toLocaleDateString()}</>
+                  ) : (
+                    <><Clock className="w-3 h-3" /> Pending — will apply on signup/sign-in</>
+                  )}
+                </div>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => revokeInvite(i.id)}>
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </div>
+          ))}
+          {invites.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No invites yet.</p>}
+        </div>
+      </Card>
 
       <div className="grid gap-3">
         {rows.map((p) => {
