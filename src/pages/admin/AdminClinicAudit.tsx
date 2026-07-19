@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
-import { Search, X, Download } from "lucide-react";
+import { Search, X, Download, ArrowUp, ArrowDown, ArrowUpDown } from "lucide-react";
 
 type LogRow = {
   id: string;
@@ -27,6 +28,8 @@ const actionColor: Record<string, string> = {
 };
 
 const ALL = "__all__";
+type SortKey = "created_at" | "action" | "clinic_name" | "actor" | "changed_fields";
+const PAGE_SIZES = [10, 25, 50, 100];
 
 const AdminClinicAudit = () => {
   const [logs, setLogs] = useState<LogRow[]>([]);
@@ -40,6 +43,11 @@ const AdminClinicAudit = () => {
   const [action, setAction] = useState<string>(ALL);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
+
+  const [sortKey, setSortKey] = useState<SortKey>("created_at");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
 
   useEffect(() => {
     (async () => {
@@ -112,6 +120,56 @@ const AdminClinicAudit = () => {
     });
   }, [logs, search, clinicId, actorId, action, field, from, to, actors]);
 
+  const sorted = useMemo(() => {
+    const rows = [...filtered];
+    const dir = sortDir === "asc" ? 1 : -1;
+    rows.sort((a, b) => {
+      let av: string | number = "";
+      let bv: string | number = "";
+      switch (sortKey) {
+        case "created_at":
+          av = new Date(a.created_at).getTime();
+          bv = new Date(b.created_at).getTime();
+          break;
+        case "action":
+          av = a.action; bv = b.action; break;
+        case "clinic_name":
+          av = (a.clinic_name || "").toLowerCase();
+          bv = (b.clinic_name || "").toLowerCase(); break;
+        case "actor":
+          av = (actors[a.actor_id || ""] || "").toLowerCase();
+          bv = (actors[b.actor_id || ""] || "").toLowerCase(); break;
+        case "changed_fields":
+          av = (a.changed_fields || []).length;
+          bv = (b.changed_fields || []).length; break;
+      }
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+    return rows;
+  }, [filtered, sortKey, sortDir, actors]);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pageRows = useMemo(
+    () => sorted.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [sorted, currentPage, pageSize]
+  );
+
+  // Reset to page 1 when filters/sort/pageSize change
+  useEffect(() => { setPage(1); }, [search, clinicId, actorId, field, action, from, to, sortKey, sortDir, pageSize]);
+
+  const toggleSort = (key: SortKey) => {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(key); setSortDir(key === "created_at" ? "desc" : "asc"); }
+  };
+
+  const SortIcon = ({ k }: { k: SortKey }) => {
+    if (sortKey !== k) return <ArrowUpDown className="w-3.5 h-3.5 opacity-50" />;
+    return sortDir === "asc" ? <ArrowUp className="w-3.5 h-3.5" /> : <ArrowDown className="w-3.5 h-3.5" />;
+  };
+
   const clearAll = () => {
     setSearch(""); setClinicId(ALL); setActorId(ALL); setField(ALL); setAction(ALL); setFrom(""); setTo("");
   };
@@ -123,7 +181,7 @@ const AdminClinicAudit = () => {
     };
     const headers = ["Timestamp", "Action", "Clinic", "Editor", "Changed Fields", "Old Values", "New Values"];
     const lines = [headers.join(",")];
-    filtered.forEach((l) => {
+    sorted.forEach((l) => {
       lines.push([
         new Date(l.created_at).toISOString(),
         l.action,
@@ -148,6 +206,19 @@ const AdminClinicAudit = () => {
   const activeCount = [
     search, clinicId !== ALL, actorId !== ALL, field !== ALL, action !== ALL, from, to,
   ].filter(Boolean).length;
+
+  const SortableTh = ({ k, children, className }: { k: SortKey; children: React.ReactNode; className?: string }) => (
+    <TableHead className={className}>
+      <button
+        type="button"
+        onClick={() => toggleSort(k)}
+        className="inline-flex items-center gap-1 font-semibold hover:text-foreground transition-colors"
+      >
+        {children}
+        <SortIcon k={k} />
+      </button>
+    </TableHead>
+  );
 
   return (
     <div>
@@ -199,14 +270,14 @@ const AdminClinicAudit = () => {
           <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
         </div>
         <div className="flex items-center justify-between text-sm text-muted-foreground gap-2 flex-wrap">
-          <span>{filtered.length} of {logs.length} entries{activeCount > 0 && ` · ${activeCount} filter${activeCount > 1 ? "s" : ""} active`}</span>
+          <span>{sorted.length} of {logs.length} entries{activeCount > 0 && ` · ${activeCount} filter${activeCount > 1 ? "s" : ""} active`}</span>
           <div className="flex items-center gap-2">
             {activeCount > 0 && (
               <Button size="sm" variant="ghost" onClick={clearAll}>
                 <X className="w-4 h-4 mr-1" />Clear
               </Button>
             )}
-            <Button size="sm" variant="outline" onClick={exportCsv} disabled={filtered.length === 0}>
+            <Button size="sm" variant="outline" onClick={exportCsv} disabled={sorted.length === 0}>
               <Download className="w-4 h-4 mr-1" />Export CSV
             </Button>
           </div>
@@ -215,47 +286,84 @@ const AdminClinicAudit = () => {
 
       {loading ? (
         <p className="text-muted-foreground text-center py-8">Loading…</p>
-      ) : filtered.length === 0 ? (
+      ) : sorted.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">No matching entries.</p>
       ) : (
-        <div className="grid gap-3">
-          {filtered.map((l) => (
-            <Card key={l.id} className="p-4 border-border bg-card">
-              <div className="flex items-start gap-4 flex-wrap">
-                <Badge className={actionColor[l.action] || ""}>{l.action}</Badge>
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold">{l.clinic_name || "(unnamed)"}</div>
-                  <div className="text-sm text-muted-foreground">
-                    by <span className="font-medium text-foreground">{actors[l.actor_id || ""] || "System"}</span>
-                    {" · "}
-                    <span title={new Date(l.created_at).toLocaleString()}>
+        <Card className="border-border bg-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <SortableTh k="created_at" className="w-[180px]">When</SortableTh>
+                  <SortableTh k="action" className="w-[110px]">Action</SortableTh>
+                  <SortableTh k="clinic_name">Clinic</SortableTh>
+                  <SortableTh k="actor" className="w-[180px]">Editor</SortableTh>
+                  <SortableTh k="changed_fields">Changes</SortableTh>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pageRows.map((l) => (
+                  <TableRow key={l.id}>
+                    <TableCell className="text-sm text-muted-foreground align-top" title={new Date(l.created_at).toLocaleString()}>
                       {formatDistanceToNow(new Date(l.created_at), { addSuffix: true })}
-                    </span>
-                  </div>
-                  {l.action === "update" && l.changed_fields && l.changed_fields.length > 0 && (
-                    <div className="mt-3 space-y-1">
-                      {l.changed_fields.map((f) => (
-                        <div key={f} className="text-sm">
-                          <span className="font-medium">{f}:</span>{" "}
-                          <span className="text-muted-foreground line-through">
-                            {String(l.old_values?.[f] ?? "—")}
-                          </span>{" "}
-                          →{" "}
-                          <span className="text-foreground">{String(l.new_values?.[f] ?? "—")}</span>
+                    </TableCell>
+                    <TableCell className="align-top">
+                      <Badge className={actionColor[l.action] || ""}>{l.action}</Badge>
+                    </TableCell>
+                    <TableCell className="font-medium align-top">{l.clinic_name || "(unnamed)"}</TableCell>
+                    <TableCell className="text-sm align-top">{actors[l.actor_id || ""] || "System"}</TableCell>
+                    <TableCell className="align-top">
+                      {l.action === "update" && l.changed_fields && l.changed_fields.length > 0 && (
+                        <div className="space-y-1">
+                          {l.changed_fields.map((f) => (
+                            <div key={f} className="text-sm">
+                              <span className="font-medium">{f}:</span>{" "}
+                              <span className="text-muted-foreground line-through">
+                                {String(l.old_values?.[f] ?? "—")}
+                              </span>{" "}
+                              →{" "}
+                              <span className="text-foreground">{String(l.new_values?.[f] ?? "—")}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  )}
-                  {l.action === "create" && l.new_values && (
-                    <div className="mt-2 text-sm text-muted-foreground">
-                      {[l.new_values.address, l.new_values.phone].filter(Boolean).join(" • ")}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+                      )}
+                      {l.action === "create" && l.new_values && (
+                        <div className="text-sm text-muted-foreground">
+                          {[l.new_values.address, l.new_values.phone].filter(Boolean).join(" • ") || "Created"}
+                        </div>
+                      )}
+                      {l.action === "delete" && (
+                        <div className="text-sm text-muted-foreground">Removed</div>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 p-3 border-t border-border flex-wrap">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>Rows per page</span>
+              <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+                <SelectTrigger className="h-8 w-[80px]"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-popover">
+                  {PAGE_SIZES.map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <span className="ml-2">
+                {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, sorted.length)} of {sorted.length}
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button size="sm" variant="outline" onClick={() => setPage(1)} disabled={currentPage === 1}>« First</Button>
+              <Button size="sm" variant="outline" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Prev</Button>
+              <span className="text-sm px-2">Page {currentPage} of {totalPages}</span>
+              <Button size="sm" variant="outline" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Next ›</Button>
+              <Button size="sm" variant="outline" onClick={() => setPage(totalPages)} disabled={currentPage === totalPages}>Last »</Button>
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );
