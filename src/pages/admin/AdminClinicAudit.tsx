@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
-import { Search, X } from "lucide-react";
+import { Search, X, Download } from "lucide-react";
 
 type LogRow = {
   id: string;
@@ -116,6 +116,35 @@ const AdminClinicAudit = () => {
     setSearch(""); setClinicId(ALL); setActorId(ALL); setField(ALL); setAction(ALL); setFrom(""); setTo("");
   };
 
+  const exportCsv = () => {
+    const esc = (v: unknown) => {
+      const s = v == null ? "" : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ["Timestamp", "Action", "Clinic", "Editor", "Changed Fields", "Old Values", "New Values"];
+    const lines = [headers.join(",")];
+    filtered.forEach((l) => {
+      lines.push([
+        new Date(l.created_at).toISOString(),
+        l.action,
+        l.clinic_name || "",
+        actors[l.actor_id || ""] || "",
+        (l.changed_fields || []).join("; "),
+        l.old_values ? JSON.stringify(l.old_values) : "",
+        l.new_values ? JSON.stringify(l.new_values) : "",
+      ].map(esc).join(","));
+    });
+    const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clinic-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const activeCount = [
     search, clinicId !== ALL, actorId !== ALL, field !== ALL, action !== ALL, from, to,
   ].filter(Boolean).length;
@@ -169,13 +198,18 @@ const AdminClinicAudit = () => {
           <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
           <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
         </div>
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-muted-foreground gap-2 flex-wrap">
           <span>{filtered.length} of {logs.length} entries{activeCount > 0 && ` · ${activeCount} filter${activeCount > 1 ? "s" : ""} active`}</span>
-          {activeCount > 0 && (
-            <Button size="sm" variant="ghost" onClick={clearAll}>
-              <X className="w-4 h-4 mr-1" />Clear
+          <div className="flex items-center gap-2">
+            {activeCount > 0 && (
+              <Button size="sm" variant="ghost" onClick={clearAll}>
+                <X className="w-4 h-4 mr-1" />Clear
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={exportCsv} disabled={filtered.length === 0}>
+              <Download className="w-4 h-4 mr-1" />Export CSV
             </Button>
-          )}
+          </div>
         </div>
       </Card>
 
