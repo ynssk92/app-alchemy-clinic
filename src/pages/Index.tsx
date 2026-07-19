@@ -63,21 +63,21 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 animate-pulse">
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-medium">Your Health, Simplified</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="reveal text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight" style={{ transitionDelay: "80ms" }}>
               Book Healthcare Appointments in{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 Seconds
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="reveal text-xl text-muted-foreground mb-8" style={{ transitionDelay: "160ms" }}>
               Connect with top doctors, manage appointments, and take control of your health
               journey—all in one beautiful, easy-to-use platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="reveal flex flex-col sm:flex-row gap-4 justify-center" style={{ transitionDelay: "240ms" }}>
               <Link to="/doctors">
                 <Button size="lg" className="text-lg px-8 shadow-medium hover:shadow-large transition-all">
                   Find a Doctor
@@ -93,6 +93,7 @@ const Index = () => {
           </div>
         </div>
       </section>
+
 
       {/* Features Section */}
       <section className="py-20 bg-muted/30">
