@@ -26,7 +26,14 @@ const AdminPatients = () => {
     setRows((profiles || []).map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] })));
 
     const { data: inv } = await supabase.from("admin_invites").select("*").order("created_at", { ascending: false });
-    setInvites((inv || []) as Invite[]);
+    const invList = (inv || []) as any[];
+    const claimedIds = invList.map((i) => i.claimed_by).filter(Boolean);
+    let nameMap = new Map<string, string>();
+    if (claimedIds.length) {
+      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", claimedIds);
+      (profs || []).forEach((p: any) => nameMap.set(p.id, p.full_name));
+    }
+    setInvites(invList.map((i) => ({ ...i, full_name: i.claimed_by ? nameMap.get(i.claimed_by) : null })));
   };
 
   useEffect(() => { load(); }, []);
