@@ -17,6 +17,7 @@ export type Database = {
       admin_invites: {
         Row: {
           claimed_at: string | null
+          claimed_by: string | null
           created_at: string
           email: string
           id: string
@@ -24,6 +25,7 @@ export type Database = {
         }
         Insert: {
           claimed_at?: string | null
+          claimed_by?: string | null
           created_at?: string
           email: string
           id?: string
@@ -31,6 +33,7 @@ export type Database = {
         }
         Update: {
           claimed_at?: string | null
+          claimed_by?: string | null
           created_at?: string
           email?: string
           id?: string

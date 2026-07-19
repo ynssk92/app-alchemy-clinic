@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type P = { id: string; full_name: string | null; phone: string | null; created_at: string; roles: string[] };
-type Invite = { id: string; email: string; claimed_at: string | null; created_at: string };
+type Invite = { id: string; email: string; claimed_at: string | null; created_at: string; full_name?: string | null };
 
 const AdminPatients = () => {
   const [rows, setRows] = useState<P[]>([]);
@@ -26,7 +26,14 @@ const AdminPatients = () => {
     setRows((profiles || []).map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] })));
 
     const { data: inv } = await supabase.from("admin_invites").select("*").order("created_at", { ascending: false });
-    setInvites((inv || []) as Invite[]);
+    const invList = (inv || []) as any[];
+    const claimedIds = invList.map((i) => i.claimed_by).filter(Boolean);
+    let nameMap = new Map<string, string>();
+    if (claimedIds.length) {
+      const { data: profs } = await supabase.from("profiles").select("id, full_name").in("id", claimedIds);
+      (profs || []).forEach((p: any) => nameMap.set(p.id, p.full_name));
+    }
+    setInvites(invList.map((i) => ({ ...i, full_name: i.claimed_by ? nameMap.get(i.claimed_by) : null })));
   };
 
   useEffect(() => { load(); }, []);
@@ -102,7 +109,7 @@ const AdminPatients = () => {
           {invites.map((i) => (
             <div key={i.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/40">
               <div className="flex-1">
-                <div className="font-medium">{i.email}</div>
+                <div className="font-medium">{i.claimed_at ? (i.full_name || "Unnamed admin") : i.email}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                   {i.claimed_at ? (
                     <><Check className="w-3 h-3 text-green-600" /> Claimed {new Date(i.claimed_at).toLocaleDateString()}</>
