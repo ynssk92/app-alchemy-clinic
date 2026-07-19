@@ -169,13 +169,18 @@ const AdminClinicAudit = () => {
           <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} aria-label="From date" />
           <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} aria-label="To date" />
         </div>
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-sm text-muted-foreground gap-2 flex-wrap">
           <span>{filtered.length} of {logs.length} entries{activeCount > 0 && ` · ${activeCount} filter${activeCount > 1 ? "s" : ""} active`}</span>
-          {activeCount > 0 && (
-            <Button size="sm" variant="ghost" onClick={clearAll}>
-              <X className="w-4 h-4 mr-1" />Clear
+          <div className="flex items-center gap-2">
+            {activeCount > 0 && (
+              <Button size="sm" variant="ghost" onClick={clearAll}>
+                <X className="w-4 h-4 mr-1" />Clear
+              </Button>
+            )}
+            <Button size="sm" variant="outline" onClick={exportCsv} disabled={filtered.length === 0}>
+              <Download className="w-4 h-4 mr-1" />Export CSV
             </Button>
-          )}
+          </div>
         </div>
       </Card>
 
