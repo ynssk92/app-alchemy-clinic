@@ -1,11 +1,13 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home, ShieldCheck, Zap, Mail, CalendarCheck, UserPlus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
+
 
 const links = [
   { to: "/admin", icon: LayoutDashboard, label: "Overview", end: true },
@@ -74,10 +76,40 @@ const AdminLayout = () => {
       </aside>
 
       <main className="flex-1 overflow-auto">
+        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" className="gap-2">
+                <Zap className="w-4 h-4" />Quick Actions
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-popover">
+              <DropdownMenuLabel>Common tasks</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                <Users className="w-4 h-4 mr-2" />View patients
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/admin/appointments")}>
+                <CalendarCheck className="w-4 h-4 mr-2" />Check appointments
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/admin/doctors")}>
+                <Stethoscope className="w-4 h-4 mr-2" />Add / edit doctors
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "mailto:"}>
+                <Mail className="w-4 h-4 mr-2" />Email support
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
         <div className="p-8">
           <Outlet />
         </div>
       </main>
+
     </div>
   );
 };
