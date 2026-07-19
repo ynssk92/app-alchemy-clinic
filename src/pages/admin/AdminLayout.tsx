@@ -16,6 +16,7 @@ const links = [
   { to: "/admin/patients", icon: Users, label: "Patients" },
   { to: "/admin/specialties", icon: Tag, label: "Specialties" },
   { to: "/admin/clinics", icon: Building2, label: "Clinics" },
+  { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
 ];
 
 const AdminLayout = () => {
