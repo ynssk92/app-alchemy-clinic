@@ -31,6 +31,8 @@ const AdminDoctors = () => {
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<any>(empty);
   const [uploading, setUploading] = useState(false);
+  const [scheduleFor, setScheduleFor] = useState<Doctor | null>(null);
+
 
   const uploadAvatar = async (file: File) => {
     setUploading(true);
