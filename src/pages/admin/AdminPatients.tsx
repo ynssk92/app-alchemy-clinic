@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 type P = { id: string; full_name: string | null; phone: string | null; created_at: string; roles: string[] };
-type Invite = { id: string; email: string; claimed_at: string | null; created_at: string };
+type Invite = { id: string; email: string; claimed_at: string | null; created_at: string; full_name?: string | null };
 
 const AdminPatients = () => {
   const [rows, setRows] = useState<P[]>([]);
