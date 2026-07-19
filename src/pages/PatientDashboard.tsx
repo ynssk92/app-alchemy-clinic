@@ -50,6 +50,7 @@ const PatientDashboard = () => {
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/doctors"><Button variant="ghost">Find Doctors</Button></Link>
+            <Link to="/profile"><Button variant="ghost">Profile</Button></Link>
             {isAdmin && <Link to="/admin"><Button variant="secondary">Admin Panel</Button></Link>}
             <Button variant="outline" onClick={signOut}><LogOut className="w-4 h-4 mr-2" />Sign Out</Button>
           </div>
