@@ -242,9 +242,13 @@ const AdminDoctors = () => {
                   {d.clinics?.name || "No clinic"} • {d.experience_years || 0} years
                 </p>
               </div>
+              <Button size="sm" variant="outline" onClick={() => setScheduleFor(d)} title="Manage schedule">
+                <CalendarClock className="w-4 h-4" />
+              </Button>
               <Button size="sm" variant="outline" onClick={() => openEdit(d)}><Pencil className="w-4 h-4" /></Button>
               <Button size="sm" variant="outline" onClick={() => remove(d.id)}><Trash2 className="w-4 h-4" /></Button>
             </Card>
+
           ))}
           {rows.length === 0 && <p className="text-muted-foreground text-center py-8">No doctors yet.</p>}
         </div>
