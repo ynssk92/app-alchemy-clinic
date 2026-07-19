@@ -23,12 +23,16 @@ const Index = () => {
             <img src={logo} alt="HealthBook Logo" className="h-10" />
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <Link
-              to="/"
+            <a
+              href="#home"
+              onClick={(e) => {
+                e.preventDefault();
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
               className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
             >
               Home
-            </Link>
+            </a>
             <Link
               to="/doctors"
               className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
@@ -48,6 +52,7 @@ const Index = () => {
               Contact
             </a>
           </div>
+
           <div className="flex items-center gap-3">
             <Link to="/auth">
               <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5">
@@ -59,7 +64,8 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section id="home" className="relative overflow-hidden scroll-mt-20">
+
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center">
@@ -96,7 +102,7 @@ const Index = () => {
 
 
       {/* Features Section */}
-      <section className="py-20 bg-muted/30">
+      <section id="features" className="py-20 bg-muted/30 scroll-mt-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16 reveal">
             <h2 className="text-4xl font-bold text-foreground mb-4">
@@ -133,7 +139,7 @@ const Index = () => {
 
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-primary relative overflow-hidden">
+      <section id="contact" className="py-20 bg-gradient-primary relative overflow-hidden scroll-mt-20">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-3xl" />
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl" />
