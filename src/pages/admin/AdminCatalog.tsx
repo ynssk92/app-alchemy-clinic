@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil, X, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -16,6 +16,8 @@ type Props = {
 const SimpleCrud = ({ table, title, subtitle, fields }: Props) => {
   const [rows, setRows] = useState<any[]>([]);
   const [form, setForm] = useState<Record<string, string>>(Object.fromEntries(fields.map((f) => [f.key, ""])));
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<Record<string, string>>({});
 
   const load = async () => {
     const { data } = await supabase.from(table).select("*").order("created_at", { ascending: false });
@@ -30,6 +32,26 @@ const SimpleCrud = ({ table, title, subtitle, fields }: Props) => {
     if (error) return toast.error(error.message);
     toast.success("Added");
     setForm(Object.fromEntries(fields.map((f) => [f.key, ""])));
+    load();
+  };
+
+  const startEdit = (r: any) => {
+    setEditingId(r.id);
+    setEditForm(Object.fromEntries(fields.map((f) => [f.key, r[f.key] ?? ""])));
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditForm({});
+  };
+
+  const saveEdit = async (id: string) => {
+    if (!editForm.name?.trim()) return toast.error("Name required");
+    const payload = Object.fromEntries(Object.entries(editForm).map(([k, v]) => [k, v || null]));
+    const { error } = await supabase.from(table).update(payload as any).eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success("Updated");
+    cancelEdit();
     load();
   };
 
@@ -61,16 +83,33 @@ const SimpleCrud = ({ table, title, subtitle, fields }: Props) => {
 
       <div className="grid gap-3">
         {rows.map((r) => (
-          <Card key={r.id} className="p-4 flex items-center gap-4 border-border bg-card">
-            <div className="flex-1">
-              <h3 className="font-bold">{r.name}</h3>
-              {(r.address || r.phone) && (
-                <p className="text-sm text-muted-foreground">
-                  {[r.address, r.phone].filter(Boolean).join(" • ")}
-                </p>
-              )}
-            </div>
-            <Button size="sm" variant="outline" onClick={() => remove(r.id)}><Trash2 className="w-4 h-4" /></Button>
+          <Card key={r.id} className="p-4 border-border bg-card">
+            {editingId === r.id ? (
+              <div className="flex gap-2 items-end flex-wrap">
+                {fields.map((f) => (
+                  <div key={f.key} className="flex-1 min-w-40">
+                    <label className="text-sm font-medium mb-1 block">{f.label}</label>
+                    <Input placeholder={f.placeholder} value={editForm[f.key] || ""}
+                      onChange={(e) => setEditForm({ ...editForm, [f.key]: e.target.value })} />
+                  </div>
+                ))}
+                <Button size="sm" onClick={() => saveEdit(r.id)}><Check className="w-4 h-4 mr-1" />Save</Button>
+                <Button size="sm" variant="outline" onClick={cancelEdit}><X className="w-4 h-4" /></Button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <div className="flex-1">
+                  <h3 className="font-bold">{r.name}</h3>
+                  {(r.address || r.phone) && (
+                    <p className="text-sm text-muted-foreground">
+                      {[r.address, r.phone].filter(Boolean).join(" • ")}
+                    </p>
+                  )}
+                </div>
+                <Button size="sm" variant="outline" onClick={() => startEdit(r)}><Pencil className="w-4 h-4" /></Button>
+                <Button size="sm" variant="outline" onClick={() => remove(r.id)}><Trash2 className="w-4 h-4" /></Button>
+              </div>
+            )}
           </Card>
         ))}
         {rows.length === 0 && <p className="text-muted-foreground text-center py-8">Nothing yet.</p>}
