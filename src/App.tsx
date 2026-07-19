@@ -43,6 +43,7 @@ const App = () => (
               <Route path="patients" element={<AdminPatients />} />
               <Route path="specialties" element={<AdminSpecialties />} />
               <Route path="clinics" element={<AdminClinics />} />
+              <Route path="clinics/audit" element={<AdminClinicAudit />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
