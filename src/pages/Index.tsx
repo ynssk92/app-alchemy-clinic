@@ -139,19 +139,20 @@ const Index = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center relative">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="reveal text-4xl font-bold text-white mb-4">
             Ready to Transform Your Healthcare Experience?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="reveal text-xl text-white/90 mb-8 max-w-2xl mx-auto" style={{ transitionDelay: "100ms" }}>
             Join thousands of patients who have simplified their healthcare journey
           </p>
-          <Link to="/auth">
+          <Link to="/auth" className="reveal inline-block" style={{ transitionDelay: "200ms" }}>
             <Button size="lg" variant="secondary" className="text-lg px-8 shadow-large">
               Get Started Free
               <Sparkles className="ml-2 w-5 h-5" />
             </Button>
           </Link>
         </div>
+
       </section>
 
       {/* Footer */}
