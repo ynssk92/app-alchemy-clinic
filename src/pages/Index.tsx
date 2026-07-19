@@ -4,10 +4,13 @@ import { Calendar, Clock, Shield, Sparkles, TrendingUp, Users } from "lucide-rea
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const Index = () => {
+  useScrollReveal();
   return (
     <div className="min-h-screen bg-background">
+
       <Seo
         title="HealthBook — Book Healthcare Appointments in Seconds"
         description="Find and book appointments with verified doctors instantly. Manage your health records, get reminders, and take control of your care."
@@ -60,21 +63,21 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6 animate-pulse">
+            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-medium">Your Health, Simplified</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h1 className="reveal text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight" style={{ transitionDelay: "80ms" }}>
               Book Healthcare Appointments in{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 Seconds
               </span>
             </h1>
-            <p className="text-xl text-muted-foreground mb-8">
+            <p className="reveal text-xl text-muted-foreground mb-8" style={{ transitionDelay: "160ms" }}>
               Connect with top doctors, manage appointments, and take control of your health
               journey—all in one beautiful, easy-to-use platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="reveal flex flex-col sm:flex-row gap-4 justify-center" style={{ transitionDelay: "240ms" }}>
               <Link to="/doctors">
                 <Button size="lg" className="text-lg px-8 shadow-medium hover:shadow-large transition-all">
                   Find a Doctor
@@ -91,10 +94,11 @@ const Index = () => {
         </div>
       </section>
 
+
       {/* Features Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 reveal">
             <h2 className="text-4xl font-bold text-foreground mb-4">
               Everything You Need for Better Healthcare
             </h2>
@@ -103,68 +107,30 @@ const Index = () => {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mb-4">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Easy Booking</h3>
-              <p className="text-muted-foreground">
-                Find and book appointments with top doctors in just a few clicks. No phone calls, no hassle.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Smart Reminders</h3>
-              <p className="text-muted-foreground">
-                Never miss an appointment with intelligent reminders and real-time notifications.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Secure Records</h3>
-              <p className="text-muted-foreground">
-                Your health records are encrypted and accessible only to you and your doctors.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Top Doctors</h3>
-              <p className="text-muted-foreground">
-                Access a network of verified, experienced healthcare professionals in your area.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Health Insights</h3>
-              <p className="text-muted-foreground">
-                Track your health journey with personalized insights and recommendations.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Gamified Experience</h3>
-              <p className="text-muted-foreground">
-                Earn points and achievements for maintaining healthy habits and regular checkups.
-              </p>
-            </Card>
+            {[
+              { icon: Calendar, bg: "bg-gradient-primary", title: "Easy Booking", desc: "Find and book appointments with top doctors in just a few clicks. No phone calls, no hassle." },
+              { icon: Clock, bg: "bg-gradient-accent", title: "Smart Reminders", desc: "Never miss an appointment with intelligent reminders and real-time notifications." },
+              { icon: Shield, bg: "bg-secondary", title: "Secure Records", desc: "Your health records are encrypted and accessible only to you and your doctors." },
+              { icon: Users, bg: "bg-primary", title: "Top Doctors", desc: "Access a network of verified, experienced healthcare professionals in your area." },
+              { icon: TrendingUp, bg: "bg-gradient-primary", title: "Health Insights", desc: "Track your health journey with personalized insights and recommendations." },
+              { icon: Sparkles, bg: "bg-gradient-accent", title: "Gamified Experience", desc: "Earn points and achievements for maintaining healthy habits and regular checkups." },
+            ].map((f, i) => (
+              <Card
+                key={f.title}
+                className="reveal reveal-scale p-6 hover:shadow-medium hover:-translate-y-1 transition-all cursor-pointer border-border bg-card"
+                style={{ transitionDelay: `${i * 90}ms` }}
+              >
+                <div className={`w-12 h-12 ${f.bg} rounded-xl flex items-center justify-center mb-4`}>
+                  <f.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-card-foreground mb-2">{f.title}</h3>
+                <p className="text-muted-foreground">{f.desc}</p>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
+
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-primary relative overflow-hidden">
@@ -173,19 +139,20 @@ const Index = () => {
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-white rounded-full blur-3xl" />
         </div>
         <div className="container mx-auto px-4 text-center relative">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="reveal text-4xl font-bold text-white mb-4">
             Ready to Transform Your Healthcare Experience?
           </h2>
-          <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+          <p className="reveal text-xl text-white/90 mb-8 max-w-2xl mx-auto" style={{ transitionDelay: "100ms" }}>
             Join thousands of patients who have simplified their healthcare journey
           </p>
-          <Link to="/auth">
+          <Link to="/auth" className="reveal inline-block" style={{ transitionDelay: "200ms" }}>
             <Button size="lg" variant="secondary" className="text-lg px-8 shadow-large">
               Get Started Free
               <Sparkles className="ml-2 w-5 h-5" />
             </Button>
           </Link>
         </div>
+
       </section>
 
       {/* Footer */}
