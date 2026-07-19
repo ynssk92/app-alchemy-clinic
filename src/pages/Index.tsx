@@ -4,10 +4,13 @@ import { Calendar, Clock, Shield, Sparkles, TrendingUp, Users } from "lucide-rea
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 const Index = () => {
+  useScrollReveal();
   return (
     <div className="min-h-screen bg-background">
+
       <Seo
         title="HealthBook — Book Healthcare Appointments in Seconds"
         description="Find and book appointments with verified doctors instantly. Manage your health records, get reminders, and take control of your care."
