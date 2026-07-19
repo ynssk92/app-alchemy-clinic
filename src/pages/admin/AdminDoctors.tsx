@@ -306,7 +306,14 @@ const AdminDoctors = () => {
           <DialogFooter><Button onClick={save}>Save</Button></DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DoctorScheduleDialog
+        doctorId={scheduleFor?.id ?? null}
+        doctorName={scheduleFor?.full_name}
+        onClose={() => setScheduleFor(null)}
+      />
     </div>
+
   );
 };
 
