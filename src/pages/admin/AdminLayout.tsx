@@ -76,10 +76,40 @@ const AdminLayout = () => {
       </aside>
 
       <main className="flex-1 overflow-auto">
+        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm" className="gap-2">
+                <Zap className="w-4 h-4" />Quick Actions
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-popover">
+              <DropdownMenuLabel>Common tasks</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                <Users className="w-4 h-4 mr-2" />View patients
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/admin/appointments")}>
+                <CalendarCheck className="w-4 h-4 mr-2" />Check appointments
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate("/admin/doctors")}>
+                <Stethoscope className="w-4 h-4 mr-2" />Add / edit doctors
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = "mailto:"}>
+                <Mail className="w-4 h-4 mr-2" />Email support
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </header>
         <div className="p-8">
           <Outlet />
         </div>
       </main>
+
     </div>
   );
 };
