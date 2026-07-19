@@ -116,6 +116,35 @@ const AdminClinicAudit = () => {
     setSearch(""); setClinicId(ALL); setActorId(ALL); setField(ALL); setAction(ALL); setFrom(""); setTo("");
   };
 
+  const exportCsv = () => {
+    const esc = (v: unknown) => {
+      const s = v == null ? "" : String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const headers = ["Timestamp", "Action", "Clinic", "Editor", "Changed Fields", "Old Values", "New Values"];
+    const lines = [headers.join(",")];
+    filtered.forEach((l) => {
+      lines.push([
+        new Date(l.created_at).toISOString(),
+        l.action,
+        l.clinic_name || "",
+        actors[l.actor_id || ""] || "",
+        (l.changed_fields || []).join("; "),
+        l.old_values ? JSON.stringify(l.old_values) : "",
+        l.new_values ? JSON.stringify(l.new_values) : "",
+      ].map(esc).join(","));
+    });
+    const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `clinic-audit-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   const activeCount = [
     search, clinicId !== ALL, actorId !== ALL, field !== ALL, action !== ALL, from, to,
   ].filter(Boolean).length;
