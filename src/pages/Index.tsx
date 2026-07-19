@@ -64,7 +64,8 @@ const Index = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section id="home" className="relative overflow-hidden scroll-mt-20">
+
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center">
