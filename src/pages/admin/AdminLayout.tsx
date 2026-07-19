@@ -1,7 +1,9 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 
@@ -15,8 +17,15 @@ const links = [
 ];
 
 const AdminLayout = () => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const [adminName, setAdminName] = useState<string>("");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle()
+      .then(({ data }) => setAdminName(data?.full_name || user.email?.split("@")[0] || "Admin"));
+  }, [user]);
 
   return (
     <div className="min-h-screen flex bg-muted/20">
@@ -24,6 +33,7 @@ const AdminLayout = () => {
         <Link to="/" className="p-6 border-b border-border flex items-center gap-3">
           <img src={logo} alt="HealthBook" className="h-8" />
         </Link>
+
 
         <nav className="flex-1 p-4 space-y-1">
           {links.map((l) => (
