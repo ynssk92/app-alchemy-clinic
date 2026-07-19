@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home, ShieldCheck, Zap, Mail, CalendarCheck, UserPlus } from "lucide-react";
+import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home, ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -16,6 +16,7 @@ const links = [
   { to: "/admin/patients", icon: Users, label: "Patients" },
   { to: "/admin/specialties", icon: Tag, label: "Specialties" },
   { to: "/admin/clinics", icon: Building2, label: "Clinics" },
+  { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
 ];
 
 const AdminLayout = () => {

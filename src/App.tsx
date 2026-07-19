@@ -18,6 +18,7 @@ import AdminDoctors from "./pages/admin/AdminDoctors";
 import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
 import { AdminSpecialties, AdminClinics } from "./pages/admin/AdminCatalog";
+import AdminClinicAudit from "./pages/admin/AdminClinicAudit";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="patients" element={<AdminPatients />} />
               <Route path="specialties" element={<AdminSpecialties />} />
               <Route path="clinics" element={<AdminClinics />} />
+              <Route path="clinics/audit" element={<AdminClinicAudit />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
