@@ -16,15 +16,40 @@ const Index = () => {
       {/* Navigation */}
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 transition-transform duration-300 hover:scale-105">
             <img src={logo} alt="HealthBook Logo" className="h-10" />
-          </div>
-          <div className="flex items-center gap-4">
-            <Link to="/doctors">
-              <Button variant="ghost">Find Doctors</Button>
+          </Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link
+              to="/"
+              className="relative text-sm font-medium text-foreground/80 hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
+            >
+              Home
             </Link>
+            <Link
+              to="/doctors"
+              className="relative text-sm font-medium text-foreground/80 hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
+            >
+              Find Doctors
+            </Link>
+            <a
+              href="#features"
+              className="relative text-sm font-medium text-foreground/80 hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
+            >
+              Features
+            </a>
+            <a
+              href="#contact"
+              className="relative text-sm font-medium text-foreground/80 hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
+            >
+              Contact
+            </a>
+          </div>
+          <div className="flex items-center gap-3">
             <Link to="/auth">
-              <Button>Sign In</Button>
+              <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5">
+                Sign In
+              </Button>
             </Link>
           </div>
         </div>
