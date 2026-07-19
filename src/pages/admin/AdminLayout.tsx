@@ -57,6 +57,12 @@ const AdminLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-border space-y-2">
+          {adminName && (
+            <div className="flex items-center gap-2 px-2 pb-2 text-sm">
+              <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
+              <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+            </div>
+          )}
           <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/")}>
             <Home className="w-4 h-4 mr-2" />View Site
           </Button>
@@ -64,6 +70,7 @@ const AdminLayout = () => {
             <LogOut className="w-4 h-4 mr-2" />Sign Out
           </Button>
         </div>
+
       </aside>
 
       <main className="flex-1 overflow-auto">
