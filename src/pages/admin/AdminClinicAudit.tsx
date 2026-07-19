@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
-import { Search, X } from "lucide-react";
+import { Search, X, Download } from "lucide-react";
 
 type LogRow = {
   id: string;
