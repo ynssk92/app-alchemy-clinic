@@ -98,7 +98,7 @@ const Index = () => {
       {/* Features Section */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 reveal">
             <h2 className="text-4xl font-bold text-foreground mb-4">
               Everything You Need for Better Healthcare
             </h2>
@@ -107,68 +107,30 @@ const Index = () => {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mb-4">
-                <Calendar className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Easy Booking</h3>
-              <p className="text-muted-foreground">
-                Find and book appointments with top doctors in just a few clicks. No phone calls, no hassle.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Smart Reminders</h3>
-              <p className="text-muted-foreground">
-                Never miss an appointment with intelligent reminders and real-time notifications.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Secure Records</h3>
-              <p className="text-muted-foreground">
-                Your health records are encrypted and accessible only to you and your doctors.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Top Doctors</h3>
-              <p className="text-muted-foreground">
-                Access a network of verified, experienced healthcare professionals in your area.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-primary rounded-xl flex items-center justify-center mb-4">
-                <TrendingUp className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Health Insights</h3>
-              <p className="text-muted-foreground">
-                Track your health journey with personalized insights and recommendations.
-              </p>
-            </Card>
-
-            <Card className="p-6 hover:shadow-medium transition-all cursor-pointer border-border bg-card">
-              <div className="w-12 h-12 bg-gradient-accent rounded-xl flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold text-card-foreground mb-2">Gamified Experience</h3>
-              <p className="text-muted-foreground">
-                Earn points and achievements for maintaining healthy habits and regular checkups.
-              </p>
-            </Card>
+            {[
+              { icon: Calendar, bg: "bg-gradient-primary", title: "Easy Booking", desc: "Find and book appointments with top doctors in just a few clicks. No phone calls, no hassle." },
+              { icon: Clock, bg: "bg-gradient-accent", title: "Smart Reminders", desc: "Never miss an appointment with intelligent reminders and real-time notifications." },
+              { icon: Shield, bg: "bg-secondary", title: "Secure Records", desc: "Your health records are encrypted and accessible only to you and your doctors." },
+              { icon: Users, bg: "bg-primary", title: "Top Doctors", desc: "Access a network of verified, experienced healthcare professionals in your area." },
+              { icon: TrendingUp, bg: "bg-gradient-primary", title: "Health Insights", desc: "Track your health journey with personalized insights and recommendations." },
+              { icon: Sparkles, bg: "bg-gradient-accent", title: "Gamified Experience", desc: "Earn points and achievements for maintaining healthy habits and regular checkups." },
+            ].map((f, i) => (
+              <Card
+                key={f.title}
+                className="reveal reveal-scale p-6 hover:shadow-medium hover:-translate-y-1 transition-all cursor-pointer border-border bg-card"
+                style={{ transitionDelay: `${i * 90}ms` }}
+              >
+                <div className={`w-12 h-12 ${f.bg} rounded-xl flex items-center justify-center mb-4`}>
+                  <f.icon className="w-6 h-6 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-card-foreground mb-2">{f.title}</h3>
+                <p className="text-muted-foreground">{f.desc}</p>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
+
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-primary relative overflow-hidden">
