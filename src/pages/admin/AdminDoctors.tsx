@@ -8,9 +8,11 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X, CalendarClock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import DoctorScheduleDialog from "@/components/admin/DoctorScheduleDialog";
+
 
 type Doctor = {
   id: string; full_name: string; bio: string | null; avatar_url: string | null;
@@ -29,6 +31,8 @@ const AdminDoctors = () => {
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<any>(empty);
   const [uploading, setUploading] = useState(false);
+  const [scheduleFor, setScheduleFor] = useState<Doctor | null>(null);
+
 
   const uploadAvatar = async (file: File) => {
     setUploading(true);
@@ -238,9 +242,13 @@ const AdminDoctors = () => {
                   {d.clinics?.name || "No clinic"} • {d.experience_years || 0} years
                 </p>
               </div>
+              <Button size="sm" variant="outline" onClick={() => setScheduleFor(d)} title="Manage schedule">
+                <CalendarClock className="w-4 h-4" />
+              </Button>
               <Button size="sm" variant="outline" onClick={() => openEdit(d)}><Pencil className="w-4 h-4" /></Button>
               <Button size="sm" variant="outline" onClick={() => remove(d.id)}><Trash2 className="w-4 h-4" /></Button>
             </Card>
+
           ))}
           {rows.length === 0 && <p className="text-muted-foreground text-center py-8">No doctors yet.</p>}
         </div>
@@ -298,7 +306,14 @@ const AdminDoctors = () => {
           <DialogFooter><Button onClick={save}>Save</Button></DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <DoctorScheduleDialog
+        doctorId={scheduleFor?.id ?? null}
+        doctorName={scheduleFor?.full_name}
+        onClose={() => setScheduleFor(null)}
+      />
     </div>
+
   );
 };
 
