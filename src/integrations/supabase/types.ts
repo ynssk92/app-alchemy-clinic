@@ -85,6 +85,42 @@ export type Database = {
           },
         ]
       }
+      clinic_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          changed_fields: string[] | null
+          clinic_id: string | null
+          clinic_name: string | null
+          created_at: string
+          id: string
+          new_values: Json | null
+          old_values: Json | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          changed_fields?: string[] | null
+          clinic_id?: string | null
+          clinic_name?: string | null
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          changed_fields?: string[] | null
+          clinic_id?: string | null
+          clinic_name?: string | null
+          created_at?: string
+          id?: string
+          new_values?: Json | null
+          old_values?: Json | null
+        }
+        Relationships: []
+      }
       clinics: {
         Row: {
           address: string | null
