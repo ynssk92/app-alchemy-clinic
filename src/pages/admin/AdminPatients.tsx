@@ -109,7 +109,7 @@ const AdminPatients = () => {
           {invites.map((i) => (
             <div key={i.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/40">
               <div className="flex-1">
-                <div className="font-medium">{i.email}</div>
+                <div className="font-medium">{i.claimed_at ? (i.full_name || "Unnamed admin") : i.email}</div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                   {i.claimed_at ? (
                     <><Check className="w-3 h-3 text-green-600" /> Claimed {new Date(i.claimed_at).toLocaleDateString()}</>
