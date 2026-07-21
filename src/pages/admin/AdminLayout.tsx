@@ -98,7 +98,14 @@ const AdminLayout = () => {
       </aside>
 
       <main className="flex-1 overflow-auto">
-        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end gap-2">
+        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end gap-3">
+          <Link to="/profile" className="flex items-center gap-2 text-sm hover:opacity-80 transition-opacity" title="Edit profile">
+            <Avatar className="w-8 h-8 border border-border">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
+            </Avatar>
+            <span className="font-medium hidden sm:inline">{adminName}</span>
+          </Link>
           <AdminNotifications />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
