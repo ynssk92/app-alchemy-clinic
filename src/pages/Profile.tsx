@@ -54,25 +54,30 @@ const Profile = () => {
       });
   }, [user]);
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file || !user) return;
     if (!file.type.startsWith("image/")) return toast.error("Please choose an image file");
     if (file.size > 5 * 1024 * 1024) return toast.error("Image must be under 5MB");
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
+  const handleCropped = async (blob: Blob) => {
+    if (!user) return;
     setUploading(true);
-    const ext = file.name.split(".").pop() || "png";
-    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const path = `${user.id}/avatar-${Date.now()}.jpg`;
 
     const { error: upErr } = await supabase.storage
       .from("avatars")
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
     if (upErr) {
       setUploading(false);
       return toast.error(upErr.message);
     }
 
-    // Remove previous avatar file
     if (avatarPath && avatarPath !== path) {
       await supabase.storage.from("avatars").remove([avatarPath]);
     }
@@ -86,6 +91,7 @@ const Profile = () => {
 
     setAvatarPath(path);
     await loadAvatar(path);
+    setCropSrc(null);
     toast.success("Profile photo updated!");
   };
 
