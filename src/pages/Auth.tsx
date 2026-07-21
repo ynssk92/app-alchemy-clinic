@@ -16,6 +16,17 @@ const Auth = () => {
   const { user, isAdmin, loading } = useAuth();
   const [busy, setBusy] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+
+  const handleForgot = async () => {
+    if (!loginData.email) return toast.error("Enter your email above, then click Forgot password.");
+    setBusy(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(loginData.email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    toast.success("Password reset email sent. Check your inbox.");
+  };
   const [signupData, setSignupData] = useState({
     name: "",
     email: "",
@@ -94,6 +105,10 @@ const Auth = () => {
                 <Button type="submit" className="w-full mt-6" disabled={busy}>
                   {busy ? "Signing in..." : "Login"}
                 </Button>
+                <button type="button" onClick={handleForgot}
+                  className="w-full text-sm text-primary hover:underline mt-2">
+                  Forgot password?
+                </button>
               </form>
             </TabsContent>
 

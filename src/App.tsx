@@ -8,6 +8,7 @@ import Doctors from "./pages/Doctors";
 import Booking from "./pages/Booking";
 import PatientDashboard from "./pages/PatientDashboard";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/patient-dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/about" element={<About />} />
             <Route path="/soins" element={<Soins />} />
             <Route path="/expertise" element={<Expertise />} />
