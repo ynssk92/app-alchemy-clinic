@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Save } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft, Save, Upload, User as UserIcon } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -22,22 +23,69 @@ const Profile = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const loadAvatar = async (path: string | null) => {
+    if (!path) return setAvatarUrl(null);
+    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 3600);
+    setAvatarUrl(data?.signedUrl || null);
+  };
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("full_name, phone")
+      .select("full_name, phone, avatar_url")
       .eq("id", user.id)
       .maybeSingle()
       .then(({ data }) => {
         setFullName(data?.full_name || "");
         setPhone(data?.phone || "");
+        setAvatarPath(data?.avatar_url || null);
+        loadAvatar(data?.avatar_url || null);
         setLoading(false);
       });
   }, [user]);
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (!file.type.startsWith("image/")) return toast.error("Please choose an image file");
+    if (file.size > 5 * 1024 * 1024) return toast.error("Image must be under 5MB");
+
+    setUploading(true);
+    const ext = file.name.split(".").pop() || "png";
+    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+
+    const { error: upErr } = await supabase.storage
+      .from("avatars")
+      .upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) {
+      setUploading(false);
+      return toast.error(upErr.message);
+    }
+
+    // Remove previous avatar file
+    if (avatarPath && avatarPath !== path) {
+      await supabase.storage.from("avatars").remove([avatarPath]);
+    }
+
+    const { error: updErr } = await supabase
+      .from("profiles")
+      .update({ avatar_url: path })
+      .eq("id", user.id);
+    setUploading(false);
+    if (updErr) return toast.error(updErr.message);
+
+    setAvatarPath(path);
+    await loadAvatar(path);
+    toast.success("Profile photo updated!");
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,11 +104,13 @@ const Profile = () => {
     toast.success("Profile updated!");
   };
 
+  const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
+
   return (
     <div className="min-h-screen bg-background">
       <Seo
         title="Your Profile — HealthBook"
-        description="Update your display name and contact info on HealthBook."
+        description="Update your display name, photo and contact info on HealthBook."
         path="/profile"
       />
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
@@ -77,7 +127,7 @@ const Profile = () => {
       <section className="py-12">
         <div className="container mx-auto px-4 max-w-2xl">
           <h1 className="text-3xl font-bold text-foreground mb-2">Your Profile</h1>
-          <p className="text-muted-foreground mb-8">Update your display name and contact details.</p>
+          <p className="text-muted-foreground mb-8">Update your photo, display name and contact details.</p>
 
           <Card className="p-8 border-border bg-card shadow-large">
             {loading ? (
@@ -85,7 +135,37 @@ const Profile = () => {
                 <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
             ) : (
-              <form onSubmit={handleSave} className="space-y-5">
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <Avatar className="w-24 h-24 border-2 border-border shadow-medium">
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} alt="Profile photo" />
+                    ) : null}
+                    <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
+                      {initials || <UserIcon className="w-8 h-8" />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploading ? "Uploading..." : avatarPath ? "Change photo" : "Upload photo"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">PNG or JPG, up to 5MB.</p>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="email">Email</Label>
                   <Input id="email" value={user?.email || ""} disabled />
