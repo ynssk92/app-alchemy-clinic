@@ -24,7 +24,7 @@ const links = [
 ];
 
 const AdminLayout = () => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAdmin, isAssistant } = useAuth();
   const navigate = useNavigate();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
