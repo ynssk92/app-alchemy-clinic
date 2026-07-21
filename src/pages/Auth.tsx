@@ -93,6 +93,20 @@ const Auth = () => {
     toast.success("Account created! You're signed in.");
   };
 
+  const handleGoogle = async () => {
+    setBusy(true);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      setBusy(false);
+      return toast.error(result.error.message);
+    }
+    if (result.redirected) return;
+    setBusy(false);
+  };
+
+
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <Seo
