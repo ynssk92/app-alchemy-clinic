@@ -69,9 +69,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-              <Sparkles className="w-4 h-4" />
-            </div>
+            
             <h1 className="reveal text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight whitespace-pre-line" style={{ transitionDelay: "80ms" }}>
               Book Your Appointments&nbsp;{"\n"}
               in{" "}
