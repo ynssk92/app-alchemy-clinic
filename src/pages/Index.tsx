@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Calendar, Clock, Shield, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import { Seo } from "@/components/Seo";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
