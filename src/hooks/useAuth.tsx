@@ -6,6 +6,8 @@ type AuthCtx = {
   user: User | null;
   session: Session | null;
   isAdmin: boolean;
+  isAssistant: boolean;
+  isStaff: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -14,6 +16,8 @@ const Ctx = createContext<AuthCtx>({
   user: null,
   session: null,
   isAdmin: false,
+  isAssistant: false,
+  isStaff: false,
   loading: true,
   signOut: async () => {},
 });
@@ -22,16 +26,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAssistant, setIsAssistant] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const loadRole = async (uid: string) => {
     const { data } = await supabase
       .from("user_roles")
       .select("role")
-      .eq("user_id", uid)
-      .eq("role", "admin")
-      .maybeSingle();
-    setIsAdmin(!!data);
+      .eq("user_id", uid);
+    const roles = (data || []).map((r: any) => r.role);
+    setIsAdmin(roles.includes("admin"));
+    setIsAssistant(roles.includes("assistant"));
   };
 
   useEffect(() => {
@@ -42,6 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setTimeout(() => loadRole(s.user.id), 0);
       } else {
         setIsAdmin(false);
+        setIsAssistant(false);
       }
     });
 
