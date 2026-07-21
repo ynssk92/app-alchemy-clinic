@@ -77,8 +77,14 @@ const AdminLayout = () => {
         <div className="p-4 border-t border-border space-y-2">
           {adminName && (
             <div className="flex items-center gap-2 px-2 pb-2 text-sm">
-              <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-              <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+              <Avatar className="w-8 h-8 shrink-0 border border-border">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="flex items-center gap-1 min-w-0">
+                <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
+                <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+              </div>
             </div>
           )}
           <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/")}>
