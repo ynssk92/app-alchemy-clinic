@@ -23,35 +23,25 @@ const Index = () => {
             <img src={logo} alt="HealthBook Logo" className="h-10" />
           </Link>
           <div className="hidden md:flex items-center gap-8">
-            <a
-              href="#home"
-              onClick={(e) => {
-                e.preventDefault();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
-              className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
-            >
-              Home
-            </a>
-            <Link
-              to="/doctors"
-              className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
-            >
-              Find Doctors
-            </Link>
-            <a
-              href="#features"
-              className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
-            >
-              Features
-            </a>
-            <a
-              href="#contact"
-              className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
-            >
-              Contact
-            </a>
+            {[
+              { label: "À Propos", href: "#about" },
+              { label: "Nos Soins", href: "#services" },
+              { label: "Expertise", href: "#expertise" },
+              { label: "L'Équipe", href: "#team" },
+              { label: "FAQ", href: "#faq" },
+              { label: "Blog", href: "#blog" },
+              { label: "Contact", href: "#contact" },
+            ].map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
+              >
+                {item.label}
+              </a>
+            ))}
           </div>
+
 
           <div className="flex items-center gap-3">
             <Link to="/auth">
