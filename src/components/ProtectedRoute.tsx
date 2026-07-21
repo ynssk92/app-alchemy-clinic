@@ -17,6 +17,9 @@ export const ProtectedRoute = ({
     );
   }
   if (!user) return <Navigate to="/auth" replace />;
+  if (!user.email_confirmed_at && !(user as any).confirmed_at) {
+    return <Navigate to="/verify-email" replace />;
+  }
   if (adminOnly && !isAdmin) return <Navigate to="/patient-dashboard" replace />;
   return children;
 };
