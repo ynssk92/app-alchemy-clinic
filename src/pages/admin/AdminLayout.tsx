@@ -12,15 +12,15 @@ import AdminNotifications from "@/components/admin/AdminNotifications";
 
 
 const links = [
-  { to: "/admin", icon: LayoutDashboard, label: "Overview", end: true },
+  { to: "/admin", icon: LayoutDashboard, label: "Overview", end: true, staff: true },
   { to: "/admin/doctors", icon: Stethoscope, label: "Doctors" },
-  { to: "/admin/appointments", icon: Calendar, label: "Appointments" },
+  { to: "/admin/appointments", icon: Calendar, label: "Appointments", staff: true },
   { to: "/admin/patients", icon: Users, label: "Patients" },
   { to: "/admin/specialties", icon: Tag, label: "Specialties" },
   { to: "/admin/clinics", icon: Building2, label: "Clinics" },
   { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
   { to: "/admin/blog", icon: FileText, label: "Blog" },
-  { to: "/admin/messages", icon: Inbox, label: "Messages" },
+  { to: "/admin/messages", icon: Inbox, label: "Messages", staff: true },
 ];
 
 const AdminLayout = () => {
