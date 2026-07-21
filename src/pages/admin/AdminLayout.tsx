@@ -119,19 +119,30 @@ const AdminLayout = () => {
             <DropdownMenuContent align="end" className="w-56 bg-popover">
               <DropdownMenuLabel>Common tasks</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
-                <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
-                <Users className="w-4 h-4 mr-2" />View patients
-              </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                    <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                    <Users className="w-4 h-4 mr-2" />View patients
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuItem onClick={() => navigate("/admin/appointments")}>
                 <CalendarCheck className="w-4 h-4 mr-2" />Check appointments
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/admin/doctors")}>
-                <Stethoscope className="w-4 h-4 mr-2" />Add / edit doctors
+              <DropdownMenuItem onClick={() => navigate("/admin/messages")}>
+                <Inbox className="w-4 h-4 mr-2" />View messages
               </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/admin/doctors")}>
+                    <Stethoscope className="w-4 h-4 mr-2" />Add / edit doctors
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuItem onClick={() => window.location.href = "mailto:"}>
                 <Mail className="w-4 h-4 mr-2" />Email support
               </DropdownMenuItem>
