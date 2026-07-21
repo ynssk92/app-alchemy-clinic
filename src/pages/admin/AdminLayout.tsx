@@ -54,7 +54,7 @@ const AdminLayout = () => {
 
 
         <nav className="flex-1 p-4 space-y-1">
-          {links.map((l) => (
+          {links.filter((l) => isAdmin || l.staff).map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
