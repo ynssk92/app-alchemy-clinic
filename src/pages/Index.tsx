@@ -63,8 +63,10 @@ const Index = () => {
               <Sparkles className="w-4 h-4" />
               <span className="text-sm font-medium">Your Health, Simplified</span>
             </div>
-            <h1 className="reveal text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight" style={{ transitionDelay: "80ms" }}>
-              Book Healthcare Appointments in{" "}
+            <h1 className="reveal text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight whitespace-pre-line" style={{ transitionDelay: "80ms" }}>
+              Book Your&nbsp;{"\n"}
+              Appointments&nbsp;{"\n"}
+              in{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">
                 Seconds
               </span>
