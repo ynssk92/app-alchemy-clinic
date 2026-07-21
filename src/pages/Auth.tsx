@@ -105,6 +105,10 @@ const Auth = () => {
                 <Button type="submit" className="w-full mt-6" disabled={busy}>
                   {busy ? "Signing in..." : "Login"}
                 </Button>
+                <button type="button" onClick={handleForgot}
+                  className="w-full text-sm text-primary hover:underline mt-2">
+                  Forgot password?
+                </button>
               </form>
             </TabsContent>
 
