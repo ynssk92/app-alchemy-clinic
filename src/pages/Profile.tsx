@@ -212,6 +212,13 @@ const Profile = () => {
           </Card>
         </div>
       </section>
+      <AvatarCropDialog
+        open={!!cropSrc}
+        imageSrc={cropSrc}
+        onCancel={() => setCropSrc(null)}
+        onCropped={handleCropped}
+        busy={uploading}
+      />
     </div>
   );
 };
