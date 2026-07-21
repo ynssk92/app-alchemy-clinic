@@ -16,6 +16,8 @@ import Expertise from "./pages/Expertise";
 import Equipe from "./pages/Equipe";
 import Faq from "./pages/Faq";
 import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
+import AdminBlog from "./pages/admin/AdminBlog";
 import Contact from "./pages/Contact";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -49,6 +51,7 @@ const App = () => (
             <Route path="/equipe" element={<Equipe />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
@@ -58,6 +61,7 @@ const App = () => (
               <Route path="specialties" element={<AdminSpecialties />} />
               <Route path="clinics" element={<AdminClinics />} />
               <Route path="clinics/audit" element={<AdminClinicAudit />} />
+              <Route path="blog" element={<AdminBlog />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
