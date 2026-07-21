@@ -18,6 +18,7 @@ const links = [
   { to: "/admin/clinics", icon: Building2, label: "Clinics" },
   { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
   { to: "/admin/blog", icon: FileText, label: "Blog" },
+  { to: "/admin/messages", icon: Inbox, label: "Messages" },
 ];
 
 const AdminLayout = () => {
