@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
+import AdminNotifications from "@/components/admin/AdminNotifications";
 
 
 const links = [
