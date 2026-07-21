@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X, CalendarClock } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X, CalendarClock, CalendarPlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 import DoctorScheduleDialog from "@/components/admin/DoctorScheduleDialog";
 
 
@@ -242,6 +243,11 @@ const AdminDoctors = () => {
                   {d.clinics?.name || "No clinic"} • {d.experience_years || 0} years
                 </p>
               </div>
+              <Link to={`/booking?doctor=${d.id}`}>
+                <Button size="sm" title="Book appointment">
+                  <CalendarPlus className="w-4 h-4" />
+                </Button>
+              </Link>
               <Button size="sm" variant="outline" onClick={() => setScheduleFor(d)} title="Manage schedule">
                 <CalendarClock className="w-4 h-4" />
               </Button>
