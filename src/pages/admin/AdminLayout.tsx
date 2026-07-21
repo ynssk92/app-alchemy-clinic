@@ -27,12 +27,23 @@ const AdminLayout = () => {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const [adminName, setAdminName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle()
-      .then(({ data }) => setAdminName(data?.full_name || user.email?.split("@")[0] || "Admin"));
+    supabase.from("profiles").select("full_name, avatar_url").eq("id", user.id).maybeSingle()
+      .then(async ({ data }) => {
+        setAdminName(data?.full_name || user.email?.split("@")[0] || "Admin");
+        if (data?.avatar_url) {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
+          setAvatarUrl(signed?.signedUrl || null);
+        } else {
+          setAvatarUrl(null);
+        }
+      });
   }, [user]);
+
+  const initials = (adminName || "A").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
 
   return (
     <div className="min-h-screen flex bg-muted/20">
