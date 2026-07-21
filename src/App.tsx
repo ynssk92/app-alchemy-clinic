@@ -10,6 +10,13 @@ import PatientDashboard from "./pages/PatientDashboard";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Soins from "./pages/Soins";
+import Expertise from "./pages/Expertise";
+import Equipe from "./pages/Equipe";
+import Faq from "./pages/Faq";
+import Blog from "./pages/Blog";
+import Contact from "./pages/Contact";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
@@ -36,6 +43,13 @@ const App = () => (
             <Route path="/patient-dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/soins" element={<Soins />} />
+            <Route path="/expertise" element={<Expertise />} />
+            <Route path="/equipe" element={<Equipe />} />
+            <Route path="/faq" element={<Faq />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
               <Route path="doctors" element={<AdminDoctors />} />
