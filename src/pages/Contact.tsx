@@ -6,13 +6,37 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
+import { z } from "zod";
+import { supabase } from "@/integrations/supabase/client";
+
+const schema = z.object({
+  name: z.string().trim().min(1, "Nom requis").max(100),
+  email: z.string().trim().email("Email invalide").max(255),
+  message: z.string().trim().min(1, "Message requis").max(2000),
+});
 
 const Contact = () => {
-  const onSubmit = (e: FormEvent) => {
+  const [busy, setBusy] = useState(false);
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+    const parsed = schema.safeParse({
+      name: fd.get("name"),
+      email: fd.get("email"),
+      message: fd.get("message"),
+    });
+    if (!parsed.success) {
+      return toast.error(parsed.error.issues[0].message);
+    }
+    setBusy(true);
+    const { error } = await supabase.from("contact_messages").insert(parsed.data);
+    setBusy(false);
+    if (error) return toast.error("Envoi impossible. Réessayez plus tard.");
     toast.success("Message envoyé ! Nous vous répondrons rapidement.");
-    (e.target as HTMLFormElement).reset();
+    form.reset();
   };
 
   return (
@@ -47,17 +71,19 @@ const Contact = () => {
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name">Nom complet</Label>
-              <Input id="name" required placeholder="Votre nom" />
+              <Input id="name" name="name" required maxLength={100} placeholder="Votre nom" />
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required placeholder="vous@email.com" />
+              <Input id="email" name="email" type="email" required maxLength={255} placeholder="vous@email.com" />
             </div>
             <div>
               <Label htmlFor="message">Message</Label>
-              <Textarea id="message" required rows={5} placeholder="Comment pouvons-nous vous aider ?" />
+              <Textarea id="message" name="message" required rows={5} maxLength={2000} placeholder="Comment pouvons-nous vous aider ?" />
             </div>
-            <Button type="submit" className="w-full">Envoyer le message</Button>
+            <Button type="submit" className="w-full" disabled={busy}>
+              {busy ? "Envoi..." : "Envoyer le message"}
+            </Button>
           </form>
         </Card>
       </div>
