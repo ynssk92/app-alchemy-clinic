@@ -29,6 +29,7 @@ const Profile = () => {
   const [phone, setPhone] = useState("");
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadAvatar = async (path: string | null) => {
