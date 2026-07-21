@@ -4,11 +4,13 @@ import { useAuth } from "@/hooks/useAuth";
 export const ProtectedRoute = ({
   children,
   adminOnly = false,
+  staffOnly = false,
 }: {
   children: JSX.Element;
   adminOnly?: boolean;
+  staffOnly?: boolean;
 }) => {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isAssistant, loading } = useAuth();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -21,5 +23,6 @@ export const ProtectedRoute = ({
     return <Navigate to="/verify-email" replace />;
   }
   if (adminOnly && !isAdmin) return <Navigate to="/patient-dashboard" replace />;
+  if (staffOnly && !isAdmin && !isAssistant) return <Navigate to="/patient-dashboard" replace />;
   return children;
 };

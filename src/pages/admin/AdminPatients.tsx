@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Shield, ShieldOff, Trash2, Mail, Check, Clock } from "lucide-react";
+import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -38,15 +38,15 @@ const AdminPatients = () => {
 
   useEffect(() => { load(); }, []);
 
-  const toggleAdmin = async (id: string, isAdmin: boolean) => {
-    if (isAdmin) {
-      const { error } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", "admin");
+  const toggleRole = async (id: string, role: "admin" | "assistant", has: boolean) => {
+    if (has) {
+      const { error } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", role);
       if (error) return toast.error(error.message);
-      toast.success("Admin removed");
+      toast.success(`${role} removed`);
     } else {
-      const { error } = await supabase.from("user_roles").insert({ user_id: id, role: "admin" });
+      const { error } = await supabase.from("user_roles").insert({ user_id: id, role });
       if (error) return toast.error(error.message);
-      toast.success("Admin granted");
+      toast.success(`${role} granted`);
     }
     load();
   };
@@ -130,19 +130,24 @@ const AdminPatients = () => {
       <div className="grid gap-3">
         {rows.map((p) => {
           const isAdmin = p.roles.includes("admin");
+          const isAssistant = p.roles.includes("assistant");
           return (
-            <Card key={p.id} className="p-4 flex items-center gap-4 border-border bg-card">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
+            <Card key={p.id} className="p-4 flex items-center gap-4 border-border bg-card flex-wrap">
+              <div className="flex-1 min-w-[200px]">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
                   <h3 className="font-bold">{p.full_name || "Unnamed"}</h3>
                   {isAdmin && <Badge>Admin</Badge>}
+                  {isAssistant && <Badge variant="outline" className="border-primary text-primary">Assistant</Badge>}
                   {p.roles.includes("patient") && <Badge variant="secondary">Patient</Badge>}
                 </div>
                 <p className="text-sm text-muted-foreground">
                   {p.phone || "No phone"} • Joined {new Date(p.created_at).toLocaleDateString()}
                 </p>
               </div>
-              <Button size="sm" variant={isAdmin ? "outline" : "default"} onClick={() => toggleAdmin(p.id, isAdmin)}>
+              <Button size="sm" variant={isAssistant ? "outline" : "secondary"} onClick={() => toggleRole(p.id, "assistant", isAssistant)}>
+                <Headset className="w-4 h-4 mr-2" />{isAssistant ? "Revoke Assistant" : "Make Assistant"}
+              </Button>
+              <Button size="sm" variant={isAdmin ? "outline" : "default"} onClick={() => toggleRole(p.id, "admin", isAdmin)}>
                 {isAdmin ? <><ShieldOff className="w-4 h-4 mr-2" />Revoke Admin</> : <><Shield className="w-4 h-4 mr-2" />Make Admin</>}
               </Button>
               <Button size="sm" variant="outline" onClick={() => remove(p.id)}><Trash2 className="w-4 h-4" /></Button>

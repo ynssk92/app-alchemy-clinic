@@ -12,19 +12,19 @@ import AdminNotifications from "@/components/admin/AdminNotifications";
 
 
 const links = [
-  { to: "/admin", icon: LayoutDashboard, label: "Overview", end: true },
+  { to: "/admin", icon: LayoutDashboard, label: "Overview", end: true, staff: true },
   { to: "/admin/doctors", icon: Stethoscope, label: "Doctors" },
-  { to: "/admin/appointments", icon: Calendar, label: "Appointments" },
+  { to: "/admin/appointments", icon: Calendar, label: "Appointments", staff: true },
   { to: "/admin/patients", icon: Users, label: "Patients" },
   { to: "/admin/specialties", icon: Tag, label: "Specialties" },
   { to: "/admin/clinics", icon: Building2, label: "Clinics" },
   { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
   { to: "/admin/blog", icon: FileText, label: "Blog" },
-  { to: "/admin/messages", icon: Inbox, label: "Messages" },
+  { to: "/admin/messages", icon: Inbox, label: "Messages", staff: true },
 ];
 
 const AdminLayout = () => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAdmin, isAssistant } = useAuth();
   const navigate = useNavigate();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -54,7 +54,7 @@ const AdminLayout = () => {
 
 
         <nav className="flex-1 p-4 space-y-1">
-          {links.map((l) => (
+          {links.filter((l) => isAdmin || l.staff).map((l) => (
             <NavLink
               key={l.to}
               to={l.to}
@@ -84,6 +84,9 @@ const AdminLayout = () => {
               <div className="flex items-center gap-1 min-w-0">
                 <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+                <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground shrink-0">
+                  {isAdmin ? "Admin" : isAssistant ? "Assistant" : ""}
+                </span>
               </div>
             </div>
           )}
@@ -116,19 +119,30 @@ const AdminLayout = () => {
             <DropdownMenuContent align="end" className="w-56 bg-popover">
               <DropdownMenuLabel>Common tasks</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
-                <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
-                <Users className="w-4 h-4 mr-2" />View patients
-              </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                    <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                    <Users className="w-4 h-4 mr-2" />View patients
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuItem onClick={() => navigate("/admin/appointments")}>
                 <CalendarCheck className="w-4 h-4 mr-2" />Check appointments
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate("/admin/doctors")}>
-                <Stethoscope className="w-4 h-4 mr-2" />Add / edit doctors
+              <DropdownMenuItem onClick={() => navigate("/admin/messages")}>
+                <Inbox className="w-4 h-4 mr-2" />View messages
               </DropdownMenuItem>
+              {isAdmin && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/admin/doctors")}>
+                    <Stethoscope className="w-4 h-4 mr-2" />Add / edit doctors
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuItem onClick={() => window.location.href = "mailto:"}>
                 <Mail className="w-4 h-4 mr-2" />Email support
               </DropdownMenuItem>
