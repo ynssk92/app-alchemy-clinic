@@ -58,15 +58,15 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<ProtectedRoute adminOnly><AdminLayout /></ProtectedRoute>}>
+            <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
-              <Route path="doctors" element={<AdminDoctors />} />
+              <Route path="doctors" element={<ProtectedRoute adminOnly><AdminDoctors /></ProtectedRoute>} />
               <Route path="appointments" element={<AdminAppointments />} />
-              <Route path="patients" element={<AdminPatients />} />
-              <Route path="specialties" element={<AdminSpecialties />} />
-              <Route path="clinics" element={<AdminClinics />} />
-              <Route path="clinics/audit" element={<AdminClinicAudit />} />
-              <Route path="blog" element={<AdminBlog />} />
+              <Route path="patients" element={<ProtectedRoute adminOnly><AdminPatients /></ProtectedRoute>} />
+              <Route path="specialties" element={<ProtectedRoute adminOnly><AdminSpecialties /></ProtectedRoute>} />
+              <Route path="clinics" element={<ProtectedRoute adminOnly><AdminClinics /></ProtectedRoute>} />
+              <Route path="clinics/audit" element={<ProtectedRoute adminOnly><AdminClinicAudit /></ProtectedRoute>} />
+              <Route path="blog" element={<ProtectedRoute adminOnly><AdminBlog /></ProtectedRoute>} />
               <Route path="messages" element={<AdminMessages />} />
             </Route>
             <Route path="*" element={<NotFound />} />
