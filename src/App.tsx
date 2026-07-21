@@ -8,6 +8,7 @@ import Doctors from "./pages/Doctors";
 import Booking from "./pages/Booking";
 import PatientDashboard from "./pages/PatientDashboard";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
