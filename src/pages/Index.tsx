@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Calendar, Clock, Shield, Sparkles, TrendingUp, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import logo from "@/assets/logo.png";
+import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import { Seo } from "@/components/Seo";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
@@ -56,6 +57,15 @@ const Index = () => {
       {/* Hero Section */}
       <section id="home" className="relative overflow-hidden scroll-mt-20">
 
+        <video
+          className="absolute inset-0 w-full h-full object-cover"
+          src={heroVideo.url}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
         <div className="absolute inset-0 bg-gradient-hero" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="max-w-3xl mx-auto text-center">
