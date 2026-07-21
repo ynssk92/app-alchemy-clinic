@@ -19,6 +19,7 @@ import Faq from "./pages/Faq";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/admin/AdminBlog";
+import AdminMessages from "./pages/admin/AdminMessages";
 import Contact from "./pages/Contact";
 import { AuthProvider } from "./hooks/useAuth";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="clinics" element={<AdminClinics />} />
               <Route path="clinics/audit" element={<AdminClinicAudit />} />
               <Route path="blog" element={<AdminBlog />} />
+              <Route path="messages" element={<AdminMessages />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
