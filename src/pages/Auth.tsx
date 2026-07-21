@@ -134,6 +134,23 @@ const Auth = () => {
                   className="w-full text-sm text-primary hover:underline mt-2">
                   Forgot password?
                 </button>
+                {resetSentTo && (
+                  <div className="mt-3 rounded-md border border-border bg-muted/40 p-3 text-sm">
+                    <p className="text-muted-foreground">
+                      Reset link sent to <span className="font-medium text-foreground">{resetSentTo}</span>. Didn't get it? Check spam or resend.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleResend}
+                      disabled={busy || resendCooldown > 0}
+                      className="mt-2"
+                    >
+                      {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend reset email"}
+                    </Button>
+                  </div>
+                )}
               </form>
             </TabsContent>
 
