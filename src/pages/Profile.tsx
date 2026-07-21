@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { AvatarCropDialog } from "@/components/AvatarCropDialog";
 import { z } from "zod";
 
 const schema = z.object({
