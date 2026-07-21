@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { AvatarCropDialog } from "@/components/AvatarCropDialog";
 import { z } from "zod";
 
 const schema = z.object({
@@ -28,6 +29,7 @@ const Profile = () => {
   const [phone, setPhone] = useState("");
   const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const loadAvatar = async (path: string | null) => {
@@ -52,25 +54,30 @@ const Profile = () => {
       });
   }, [user]);
 
-  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file || !user) return;
     if (!file.type.startsWith("image/")) return toast.error("Please choose an image file");
     if (file.size > 5 * 1024 * 1024) return toast.error("Image must be under 5MB");
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
+  const handleCropped = async (blob: Blob) => {
+    if (!user) return;
     setUploading(true);
-    const ext = file.name.split(".").pop() || "png";
-    const path = `${user.id}/avatar-${Date.now()}.${ext}`;
+    const path = `${user.id}/avatar-${Date.now()}.jpg`;
 
     const { error: upErr } = await supabase.storage
       .from("avatars")
-      .upload(path, file, { upsert: true, contentType: file.type });
+      .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
     if (upErr) {
       setUploading(false);
       return toast.error(upErr.message);
     }
 
-    // Remove previous avatar file
     if (avatarPath && avatarPath !== path) {
       await supabase.storage.from("avatars").remove([avatarPath]);
     }
@@ -84,6 +91,7 @@ const Profile = () => {
 
     setAvatarPath(path);
     await loadAvatar(path);
+    setCropSrc(null);
     toast.success("Profile photo updated!");
   };
 
@@ -204,6 +212,13 @@ const Profile = () => {
           </Card>
         </div>
       </section>
+      <AvatarCropDialog
+        open={!!cropSrc}
+        imageSrc={cropSrc}
+        onCancel={() => setCropSrc(null)}
+        onCropped={handleCropped}
+        busy={uploading}
+      />
     </div>
   );
 };
