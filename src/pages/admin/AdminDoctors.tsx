@@ -243,6 +243,11 @@ const AdminDoctors = () => {
                   {d.clinics?.name || "No clinic"} • {d.experience_years || 0} years
                 </p>
               </div>
+              <Link to={`/booking?doctor=${d.id}`}>
+                <Button size="sm" title="Book appointment">
+                  <CalendarPlus className="w-4 h-4" />
+                </Button>
+              </Link>
               <Button size="sm" variant="outline" onClick={() => setScheduleFor(d)} title="Manage schedule">
                 <CalendarClock className="w-4 h-4" />
               </Button>
