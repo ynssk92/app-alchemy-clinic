@@ -160,7 +160,7 @@ const Index = () => {
             <div className="flex items-center gap-3 mb-4 md:mb-0">
               <img src={logo} alt="HealthBook Logo" className="h-8" />
             </div>
-            <p className="text-muted-foreground">© 2024 HealthBook. Your health, our priority.</p>
+            <p className="text-muted-foreground">© 2026 HealthBook. Your health, our priority.</p>
           </div>
         </div>
       </footer>
