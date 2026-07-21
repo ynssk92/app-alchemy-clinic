@@ -24,21 +24,21 @@ const Index = () => {
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {[
-              { label: "À Propos", href: "#about" },
-              { label: "Nos Soins", href: "#services" },
-              { label: "Expertise", href: "#expertise" },
-              { label: "L'Équipe", href: "#team" },
-              { label: "FAQ", href: "#faq" },
-              { label: "Blog", href: "#blog" },
-              { label: "Contact", href: "#contact" },
+              { label: "À Propos", to: "/about" },
+              { label: "Nos Soins", to: "/soins" },
+              { label: "Expertise", to: "/expertise" },
+              { label: "L'Équipe", to: "/equipe" },
+              { label: "FAQ", to: "/faq" },
+              { label: "Blog", to: "/blog" },
+              { label: "Contact", to: "/contact" },
             ].map((item) => (
-              <a
+              <Link
                 key={item.label}
-                href={item.href}
+                to={item.to}
                 className="relative text-sm font-bold text-foreground hover:text-primary transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:scale-x-0 after:origin-right hover:after:scale-x-100 hover:after:origin-left after:transition-transform after:duration-300"
               >
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
 
