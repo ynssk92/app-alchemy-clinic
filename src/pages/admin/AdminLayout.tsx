@@ -5,6 +5,7 @@ import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, 
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
@@ -26,12 +27,23 @@ const AdminLayout = () => {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const [adminName, setAdminName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle()
-      .then(({ data }) => setAdminName(data?.full_name || user.email?.split("@")[0] || "Admin"));
+    supabase.from("profiles").select("full_name, avatar_url").eq("id", user.id).maybeSingle()
+      .then(async ({ data }) => {
+        setAdminName(data?.full_name || user.email?.split("@")[0] || "Admin");
+        if (data?.avatar_url) {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
+          setAvatarUrl(signed?.signedUrl || null);
+        } else {
+          setAvatarUrl(null);
+        }
+      });
   }, [user]);
+
+  const initials = (adminName || "A").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
 
   return (
     <div className="min-h-screen flex bg-muted/20">
@@ -65,8 +77,14 @@ const AdminLayout = () => {
         <div className="p-4 border-t border-border space-y-2">
           {adminName && (
             <div className="flex items-center gap-2 px-2 pb-2 text-sm">
-              <ShieldCheck className="w-4 h-4 text-primary shrink-0" />
-              <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+              <Avatar className="w-8 h-8 shrink-0 border border-border">
+                {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
+                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="flex items-center gap-1 min-w-0">
+                <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
+                <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+              </div>
             </div>
           )}
           <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/")}>
@@ -80,7 +98,14 @@ const AdminLayout = () => {
       </aside>
 
       <main className="flex-1 overflow-auto">
-        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end gap-2">
+        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end gap-3">
+          <Link to="/profile" className="flex items-center gap-2 text-sm hover:opacity-80 transition-opacity" title="Edit profile">
+            <Avatar className="w-8 h-8 border border-border">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
+            </Avatar>
+            <span className="font-medium hidden sm:inline">{adminName}</span>
+          </Link>
           <AdminNotifications />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
