@@ -61,7 +61,11 @@ const Auth = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate(isAdmin ? "/admin" : "/patient-dashboard", { replace: true });
+      if (!user.email_confirmed_at) {
+        navigate("/verify-email", { replace: true });
+      } else {
+        navigate(isAdmin ? "/admin" : "/patient-dashboard", { replace: true });
+      }
     }
   }, [user, isAdmin, loading, navigate]);
 
@@ -80,7 +84,7 @@ const Auth = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: signupData.email,
       password: signupData.password,
       options: {
@@ -90,7 +94,12 @@ const Auth = () => {
     });
     setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success("Account created! You're signed in.");
+    if (data.user && !data.user.email_confirmed_at) {
+      toast.success("Account created! Check your email to verify.");
+      navigate("/verify-email", { replace: true });
+      return;
+    }
+    toast.success("Account created!");
   };
 
   const handleGoogle = async () => {
