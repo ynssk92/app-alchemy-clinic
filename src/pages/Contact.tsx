@@ -32,7 +32,8 @@ const Contact = () => {
       return toast.error(parsed.error.issues[0].message);
     }
     setBusy(true);
-    const { error } = await supabase.from("contact_messages").insert(parsed.data);
+    const { name, email, message } = parsed.data;
+    const { error } = await supabase.from("contact_messages").insert({ name: name!, email: email!, message: message! });
     setBusy(false);
     if (error) return toast.error("Envoi impossible. Réessayez plus tard.");
     toast.success("Message envoyé ! Nous vous répondrons rapidement.");
