@@ -16,16 +16,41 @@ const Auth = () => {
   const { user, isAdmin, loading } = useAuth();
   const [busy, setBusy] = useState(false);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [resetSentTo, setResetSentTo] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setInterval(() => setResendCooldown((s) => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(t);
+  }, [resendCooldown]);
+
+  const sendResetEmail = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    return error;
+  };
 
   const handleForgot = async () => {
     if (!loginData.email) return toast.error("Enter your email above, then click Forgot password.");
     setBusy(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(loginData.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const error = await sendResetEmail(loginData.email);
     setBusy(false);
     if (error) return toast.error(error.message);
+    setResetSentTo(loginData.email);
+    setResendCooldown(30);
     toast.success("Password reset email sent. Check your inbox.");
+  };
+
+  const handleResend = async () => {
+    if (!resetSentTo || resendCooldown > 0) return;
+    setBusy(true);
+    const error = await sendResetEmail(resetSentTo);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    setResendCooldown(30);
+    toast.success("Reset email sent again. Check your inbox (and spam).");
   };
   const [signupData, setSignupData] = useState({
     name: "",
