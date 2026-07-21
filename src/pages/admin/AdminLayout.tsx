@@ -84,6 +84,9 @@ const AdminLayout = () => {
               <div className="flex items-center gap-1 min-w-0">
                 <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span className="font-semibold truncate" title={adminName}>{adminName}</span>
+                <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground shrink-0">
+                  {isAdmin ? "Admin" : isAssistant ? "Assistant" : ""}
+                </span>
               </div>
             </div>
           )}
