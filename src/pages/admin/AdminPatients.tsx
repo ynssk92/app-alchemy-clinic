@@ -38,15 +38,15 @@ const AdminPatients = () => {
 
   useEffect(() => { load(); }, []);
 
-  const toggleAdmin = async (id: string, isAdmin: boolean) => {
-    if (isAdmin) {
-      const { error } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", "admin");
+  const toggleRole = async (id: string, role: "admin" | "assistant", has: boolean) => {
+    if (has) {
+      const { error } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", role);
       if (error) return toast.error(error.message);
-      toast.success("Admin removed");
+      toast.success(`${role} removed`);
     } else {
-      const { error } = await supabase.from("user_roles").insert({ user_id: id, role: "admin" });
+      const { error } = await supabase.from("user_roles").insert({ user_id: id, role });
       if (error) return toast.error(error.message);
-      toast.success("Admin granted");
+      toast.success(`${role} granted`);
     }
     load();
   };
