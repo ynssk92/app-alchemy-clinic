@@ -165,16 +165,32 @@ const AdminNotifications = () => {
             <DropdownMenuItem
               key={n.id}
               onClick={() =>
-                navigate(n.type === "message" ? "/admin/messages" : "/admin/appointments")
+                navigate(
+                  n.type === "message"
+                    ? "/admin/messages"
+                    : n.type === "drift"
+                    ? "/admin/verify-assistants"
+                    : "/admin/appointments"
+                )
               }
               className="flex items-start gap-3 py-3 cursor-pointer"
             >
               <div
                 className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                  n.type === "message" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
+                  n.type === "message"
+                    ? "bg-primary/10 text-primary"
+                    : n.type === "drift"
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-accent/10 text-accent"
                 }`}
               >
-                {n.type === "message" ? <Mail className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
+                {n.type === "message" ? (
+                  <Mail className="w-4 h-4" />
+                ) : n.type === "drift" ? (
+                  <ShieldAlert className="w-4 h-4" />
+                ) : (
+                  <Calendar className="w-4 h-4" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate">{n.title}</div>
