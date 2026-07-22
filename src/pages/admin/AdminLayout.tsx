@@ -66,6 +66,10 @@ const sections: Section[] = [
 const AdminLayout = () => {
   const { signOut, user, isAdmin, isAssistant } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const toggleGroup = (label: string) =>
+    setOpenGroups((g) => ({ ...g, [label]: !g[label] }));
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [dark, setDark] = useState<boolean>(
