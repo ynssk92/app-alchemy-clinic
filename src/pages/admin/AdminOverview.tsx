@@ -26,6 +26,9 @@ const AdminOverview = () => {
   const [monthly, setMonthly] = useState<{ month: string; completed: number; ongoing: number; cancelled: number }[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [topDoctors, setTopDoctors] = useState<any[]>([]);
+  const [topPatients, setTopPatients] = useState<any[]>([]);
+  const [recentMessages, setRecentMessages] = useState<any[]>([]);
+  const [upcomingAppts, setUpcomingAppts] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
