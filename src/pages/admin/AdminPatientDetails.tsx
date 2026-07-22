@@ -238,10 +238,10 @@ const AdminPatientDetails = () => {
                     <BookOpen className="w-4 h-4 text-primary" /> About
                   </h3>
                   <div className="grid grid-cols-2 gap-5">
-                    <InfoTile icon={Cake} label="DOB" value="—" />
-                    <InfoTile icon={Droplet} label="Blood Group" value="—" />
-                    <InfoTile icon={VenetianMask} label="Gender" value="—" />
-                    <InfoTile icon={Mail} label="Email" value="—" />
+                    <InfoTile icon={Cake} label="DOB" value={intake?.dob ? new Date(intake.dob).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
+                    <InfoTile icon={Droplet} label="Blood Group" value={intake?.blood_group || "—"} />
+                    <InfoTile icon={VenetianMask} label="Gender" value={intake?.gender ? intake.gender.charAt(0).toUpperCase() + intake.gender.slice(1) : "—"} />
+                    <InfoTile icon={Mail} label="Email" value={intake?.email && !intake.email.endsWith("@placeholder.local") ? intake.email : "—"} />
                   </div>
                 </Card>
 
