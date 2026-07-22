@@ -5,10 +5,69 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Calendar, Phone, User, Search } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
+  Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
+  Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
 
 type Row = { id: string; full_name: string | null; phone: string | null; created_at: string };
+
+const InfoTile = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+      <Icon className="w-4 h-4" />
+    </div>
+    <div className="min-w-0">
+      <div className="text-xs font-semibold text-foreground">{label}</div>
+      <div className="text-sm text-muted-foreground truncate">{value}</div>
+    </div>
+  </div>
+);
+
+const VitalTile = ({
+  icon: Icon, label, value, dot,
+}: { icon: any; label: string; value: string; dot: "green" | "red" | "amber" | "muted" }) => (
+  <div className="flex items-center gap-3">
+    <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0">
+      <Icon className="w-4 h-4" />
+    </div>
+    <div>
+      <div className="text-xs font-semibold text-foreground">{label}</div>
+      <div className="text-sm text-muted-foreground flex items-center gap-1.5">
+        <span className={cn(
+          "w-1.5 h-1.5 rounded-full",
+          dot === "green" && "bg-emerald-500",
+          dot === "red" && "bg-destructive",
+          dot === "amber" && "bg-amber-500",
+          dot === "muted" && "bg-muted-foreground/40",
+        )} />
+        {value}
+      </div>
+    </div>
+  </div>
+);
+
+const statusPill = (status: string) => {
+  const map: Record<string, string> = {
+    upcoming: "bg-primary/10 text-primary",
+    completed: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    cancelled: "bg-destructive/10 text-destructive",
+  };
+  const label: Record<string, string> = {
+    upcoming: "Schedule",
+    completed: "Checked Out",
+    cancelled: "Cancelled",
+  };
+  return (
+    <span className={cn("px-2.5 py-1 rounded-md text-xs font-semibold", map[status] || "bg-muted text-muted-foreground")}>
+      {label[status] || status}
+    </span>
+  );
+};
 
 const AdminPatientDetails = () => {
   const { id } = useParams();
@@ -18,6 +77,7 @@ const AdminPatientDetails = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
+  const [apptSearch, setApptSearch] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -49,7 +109,7 @@ const AdminPatientDetails = () => {
       }
       const { data: a } = await supabase
         .from("appointments")
-        .select("id, appointment_date, appointment_time, status, reason, doctors(full_name)")
+        .select("id, appointment_date, appointment_time, status, reason, doctors(full_name, specialty_id, specialties(name))")
         .eq("patient_id", id)
         .order("appointment_date", { ascending: false });
       setAppts(a || []);
@@ -63,19 +123,29 @@ const AdminPatientDetails = () => {
   const initials = (selected?.full_name || "P")
     .split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
 
+  const patientCode = selected ? `#PT${selected.id.slice(0, 4).toUpperCase()}` : "";
+  const lastVisited = appts.find((a: any) => a.status === "completed")?.appointment_date;
+
+  const filteredAppts = appts.filter((a: any) => {
+    const s = apptSearch.toLowerCase();
+    return !s ||
+      (a.doctors?.full_name || "").toLowerCase().includes(s) ||
+      (a.reason || "").toLowerCase().includes(s);
+  });
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-2xl font-bold">Patient Details</h1>
-          <p className="text-sm text-muted-foreground">Full profile & appointment history</p>
-        </div>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/admin/patients"><ArrowLeft className="w-4 h-4 mr-2" />Back to Patients</Link>
-        </Button>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <Link to="/admin/patients" className="text-muted-foreground hover:text-foreground">
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          Patients
+        </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+        {/* Sidebar list */}
         <Card className="p-4 border-border h-fit">
           <div className="relative mb-3">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -99,46 +169,169 @@ const AdminPatientDetails = () => {
           </div>
         </Card>
 
+        {/* Details */}
         <div className="space-y-6">
           {selected ? (
             <>
-              <Card className="p-6 border-border">
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-20 h-20 border">
-                    {avatarUrl && <AvatarImage src={avatarUrl} />}
-                    <AvatarFallback className="bg-primary/10 text-primary text-xl font-bold">
+              {/* Header banner card */}
+              <Card className="relative overflow-hidden border-border">
+                <div className="absolute inset-y-0 right-0 w-1/2 opacity-90 pointer-events-none"
+                  style={{ background: "linear-gradient(120deg, transparent 0%, transparent 30%, hsl(var(--primary)/0.15) 55%, hsl(160 70% 55% / 0.25) 100%)" }} />
+                <div className="relative p-6 flex items-start gap-5">
+                  <Avatar className="w-24 h-24 rounded-2xl border-2 border-background shadow-md">
+                    {avatarUrl && <AvatarImage src={avatarUrl} className="object-cover" />}
+                    <AvatarFallback className="rounded-2xl bg-primary/10 text-primary text-2xl font-bold">
                       {initials}
                     </AvatarFallback>
                   </Avatar>
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold">{selected.full_name || "Unnamed"}</h2>
-                    <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mt-1">
-                      <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5" />{selected.phone || "—"}</span>
-                      <span className="flex items-center gap-1"><User className="w-3.5 h-3.5" />ID {selected.id.slice(0, 8)}</span>
-                      <span>Joined {new Date(selected.created_at).toLocaleDateString()}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-primary text-sm font-semibold">{patientCode}</div>
+                    <h2 className="text-2xl font-bold text-foreground mt-0.5">
+                      {selected.full_name || "Unnamed patient"}
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-1">—</p>
+                    <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
+                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                        <Phone className="w-4 h-4 text-primary" />
+                        <span className="font-semibold text-foreground">Phone :</span> {selected.phone || "—"}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                        <CalendarDays className="w-4 h-4 text-primary" />
+                        <span className="font-semibold text-foreground">Last Visited :</span>{" "}
+                        {lastVisited ? new Date(lastVisited).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                      </span>
                     </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-3">
+                    <div className="flex gap-2">
+                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
+                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
+                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
+                    </div>
+                    <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
+                      <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
+                    </Button>
                   </div>
                 </div>
               </Card>
 
-              <Card className="p-6 border-border">
-                <h3 className="font-semibold mb-4 flex items-center gap-2"><Calendar className="w-4 h-4" />Appointment History</h3>
-                <div className="space-y-2">
-                  {appts.map((a: any) => (
-                    <div key={a.id} className="flex items-center gap-3 p-3 rounded-lg border border-border">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold truncate">{a.reason || "General visit"}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Dr. {a.doctors?.full_name || "—"} · {new Date(a.appointment_date).toLocaleDateString()} · {a.appointment_time}
-                        </div>
+              {/* About + Vital Signs */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <Card className="p-6 border-border">
+                  <h3 className="font-bold mb-5 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-primary" /> About
+                  </h3>
+                  <div className="grid grid-cols-2 gap-5">
+                    <InfoTile icon={Cake} label="DOB" value="—" />
+                    <InfoTile icon={Droplet} label="Blood Group" value="—" />
+                    <InfoTile icon={VenetianMask} label="Gender" value="—" />
+                    <InfoTile icon={Mail} label="Email" value="—" />
+                  </div>
+                </Card>
+
+                <Card className="p-6 border-border">
+                  <h3 className="font-bold mb-5 flex items-center gap-2">
+                    <BookOpen className="w-4 h-4 text-primary" /> Vital Signs
+                  </h3>
+                  <div className="grid grid-cols-3 gap-5">
+                    <VitalTile icon={Droplet} label="Blood Pressure" value="—" dot="muted" />
+                    <VitalTile icon={Heart} label="Heart Rate" value="—" dot="muted" />
+                    <VitalTile icon={Activity} label="SPO2" value="—" dot="muted" />
+                    <VitalTile icon={Thermometer} label="Temperature" value="—" dot="muted" />
+                    <VitalTile icon={Wind} label="Respiratory Rate" value="—" dot="muted" />
+                    <VitalTile icon={Weight} label="Weight" value="—" dot="muted" />
+                  </div>
+                </Card>
+              </div>
+
+              {/* Appointments tab */}
+              <Card className="border-border">
+                <Tabs defaultValue="appointments">
+                  <div className="border-b border-border px-6 pt-4">
+                    <TabsList className="bg-transparent p-0 h-auto gap-6">
+                      <TabsTrigger
+                        value="appointments"
+                        className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
+                      >
+                        Appointments
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="transactions"
+                        className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
+                      >
+                        Transactions
+                      </TabsTrigger>
+                    </TabsList>
+                  </div>
+
+                  <TabsContent value="appointments" className="m-0 p-6 pt-4">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="relative w-48">
+                        <Input placeholder="Search" value={apptSearch} onChange={(e) => setApptSearch(e.target.value)} />
                       </div>
-                      <Badge variant="secondary" className="capitalize">{a.status}</Badge>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <CalendarDays className="w-4 h-4" />
+                        Date range
+                      </Button>
+                      <div className="flex-1" />
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Filter className="w-4 h-4" />
+                        Filters
+                      </Button>
                     </div>
-                  ))}
-                  {appts.length === 0 && (
-                    <p className="text-sm text-muted-foreground text-center py-6">No appointments yet</p>
-                  )}
-                </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="border-b border-border text-left">
+                            <th className="pb-3 font-bold">Date &amp; Time</th>
+                            <th className="pb-3 font-bold">Doctor Name</th>
+                            <th className="pb-3 font-bold">Mode</th>
+                            <th className="pb-3 font-bold">Status</th>
+                            <th className="pb-3"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {filteredAppts.map((a: any) => (
+                            <tr key={a.id} className="border-b border-border last:border-0">
+                              <td className="py-4 text-muted-foreground">
+                                {new Date(a.appointment_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} -{" "}
+                                {a.appointment_time?.slice(0, 5)}
+                              </td>
+                              <td className="py-4">
+                                <div className="flex items-center gap-3">
+                                  <Avatar className="w-9 h-9">
+                                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                                      {(a.doctors?.full_name || "D").split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                  <div>
+                                    <div className="font-semibold">Dr. {a.doctors?.full_name || "—"}</div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {a.doctors?.specialties?.name || "General"}
+                                    </div>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-4 text-muted-foreground">In-person</td>
+                              <td className="py-4">{statusPill(a.status)}</td>
+                              <td className="py-4">
+                                <Button size="icon" variant="ghost" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
+                              </td>
+                            </tr>
+                          ))}
+                          {filteredAppts.length === 0 && (
+                            <tr><td colSpan={5} className="py-10 text-center text-muted-foreground">No appointments</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="transactions" className="m-0 p-10 text-center text-muted-foreground">
+                    No transactions on file.
+                  </TabsContent>
+                </Tabs>
               </Card>
             </>
           ) : (
