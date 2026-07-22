@@ -28,6 +28,10 @@ import AdminLayout from "./pages/admin/AdminLayout";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminDoctors from "./pages/admin/AdminDoctors";
 import AdminAppointments from "./pages/admin/AdminAppointments";
+import AdminAppointmentNew from "./pages/admin/AdminAppointmentNew";
+import AdminAppointmentCalendar from "./pages/admin/AdminAppointmentCalendar";
+import AdminAppointmentKanban from "./pages/admin/AdminAppointmentKanban";
+import AdminAppointmentRequests from "./pages/admin/AdminAppointmentRequests";
 import AdminPatients from "./pages/admin/AdminPatients";
 import { AdminSpecialties, AdminClinics } from "./pages/admin/AdminCatalog";
 import AdminClinicAudit from "./pages/admin/AdminClinicAudit";
@@ -65,6 +69,10 @@ const App = () => (
               <Route index element={<AdminOverview />} />
               <Route path="doctors" element={<ProtectedRoute adminOnly><AdminDoctors /></ProtectedRoute>} />
               <Route path="appointments" element={<AdminAppointments />} />
+              <Route path="appointments/new" element={<AdminAppointmentNew />} />
+              <Route path="appointments/calendar" element={<AdminAppointmentCalendar />} />
+              <Route path="appointments/kanban" element={<AdminAppointmentKanban />} />
+              <Route path="appointments/requests" element={<AdminAppointmentRequests />} />
               <Route path="patients" element={<ProtectedRoute adminOnly><AdminPatients /></ProtectedRoute>} />
               <Route path="patients/details" element={<ProtectedRoute adminOnly><AdminPatientDetails /></ProtectedRoute>} />
               <Route path="patients/details/:id" element={<ProtectedRoute adminOnly><AdminPatientDetails /></ProtectedRoute>} />
