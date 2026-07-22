@@ -12,6 +12,16 @@ import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { z } from "zod";
 
 const schema = z.object({
@@ -44,6 +54,7 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const loadAvatar = async (path: string | null) => {
     if (!path) return setAvatarUrl(null);
@@ -125,17 +136,31 @@ const Profile = () => {
     toast.success("Profile updated!");
   };
 
-  const handleChangePassword = async (e: React.FormEvent) => {
+  const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    setConfirmOpen(true);
+  };
+
+  const confirmChangePassword = async () => {
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) {
+      setConfirmOpen(false);
+      return toast.error(parsed.error.issues[0].message);
+    }
     setChangingPassword(true);
     const { error } = await supabase.auth.updateUser({ password: parsed.data.newPassword });
     setChangingPassword(false);
+    setConfirmOpen(false);
     if (error) return toast.error(error.message);
     setNewPassword("");
     setConfirmPassword("");
-    toast.success("Password updated!");
+    toast.success("Password updated — signing you out.");
+    setTimeout(async () => {
+      await signOut();
+      navigate("/auth");
+    }, 800);
   };
 
   const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
@@ -290,6 +315,22 @@ const Profile = () => {
         onCropped={handleCropped}
         busy={uploading}
       />
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => !changingPassword && setConfirmOpen(o)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update your password?</AlertDialogTitle>
+            <AlertDialogDescription>
+              After updating, you'll be signed out on this device and will need to sign in again with your new password.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={changingPassword}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmChangePassword} disabled={changingPassword}>
+              {changingPassword ? "Updating..." : "Update & sign out"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
