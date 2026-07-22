@@ -12,6 +12,16 @@ import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { z } from "zod";
 
 const schema = z.object({
