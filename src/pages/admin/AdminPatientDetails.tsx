@@ -117,8 +117,14 @@ const AdminPatientDetails = () => {
         .eq("patient_id", id)
         .order("appointment_date", { ascending: false });
       setAppts(a || []);
+      const { data: intakeRow } = await supabase
+        .from("patient_intake")
+        .select("dob, gender, blood_group, email, address_1, city, country")
+        .eq("user_id", id)
+        .maybeSingle();
+      setIntake(intakeRow);
     })();
-  }, [id]);
+  }, [id, reloadTick]);
 
   const filtered = list.filter((p) =>
     (p.full_name || "").toLowerCase().includes(q.toLowerCase())
