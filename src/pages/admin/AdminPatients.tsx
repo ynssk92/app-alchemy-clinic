@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset } from "lucide-react";
+import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 type P = { id: string; full_name: string | null; phone: string | null; created_at: string; roles: string[] };
 type Invite = { id: string; email: string; claimed_at: string | null; created_at: string; full_name?: string | null };
