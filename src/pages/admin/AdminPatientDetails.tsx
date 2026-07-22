@@ -214,13 +214,19 @@ const AdminPatientDetails = () => {
                   </div>
                   <div className="flex flex-col items-end gap-3">
                     <div className="flex gap-2">
+                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9" onClick={() => setEditOpen(true)} title="Edit patient"><Pencil className="w-4 h-4" /></Button>
                       <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
                       <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
                       <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
                     </div>
-                    <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
-                      <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="gap-2" onClick={() => setEditOpen(true)}>
+                        <Pencil className="w-4 h-4" />Edit
+                      </Button>
+                      <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
+                        <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>
