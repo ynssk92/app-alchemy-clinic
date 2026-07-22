@@ -19,7 +19,7 @@ import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; children?: { to: string; label: string; end?: boolean }[] };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
