@@ -96,12 +96,12 @@ const AdminOverview = () => {
       if (topIds.length) {
         const { data: profs } = await supabase
           .from("profiles")
-          .select("id, full_name, email")
+          .select("id, full_name")
           .in("id", topIds);
         setTopPatients(
           topIds.map((id) => {
-            const p = profs?.find((x: any) => x.id === id);
-            return { id, name: p?.full_name || p?.email || "Patient", count: pCounts[id] };
+            const p: any = profs?.find((x: any) => x.id === id);
+            return { id, name: p?.full_name || "Patient", count: pCounts[id] };
           })
         );
       }
