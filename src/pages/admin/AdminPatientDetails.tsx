@@ -9,10 +9,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
-  Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays,
+  Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 type Row = { id: string; full_name: string | null; phone: string | null; created_at: string };
 
@@ -78,6 +79,9 @@ const AdminPatientDetails = () => {
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [apptSearch, setApptSearch] = useState("");
+  const [intake, setIntake] = useState<any>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -113,8 +117,14 @@ const AdminPatientDetails = () => {
         .eq("patient_id", id)
         .order("appointment_date", { ascending: false });
       setAppts(a || []);
+      const { data: intakeRow } = await supabase
+        .from("patient_intake")
+        .select("dob, gender, blood_group, email, address_1, city, country")
+        .eq("user_id", id)
+        .maybeSingle();
+      setIntake(intakeRow);
     })();
-  }, [id]);
+  }, [id, reloadTick]);
 
   const filtered = list.filter((p) =>
     (p.full_name || "").toLowerCase().includes(q.toLowerCase())
@@ -204,13 +214,19 @@ const AdminPatientDetails = () => {
                   </div>
                   <div className="flex flex-col items-end gap-3">
                     <div className="flex gap-2">
+                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9" onClick={() => setEditOpen(true)} title="Edit patient"><Pencil className="w-4 h-4" /></Button>
                       <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
                       <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
                       <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
                     </div>
-                    <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
-                      <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button variant="outline" className="gap-2" onClick={() => setEditOpen(true)}>
+                        <Pencil className="w-4 h-4" />Edit
+                      </Button>
+                      <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
+                        <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -222,10 +238,10 @@ const AdminPatientDetails = () => {
                     <BookOpen className="w-4 h-4 text-primary" /> About
                   </h3>
                   <div className="grid grid-cols-2 gap-5">
-                    <InfoTile icon={Cake} label="DOB" value="—" />
-                    <InfoTile icon={Droplet} label="Blood Group" value="—" />
-                    <InfoTile icon={VenetianMask} label="Gender" value="—" />
-                    <InfoTile icon={Mail} label="Email" value="—" />
+                    <InfoTile icon={Cake} label="DOB" value={intake?.dob ? new Date(intake.dob).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
+                    <InfoTile icon={Droplet} label="Blood Group" value={intake?.blood_group || "—"} />
+                    <InfoTile icon={VenetianMask} label="Gender" value={intake?.gender ? intake.gender.charAt(0).toUpperCase() + intake.gender.slice(1) : "—"} />
+                    <InfoTile icon={Mail} label="Email" value={intake?.email && !intake.email.endsWith("@placeholder.local") ? intake.email : "—"} />
                   </div>
                 </Card>
 
@@ -341,6 +357,15 @@ const AdminPatientDetails = () => {
           )}
         </div>
       </div>
+
+      {id && (
+        <EditPatientDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          patientId={id}
+          onSaved={() => setReloadTick((t) => t + 1)}
+        />
+      )}
     </div>
   );
 };

@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset } from "lucide-react";
+import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 type P = { id: string; full_name: string | null; phone: string | null; created_at: string; roles: string[] };
 type Invite = { id: string; email: string; claimed_at: string | null; created_at: string; full_name?: string | null };
@@ -15,6 +16,7 @@ const AdminPatients = () => {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const load = async () => {
     const { data: profiles } = await supabase.from("profiles").select("id, full_name, phone, created_at").order("created_at", { ascending: false });
@@ -144,6 +146,9 @@ const AdminPatients = () => {
                   {p.phone || "No phone"} • Joined {new Date(p.created_at).toLocaleDateString()}
                 </p>
               </div>
+              <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)}>
+                <Pencil className="w-4 h-4 mr-2" />Edit
+              </Button>
               <Button size="sm" variant={isAssistant ? "outline" : "secondary"} onClick={() => toggleRole(p.id, "assistant", isAssistant)}>
                 <Headset className="w-4 h-4 mr-2" />{isAssistant ? "Revoke Assistant" : "Make Assistant"}
               </Button>
@@ -156,6 +161,15 @@ const AdminPatients = () => {
         })}
         {rows.length === 0 && <p className="text-muted-foreground text-center py-8">No users yet.</p>}
       </div>
+
+      {editingId && (
+        <EditPatientDialog
+          open={!!editingId}
+          onOpenChange={(v) => !v && setEditingId(null)}
+          patientId={editingId}
+          onSaved={load}
+        />
+      )}
     </div>
   );
 };
