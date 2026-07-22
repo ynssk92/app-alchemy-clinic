@@ -31,6 +31,7 @@ import AdminAppointments from "./pages/admin/AdminAppointments";
 import AdminPatients from "./pages/admin/AdminPatients";
 import { AdminSpecialties, AdminClinics } from "./pages/admin/AdminCatalog";
 import AdminClinicAudit from "./pages/admin/AdminClinicAudit";
+import AdminAssistantVerifier from "./pages/admin/AdminAssistantVerifier";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
               <Route path="clinics/audit" element={<ProtectedRoute adminOnly><AdminClinicAudit /></ProtectedRoute>} />
               <Route path="blog" element={<ProtectedRoute adminOnly><AdminBlog /></ProtectedRoute>} />
               <Route path="messages" element={<AdminMessages />} />
+              <Route path="verify-assistants" element={<ProtectedRoute adminOnly><AdminAssistantVerifier /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
