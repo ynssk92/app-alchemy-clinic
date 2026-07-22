@@ -9,10 +9,11 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
-  Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays,
+  Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 type Row = { id: string; full_name: string | null; phone: string | null; created_at: string };
 
