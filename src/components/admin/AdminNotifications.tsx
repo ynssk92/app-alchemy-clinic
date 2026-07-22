@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Calendar, Mail } from "lucide-react";
+import { Bell, Calendar, Mail, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,10 +16,17 @@ import { toast } from "sonner";
 
 type Notif = {
   id: string;
-  type: "appointment" | "message";
+  type: "appointment" | "message" | "drift";
   title: string;
   subtitle: string;
   created_at: string;
+};
+
+const DRIFT_LABEL: Record<string, string> = {
+  assistant_also_admin: "Escalade admin détectée",
+  missing_profile: "Profil assistant manquant",
+  appointments_unreachable: "Rendez-vous inaccessibles",
+  messages_unreachable: "Messages inaccessibles",
 };
 
 const AdminNotifications = () => {
@@ -28,8 +35,10 @@ const AdminNotifications = () => {
   const [unreadAppts, setUnreadAppts] = useState(0);
   const [unreadMsgs, setUnreadMsgs] = useState(0);
 
+  const [unreadDrift, setUnreadDrift] = useState(0);
+
   const load = async () => {
-    const [msgs, appts] = await Promise.all([
+    const [msgs, appts, drift] = await Promise.all([
       supabase
         .from("contact_messages")
         .select("id, name, email, message, created_at, read")
@@ -38,6 +47,11 @@ const AdminNotifications = () => {
       supabase
         .from("appointments")
         .select("id, appointment_date, appointment_time, status, reason, created_at, doctors(full_name)")
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabase
+        .from("assistant_verification_alerts")
+        .select("id, kind, detail, user_name, created_at, acknowledged_at")
         .order("created_at", { ascending: false })
         .limit(10),
     ]);
@@ -61,10 +75,20 @@ const AdminNotifications = () => {
         created_at: a.created_at,
       })
     );
+    (drift.data || []).forEach((d: any) =>
+      n.push({
+        id: `d-${d.id}`,
+        type: "drift",
+        title: `${DRIFT_LABEL[d.kind] || "Alerte permissions"}${d.user_name ? ` — ${d.user_name}` : ""}`,
+        subtitle: d.detail || "",
+        created_at: d.created_at,
+      })
+    );
     n.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
-    setItems(n.slice(0, 12));
+    setItems(n.slice(0, 15));
 
     setUnreadMsgs((msgs.data || []).filter((m: any) => !m.read).length);
+    setUnreadDrift((drift.data || []).filter((d: any) => !d.acknowledged_at).length);
     const { count } = await supabase
       .from("appointments")
       .select("*", { count: "exact", head: true })
@@ -92,6 +116,14 @@ const AdminNotifications = () => {
           load();
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "assistant_verification_alerts" },
+        (payload: any) => {
+          toast.warning(DRIFT_LABEL[payload.new.kind] || "Alerte permissions assistant");
+          load();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -99,7 +131,7 @@ const AdminNotifications = () => {
     };
   }, []);
 
-  const total = unreadAppts + unreadMsgs;
+  const total = unreadAppts + unreadMsgs + unreadDrift;
 
   return (
     <DropdownMenu>
@@ -117,6 +149,7 @@ const AdminNotifications = () => {
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>Notifications</span>
           <div className="flex gap-1">
+            {unreadDrift > 0 && <Badge variant="destructive">{unreadDrift} drift</Badge>}
             {unreadMsgs > 0 && <Badge variant="secondary">{unreadMsgs} msg</Badge>}
             {unreadAppts > 0 && <Badge>{unreadAppts} RDV</Badge>}
           </div>
@@ -132,16 +165,32 @@ const AdminNotifications = () => {
             <DropdownMenuItem
               key={n.id}
               onClick={() =>
-                navigate(n.type === "message" ? "/admin/messages" : "/admin/appointments")
+                navigate(
+                  n.type === "message"
+                    ? "/admin/messages"
+                    : n.type === "drift"
+                    ? "/admin/verify-assistants"
+                    : "/admin/appointments"
+                )
               }
               className="flex items-start gap-3 py-3 cursor-pointer"
             >
               <div
                 className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                  n.type === "message" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"
+                  n.type === "message"
+                    ? "bg-primary/10 text-primary"
+                    : n.type === "drift"
+                    ? "bg-destructive/10 text-destructive"
+                    : "bg-accent/10 text-accent"
                 }`}
               >
-                {n.type === "message" ? <Mail className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
+                {n.type === "message" ? (
+                  <Mail className="w-4 h-4" />
+                ) : n.type === "drift" ? (
+                  <ShieldAlert className="w-4 h-4" />
+                ) : (
+                  <Calendar className="w-4 h-4" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm truncate">{n.title}</div>
