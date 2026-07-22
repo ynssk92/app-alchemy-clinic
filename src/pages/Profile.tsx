@@ -19,6 +19,16 @@ const schema = z.object({
   phone: z.string().trim().max(30, "Phone must be under 30 characters").optional().or(z.literal("")),
 });
 
+const passwordSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password must be at least 8 characters").max(72, "Password too long"),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 const Profile = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
