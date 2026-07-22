@@ -1,27 +1,57 @@
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home, ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox, UserCheck } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
+  ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
+  UserCheck, Search, Moon, Sun, Plus,
+} from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean };
+type Section = { title: string; items: LinkItem[] };
 
-const links = [
-  { to: "/admin", icon: LayoutDashboard, label: "Overview", end: true, staff: true },
-  { to: "/admin/doctors", icon: Stethoscope, label: "Doctors" },
-  { to: "/admin/appointments", icon: Calendar, label: "Appointments", staff: true },
-  { to: "/admin/patients", icon: Users, label: "Patients" },
-  { to: "/admin/specialties", icon: Tag, label: "Specialties" },
-  { to: "/admin/clinics", icon: Building2, label: "Clinics" },
-  { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
-  { to: "/admin/blog", icon: FileText, label: "Blog" },
-  { to: "/admin/messages", icon: Inbox, label: "Messages", staff: true },
-  { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants" },
+const sections: Section[] = [
+  {
+    title: "Main Menu",
+    items: [
+      { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
+    ],
+  },
+  {
+    title: "Clinic",
+    items: [
+      { to: "/admin/doctors", icon: Stethoscope, label: "Doctors" },
+      { to: "/admin/patients", icon: Users, label: "Patients" },
+      { to: "/admin/appointments", icon: Calendar, label: "Appointments", staff: true },
+      { to: "/admin/specialties", icon: Tag, label: "Specialties" },
+      { to: "/admin/clinics", icon: Building2, label: "Clinics" },
+      { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
+    ],
+  },
+  {
+    title: "Content & Comms",
+    items: [
+      { to: "/admin/blog", icon: FileText, label: "Blog" },
+      { to: "/admin/messages", icon: Inbox, label: "Messages", staff: true },
+    ],
+  },
+  {
+    title: "System",
+    items: [
+      { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants" },
+    ],
+  },
 ];
 
 const AdminLayout = () => {
@@ -29,6 +59,9 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [dark, setDark] = useState<boolean>(
+    typeof document !== "undefined" && document.documentElement.classList.contains("dark")
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -46,74 +79,91 @@ const AdminLayout = () => {
 
   const initials = (adminName || "A").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
 
+  const toggleTheme = () => {
+    const next = !dark;
+    document.documentElement.classList.toggle("dark", next);
+    setDark(next);
+  };
+
   return (
-    <div className="min-h-screen flex bg-muted/20">
+    <div className="min-h-screen flex bg-muted/30">
+      {/* Sidebar */}
       <aside className="w-64 bg-card border-r border-border flex flex-col">
-        <Link to="/" className="p-6 border-b border-border flex items-center gap-3">
-          <img src={logo} alt="HealthBook" className="h-8" />
+        <Link to="/" className="p-5 flex items-center gap-3">
+          <img src={logo} alt="La Dune" className="h-9" />
         </Link>
 
+        {/* Clinic switcher card */}
+        <div className="mx-4 mb-4 p-3 rounded-xl border border-border bg-muted/40 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
+            LD
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold truncate">La Dune Clinic</div>
+            <div className="text-[11px] text-muted-foreground truncate">Dental Care</div>
+          </div>
+        </div>
 
-        <nav className="flex-1 p-4 space-y-1">
-          {links.filter((l) => isAdmin || l.staff).map((l) => (
-            <NavLink
-              key={l.to}
-              to={l.to}
-              end={l.end}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-soft"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )
-              }
-            >
-              <l.icon className="w-4 h-4" />
-              {l.label}
-            </NavLink>
-          ))}
+        <nav className="flex-1 px-3 overflow-y-auto pb-4 space-y-5">
+          {sections.map((section) => {
+            const visible = section.items.filter((l) => isAdmin || l.staff);
+            if (visible.length === 0) return null;
+            return (
+              <div key={section.title}>
+                <div className="px-3 mb-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
+                  {section.title}
+                </div>
+                <div className="space-y-1">
+                  {visible.map((l) => (
+                    <NavLink
+                      key={l.to}
+                      to={l.to}
+                      end={l.end}
+                      className={({ isActive }) =>
+                        cn(
+                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-soft"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                        )
+                      }
+                    >
+                      <l.icon className="w-4 h-4" />
+                      {l.label}
+                    </NavLink>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </nav>
 
-        <div className="p-4 border-t border-border space-y-2">
-          {adminName && (
-            <div className="flex items-center gap-2 px-2 pb-2 text-sm">
-              <Avatar className="w-8 h-8 shrink-0 border border-border">
-                {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
-                <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
-              </Avatar>
-              <div className="flex items-center gap-1 min-w-0">
-                <ShieldCheck className="w-3.5 h-3.5 text-primary shrink-0" />
-                <span className="font-semibold truncate" title={adminName}>{adminName}</span>
-                <span className="ml-1 text-[10px] uppercase tracking-wide text-muted-foreground shrink-0">
-                  {isAdmin ? "Admin" : isAssistant ? "Assistant" : ""}
-                </span>
-              </div>
-            </div>
-          )}
-          <Button variant="ghost" className="w-full justify-start" onClick={() => navigate("/")}>
+        <div className="p-3 border-t border-border space-y-1">
+          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/")}>
             <Home className="w-4 h-4 mr-2" />View Site
           </Button>
-          <Button variant="outline" className="w-full justify-start" onClick={async () => { await signOut(); navigate("/"); }}>
+          <Button variant="ghost" size="sm" className="w-full justify-start text-destructive hover:text-destructive"
+            onClick={async () => { await signOut(); navigate("/"); }}>
             <LogOut className="w-4 h-4 mr-2" />Sign Out
           </Button>
         </div>
-
       </aside>
 
-      <main className="flex-1 overflow-auto">
-        <header className="sticky top-0 z-10 bg-card/80 backdrop-blur border-b border-border px-8 py-3 flex items-center justify-end gap-3">
-          <Link to="/profile" className="flex items-center gap-2 text-sm hover:opacity-80 transition-opacity" title="Edit profile">
-            <Avatar className="w-8 h-8 border border-border">
-              {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
-            </Avatar>
-            <span className="font-medium hidden sm:inline">{adminName}</span>
-          </Link>
+      {/* Main */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <header className="sticky top-0 z-10 bg-card/90 backdrop-blur border-b border-border px-6 py-3 flex items-center gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input placeholder="Search patients, doctors, appointments…" className="pl-9 bg-muted/50 border-0" />
+          </div>
+          <div className="flex-1" />
+          <Button variant="ghost" size="icon" onClick={toggleTheme} title="Toggle theme">
+            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </Button>
           <AdminNotifications />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="gap-2">
+              <Button size="sm" className="gap-2 bg-gradient-primary text-primary-foreground">
                 <Zap className="w-4 h-4" />Quick Actions
               </Button>
             </DropdownMenuTrigger>
@@ -144,17 +194,33 @@ const AdminLayout = () => {
                   </DropdownMenuItem>
                 </>
               )}
-              <DropdownMenuItem onClick={() => window.location.href = "mailto:"}>
+              <DropdownMenuItem onClick={() => (window.location.href = "mailto:")}>
                 <Mail className="w-4 h-4 mr-2" />Email support
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          <Link to="/profile" className="flex items-center gap-2 pl-2 border-l border-border ml-1" title="Edit profile">
+            <Avatar className="w-9 h-9 border border-border">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="hidden sm:flex flex-col leading-tight">
+              <span className="text-sm font-semibold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                {adminName}
+              </span>
+              <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                {isAdmin ? "Admin" : isAssistant ? "Assistant" : ""}
+              </span>
+            </div>
+          </Link>
         </header>
-        <div className="p-8">
+
+        <div className="flex-1 overflow-auto p-6 lg:p-8">
           <Outlet />
         </div>
       </main>
-
     </div>
   );
 };
