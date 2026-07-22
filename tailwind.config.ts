@@ -47,6 +47,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        stat: {
+          blue: "hsl(var(--stat-blue))",
+          red: "hsl(var(--stat-red))",
+          cyan: "hsl(var(--stat-cyan))",
+          green: "hsl(var(--stat-green))",
+          amber: "hsl(var(--stat-amber))",
+          violet: "hsl(var(--stat-violet))",
+        },
+        positive: "hsl(var(--positive))",
+        negative: "hsl(var(--negative))",
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
