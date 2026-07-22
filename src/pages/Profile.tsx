@@ -136,17 +136,31 @@ const Profile = () => {
     toast.success("Profile updated!");
   };
 
-  const handleChangePassword = async (e: React.FormEvent) => {
+  const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
     const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
     if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    setConfirmOpen(true);
+  };
+
+  const confirmChangePassword = async () => {
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) {
+      setConfirmOpen(false);
+      return toast.error(parsed.error.issues[0].message);
+    }
     setChangingPassword(true);
     const { error } = await supabase.auth.updateUser({ password: parsed.data.newPassword });
     setChangingPassword(false);
+    setConfirmOpen(false);
     if (error) return toast.error(error.message);
     setNewPassword("");
     setConfirmPassword("");
-    toast.success("Password updated!");
+    toast.success("Password updated — signing you out.");
+    setTimeout(async () => {
+      await signOut();
+      navigate("/auth");
+    }, 800);
   };
 
   const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
