@@ -54,6 +54,7 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [changingPassword, setChangingPassword] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const loadAvatar = async (path: string | null) => {
     if (!path) return setAvatarUrl(null);
