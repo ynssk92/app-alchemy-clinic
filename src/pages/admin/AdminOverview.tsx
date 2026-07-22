@@ -83,6 +83,45 @@ const AdminOverview = () => {
         .sort((a: any, b: any) => b.bookings - a.bookings)
         .slice(0, 3);
       setTopDoctors(top);
+
+      // Top 5 patients by appointment count
+      const { data: allApptsWithPatient } = await supabase
+        .from("appointments")
+        .select("patient_id");
+      const pCounts: Record<string, number> = {};
+      (allApptsWithPatient || []).forEach((r: any) => {
+        if (r.patient_id) pCounts[r.patient_id] = (pCounts[r.patient_id] || 0) + 1;
+      });
+      const topIds = Object.entries(pCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id]) => id);
+      if (topIds.length) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, full_name, email")
+          .in("id", topIds);
+        setTopPatients(
+          topIds.map((id) => {
+            const p = profs?.find((x: any) => x.id === id);
+            return { id, name: p?.full_name || p?.email || "Patient", count: pCounts[id] };
+          })
+        );
+      }
+
+      // Recent contact messages
+      const { data: msgs } = await supabase
+        .from("contact_messages")
+        .select("id, name, email, subject, created_at, status")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setRecentMessages(msgs || []);
+
+      // Upcoming appointments
+      const { data: upc } = await supabase
+        .from("appointments")
+        .select("id, appointment_date, appointment_time, reason, doctors(full_name), profiles(full_name)")
+        .eq("status", "upcoming")
+        .order("appointment_date", { ascending: true })
+        .limit(5);
+      setUpcomingAppts(upc || []);
     })();
   }, []);
 
