@@ -127,24 +127,83 @@ const AdminLayout = () => {
                   {section.title}
                 </div>
                 <div className="space-y-1">
-                  {visible.map((l) => (
-                    <NavLink
-                      key={l.to}
-                      to={l.to}
-                      end={l.end}
-                      className={({ isActive }) =>
-                        cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-                          isActive
-                            ? "bg-primary text-primary-foreground shadow-soft"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        )
-                      }
-                    >
-                      <l.icon className="w-4 h-4" />
-                      {l.label}
-                    </NavLink>
-                  ))}
+                  {visible.map((l) => {
+                    if (l.children && l.children.length) {
+                      const groupActive = l.children.some((c) =>
+                        c.end ? location.pathname === c.to : location.pathname.startsWith(c.to)
+                      );
+                      const open = openGroups[l.label] ?? groupActive;
+                      return (
+                        <div key={l.to}>
+                          <button
+                            type="button"
+                            onClick={() => toggleGroup(l.label)}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                              groupActive
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            )}
+                          >
+                            <l.icon className="w-4 h-4" />
+                            <span className="flex-1 text-left">{l.label}</span>
+                            <ChevronDown
+                              className={cn("w-4 h-4 transition-transform", open && "rotate-180")}
+                            />
+                          </button>
+                          {open && (
+                            <div className="mt-1 ml-4 pl-4 border-l border-border space-y-0.5">
+                              {l.children.map((c) => (
+                                <NavLink
+                                  key={c.to}
+                                  to={c.to}
+                                  end={c.end}
+                                  className={({ isActive }) =>
+                                    cn(
+                                      "flex items-center gap-3 pl-3 pr-3 py-1.5 rounded-md text-sm transition-colors relative",
+                                      isActive
+                                        ? "text-primary font-semibold"
+                                        : "text-muted-foreground hover:text-foreground"
+                                    )
+                                  }
+                                >
+                                  {({ isActive }) => (
+                                    <>
+                                      <span
+                                        className={cn(
+                                          "w-1.5 h-1.5 rounded-full",
+                                          isActive ? "bg-primary" : "bg-muted-foreground/30"
+                                        )}
+                                      />
+                                      {c.label}
+                                    </>
+                                  )}
+                                </NavLink>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                    return (
+                      <NavLink
+                        key={l.to}
+                        to={l.to}
+                        end={l.end}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                            isActive
+                              ? "bg-primary text-primary-foreground shadow-soft"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          )
+                        }
+                      >
+                        <l.icon className="w-4 h-4" />
+                        {l.label}
+                      </NavLink>
+                    );
+                  })}
                 </div>
               </div>
             );
