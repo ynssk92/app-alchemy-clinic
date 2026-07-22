@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
-  UserCheck, Search, Moon, Sun, Plus, ChevronDown,
+  UserCheck, Search, Moon, Sun, Plus, ChevronDown, User, UserX, BarChart3,
+  FileStack, MapPin, MessageSquareQuote, HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -75,6 +76,38 @@ const sections: Section[] = [
     items: [
       { to: "/admin/blog", icon: FileText, label: "Blog" },
       { to: "/admin/messages", icon: Inbox, label: "Messages", staff: true },
+    ],
+  },
+  {
+    title: "Administration",
+    items: [
+      {
+        to: "/admin/users",
+        icon: User,
+        label: "Users",
+        children: [
+          { to: "/admin/roles", label: "Roles & Permissions" },
+          { to: "/admin/delete-requests", label: "Delete Account Request" },
+        ],
+      },
+      { to: "/admin/reports", icon: BarChart3, label: "Reports" },
+    ],
+  },
+  {
+    title: "Content",
+    items: [
+      { to: "/admin/pages", icon: FileStack, label: "Pages" },
+      {
+        to: "/admin/blog",
+        icon: FileText,
+        label: "Blogs",
+        children: [
+          { to: "/admin/blog", label: "All Blogs", end: true },
+        ],
+      },
+      { to: "/admin/location", icon: MapPin, label: "Location" },
+      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "Testimonials" },
+      { to: "/admin/faq", icon: HelpCircle, label: "FAQ" },
     ],
   },
   {
