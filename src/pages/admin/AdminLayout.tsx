@@ -79,6 +79,38 @@ const sections: Section[] = [
     ],
   },
   {
+    title: "Administration",
+    items: [
+      {
+        to: "/admin/users",
+        icon: User,
+        label: "Users",
+        children: [
+          { to: "/admin/roles", label: "Roles & Permissions" },
+          { to: "/admin/delete-requests", label: "Delete Account Request" },
+        ],
+      },
+      { to: "/admin/reports", icon: BarChart3, label: "Reports" },
+    ],
+  },
+  {
+    title: "Content",
+    items: [
+      { to: "/admin/pages", icon: FileStack, label: "Pages" },
+      {
+        to: "/admin/blog",
+        icon: FileText,
+        label: "Blogs",
+        children: [
+          { to: "/admin/blog", label: "All Blogs", end: true },
+        ],
+      },
+      { to: "/admin/location", icon: MapPin, label: "Location" },
+      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "Testimonials" },
+      { to: "/admin/faq", icon: HelpCircle, label: "FAQ" },
+    ],
+  },
+  {
     title: "System",
     items: [
       { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants" },
