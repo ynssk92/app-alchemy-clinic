@@ -146,6 +146,9 @@ const AdminPatients = () => {
                   {p.phone || "No phone"} • Joined {new Date(p.created_at).toLocaleDateString()}
                 </p>
               </div>
+              <Button size="sm" variant="outline" onClick={() => setEditingId(p.id)}>
+                <Pencil className="w-4 h-4 mr-2" />Edit
+              </Button>
               <Button size="sm" variant={isAssistant ? "outline" : "secondary"} onClick={() => toggleRole(p.id, "assistant", isAssistant)}>
                 <Headset className="w-4 h-4 mr-2" />{isAssistant ? "Revoke Assistant" : "Make Assistant"}
               </Button>
@@ -158,6 +161,15 @@ const AdminPatients = () => {
         })}
         {rows.length === 0 && <p className="text-muted-foreground text-center py-8">No users yet.</p>}
       </div>
+
+      {editingId && (
+        <EditPatientDialog
+          open={!!editingId}
+          onOpenChange={(v) => !v && setEditingId(null)}
+          patientId={editingId}
+          onSaved={load}
+        />
+      )}
     </div>
   );
 };
