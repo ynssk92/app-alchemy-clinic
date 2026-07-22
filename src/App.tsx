@@ -38,6 +38,9 @@ import AdminClinicAudit from "./pages/admin/AdminClinicAudit";
 import AdminAssistantVerifier from "./pages/admin/AdminAssistantVerifier";
 import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
 import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
+import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
+import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
+import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
 
 const queryClient = new QueryClient();
 
