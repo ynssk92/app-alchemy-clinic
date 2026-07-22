@@ -1,11 +1,11 @@
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
-  UserCheck, Search, Moon, Sun, Plus,
+  UserCheck, Search, Moon, Sun, Plus, ChevronDown,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +18,7 @@ import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
@@ -32,7 +32,16 @@ const sections: Section[] = [
     title: "Clinic",
     items: [
       { to: "/admin/doctors", icon: Stethoscope, label: "Doctors" },
-      { to: "/admin/patients", icon: Users, label: "Patients" },
+      {
+        to: "/admin/patients",
+        icon: Users,
+        label: "Patients",
+        children: [
+          { to: "/admin/patients", label: "Patients", end: true },
+          { to: "/admin/patients/details", label: "Patient Details" },
+          { to: "/admin/patients/create", label: "Create Patient" },
+        ],
+      },
       { to: "/admin/appointments", icon: Calendar, label: "Appointments", staff: true },
       { to: "/admin/specialties", icon: Tag, label: "Specialties" },
       { to: "/admin/clinics", icon: Building2, label: "Clinics" },
@@ -57,6 +66,10 @@ const sections: Section[] = [
 const AdminLayout = () => {
   const { signOut, user, isAdmin, isAssistant } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const toggleGroup = (label: string) =>
+    setOpenGroups((g) => ({ ...g, [label]: !g[label] }));
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [dark, setDark] = useState<boolean>(
@@ -114,24 +127,83 @@ const AdminLayout = () => {
                   {section.title}
                 </div>
                 <div className="space-y-1">
-                  {visible.map((l) => (
-                    <NavLink
-                      key={l.to}
-                      to={l.to}
-                      end={l.end}
-                      className={({ isActive }) =>
-                        cn(
-                          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-                          isActive
-                            ? "bg-primary text-primary-foreground shadow-soft"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                        )
-                      }
-                    >
-                      <l.icon className="w-4 h-4" />
-                      {l.label}
-                    </NavLink>
-                  ))}
+                  {visible.map((l) => {
+                    if (l.children && l.children.length) {
+                      const groupActive = l.children.some((c) =>
+                        c.end ? location.pathname === c.to : location.pathname.startsWith(c.to)
+                      );
+                      const open = openGroups[l.label] ?? groupActive;
+                      return (
+                        <div key={l.to}>
+                          <button
+                            type="button"
+                            onClick={() => toggleGroup(l.label)}
+                            className={cn(
+                              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                              groupActive
+                                ? "bg-primary/10 text-primary"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            )}
+                          >
+                            <l.icon className="w-4 h-4" />
+                            <span className="flex-1 text-left">{l.label}</span>
+                            <ChevronDown
+                              className={cn("w-4 h-4 transition-transform", open && "rotate-180")}
+                            />
+                          </button>
+                          {open && (
+                            <div className="mt-1 ml-4 pl-4 border-l border-border space-y-0.5">
+                              {l.children.map((c) => (
+                                <NavLink
+                                  key={c.to}
+                                  to={c.to}
+                                  end={c.end}
+                                  className={({ isActive }) =>
+                                    cn(
+                                      "flex items-center gap-3 pl-3 pr-3 py-1.5 rounded-md text-sm transition-colors relative",
+                                      isActive
+                                        ? "text-primary font-semibold"
+                                        : "text-muted-foreground hover:text-foreground"
+                                    )
+                                  }
+                                >
+                                  {({ isActive }) => (
+                                    <>
+                                      <span
+                                        className={cn(
+                                          "w-1.5 h-1.5 rounded-full",
+                                          isActive ? "bg-primary" : "bg-muted-foreground/30"
+                                        )}
+                                      />
+                                      {c.label}
+                                    </>
+                                  )}
+                                </NavLink>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    }
+                    return (
+                      <NavLink
+                        key={l.to}
+                        to={l.to}
+                        end={l.end}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
+                            isActive
+                              ? "bg-primary text-primary-foreground shadow-soft"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          )
+                        }
+                      >
+                        <l.icon className="w-4 h-4" />
+                        {l.label}
+                      </NavLink>
+                    );
+                  })}
                 </div>
               </div>
             );
