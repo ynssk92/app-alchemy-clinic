@@ -75,10 +75,20 @@ const AdminNotifications = () => {
         created_at: a.created_at,
       })
     );
+    (drift.data || []).forEach((d: any) =>
+      n.push({
+        id: `d-${d.id}`,
+        type: "drift",
+        title: `${DRIFT_LABEL[d.kind] || "Alerte permissions"}${d.user_name ? ` — ${d.user_name}` : ""}`,
+        subtitle: d.detail || "",
+        created_at: d.created_at,
+      })
+    );
     n.sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at));
-    setItems(n.slice(0, 12));
+    setItems(n.slice(0, 15));
 
     setUnreadMsgs((msgs.data || []).filter((m: any) => !m.read).length);
+    setUnreadDrift((drift.data || []).filter((d: any) => !d.acknowledged_at).length);
     const { count } = await supabase
       .from("appointments")
       .select("*", { count: "exact", head: true })
@@ -106,6 +116,14 @@ const AdminNotifications = () => {
           load();
         }
       )
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "assistant_verification_alerts" },
+        (payload: any) => {
+          toast.warning(DRIFT_LABEL[payload.new.kind] || "Alerte permissions assistant");
+          load();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -113,7 +131,7 @@ const AdminNotifications = () => {
     };
   }, []);
 
-  const total = unreadAppts + unreadMsgs;
+  const total = unreadAppts + unreadMsgs + unreadDrift;
 
   return (
     <DropdownMenu>
@@ -131,6 +149,7 @@ const AdminNotifications = () => {
         <DropdownMenuLabel className="flex items-center justify-between">
           <span>Notifications</span>
           <div className="flex gap-1">
+            {unreadDrift > 0 && <Badge variant="destructive">{unreadDrift} drift</Badge>}
             {unreadMsgs > 0 && <Badge variant="secondary">{unreadMsgs} msg</Badge>}
             {unreadAppts > 0 && <Badge>{unreadAppts} RDV</Badge>}
           </div>
