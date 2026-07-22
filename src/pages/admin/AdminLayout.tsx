@@ -159,7 +159,12 @@ const AdminLayout = () => {
 
         <nav className="flex-1 px-3 overflow-y-auto pb-4 space-y-5">
           {sections.map((section) => {
-            const visible = section.items.filter((l) => isAdmin || l.staff);
+            const visible = section.items.filter((l) => {
+              if (isAdmin) return true;
+              if (l.adminOnly) return false;
+              if (l.module) return can(l.module, "view");
+              return !!l.staff;
+            });
             if (visible.length === 0) return null;
             return (
               <div key={section.title}>
