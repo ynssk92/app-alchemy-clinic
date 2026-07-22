@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
-  UserCheck, Search, Moon, Sun, Plus, ChevronDown,
+  UserCheck, Search, Moon, Sun, Plus, ChevronDown, User, UserX, BarChart3,
+  FileStack, MapPin, MessageSquareQuote, HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
