@@ -46,6 +46,7 @@ import {
   AdminLocation, AdminTestimonials, AdminFaq,
 } from "./pages/admin/AdminStubs";
 import AdminRoles from "./pages/admin/AdminRoles";
+import { PermissionRoute } from "./components/permissions";
 
 const queryClient = new QueryClient();
 
@@ -75,26 +76,26 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
-              <Route path="doctors" element={<ProtectedRoute adminOnly><AdminDoctors /></ProtectedRoute>} />
-              <Route path="doctors/new" element={<ProtectedRoute adminOnly><AdminDoctorAdd /></ProtectedRoute>} />
-              <Route path="doctors/details" element={<ProtectedRoute adminOnly><AdminDoctorDetails /></ProtectedRoute>} />
-              <Route path="doctors/details/:id" element={<ProtectedRoute adminOnly><AdminDoctorDetails /></ProtectedRoute>} />
-              <Route path="doctors/schedule" element={<ProtectedRoute adminOnly><AdminDoctorSchedule /></ProtectedRoute>} />
-              <Route path="doctors/schedule/:id" element={<ProtectedRoute adminOnly><AdminDoctorSchedule /></ProtectedRoute>} />
-              <Route path="appointments" element={<AdminAppointments />} />
-              <Route path="appointments/new" element={<AdminAppointmentNew />} />
-              <Route path="appointments/calendar" element={<AdminAppointmentCalendar />} />
-              <Route path="appointments/kanban" element={<AdminAppointmentKanban />} />
-              <Route path="appointments/requests" element={<AdminAppointmentRequests />} />
-              <Route path="patients" element={<ProtectedRoute adminOnly><AdminPatients /></ProtectedRoute>} />
-              <Route path="patients/details" element={<ProtectedRoute adminOnly><AdminPatientDetails /></ProtectedRoute>} />
-              <Route path="patients/details/:id" element={<ProtectedRoute adminOnly><AdminPatientDetails /></ProtectedRoute>} />
-              <Route path="patients/create" element={<ProtectedRoute adminOnly><AdminPatientCreate /></ProtectedRoute>} />
-              <Route path="specialties" element={<ProtectedRoute adminOnly><AdminSpecialties /></ProtectedRoute>} />
-              <Route path="clinics" element={<ProtectedRoute adminOnly><AdminClinics /></ProtectedRoute>} />
-              <Route path="clinics/audit" element={<ProtectedRoute adminOnly><AdminClinicAudit /></ProtectedRoute>} />
-              <Route path="blog" element={<ProtectedRoute adminOnly><AdminBlog /></ProtectedRoute>} />
-              <Route path="messages" element={<AdminMessages />} />
+              <Route path="doctors" element={<PermissionRoute module="Doctors"><AdminDoctors /></PermissionRoute>} />
+              <Route path="doctors/new" element={<PermissionRoute module="Doctors" action="create"><AdminDoctorAdd /></PermissionRoute>} />
+              <Route path="doctors/details" element={<PermissionRoute module="Doctors"><AdminDoctorDetails /></PermissionRoute>} />
+              <Route path="doctors/details/:id" element={<PermissionRoute module="Doctors"><AdminDoctorDetails /></PermissionRoute>} />
+              <Route path="doctors/schedule" element={<PermissionRoute module="Doctors" action="edit"><AdminDoctorSchedule /></PermissionRoute>} />
+              <Route path="doctors/schedule/:id" element={<PermissionRoute module="Doctors" action="edit"><AdminDoctorSchedule /></PermissionRoute>} />
+              <Route path="appointments" element={<PermissionRoute module="Appointments"><AdminAppointments /></PermissionRoute>} />
+              <Route path="appointments/new" element={<PermissionRoute module="Appointments" action="create"><AdminAppointmentNew /></PermissionRoute>} />
+              <Route path="appointments/calendar" element={<PermissionRoute module="Appointments"><AdminAppointmentCalendar /></PermissionRoute>} />
+              <Route path="appointments/kanban" element={<PermissionRoute module="Appointments"><AdminAppointmentKanban /></PermissionRoute>} />
+              <Route path="appointments/requests" element={<PermissionRoute module="Appointments"><AdminAppointmentRequests /></PermissionRoute>} />
+              <Route path="patients" element={<PermissionRoute module="Patients"><AdminPatients /></PermissionRoute>} />
+              <Route path="patients/details" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
+              <Route path="patients/details/:id" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
+              <Route path="patients/create" element={<PermissionRoute module="Patients" action="create"><AdminPatientCreate /></PermissionRoute>} />
+              <Route path="specialties" element={<PermissionRoute module="Specialties"><AdminSpecialties /></PermissionRoute>} />
+              <Route path="clinics" element={<PermissionRoute module="Clinics"><AdminClinics /></PermissionRoute>} />
+              <Route path="clinics/audit" element={<PermissionRoute module="Clinics"><AdminClinicAudit /></PermissionRoute>} />
+              <Route path="blog" element={<PermissionRoute module="Blog"><AdminBlog /></PermissionRoute>} />
+              <Route path="messages" element={<PermissionRoute module="Messages"><AdminMessages /></PermissionRoute>} />
               <Route path="verify-assistants" element={<ProtectedRoute adminOnly><AdminAssistantVerifier /></ProtectedRoute>} />
               <Route path="roles" element={<ProtectedRoute adminOnly><AdminRoles /></ProtectedRoute>} />
               <Route path="delete-requests" element={<ProtectedRoute adminOnly><AdminDeleteRequests /></ProtectedRoute>} />

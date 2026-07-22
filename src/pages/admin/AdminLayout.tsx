@@ -18,8 +18,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
+import { usePermissions } from "@/hooks/usePermissions";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; children?: { to: string; label: string; end?: boolean }[] };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
@@ -33,9 +34,7 @@ const sections: Section[] = [
     title: "Clinic",
     items: [
       {
-        to: "/admin/doctors",
-        icon: Stethoscope,
-        label: "Doctors",
+        to: "/admin/doctors", icon: Stethoscope, label: "Doctors", module: "Doctors",
         children: [
           { to: "/admin/doctors", label: "Doctors", end: true },
           { to: "/admin/doctors/details", label: "Doctor Details" },
@@ -44,9 +43,7 @@ const sections: Section[] = [
         ],
       },
       {
-        to: "/admin/patients",
-        icon: Users,
-        label: "Patients",
+        to: "/admin/patients", icon: Users, label: "Patients", module: "Patients",
         children: [
           { to: "/admin/patients", label: "Patients", end: true },
           { to: "/admin/patients/details", label: "Patient Details" },
@@ -54,10 +51,7 @@ const sections: Section[] = [
         ],
       },
       {
-        to: "/admin/appointments",
-        icon: Calendar,
-        label: "Appointments",
-        staff: true,
+        to: "/admin/appointments", icon: Calendar, label: "Appointments", module: "Appointments", staff: true,
         children: [
           { to: "/admin/appointments", label: "Appointments", end: true },
           { to: "/admin/appointments/new", label: "New Appointment" },
@@ -66,60 +60,51 @@ const sections: Section[] = [
           { to: "/admin/appointments/requests", label: "Appointment Requests" },
         ],
       },
-      { to: "/admin/specialties", icon: Tag, label: "Specialties" },
-      { to: "/admin/clinics", icon: Building2, label: "Clinics" },
-      { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit" },
+      { to: "/admin/specialties", icon: Tag, label: "Specialties", module: "Specialties" },
+      { to: "/admin/clinics", icon: Building2, label: "Clinics", module: "Clinics" },
+      { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit", module: "Clinics" },
     ],
   },
   {
     title: "Content & Comms",
     items: [
-      { to: "/admin/blog", icon: FileText, label: "Blog" },
-      { to: "/admin/messages", icon: Inbox, label: "Messages", staff: true },
+      { to: "/admin/blog", icon: FileText, label: "Blog", module: "Blog" },
+      { to: "/admin/messages", icon: Inbox, label: "Messages", module: "Messages", staff: true },
     ],
   },
   {
     title: "Administration",
     items: [
       {
-        to: "/admin/users",
-        icon: User,
-        label: "Users",
+        to: "/admin/users", icon: User, label: "Users", adminOnly: true,
         children: [
           { to: "/admin/roles", label: "Roles & Permissions" },
           { to: "/admin/delete-requests", label: "Delete Account Request" },
         ],
       },
-      { to: "/admin/reports", icon: BarChart3, label: "Reports" },
+      { to: "/admin/reports", icon: BarChart3, label: "Reports", module: "Reports" },
     ],
   },
   {
     title: "Content",
     items: [
-      { to: "/admin/pages", icon: FileStack, label: "Pages" },
-      {
-        to: "/admin/blog",
-        icon: FileText,
-        label: "Blogs",
-        children: [
-          { to: "/admin/blog", label: "All Blogs", end: true },
-        ],
-      },
-      { to: "/admin/location", icon: MapPin, label: "Location" },
-      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "Testimonials" },
-      { to: "/admin/faq", icon: HelpCircle, label: "FAQ" },
+      { to: "/admin/pages", icon: FileStack, label: "Pages", adminOnly: true },
+      { to: "/admin/location", icon: MapPin, label: "Location", adminOnly: true },
+      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "Testimonials", adminOnly: true },
+      { to: "/admin/faq", icon: HelpCircle, label: "FAQ", adminOnly: true },
     ],
   },
   {
     title: "System",
     items: [
-      { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants" },
+      { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants", adminOnly: true },
     ],
   },
 ];
 
 const AdminLayout = () => {
   const { signOut, user, isAdmin, isAssistant } = useAuth();
+  const { can } = usePermissions();
   const navigate = useNavigate();
   const location = useLocation();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -174,7 +159,12 @@ const AdminLayout = () => {
 
         <nav className="flex-1 px-3 overflow-y-auto pb-4 space-y-5">
           {sections.map((section) => {
-            const visible = section.items.filter((l) => isAdmin || l.staff);
+            const visible = section.items.filter((l) => {
+              if (isAdmin) return true;
+              if (l.adminOnly) return false;
+              if (l.module) return can(l.module, "view");
+              return !!l.staff;
+            });
             if (visible.length === 0) return null;
             return (
               <div key={section.title}>
