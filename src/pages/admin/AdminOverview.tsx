@@ -26,6 +26,9 @@ const AdminOverview = () => {
   const [monthly, setMonthly] = useState<{ month: string; completed: number; ongoing: number; cancelled: number }[]>([]);
   const [recent, setRecent] = useState<any[]>([]);
   const [topDoctors, setTopDoctors] = useState<any[]>([]);
+  const [topPatients, setTopPatients] = useState<any[]>([]);
+  const [recentMessages, setRecentMessages] = useState<any[]>([]);
+  const [upcomingAppts, setUpcomingAppts] = useState<any[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -80,6 +83,45 @@ const AdminOverview = () => {
         .sort((a: any, b: any) => b.bookings - a.bookings)
         .slice(0, 3);
       setTopDoctors(top);
+
+      // Top 5 patients by appointment count
+      const { data: allApptsWithPatient } = await supabase
+        .from("appointments")
+        .select("patient_id");
+      const pCounts: Record<string, number> = {};
+      (allApptsWithPatient || []).forEach((r: any) => {
+        if (r.patient_id) pCounts[r.patient_id] = (pCounts[r.patient_id] || 0) + 1;
+      });
+      const topIds = Object.entries(pCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([id]) => id);
+      if (topIds.length) {
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .in("id", topIds);
+        setTopPatients(
+          topIds.map((id) => {
+            const p: any = profs?.find((x: any) => x.id === id);
+            return { id, name: p?.full_name || "Patient", count: pCounts[id] };
+          })
+        );
+      }
+
+      // Recent contact messages
+      const { data: msgs } = await supabase
+        .from("contact_messages")
+        .select("id, name, email, subject, created_at, status")
+        .order("created_at", { ascending: false })
+        .limit(5);
+      setRecentMessages(msgs || []);
+
+      // Upcoming appointments
+      const { data: upc } = await supabase
+        .from("appointments")
+        .select("id, appointment_date, appointment_time, reason, doctors(full_name), profiles(full_name)")
+        .eq("status", "upcoming")
+        .order("appointment_date", { ascending: true })
+        .limit(5);
+      setUpcomingAppts(upc || []);
     })();
   }, []);
 
@@ -292,7 +334,124 @@ const AdminOverview = () => {
           )}
         </div>
       </Card>
+
+      {/* Three-column insights row: Top Patients / Recent Messages / Upcoming Appointments */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top 5 Patients */}
+        <Card className="p-6 border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg">Top 5 Patients</h3>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/patients">View All</Link>
+            </Button>
+          </div>
+          <div className="space-y-3">
+            {topPatients.length === 0 && (
+              <p className="text-sm text-muted-foreground py-8 text-center">No patient activity yet</p>
+            )}
+            {topPatients.map((p, i) => {
+              const tint = ["stat-blue", "stat-cyan", "stat-violet", "stat-green", "stat-red"][i % 5];
+              return (
+                <div key={p.id} className="flex items-center gap-3">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+                    style={{ background: `hsl(var(--${tint}) / 0.15)`, color: `hsl(var(--${tint}))` }}
+                  >
+                    {p.name.split(" ").map((s: string) => s[0]).slice(0, 2).join("").toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold truncate">{p.name}</div>
+                    <div className="text-xs text-muted-foreground">Loyal patient</div>
+                  </div>
+                  <Badge variant="outline" className="text-xs border-primary/40 text-primary">
+                    {p.count} Appts
+                  </Badge>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Recent Messages */}
+        <Card className="p-6 border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg">Recent Messages</h3>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/messages">View All</Link>
+            </Button>
+          </div>
+          <div className="space-y-3">
+            {recentMessages.length === 0 && (
+              <p className="text-sm text-muted-foreground py-8 text-center">No messages yet</p>
+            )}
+            {recentMessages.map((m: any) => (
+              <div key={m.id} className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: "hsl(var(--stat-violet) / 0.15)", color: "hsl(var(--stat-violet))" }}
+                >
+                  {(m.name || "?").slice(0, 1).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">{m.subject || "New enquiry"}</div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {m.name} · {format(new Date(m.created_at), "MMM d")}
+                  </div>
+                </div>
+                <Badge
+                  className={
+                    m.status === "unread"
+                      ? "bg-stat-red/15 text-stat-red border-0 text-[10px]"
+                      : "bg-positive/15 text-positive border-0 text-[10px]"
+                  }
+                >
+                  {m.status || "new"}
+                </Badge>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Upcoming Appointments */}
+        <Card className="p-6 border-border">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-lg">Upcoming Appointments</h3>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/appointments">View All</Link>
+            </Button>
+          </div>
+          <div className="space-y-3">
+            {upcomingAppts.length === 0 && (
+              <p className="text-sm text-muted-foreground py-8 text-center">Nothing on the schedule</p>
+            )}
+            {upcomingAppts.map((a: any) => (
+              <div key={a.id} className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: "hsl(var(--stat-cyan) / 0.15)", color: "hsl(var(--stat-cyan))" }}
+                >
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">
+                    {a.profiles?.full_name || "Patient"}
+                  </div>
+                  <div className="text-xs text-muted-foreground truncate">
+                    {format(new Date(a.appointment_date), "MMM d")} · {a.appointment_time} · Dr. {a.doctors?.full_name || ""}
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Button asChild size="icon" variant="ghost" className="h-7 w-7 text-positive hover:bg-positive/10">
+                    <Link to="/admin/appointments"><CalendarCheck className="w-4 h-4" /></Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
     </div>
+
   );
 };
 
