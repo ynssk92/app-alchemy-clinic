@@ -236,6 +236,51 @@ const Profile = () => {
               </form>
             )}
           </Card>
+
+          <Card className="p-8 border-border bg-card shadow-large mt-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Change Password</h2>
+                <p className="text-sm text-muted-foreground">Update the password used to sign in.</p>
+              </div>
+            </div>
+            <form onSubmit={handleChangePassword} className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="new_password">New password</Label>
+                <Input
+                  id="new_password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={8}
+                  maxLength={72}
+                  required
+                  autoComplete="new-password"
+                />
+                <p className="text-xs text-muted-foreground mt-1">At least 8 characters.</p>
+              </div>
+              <div>
+                <Label htmlFor="confirm_password">Confirm new password</Label>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  minLength={8}
+                  maxLength={72}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+              <Button type="submit" disabled={changingPassword}>
+                <Lock className="w-4 h-4 mr-2" />
+                {changingPassword ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          </Card>
         </div>
       </section>
       <AvatarCropDialog
