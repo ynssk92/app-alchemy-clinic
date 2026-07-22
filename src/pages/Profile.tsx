@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Save, Upload, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Save, Upload, User as UserIcon, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,16 @@ const schema = z.object({
   phone: z.string().trim().max(30, "Phone must be under 30 characters").optional().or(z.literal("")),
 });
 
+const passwordSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password must be at least 8 characters").max(72, "Password too long"),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 const Profile = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -31,6 +41,9 @@ const Profile = () => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
 
   const loadAvatar = async (path: string | null) => {
     if (!path) return setAvatarUrl(null);
@@ -110,6 +123,19 @@ const Profile = () => {
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Profile updated!");
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    setChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: parsed.data.newPassword });
+    setChangingPassword(false);
+    if (error) return toast.error(error.message);
+    setNewPassword("");
+    setConfirmPassword("");
+    toast.success("Password updated!");
   };
 
   const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
@@ -209,6 +235,51 @@ const Profile = () => {
                 </div>
               </form>
             )}
+          </Card>
+
+          <Card className="p-8 border-border bg-card shadow-large mt-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Change Password</h2>
+                <p className="text-sm text-muted-foreground">Update the password used to sign in.</p>
+              </div>
+            </div>
+            <form onSubmit={handleChangePassword} className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="new_password">New password</Label>
+                <Input
+                  id="new_password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={8}
+                  maxLength={72}
+                  required
+                  autoComplete="new-password"
+                />
+                <p className="text-xs text-muted-foreground mt-1">At least 8 characters.</p>
+              </div>
+              <div>
+                <Label htmlFor="confirm_password">Confirm new password</Label>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  minLength={8}
+                  maxLength={72}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+              <Button type="submit" disabled={changingPassword}>
+                <Lock className="w-4 h-4 mr-2" />
+                {changingPassword ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
           </Card>
         </div>
       </section>
