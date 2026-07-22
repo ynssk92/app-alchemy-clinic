@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Bell, Calendar, Mail } from "lucide-react";
+import { Bell, Calendar, Mail, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -16,10 +16,17 @@ import { toast } from "sonner";
 
 type Notif = {
   id: string;
-  type: "appointment" | "message";
+  type: "appointment" | "message" | "drift";
   title: string;
   subtitle: string;
   created_at: string;
+};
+
+const DRIFT_LABEL: Record<string, string> = {
+  assistant_also_admin: "Escalade admin détectée",
+  missing_profile: "Profil assistant manquant",
+  appointments_unreachable: "Rendez-vous inaccessibles",
+  messages_unreachable: "Messages inaccessibles",
 };
 
 const AdminNotifications = () => {
@@ -28,8 +35,10 @@ const AdminNotifications = () => {
   const [unreadAppts, setUnreadAppts] = useState(0);
   const [unreadMsgs, setUnreadMsgs] = useState(0);
 
+  const [unreadDrift, setUnreadDrift] = useState(0);
+
   const load = async () => {
-    const [msgs, appts] = await Promise.all([
+    const [msgs, appts, drift] = await Promise.all([
       supabase
         .from("contact_messages")
         .select("id, name, email, message, created_at, read")
@@ -38,6 +47,11 @@ const AdminNotifications = () => {
       supabase
         .from("appointments")
         .select("id, appointment_date, appointment_time, status, reason, created_at, doctors(full_name)")
+        .order("created_at", { ascending: false })
+        .limit(10),
+      supabase
+        .from("assistant_verification_alerts")
+        .select("id, kind, detail, user_name, created_at, acknowledged_at")
         .order("created_at", { ascending: false })
         .limit(10),
     ]);
