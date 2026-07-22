@@ -47,6 +47,16 @@ All colors MUST be HSL.
     --shadow-large: 0 8px 32px hsl(222 47% 11% / 0.16);
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Admin stat accents (Preclinic style) */
+    --stat-blue: 220 90% 56%;
+    --stat-red: 352 84% 60%;
+    --stat-cyan: 190 90% 45%;
+    --stat-green: 152 60% 42%;
+    --stat-amber: 38 92% 52%;
+    --stat-violet: 262 72% 60%;
+    --positive: 152 60% 42%;
+    --negative: 352 84% 60%;
   }
 
   .dark {
