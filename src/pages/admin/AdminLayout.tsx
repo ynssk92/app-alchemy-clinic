@@ -18,7 +18,7 @@ import logo from "@/assets/logo.png";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
@@ -32,7 +32,16 @@ const sections: Section[] = [
     title: "Clinic",
     items: [
       { to: "/admin/doctors", icon: Stethoscope, label: "Doctors" },
-      { to: "/admin/patients", icon: Users, label: "Patients" },
+      {
+        to: "/admin/patients",
+        icon: Users,
+        label: "Patients",
+        children: [
+          { to: "/admin/patients", label: "Patients", end: true },
+          { to: "/admin/patients/details", label: "Patient Details" },
+          { to: "/admin/patients/create", label: "Create Patient" },
+        ],
+      },
       { to: "/admin/appointments", icon: Calendar, label: "Appointments", staff: true },
       { to: "/admin/specialties", icon: Tag, label: "Specialties" },
       { to: "/admin/clinics", icon: Building2, label: "Clinics" },
