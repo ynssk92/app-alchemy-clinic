@@ -125,6 +125,19 @@ const Profile = () => {
     toast.success("Profile updated!");
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    setChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: parsed.data.newPassword });
+    setChangingPassword(false);
+    if (error) return toast.error(error.message);
+    setNewPassword("");
+    setConfirmPassword("");
+    toast.success("Password updated!");
+  };
+
   const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
 
   return (
