@@ -66,6 +66,9 @@ const App = () => (
               <Route path="doctors" element={<ProtectedRoute adminOnly><AdminDoctors /></ProtectedRoute>} />
               <Route path="appointments" element={<AdminAppointments />} />
               <Route path="patients" element={<ProtectedRoute adminOnly><AdminPatients /></ProtectedRoute>} />
+              <Route path="patients/details" element={<ProtectedRoute adminOnly><AdminPatientDetails /></ProtectedRoute>} />
+              <Route path="patients/details/:id" element={<ProtectedRoute adminOnly><AdminPatientDetails /></ProtectedRoute>} />
+              <Route path="patients/create" element={<ProtectedRoute adminOnly><AdminPatientCreate /></ProtectedRoute>} />
               <Route path="specialties" element={<ProtectedRoute adminOnly><AdminSpecialties /></ProtectedRoute>} />
               <Route path="clinics" element={<ProtectedRoute adminOnly><AdminClinics /></ProtectedRoute>} />
               <Route path="clinics/audit" element={<ProtectedRoute adminOnly><AdminClinicAudit /></ProtectedRoute>} />
