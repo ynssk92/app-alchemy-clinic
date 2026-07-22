@@ -85,6 +85,39 @@ export type Database = {
           },
         ]
       }
+      assistant_verification_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          detail: string | null
+          id: string
+          kind: string
+          user_id: string | null
+          user_name: string | null
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind: string
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          user_id?: string | null
+          user_name?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
