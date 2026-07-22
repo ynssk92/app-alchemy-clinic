@@ -46,6 +46,7 @@ import {
   AdminLocation, AdminTestimonials, AdminFaq,
 } from "./pages/admin/AdminStubs";
 import AdminRoles from "./pages/admin/AdminRoles";
+import { PermissionRoute } from "./components/permissions";
 
 const queryClient = new QueryClient();
 
