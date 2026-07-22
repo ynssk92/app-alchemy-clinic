@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Save, Upload, User as UserIcon } from "lucide-react";
+import { ArrowLeft, Save, Upload, User as UserIcon, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
