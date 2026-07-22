@@ -104,6 +104,7 @@ const sections: Section[] = [
 
 const AdminLayout = () => {
   const { signOut, user, isAdmin, isAssistant } = useAuth();
+  const { can } = usePermissions();
   const navigate = useNavigate();
   const location = useLocation();
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
