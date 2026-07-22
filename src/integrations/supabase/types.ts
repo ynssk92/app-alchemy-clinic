@@ -374,6 +374,86 @@ export type Database = {
           },
         ]
       }
+      patient_intake: {
+        Row: {
+          address_1: string | null
+          address_2: string | null
+          avatar_url: string | null
+          blood_group: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          dob: string | null
+          email: string
+          first_name: string
+          gender: string | null
+          id: string
+          last_name: string
+          phone: string | null
+          pincode: string | null
+          primary_doctor_id: string | null
+          state: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address_1?: string | null
+          address_2?: string | null
+          avatar_url?: string | null
+          blood_group?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          dob?: string | null
+          email: string
+          first_name: string
+          gender?: string | null
+          id?: string
+          last_name: string
+          phone?: string | null
+          pincode?: string | null
+          primary_doctor_id?: string | null
+          state?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address_1?: string | null
+          address_2?: string | null
+          avatar_url?: string | null
+          blood_group?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          dob?: string | null
+          email?: string
+          first_name?: string
+          gender?: string | null
+          id?: string
+          last_name?: string
+          phone?: string | null
+          pincode?: string | null
+          primary_doctor_id?: string | null
+          state?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_intake_primary_doctor_id_fkey"
+            columns: ["primary_doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
