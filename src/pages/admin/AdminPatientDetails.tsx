@@ -79,6 +79,9 @@ const AdminPatientDetails = () => {
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [apptSearch, setApptSearch] = useState("");
+  const [intake, setIntake] = useState<any>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [reloadTick, setReloadTick] = useState(0);
 
   useEffect(() => {
     (async () => {
