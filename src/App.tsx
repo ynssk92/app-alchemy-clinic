@@ -95,6 +95,13 @@ const App = () => (
               <Route path="blog" element={<ProtectedRoute adminOnly><AdminBlog /></ProtectedRoute>} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="verify-assistants" element={<ProtectedRoute adminOnly><AdminAssistantVerifier /></ProtectedRoute>} />
+              <Route path="roles" element={<ProtectedRoute adminOnly><AdminRoles /></ProtectedRoute>} />
+              <Route path="delete-requests" element={<ProtectedRoute adminOnly><AdminDeleteRequests /></ProtectedRoute>} />
+              <Route path="reports" element={<ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>} />
+              <Route path="pages" element={<ProtectedRoute adminOnly><AdminPages /></ProtectedRoute>} />
+              <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
+              <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
+              <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
