@@ -41,6 +41,10 @@ import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
 import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
+import {
+  AdminRoles, AdminDeleteRequests, AdminReports, AdminPages,
+  AdminLocation, AdminTestimonials, AdminFaq,
+} from "./pages/admin/AdminStubs";
 
 const queryClient = new QueryClient();
 
