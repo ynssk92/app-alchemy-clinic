@@ -357,6 +357,15 @@ const AdminPatientDetails = () => {
           )}
         </div>
       </div>
+
+      {id && (
+        <EditPatientDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          patientId={id}
+          onSaved={() => setReloadTick((t) => t + 1)}
+        />
+      )}
     </div>
   );
 };
