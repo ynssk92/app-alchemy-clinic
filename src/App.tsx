@@ -42,9 +42,10 @@ import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
 import {
-  AdminRoles, AdminDeleteRequests, AdminReports, AdminPages,
+  AdminDeleteRequests, AdminReports, AdminPages,
   AdminLocation, AdminTestimonials, AdminFaq,
 } from "./pages/admin/AdminStubs";
+import AdminRoles from "./pages/admin/AdminRoles";
 
 const queryClient = new QueryClient();
 
