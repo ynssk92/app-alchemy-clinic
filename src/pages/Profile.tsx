@@ -315,6 +315,22 @@ const Profile = () => {
         onCropped={handleCropped}
         busy={uploading}
       />
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => !changingPassword && setConfirmOpen(o)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update your password?</AlertDialogTitle>
+            <AlertDialogDescription>
+              After updating, you'll be signed out on this device and will need to sign in again with your new password.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={changingPassword}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmChangePassword} disabled={changingPassword}>
+              {changingPassword ? "Updating..." : "Update & sign out"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
