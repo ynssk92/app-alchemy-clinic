@@ -101,7 +101,7 @@ const AdminPatients = () => {
           <p className="text-muted-foreground">All registered patients.</p>
         </div>
         <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
-          <Link to="/admin/patients/new">
+          <Link to="/admin/patients/create">
             <UserPlus className="w-4 h-4" />
             Add New Patient
           </Link>
