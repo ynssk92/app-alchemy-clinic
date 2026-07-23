@@ -48,6 +48,13 @@ import {
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminUsers from "./pages/admin/AdminUsers";
 import { PermissionRoute } from "./components/permissions";
+import BillingDashboard from "./pages/admin/billing/BillingDashboard";
+import Invoices from "./pages/admin/billing/Invoices";
+import InvoiceDetails from "./pages/admin/billing/InvoiceDetails";
+import CreateInvoice from "./pages/admin/billing/CreateInvoice";
+import Payments from "./pages/admin/billing/Payments";
+import Services from "./pages/admin/billing/Services";
+import Categories from "./pages/admin/billing/Categories";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +104,13 @@ const App = () => (
               <Route path="clinics/audit" element={<PermissionRoute module="Clinics"><AdminClinicAudit /></PermissionRoute>} />
               <Route path="blog" element={<PermissionRoute module="Blog"><AdminBlog /></PermissionRoute>} />
               <Route path="messages" element={<PermissionRoute module="Messages"><AdminMessages /></PermissionRoute>} />
+              <Route path="billing" element={<PermissionRoute module="Billing"><BillingDashboard /></PermissionRoute>} />
+              <Route path="billing/invoices" element={<PermissionRoute module="Billing"><Invoices /></PermissionRoute>} />
+              <Route path="billing/invoices/new" element={<PermissionRoute module="Billing" action="create"><CreateInvoice /></PermissionRoute>} />
+              <Route path="billing/invoices/:id" element={<PermissionRoute module="Billing"><InvoiceDetails /></PermissionRoute>} />
+              <Route path="billing/payments" element={<PermissionRoute module="Billing"><Payments /></PermissionRoute>} />
+              <Route path="billing/services" element={<PermissionRoute module="Billing"><Services /></PermissionRoute>} />
+              <Route path="billing/categories" element={<PermissionRoute module="Billing"><Categories /></PermissionRoute>} />
               <Route path="verify-assistants" element={<ProtectedRoute adminOnly><AdminAssistantVerifier /></ProtectedRoute>} />
               <Route path="roles" element={<ProtectedRoute adminOnly><AdminRoles /></ProtectedRoute>} />
               <Route path="users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />

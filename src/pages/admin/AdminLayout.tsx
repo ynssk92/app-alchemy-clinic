@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, Plus, ChevronDown, User, UserX, BarChart3,
-  FileStack, MapPin, MessageSquareQuote, HelpCircle,
+  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -63,6 +63,22 @@ const sections: Section[] = [
       { to: "/admin/specialties", icon: Tag, label: "Specialties", module: "Specialties" },
       { to: "/admin/clinics", icon: Building2, label: "Clinics", module: "Clinics" },
       { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit", module: "Clinics" },
+    ],
+  },
+  {
+    title: "Billing",
+    items: [
+      {
+        to: "/admin/billing", icon: Receipt, label: "Billing", module: "Billing",
+        children: [
+          { to: "/admin/billing", label: "Dashboard", end: true },
+          { to: "/admin/billing/invoices", label: "Invoices", end: true },
+          { to: "/admin/billing/invoices/new", label: "New Invoice" },
+          { to: "/admin/billing/payments", label: "Payments" },
+          { to: "/admin/billing/services", label: "Services" },
+          { to: "/admin/billing/categories", label: "Categories" },
+        ],
+      },
     ],
   },
   {
