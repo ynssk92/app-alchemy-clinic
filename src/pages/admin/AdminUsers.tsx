@@ -310,11 +310,12 @@ const AdminUsers = () => {
           </div>
           <Tabs value={filter} onValueChange={(v) => setFilter(v as RoleFilter)}>
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="staff">Staff</TabsTrigger>
               <TabsTrigger value="admin">Admins</TabsTrigger>
               <TabsTrigger value="assistant">Assistants</TabsTrigger>
               <TabsTrigger value="doctor">Doctors</TabsTrigger>
               <TabsTrigger value="patient">Patients</TabsTrigger>
+              <TabsTrigger value="all">All</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
