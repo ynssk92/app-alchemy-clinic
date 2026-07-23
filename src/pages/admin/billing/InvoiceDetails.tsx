@@ -111,7 +111,11 @@ export default function InvoiceDetails() {
           {inv.status !== "cancelled" && inv.status !== "paid" && (
             <Button onClick={() => setPayOpen(true)}><Wallet className="w-4 h-4 mr-2" />Record Payment</Button>
           )}
-          <Button variant="outline" onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" />Print / PDF</Button>
+          <Button variant="outline" onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" />Print</Button>
+          <Button variant="outline" onClick={exportPDF} disabled={exporting}>
+            {exporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            {exporting ? "Generating…" : "Download PDF"}
+          </Button>
           {inv.status !== "cancelled" && (
             <Button variant="outline" className="text-destructive" onClick={cancel}><XCircle className="w-4 h-4 mr-2" />Cancel</Button>
           )}
