@@ -90,9 +90,9 @@ export default function AdminApprovals() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
           <TabsList>
-            <TabsTrigger value="pending"><Clock className="w-4 h-4 mr-1" />Pending</TabsTrigger>
-            <TabsTrigger value="approved"><CheckCircle2 className="w-4 h-4 mr-1" />Approved</TabsTrigger>
-            <TabsTrigger value="rejected"><XCircle className="w-4 h-4 mr-1" />Rejected</TabsTrigger>
+            <TabsTrigger value="pending"><Clock className="w-4 h-4 mr-1" />Pending <Badge variant="secondary" className="ml-2">{counts.pending}</Badge></TabsTrigger>
+            <TabsTrigger value="approved"><CheckCircle2 className="w-4 h-4 mr-1" />Approved <Badge variant="secondary" className="ml-2">{counts.approved}</Badge></TabsTrigger>
+            <TabsTrigger value="rejected"><XCircle className="w-4 h-4 mr-1" />Rejected <Badge variant="secondary" className="ml-2">{counts.rejected}</Badge></TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="relative w-72">
