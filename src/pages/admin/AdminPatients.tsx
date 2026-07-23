@@ -1,12 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, Pencil, UserPlus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trash2, Pencil, UserPlus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
+
 
 type Row = {
   key: string;
@@ -22,6 +25,10 @@ type Row = {
 const AdminPatients = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "registered" | "not_registered">("all");
+  const [query, setQuery] = useState("");
+
+
 
   const load = async () => {
     // 1. Patient intake records (created via Admin → Add Patient)
@@ -93,12 +100,32 @@ const AdminPatients = () => {
     load();
   };
 
+  const counts = useMemo(() => {
+    const registered = rows.filter((r) => !!r.profile_id).length;
+    const notReg = rows.length - registered;
+    return { all: rows.length, registered, not_registered: notReg };
+  }, [rows]);
+
+  const visibleRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (filter === "registered" && !r.profile_id) return false;
+      if (filter === "not_registered" && r.profile_id) return false;
+      if (!q) return true;
+      return (
+        (r.full_name || "").toLowerCase().includes(q) ||
+        (r.phone || "").toLowerCase().includes(q) ||
+        (r.email || "").toLowerCase().includes(q)
+      );
+    });
+  }, [rows, filter, query]);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-1">Patients</h1>
-          <p className="text-muted-foreground">All registered patients.</p>
+          <p className="text-muted-foreground">Manage registered and admin-added patients.</p>
         </div>
         <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
           <Link to="/admin/patients/create">
@@ -108,16 +135,39 @@ const AdminPatients = () => {
         </Button>
       </div>
 
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+          <TabsList>
+            <TabsTrigger value="all">All ({counts.all})</TabsTrigger>
+            <TabsTrigger value="registered">Registered ({counts.registered})</TabsTrigger>
+            <TabsTrigger value="not_registered">Not registered ({counts.not_registered})</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div className="relative md:ml-auto md:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search name, phone, email"
+            className="pl-9"
+          />
+        </div>
+      </div>
+
       <div className="grid gap-3">
-        {rows.map((p) => (
+        {visibleRows.map((p) => (
           <Card key={p.key} className="p-4 flex items-center gap-4 border-border bg-card flex-wrap">
+
             <div className="flex-1 min-w-[200px]">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <h3 className="font-bold">{p.full_name || "Unnamed"}</h3>
                 <Badge variant="secondary">Patient</Badge>
-                {p.source === "intake" && !p.profile_id && (
+                {p.profile_id ? (
+                  <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-transparent">Registered</Badge>
+                ) : (
                   <Badge variant="outline">Not registered</Badge>
                 )}
+
               </div>
               <p className="text-sm text-muted-foreground">
                 {p.phone || p.email || "No contact"} • Added{" "}
@@ -135,9 +185,12 @@ const AdminPatients = () => {
             </Button>
           </Card>
         ))}
-        {rows.length === 0 && (
-          <p className="text-muted-foreground text-center py-8">No patients yet.</p>
+        {visibleRows.length === 0 && (
+          <p className="text-muted-foreground text-center py-8">
+            {rows.length === 0 ? "No patients yet." : "No patients match this filter."}
+          </p>
         )}
+
       </div>
 
       {editingId && (
