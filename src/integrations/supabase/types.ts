@@ -682,6 +682,10 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          status: Database["public"]["Enums"]["profile_status"]
+          status_reason: string | null
+          status_updated_at: string | null
+          status_updated_by: string | null
           updated_at: string
         }
         Insert: {
@@ -690,6 +694,10 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          status?: Database["public"]["Enums"]["profile_status"]
+          status_reason?: string | null
+          status_updated_at?: string | null
+          status_updated_by?: string | null
           updated_at?: string
         }
         Update: {
@@ -698,6 +706,10 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          status?: Database["public"]["Enums"]["profile_status"]
+          status_reason?: string | null
+          status_updated_at?: string | null
+          status_updated_by?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -926,6 +938,7 @@ export type Database = {
         | "paid"
         | "cancelled"
       payment_method: "cash" | "card" | "insurance" | "transfer" | "online"
+      profile_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1062,6 +1075,7 @@ export const Constants = {
         "cancelled",
       ],
       payment_method: ["cash", "card", "insurance", "transfer", "online"],
+      profile_status: ["pending", "approved", "rejected"],
     },
   },
 } as const
