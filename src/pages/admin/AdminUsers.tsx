@@ -16,6 +16,8 @@ const AdminUsers = () => {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "admin" | "assistant" | "doctor" | "patient">("all");
 
   const load = async () => {
     const { data: profiles } = await supabase
