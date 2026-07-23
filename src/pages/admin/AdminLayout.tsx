@@ -292,6 +292,7 @@ const AdminLayout = () => {
             <Input placeholder="Search patients, doctors, appointments…" className="pl-9 bg-muted/50 border-0" />
           </div>
           <div className="flex-1" />
+          <LanguageToggle />
           <Button variant="ghost" size="icon" onClick={toggleTheme} title="Toggle theme">
             {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </Button>
