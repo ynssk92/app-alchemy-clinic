@@ -123,9 +123,18 @@ const AdminPatientDetails = () => {
           .order("created_at", { ascending: false }),
         supabase.from("user_roles").select("user_id, role"),
       ]);
-      const staff = new Set(
-        (roles || []).filter((r: any) => r.role === "admin" || r.role === "assistant").map((r: any) => r.user_id)
-      );
+      const rolesByUser = new Map<string, Set<string>>();
+      (roles || []).forEach((r: any) => {
+        const s = rolesByUser.get(r.user_id) || new Set<string>();
+        s.add(r.role);
+        rolesByUser.set(r.user_id, s);
+      });
+      const isPatientOnly = (uid: string) => {
+        const s = rolesByUser.get(uid);
+        if (!s || !s.has("patient")) return false;
+        if (s.has("admin") || s.has("assistant") || s.has("doctor")) return false;
+        return true;
+      };
       const intakeByUser = new Map<string, any>();
       const intakeRows: ListRow[] = (intake || []).map((i: any) => {
         if (i.user_id) intakeByUser.set(i.user_id, i);
@@ -139,7 +148,7 @@ const AdminPatientDetails = () => {
         };
       });
       const profileRows: ListRow[] = (profiles || [])
-        .filter((p: any) => !staff.has(p.id) && !intakeByUser.has(p.id))
+        .filter((p: any) => isPatientOnly(p.id) && !intakeByUser.has(p.id))
         .map((p: any) => ({
           key: `profile:${p.id}`,
           id: p.id,
