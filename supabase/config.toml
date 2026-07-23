@@ -1,1 +1,7 @@
 project_id = "xseilsdlrcakjevtmcfw"
+
+[functions.verify-assistants]
+verify_jwt = false
+
+[functions.translate-batch]
+verify_jwt = false
