@@ -148,11 +148,35 @@ const AdminUsers = () => {
         </div>
       </Card>
 
-      <h2 className="text-lg font-bold mb-3">Staff accounts</h2>
+      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <h2 className="text-lg font-bold">All accounts ({filtered.length})</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search name or phone..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 w-64"
+            />
+          </div>
+          <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="admin">Admins</TabsTrigger>
+              <TabsTrigger value="assistant">Assistants</TabsTrigger>
+              <TabsTrigger value="doctor">Doctors</TabsTrigger>
+              <TabsTrigger value="patient">Patients</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
       <div className="grid gap-3">
-        {rows.map((p) => {
+        {filtered.map((p) => {
           const isAdmin = p.roles.includes("admin");
           const isAssistant = p.roles.includes("assistant");
+          const isDoctor = p.roles.includes("doctor");
+          const isPatient = p.roles.includes("patient");
           return (
             <Card key={p.id} className="p-4 flex items-center gap-4 border-border bg-card flex-wrap">
               <div className="flex-1 min-w-[200px]">
@@ -163,6 +187,10 @@ const AdminUsers = () => {
                     <Badge variant="outline" className="border-primary text-primary">
                       Assistant
                     </Badge>
+                  )}
+                  {isDoctor && <Badge variant="secondary">Doctor</Badge>}
+                  {isPatient && !isAdmin && !isAssistant && !isDoctor && (
+                    <Badge variant="outline">Patient</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -200,8 +228,8 @@ const AdminUsers = () => {
             </Card>
           );
         })}
-        {rows.length === 0 && (
-          <p className="text-muted-foreground text-center py-8">No staff users yet.</p>
+        {filtered.length === 0 && (
+          <p className="text-muted-foreground text-center py-8">No users found.</p>
         )}
       </div>
     </div>
