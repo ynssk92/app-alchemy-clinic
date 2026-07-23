@@ -1,15 +1,17 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Printer, Wallet, ArrowLeft, XCircle } from "lucide-react";
+import { Printer, Wallet, ArrowLeft, XCircle, Download, Loader2 } from "lucide-react";
 import { formatMoney } from "@/lib/currency";
 import PaymentDialog from "@/components/admin/PaymentDialog";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-slate-500/15 text-slate-600",
