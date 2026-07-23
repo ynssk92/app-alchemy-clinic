@@ -25,6 +25,10 @@ type Row = {
 const AdminPatients = () => {
   const [rows, setRows] = useState<Row[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "registered" | "not_registered">("all");
+  const [query, setQuery] = useState("");
+
+
 
   const load = async () => {
     // 1. Patient intake records (created via Admin → Add Patient)
