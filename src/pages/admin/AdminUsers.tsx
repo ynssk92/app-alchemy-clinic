@@ -29,11 +29,9 @@ const AdminUsers = () => {
     (roles || []).forEach((r: any) => {
       rmap.set(r.user_id, [...(rmap.get(r.user_id) || []), r.role]);
     });
-    // Only staff users (admin or assistant)
-    const staff = (profiles || [])
-      .map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] }))
-      .filter((p) => p.roles.includes("admin") || p.roles.includes("assistant"));
-    setRows(staff);
+    // All users with their roles
+    const all = (profiles || []).map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] }));
+    setRows(all);
 
     const { data: inv } = await supabase
       .from("admin_invites")
