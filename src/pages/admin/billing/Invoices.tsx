@@ -37,7 +37,7 @@ export default function Invoices() {
     setLoading(true);
     const { data } = await supabase
       .from("invoices")
-      .select("id, invoice_number, total, paid, due, status, issue_date, notes, patient:profiles(full_name, phone), doctor:doctors(full_name)")
+      .select("id, invoice_number, total, paid, due, status, issue_date, notes, patient_id, patient:profiles(full_name, phone), doctor:doctors(full_name)")
       .order("created_at", { ascending: false });
     setRows(data || []);
     setLoading(false);
@@ -156,7 +156,16 @@ export default function Invoices() {
                   <td className="p-3 font-medium">
                     <Link to={`/admin/billing/invoices/${r.id}`} className="text-primary hover:underline">{r.invoice_number}</Link>
                   </td>
-                  <td className="p-3">{r.patient?.full_name || "—"}<div className="text-xs text-muted-foreground">{r.patient?.phone}</div></td>
+                  <td className="p-3">
+                    {r.patient_id ? (
+                      <Link to={`/admin/patients/${r.patient_id}`} className="text-primary hover:underline">
+                        {r.patient?.full_name || "—"}
+                      </Link>
+                    ) : (
+                      r.patient?.full_name || "—"
+                    )}
+                    <div className="text-xs text-muted-foreground">{r.patient?.phone}</div>
+                  </td>
                   <td className="p-3">{r.doctor?.full_name || "—"}</td>
                   <td className="p-3">{r.issue_date}</td>
                   <td className="p-3 text-right">{formatMoney(r.total)}</td>
