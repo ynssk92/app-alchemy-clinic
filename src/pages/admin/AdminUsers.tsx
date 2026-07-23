@@ -96,7 +96,7 @@ const AdminUsers = () => {
     <div>
       <h1 className="text-3xl font-bold text-foreground mb-1">Users</h1>
       <p className="text-muted-foreground mb-8">
-        Manage admin & assistant accounts and invitations.
+        All accounts in the system — admins, assistants, doctors, and patients.
       </p>
 
       <Card className="p-6 mb-8 border-border bg-card">
