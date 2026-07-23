@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { Seo } from "@/components/Seo";
+import { LanguageToggle } from "@/components/LanguageToggle";
 import logo from "@/assets/logo.png";
 
 const ResetPassword = () => {
@@ -42,7 +43,8 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4 z-10"><LanguageToggle variant="outline" /></div>
       <Seo title="Reset Password — HealthBook" description="Set a new password for your account." path="/reset-password" />
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center mb-8">

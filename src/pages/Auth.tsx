@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { lovable } from "@/integrations/lovable";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -117,7 +118,8 @@ const Auth = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4 z-10"><LanguageToggle variant="outline" /></div>
       <Seo
         title="Sign In or Sign Up — HealthBook"
         description="Access your HealthBook account to book appointments, manage records, and track your care."

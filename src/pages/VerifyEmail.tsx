@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const VerifyEmail = () => {
   const { user, loading, signOut } = useAuth();
@@ -54,7 +55,8 @@ const VerifyEmail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative">
+      <div className="absolute top-4 right-4 z-10"><LanguageToggle variant="outline" /></div>
       <Seo title="Verify your email — HealthBook" description="Confirm your email address to activate your HealthBook account." path="/verify-email" />
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center justify-center mb-8">
