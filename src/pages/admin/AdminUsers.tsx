@@ -44,7 +44,7 @@ type Invite = {
   full_name?: string | null;
 };
 
-type RoleFilter = "all" | "admin" | "assistant" | "doctor" | "patient";
+type RoleFilter = "staff" | "all" | "admin" | "assistant" | "doctor" | "patient";
 type SortKey = "created_at" | "full_name";
 
 const PAGE_SIZES = [10, 25, 50, 100];
@@ -60,7 +60,7 @@ const AdminUsers = () => {
   // Server-side controls
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
-  const [filter, setFilter] = useState<RoleFilter>("all");
+  const [filter, setFilter] = useState<RoleFilter>("staff");
   const [sortKey, setSortKey] = useState<SortKey>("created_at");
   const [sortAsc, setSortAsc] = useState(false);
   const [page, setPage] = useState(0);
@@ -86,12 +86,13 @@ const AdminUsers = () => {
       // If filtering by role, restrict to user_ids that carry that role
       let idFilter: string[] | null = null;
       if (filter !== "all") {
+        const roles = filter === "staff" ? ["admin", "assistant", "doctor"] : [filter];
         const { data: rl, error } = await supabase
           .from("user_roles")
           .select("user_id")
-          .eq("role", filter as any);
+          .in("role", roles as any);
         if (error) throw error;
-        idFilter = (rl || []).map((r: any) => r.user_id);
+        idFilter = Array.from(new Set((rl || []).map((r: any) => r.user_id)));
         if (idFilter.length === 0) {
           if (rid === reqIdRef.current) {
             setRows([]);
@@ -309,11 +310,12 @@ const AdminUsers = () => {
           </div>
           <Tabs value={filter} onValueChange={(v) => setFilter(v as RoleFilter)}>
             <TabsList>
-              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="staff">Staff</TabsTrigger>
               <TabsTrigger value="admin">Admins</TabsTrigger>
               <TabsTrigger value="assistant">Assistants</TabsTrigger>
               <TabsTrigger value="doctor">Doctors</TabsTrigger>
               <TabsTrigger value="patient">Patients</TabsTrigger>
+              <TabsTrigger value="all">All</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
