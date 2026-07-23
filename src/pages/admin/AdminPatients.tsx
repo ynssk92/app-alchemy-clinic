@@ -100,12 +100,32 @@ const AdminPatients = () => {
     load();
   };
 
+  const counts = useMemo(() => {
+    const registered = rows.filter((r) => !!r.profile_id).length;
+    const notReg = rows.length - registered;
+    return { all: rows.length, registered, not_registered: notReg };
+  }, [rows]);
+
+  const visibleRows = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return rows.filter((r) => {
+      if (filter === "registered" && !r.profile_id) return false;
+      if (filter === "not_registered" && r.profile_id) return false;
+      if (!q) return true;
+      return (
+        (r.full_name || "").toLowerCase().includes(q) ||
+        (r.phone || "").toLowerCase().includes(q) ||
+        (r.email || "").toLowerCase().includes(q)
+      );
+    });
+  }, [rows, filter, query]);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-1">Patients</h1>
-          <p className="text-muted-foreground">All registered patients.</p>
+          <p className="text-muted-foreground">Manage registered and admin-added patients.</p>
         </div>
         <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
           <Link to="/admin/patients/create">
@@ -115,9 +135,29 @@ const AdminPatients = () => {
         </Button>
       </div>
 
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-4">
+        <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+          <TabsList>
+            <TabsTrigger value="all">All ({counts.all})</TabsTrigger>
+            <TabsTrigger value="registered">Registered ({counts.registered})</TabsTrigger>
+            <TabsTrigger value="not_registered">Not registered ({counts.not_registered})</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <div className="relative md:ml-auto md:w-72">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search name, phone, email"
+            className="pl-9"
+          />
+        </div>
+      </div>
+
       <div className="grid gap-3">
-        {rows.map((p) => (
+        {visibleRows.map((p) => (
           <Card key={p.key} className="p-4 flex items-center gap-4 border-border bg-card flex-wrap">
+
             <div className="flex-1 min-w-[200px]">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <h3 className="font-bold">{p.full_name || "Unnamed"}</h3>
