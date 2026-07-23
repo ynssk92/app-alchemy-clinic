@@ -47,6 +47,8 @@ import {
 } from "./pages/admin/AdminStubs";
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminApprovals from "./pages/admin/AdminApprovals";
+import PendingApproval from "./pages/PendingApproval";
 import { PermissionRoute } from "./components/permissions";
 import BillingDashboard from "./pages/admin/billing/BillingDashboard";
 import Invoices from "./pages/admin/billing/Invoices";
