@@ -24,14 +24,37 @@ export default function AdminApprovals() {
   const [reason, setReason] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [counts, setCounts] = useState({ pending: 0, approved: 0, rejected: 0 });
+
   const load = async () => {
     setLoading(true);
+    // Only patient-role accounts (exclude admins/assistants/doctors)
+    const { data: patientRoles } = await supabase
+      .from("user_roles")
+      .select("user_id")
+      .eq("role", "patient");
+    const patientIds = (patientRoles || []).map((r: any) => r.user_id);
+    if (patientIds.length === 0) {
+      setRows([]);
+      setCounts({ pending: 0, approved: 0, rejected: 0 });
+      setLoading(false);
+      return;
+    }
     const { data } = await supabase
       .from("profiles")
       .select("id,full_name,phone,status,status_reason,created_at")
+      .in("id", patientIds)
       .eq("status", tab)
       .order("created_at", { ascending: false });
     setRows((data as any) || []);
+
+    const { data: allStatuses } = await supabase
+      .from("profiles")
+      .select("status")
+      .in("id", patientIds);
+    const c = { pending: 0, approved: 0, rejected: 0 } as any;
+    (allStatuses || []).forEach((r: any) => { if (c[r.status] !== undefined) c[r.status]++; });
+    setCounts(c);
     setLoading(false);
   };
 
@@ -67,9 +90,9 @@ export default function AdminApprovals() {
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <Tabs value={tab} onValueChange={(v) => setTab(v as any)}>
           <TabsList>
-            <TabsTrigger value="pending"><Clock className="w-4 h-4 mr-1" />Pending</TabsTrigger>
-            <TabsTrigger value="approved"><CheckCircle2 className="w-4 h-4 mr-1" />Approved</TabsTrigger>
-            <TabsTrigger value="rejected"><XCircle className="w-4 h-4 mr-1" />Rejected</TabsTrigger>
+            <TabsTrigger value="pending"><Clock className="w-4 h-4 mr-1" />Pending <Badge variant="secondary" className="ml-2">{counts.pending}</Badge></TabsTrigger>
+            <TabsTrigger value="approved"><CheckCircle2 className="w-4 h-4 mr-1" />Approved <Badge variant="secondary" className="ml-2">{counts.approved}</Badge></TabsTrigger>
+            <TabsTrigger value="rejected"><XCircle className="w-4 h-4 mr-1" />Rejected <Badge variant="secondary" className="ml-2">{counts.rejected}</Badge></TabsTrigger>
           </TabsList>
         </Tabs>
         <div className="relative w-72">
