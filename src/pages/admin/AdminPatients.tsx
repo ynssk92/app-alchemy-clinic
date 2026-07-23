@@ -175,6 +175,12 @@ const AdminPatients = () => {
                 {new Date(p.created_at).toLocaleDateString()}
               </p>
             </div>
+            <Button size="sm" variant="outline" asChild>
+              <Link to={`/admin/patients/details/${p.profile_id || p.intake_id}`}>
+                <Eye className="w-4 h-4 mr-2" />
+                View
+              </Link>
+            </Button>
             {p.profile_id && (
               <Button size="sm" variant="outline" onClick={() => setEditingId(p.profile_id!)}>
                 <Pencil className="w-4 h-4 mr-2" />
@@ -184,6 +190,7 @@ const AdminPatients = () => {
             <Button size="sm" variant="outline" onClick={() => remove(p)}>
               <Trash2 className="w-4 h-4" />
             </Button>
+
           </Card>
         ))}
         {visibleRows.length === 0 && (
