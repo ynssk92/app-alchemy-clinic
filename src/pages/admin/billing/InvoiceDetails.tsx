@@ -145,7 +145,12 @@ export default function InvoiceDetails() {
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div>
             <div className="text-xs uppercase text-muted-foreground mb-1">Bill To</div>
-            <div className="font-semibold">{inv.patient?.full_name}</div>
+            <Link
+              to={`/admin/patients/${inv.patient_id}`}
+              className="font-semibold text-primary hover:underline print:text-foreground print:no-underline"
+            >
+              {inv.patient?.full_name}
+            </Link>
             <div className="text-sm text-muted-foreground">{inv.patient?.phone}</div>
           </div>
           <div>
