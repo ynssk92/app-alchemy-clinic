@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset } from "lucide-react";
+import { Shield, ShieldOff, Trash2, Mail, Check, Clock, Headset, Search } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -15,6 +16,8 @@ const AdminUsers = () => {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<"all" | "admin" | "assistant" | "doctor" | "patient">("all");
 
   const load = async () => {
     const { data: profiles } = await supabase
@@ -26,11 +29,9 @@ const AdminUsers = () => {
     (roles || []).forEach((r: any) => {
       rmap.set(r.user_id, [...(rmap.get(r.user_id) || []), r.role]);
     });
-    // Only staff users (admin or assistant)
-    const staff = (profiles || [])
-      .map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] }))
-      .filter((p) => p.roles.includes("admin") || p.roles.includes("assistant"));
-    setRows(staff);
+    // All users with their roles
+    const all = (profiles || []).map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] }));
+    setRows(all);
 
     const { data: inv } = await supabase
       .from("admin_invites")
@@ -49,6 +50,18 @@ const AdminUsers = () => {
   useEffect(() => {
     load();
   }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((p) => {
+      if (filter !== "all" && !p.roles.includes(filter)) return false;
+      if (!q) return true;
+      return (
+        (p.full_name || "").toLowerCase().includes(q) ||
+        (p.phone || "").toLowerCase().includes(q)
+      );
+    });
+  }, [rows, search, filter]);
 
   const toggleRole = async (id: string, role: "admin" | "assistant", has: boolean) => {
     if (has) {
@@ -95,7 +108,7 @@ const AdminUsers = () => {
     <div>
       <h1 className="text-3xl font-bold text-foreground mb-1">Users</h1>
       <p className="text-muted-foreground mb-8">
-        Manage admin & assistant accounts and invitations.
+        All accounts in the system — admins, assistants, doctors, and patients.
       </p>
 
       <Card className="p-6 mb-8 border-border bg-card">
@@ -147,11 +160,35 @@ const AdminUsers = () => {
         </div>
       </Card>
 
-      <h2 className="text-lg font-bold mb-3">Staff accounts</h2>
+      <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <h2 className="text-lg font-bold">All accounts ({filtered.length})</h2>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search name or phone..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 w-64"
+            />
+          </div>
+          <Tabs value={filter} onValueChange={(v) => setFilter(v as any)}>
+            <TabsList>
+              <TabsTrigger value="all">All</TabsTrigger>
+              <TabsTrigger value="admin">Admins</TabsTrigger>
+              <TabsTrigger value="assistant">Assistants</TabsTrigger>
+              <TabsTrigger value="doctor">Doctors</TabsTrigger>
+              <TabsTrigger value="patient">Patients</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </div>
       <div className="grid gap-3">
-        {rows.map((p) => {
+        {filtered.map((p) => {
           const isAdmin = p.roles.includes("admin");
           const isAssistant = p.roles.includes("assistant");
+          const isDoctor = p.roles.includes("doctor");
+          const isPatient = p.roles.includes("patient");
           return (
             <Card key={p.id} className="p-4 flex items-center gap-4 border-border bg-card flex-wrap">
               <div className="flex-1 min-w-[200px]">
@@ -162,6 +199,10 @@ const AdminUsers = () => {
                     <Badge variant="outline" className="border-primary text-primary">
                       Assistant
                     </Badge>
+                  )}
+                  {isDoctor && <Badge variant="secondary">Doctor</Badge>}
+                  {isPatient && !isAdmin && !isAssistant && !isDoctor && (
+                    <Badge variant="outline">Patient</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -199,8 +240,8 @@ const AdminUsers = () => {
             </Card>
           );
         })}
-        {rows.length === 0 && (
-          <p className="text-muted-foreground text-center py-8">No staff users yet.</p>
+        {filtered.length === 0 && (
+          <p className="text-muted-foreground text-center py-8">No users found.</p>
         )}
       </div>
     </div>
