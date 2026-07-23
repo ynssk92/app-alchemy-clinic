@@ -122,7 +122,7 @@ export default function InvoiceDetails() {
         </div>
       </div>
 
-      <Card className="p-8 print:shadow-none print:border-0" id="invoice-print">
+      <Card ref={printRef} className="p-8 print:shadow-none print:border-0 bg-white text-slate-900" id="invoice-print">
         <div className="flex justify-between items-start mb-8">
           <div>
             <img src={logo} alt="La Dune" className="h-10 mb-3" />
