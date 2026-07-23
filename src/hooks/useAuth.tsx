@@ -8,6 +8,7 @@ type AuthCtx = {
   isAdmin: boolean;
   isAssistant: boolean;
   isStaff: boolean;
+  profileStatus: "pending" | "approved" | "rejected" | null;
   loading: boolean;
   signOut: () => Promise<void>;
 };
