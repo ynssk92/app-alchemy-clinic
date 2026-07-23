@@ -162,9 +162,12 @@ const AdminPatients = () => {
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <h3 className="font-bold">{p.full_name || "Unnamed"}</h3>
                 <Badge variant="secondary">Patient</Badge>
-                {p.source === "intake" && !p.profile_id && (
+                {p.profile_id ? (
+                  <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-transparent">Registered</Badge>
+                ) : (
                   <Badge variant="outline">Not registered</Badge>
                 )}
+
               </div>
               <p className="text-sm text-muted-foreground">
                 {p.phone || p.email || "No contact"} • Added{" "}
