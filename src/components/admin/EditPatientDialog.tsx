@@ -10,15 +10,20 @@ import { useToast } from "@/hooks/use-toast";
 type Props = {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  patientId: string;
+  profileId?: string | null;
+  intakeId?: string | null;
   onSaved?: () => void;
 };
 
-export const EditPatientDialog = ({ open, onOpenChange, patientId, onSaved }: Props) => {
+export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: intakeIdProp, onSaved }: Props) => {
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
+  const [intakeId, setIntakeId] = useState<string | null>(intakeIdProp ?? null);
   const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
     full_name: "",
+    email: "",
     phone: "",
     dob: "",
     gender: "",
@@ -27,25 +32,51 @@ export const EditPatientDialog = ({ open, onOpenChange, patientId, onSaved }: Pr
     city: "",
     country: "",
   });
-  const [intakeId, setIntakeId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !patientId) return;
+    if (!open) return;
     (async () => {
-      const { data: p } = await supabase
-        .from("profiles")
-        .select("full_name, phone")
-        .eq("id", patientId)
-        .maybeSingle();
-      const { data: intake } = await supabase
-        .from("patient_intake")
-        .select("id, dob, gender, blood_group, address_1, city, country")
-        .eq("user_id", patientId)
-        .maybeSingle();
+      let intake: any = null;
+      if (intakeIdProp) {
+        const { data } = await supabase
+          .from("patient_intake")
+          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country")
+          .eq("id", intakeIdProp)
+          .maybeSingle();
+        intake = data;
+      } else if (profileId) {
+        const { data } = await supabase
+          .from("patient_intake")
+          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country")
+          .eq("user_id", profileId)
+          .maybeSingle();
+        intake = data;
+      }
       setIntakeId(intake?.id ?? null);
+
+      let profileName = "";
+      let profilePhone = "";
+      if (profileId) {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("full_name, phone")
+          .eq("id", profileId)
+          .maybeSingle();
+        profileName = p?.full_name || "";
+        profilePhone = p?.phone || "";
+      }
+
+      const composedFullName =
+        profileName ||
+        [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") ||
+        "";
+
       setForm({
-        full_name: p?.full_name || "",
-        phone: p?.phone || "",
+        first_name: intake?.first_name || "",
+        last_name: intake?.last_name || "",
+        full_name: composedFullName,
+        email: intake?.email || "",
+        phone: profilePhone || intake?.phone || "",
         dob: intake?.dob || "",
         gender: intake?.gender || "",
         blood_group: intake?.blood_group || "",
@@ -54,75 +85,95 @@ export const EditPatientDialog = ({ open, onOpenChange, patientId, onSaved }: Pr
         country: intake?.country || "",
       });
     })();
-  }, [open, patientId]);
+  }, [open, profileId, intakeIdProp]);
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
   const onSubmit = async () => {
     setSaving(true);
-    const { error: pErr } = await supabase
-      .from("profiles")
-      .update({ full_name: form.full_name.trim() || null, phone: form.phone.trim() || null })
-      .eq("id", patientId);
-    if (pErr) {
-      toast({ title: "Update failed", description: pErr.message, variant: "destructive" });
-      setSaving(false);
-      return;
-    }
-
-    const intakePayload: any = {
-      dob: form.dob || null,
-      gender: form.gender || null,
-      blood_group: form.blood_group || null,
-      address_1: form.address_1 || null,
-      city: form.city || null,
-      country: form.country || null,
-    };
-
-    if (intakeId) {
-      const { error } = await supabase.from("patient_intake").update(intakePayload).eq("id", intakeId);
-      if (error) {
-        toast({ title: "Update failed", description: error.message, variant: "destructive" });
-        setSaving(false);
-        return;
+    try {
+      // Update profile (if patient is registered)
+      if (profileId) {
+        const { error: pErr } = await supabase
+          .from("profiles")
+          .update({
+            full_name: form.full_name.trim() || null,
+            phone: form.phone.trim() || null,
+          })
+          .eq("id", profileId);
+        if (pErr) throw pErr;
       }
-    } else {
-      const parts = (form.full_name || "").trim().split(" ");
-      const first = parts.shift() || "Patient";
-      const last = parts.join(" ") || "-";
-      const { data: authUser } = await supabase.auth.getUser();
-      const { error } = await supabase.from("patient_intake").insert({
-        ...intakePayload,
-        user_id: patientId,
-        first_name: first,
-        last_name: last,
-        email: `${patientId}@placeholder.local`,
+
+      // Derive first/last from full name when editing a registered patient
+      const parts = (form.full_name || "").trim().split(/\s+/);
+      const derivedFirst = form.first_name || parts.shift() || "Patient";
+      const derivedLast = form.last_name || parts.join(" ") || "-";
+
+      const intakePayload: any = {
+        first_name: derivedFirst,
+        last_name: derivedLast,
+        email: form.email || (profileId ? `${profileId}@placeholder.local` : "unknown@placeholder.local"),
         phone: form.phone || null,
-        created_by: authUser.user?.id ?? null,
-      });
-      if (error) {
-        toast({ title: "Update failed", description: error.message, variant: "destructive" });
-        setSaving(false);
-        return;
-      }
-    }
+        dob: form.dob || null,
+        gender: form.gender || null,
+        blood_group: form.blood_group || null,
+        address_1: form.address_1 || null,
+        city: form.city || null,
+        country: form.country || null,
+      };
 
-    setSaving(false);
-    toast({ title: "Patient updated" });
-    onOpenChange(false);
-    onSaved?.();
+      if (intakeId) {
+        const { error } = await supabase.from("patient_intake").update(intakePayload).eq("id", intakeId);
+        if (error) throw error;
+      } else if (profileId) {
+        const { data: authUser } = await supabase.auth.getUser();
+        const { error } = await supabase.from("patient_intake").insert({
+          ...intakePayload,
+          user_id: profileId,
+          created_by: authUser.user?.id ?? null,
+        });
+        if (error) throw error;
+      }
+
+      toast({ title: "Patient updated" });
+      onOpenChange(false);
+      onSaved?.();
+    } catch (e: any) {
+      toast({ title: "Update failed", description: e.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
   };
+
+  const isRegistered = !!profileId;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit patient</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <Label>Full name</Label>
-            <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
+          {isRegistered ? (
+            <div className="col-span-2">
+              <Label>Full name</Label>
+              <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
+            </div>
+          ) : (
+            <>
+              <div>
+                <Label>First name</Label>
+                <Input value={form.first_name} onChange={(e) => set("first_name", e.target.value)} />
+              </div>
+              <div>
+                <Label>Last name</Label>
+                <Input value={form.last_name} onChange={(e) => set("last_name", e.target.value)} />
+              </div>
+            </>
+          )}
+          <div>
+            <Label>Email</Label>
+            <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} disabled={isRegistered} />
           </div>
           <div>
             <Label>Phone</Label>

@@ -205,7 +205,7 @@ const AdminPatients = () => {
         <EditPatientDialog
           open={!!editingId}
           onOpenChange={(v) => !v && setEditingId(null)}
-          patientId={editingId}
+          profileId={editingId}
           onSaved={load}
         />
       )}

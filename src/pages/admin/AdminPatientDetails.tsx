@@ -575,11 +575,12 @@ const AdminPatientDetails = () => {
         </div>
       </div>
 
-      {patient?.profileId && (
+      {patient && (
         <EditPatientDialog
           open={editOpen}
           onOpenChange={setEditOpen}
-          patientId={patient.profileId}
+          profileId={patient.profileId}
+          intakeId={patient.intakeId}
           onSaved={() => setReloadTick((t) => t + 1)}
         />
       )}
