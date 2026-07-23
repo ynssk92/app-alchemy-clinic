@@ -187,9 +187,9 @@ const AdminPatientDetails = () => {
       }
 
       let intakeRow: any = null;
-      let profileRow: any = prof;
+      let profileRow: any = profileIsPatient ? prof : null;
 
-      if (prof) {
+      if (profileIsPatient) {
         const { data } = await supabase
           .from("patient_intake")
           .select("*")
@@ -210,7 +210,15 @@ const AdminPatientDetails = () => {
             .select("id, full_name, phone, created_at, avatar_url")
             .eq("id", intakeRow.user_id)
             .maybeSingle();
-          profileRow = linked;
+          // verify linked account is patient-only too
+          const { data: lr } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", intakeRow.user_id);
+          const lrs = new Set((lr || []).map((r: any) => r.role));
+          if (lrs.has("patient") && !lrs.has("admin") && !lrs.has("assistant") && !lrs.has("doctor")) {
+            profileRow = linked;
+          }
         }
       }
 
