@@ -86,12 +86,13 @@ const AdminUsers = () => {
       // If filtering by role, restrict to user_ids that carry that role
       let idFilter: string[] | null = null;
       if (filter !== "all") {
+        const roles = filter === "staff" ? ["admin", "assistant", "doctor"] : [filter];
         const { data: rl, error } = await supabase
           .from("user_roles")
           .select("user_id")
-          .eq("role", filter as any);
+          .in("role", roles as any);
         if (error) throw error;
-        idFilter = (rl || []).map((r: any) => r.user_id);
+        idFilter = Array.from(new Set((rl || []).map((r: any) => r.user_id)));
         if (idFilter.length === 0) {
           if (rid === reqIdRef.current) {
             setRows([]);
