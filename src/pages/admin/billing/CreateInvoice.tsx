@@ -91,7 +91,7 @@ export default function CreateInvoice() {
         status,
         issue_date: issueDate,
         created_by: user?.id,
-      })
+      } as any)
       .select()
       .single();
     if (error || !inv) { setSaving(false); return toast.error(error?.message || "Failed"); }
