@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,12 +10,37 @@ import {
   ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
+  ShieldCheck, ShieldAlert, MapPin, UserCheck,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
-type Row = { id: string; full_name: string | null; phone: string | null; created_at: string };
+type ListRow = {
+  key: string;
+  id: string;              // route id (profile.id when registered, else intake.id)
+  full_name: string;
+  registered: boolean;
+  created_at: string;
+};
+
+type PatientView = {
+  routeId: string;
+  profileId: string | null;   // present when registered
+  intakeId: string | null;    // present when an intake record exists
+  full_name: string;
+  phone: string | null;
+  email: string | null;       // best available email (intake > profile-less)
+  dob: string | null;
+  gender: string | null;
+  blood_group: string | null;
+  address_1: string | null;
+  city: string | null;
+  country: string | null;
+  avatar_path: string | null; // storage path in `avatars` bucket
+  registered_at: string | null; // profile.created_at when registered
+  added_at: string;             // intake.created_at or profile.created_at
+};
 
 const InfoTile = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
   <div className="flex items-center gap-3">
@@ -70,71 +95,179 @@ const statusPill = (status: string) => {
   );
 };
 
+const fmtDate = (d?: string | null) =>
+  d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+
 const AdminPatientDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [list, setList] = useState<Row[]>([]);
-  const [selected, setSelected] = useState<Row | null>(null);
+  const [list, setList] = useState<ListRow[]>([]);
+  const [patient, setPatient] = useState<PatientView | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [apptSearch, setApptSearch] = useState("");
-  const [intake, setIntake] = useState<any>(null);
   const [editOpen, setEditOpen] = useState(false);
   const [reloadTick, setReloadTick] = useState(0);
+  const [notFound, setNotFound] = useState(false);
 
+  // --- Sidebar list (merged intake + profiles) ---
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, full_name, phone, created_at")
-        .order("created_at", { ascending: false });
-      setList(data || []);
-      if (!id && data?.[0]) navigate(`/admin/patients/details/${data[0].id}`, { replace: true });
+      const [{ data: intake }, { data: profiles }, { data: roles }] = await Promise.all([
+        supabase.from("patient_intake")
+          .select("id, user_id, first_name, last_name, created_at")
+          .order("created_at", { ascending: false }),
+        supabase.from("profiles")
+          .select("id, full_name, created_at")
+          .order("created_at", { ascending: false }),
+        supabase.from("user_roles").select("user_id, role"),
+      ]);
+      const staff = new Set(
+        (roles || []).filter((r: any) => r.role === "admin" || r.role === "assistant").map((r: any) => r.user_id)
+      );
+      const intakeByUser = new Map<string, any>();
+      const intakeRows: ListRow[] = (intake || []).map((i: any) => {
+        if (i.user_id) intakeByUser.set(i.user_id, i);
+        const name = [i.first_name, i.last_name].filter(Boolean).join(" ") || "Unnamed";
+        return {
+          key: `intake:${i.id}`,
+          id: i.user_id || i.id, // prefer profile id when linked
+          full_name: name,
+          registered: !!i.user_id,
+          created_at: i.created_at,
+        };
+      });
+      const profileRows: ListRow[] = (profiles || [])
+        .filter((p: any) => !staff.has(p.id) && !intakeByUser.has(p.id))
+        .map((p: any) => ({
+          key: `profile:${p.id}`,
+          id: p.id,
+          full_name: p.full_name || "Unnamed",
+          registered: true,
+          created_at: p.created_at,
+        }));
+      const merged = [...intakeRows, ...profileRows].sort(
+        (a, b) => +new Date(b.created_at) - +new Date(a.created_at)
+      );
+      setList(merged);
+      if (!id && merged[0]) navigate(`/admin/patients/details/${merged[0].id}`, { replace: true });
     })();
   }, [id, navigate]);
 
+  // --- Load a single patient: :id may be profile.id OR intake.id ---
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const { data: p } = await supabase
+      setNotFound(false);
+      // 1) Try as profile
+      const { data: prof } = await supabase
         .from("profiles")
         .select("id, full_name, phone, created_at, avatar_url")
         .eq("id", id)
         .maybeSingle();
-      setSelected(p as any);
-      if ((p as any)?.avatar_url) {
+
+      let intakeRow: any = null;
+      let profileRow: any = prof;
+
+      if (prof) {
+        const { data } = await supabase
+          .from("patient_intake")
+          .select("*")
+          .eq("user_id", id)
+          .maybeSingle();
+        intakeRow = data;
+      } else {
+        // 2) Fallback: treat :id as intake.id (not-registered patient)
+        const { data } = await supabase
+          .from("patient_intake")
+          .select("*")
+          .eq("id", id)
+          .maybeSingle();
+        intakeRow = data;
+        if (intakeRow?.user_id) {
+          const { data: linked } = await supabase
+            .from("profiles")
+            .select("id, full_name, phone, created_at, avatar_url")
+            .eq("id", intakeRow.user_id)
+            .maybeSingle();
+          profileRow = linked;
+        }
+      }
+
+      if (!profileRow && !intakeRow) {
+        setPatient(null);
+        setNotFound(true);
+        setAppts([]);
+        return;
+      }
+
+      const full_name =
+        profileRow?.full_name ||
+        [intakeRow?.first_name, intakeRow?.last_name].filter(Boolean).join(" ") ||
+        "Unnamed patient";
+
+      const avatarPath = profileRow?.avatar_url || intakeRow?.avatar_url || null;
+
+      const view: PatientView = {
+        routeId: id,
+        profileId: profileRow?.id || null,
+        intakeId: intakeRow?.id || null,
+        full_name,
+        phone: profileRow?.phone || intakeRow?.phone || null,
+        email:
+          intakeRow?.email && !intakeRow.email.endsWith("@placeholder.local")
+            ? intakeRow.email
+            : null,
+        dob: intakeRow?.dob || null,
+        gender: intakeRow?.gender || null,
+        blood_group: intakeRow?.blood_group || null,
+        address_1: intakeRow?.address_1 || null,
+        city: intakeRow?.city || null,
+        country: intakeRow?.country || null,
+        avatar_path: avatarPath,
+        registered_at: profileRow?.created_at || null,
+        added_at: intakeRow?.created_at || profileRow?.created_at,
+      };
+      setPatient(view);
+
+      // Avatar signed URL
+      if (avatarPath) {
         const { data: signed } = await supabase.storage
           .from("avatars")
-          .createSignedUrl((p as any).avatar_url, 3600);
+          .createSignedUrl(avatarPath, 3600);
         setAvatarUrl(signed?.signedUrl || null);
       } else {
         setAvatarUrl(null);
       }
-      const { data: a } = await supabase
-        .from("appointments")
-        .select("id, appointment_date, appointment_time, status, reason, doctors(full_name, specialty_id, specialties(name))")
-        .eq("patient_id", id)
-        .order("appointment_date", { ascending: false });
-      setAppts(a || []);
-      const { data: intakeRow } = await supabase
-        .from("patient_intake")
-        .select("dob, gender, blood_group, email, address_1, city, country")
-        .eq("user_id", id)
-        .maybeSingle();
-      setIntake(intakeRow);
+
+      // Appointments (only exist for registered patients — keyed by profile.id)
+      if (view.profileId) {
+        const { data: a } = await supabase
+          .from("appointments")
+          .select("id, appointment_date, appointment_time, status, reason, doctors(full_name, specialty_id, specialties(name))")
+          .eq("patient_id", view.profileId)
+          .order("appointment_date", { ascending: false });
+        setAppts(a || []);
+      } else {
+        setAppts([]);
+      }
     })();
   }, [id, reloadTick]);
 
-  const filtered = list.filter((p) =>
-    (p.full_name || "").toLowerCase().includes(q.toLowerCase())
+  const filteredList = useMemo(
+    () => list.filter((p) => p.full_name.toLowerCase().includes(q.toLowerCase())),
+    [list, q]
   );
 
-  const initials = (selected?.full_name || "P")
+  const initials = (patient?.full_name || "P")
     .split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
 
-  const patientCode = selected ? `#PT${selected.id.slice(0, 4).toUpperCase()}` : "";
+  const patientCode = patient
+    ? `#PT${(patient.profileId || patient.intakeId || "").slice(0, 4).toUpperCase()}`
+    : "";
   const lastVisited = appts.find((a: any) => a.status === "completed")?.appointment_date;
+  const registered = !!patient?.profileId;
 
   const filteredAppts = appts.filter((a: any) => {
     const s = apptSearch.toLowerCase();
@@ -154,7 +287,7 @@ const AdminPatientDetails = () => {
         </h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
         {/* Sidebar list */}
         <Card className="p-4 border-border h-fit">
           <div className="relative mb-3">
@@ -162,18 +295,34 @@ const AdminPatientDetails = () => {
             <Input placeholder="Search patients…" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <div className="space-y-1 max-h-[70vh] overflow-y-auto">
-            {filtered.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => navigate(`/admin/patients/details/${p.id}`)}
-                className={`w-full text-left px-3 py-2 rounded-lg text-sm truncate transition-colors ${
-                  p.id === id ? "bg-primary text-primary-foreground" : "hover:bg-muted"
-                }`}
-              >
-                {p.full_name || "Unnamed"}
-              </button>
-            ))}
-            {filtered.length === 0 && (
+            {filteredList.map((p) => {
+              const active = p.id === id;
+              return (
+                <button
+                  key={p.key}
+                  onClick={() => navigate(`/admin/patients/details/${p.id}`)}
+                  className={cn(
+                    "w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between gap-2",
+                    active ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                  )}
+                >
+                  <span className="truncate">{p.full_name}</span>
+                  {!p.registered && (
+                    <span
+                      className={cn(
+                        "text-[10px] px-1.5 py-0.5 rounded-full border shrink-0",
+                        active
+                          ? "border-primary-foreground/40 text-primary-foreground"
+                          : "border-border text-muted-foreground"
+                      )}
+                    >
+                      New
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+            {filteredList.length === 0 && (
               <p className="text-xs text-muted-foreground text-center py-4">No patients</p>
             )}
           </div>
@@ -181,13 +330,17 @@ const AdminPatientDetails = () => {
 
         {/* Details */}
         <div className="space-y-6">
-          {selected ? (
+          {notFound ? (
+            <Card className="p-10 border-border text-center text-muted-foreground">
+              Patient not found.
+            </Card>
+          ) : patient ? (
             <>
               {/* Header banner card */}
               <Card className="relative overflow-hidden border-border">
                 <div className="absolute inset-y-0 right-0 w-1/2 opacity-90 pointer-events-none"
                   style={{ background: "linear-gradient(120deg, transparent 0%, transparent 30%, hsl(var(--primary)/0.15) 55%, hsl(160 70% 55% / 0.25) 100%)" }} />
-                <div className="relative p-6 flex items-start gap-5">
+                <div className="relative p-6 flex items-start gap-5 flex-wrap">
                   <Avatar className="w-24 h-24 rounded-2xl border-2 border-background shadow-md">
                     {avatarUrl && <AvatarImage src={avatarUrl} className="object-cover" />}
                     <AvatarFallback className="rounded-2xl bg-primary/10 text-primary text-2xl font-bold">
@@ -196,19 +349,27 @@ const AdminPatientDetails = () => {
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <div className="text-primary text-sm font-semibold">{patientCode}</div>
-                    <h2 className="text-2xl font-bold text-foreground mt-0.5">
-                      {selected.full_name || "Unnamed patient"}
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-1">—</p>
+                    <div className="flex items-center gap-2 flex-wrap mt-0.5">
+                      <h2 className="text-2xl font-bold text-foreground">{patient.full_name}</h2>
+                      {registered ? (
+                        <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-transparent gap-1">
+                          <ShieldCheck className="w-3 h-3" /> Registered
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="gap-1">
+                          <ShieldAlert className="w-3 h-3" /> Not registered
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
                       <span className="flex items-center gap-1.5 text-muted-foreground">
                         <Phone className="w-4 h-4 text-primary" />
-                        <span className="font-semibold text-foreground">Phone :</span> {selected.phone || "—"}
+                        <span className="font-semibold text-foreground">Phone :</span> {patient.phone || "—"}
                       </span>
                       <span className="flex items-center gap-1.5 text-muted-foreground">
                         <CalendarDays className="w-4 h-4 text-primary" />
                         <span className="font-semibold text-foreground">Last Visited :</span>{" "}
-                        {lastVisited ? new Date(lastVisited).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"}
+                        {fmtDate(lastVisited)}
                       </span>
                     </div>
                   </div>
@@ -231,6 +392,53 @@ const AdminPatientDetails = () => {
                 </div>
               </Card>
 
+              {/* Registration status */}
+              <Card className="p-6 border-border">
+                <h3 className="font-bold mb-5 flex items-center gap-2">
+                  <UserCheck className="w-4 h-4 text-primary" /> Registration Status
+                </h3>
+                <div className="grid md:grid-cols-3 gap-5">
+                  <InfoTile
+                    icon={registered ? ShieldCheck : ShieldAlert}
+                    label="Account status"
+                    value={registered ? "Registered" : "Not registered (admin-added)"}
+                  />
+                  <InfoTile
+                    icon={Mail}
+                    label="Linked email"
+                    value={patient.email || "—"}
+                  />
+                  <InfoTile
+                    icon={CalendarDays}
+                    label={registered ? "Signed up" : "Added on"}
+                    value={fmtDate(registered ? patient.registered_at : patient.added_at)}
+                  />
+                  <InfoTile
+                    icon={BookOpen}
+                    label="Intake record"
+                    value={patient.intakeId ? "On file" : "Not created"}
+                  />
+                  <InfoTile
+                    icon={UserCheck}
+                    label="Account ID"
+                    value={patient.profileId ? patient.profileId.slice(0, 8) + "…" : "—"}
+                  />
+                  <InfoTile
+                    icon={MapPin}
+                    label="Location"
+                    value={
+                      [patient.city, patient.country].filter(Boolean).join(", ") || "—"
+                    }
+                  />
+                </div>
+                {!registered && (
+                  <p className="mt-5 text-xs text-muted-foreground">
+                    This patient was created by staff and has not signed up yet. Appointment
+                    history and messaging will activate once they register with the email above.
+                  </p>
+                )}
+              </Card>
+
               {/* About + Vital Signs */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Card className="p-6 border-border">
@@ -238,10 +446,12 @@ const AdminPatientDetails = () => {
                     <BookOpen className="w-4 h-4 text-primary" /> About
                   </h3>
                   <div className="grid grid-cols-2 gap-5">
-                    <InfoTile icon={Cake} label="DOB" value={intake?.dob ? new Date(intake.dob).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—"} />
-                    <InfoTile icon={Droplet} label="Blood Group" value={intake?.blood_group || "—"} />
-                    <InfoTile icon={VenetianMask} label="Gender" value={intake?.gender ? intake.gender.charAt(0).toUpperCase() + intake.gender.slice(1) : "—"} />
-                    <InfoTile icon={Mail} label="Email" value={intake?.email && !intake.email.endsWith("@placeholder.local") ? intake.email : "—"} />
+                    <InfoTile icon={Cake} label="DOB" value={fmtDate(patient.dob)} />
+                    <InfoTile icon={Droplet} label="Blood Group" value={patient.blood_group || "—"} />
+                    <InfoTile icon={VenetianMask} label="Gender" value={patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : "—"} />
+                    <InfoTile icon={Mail} label="Email" value={patient.email || "—"} />
+                    <InfoTile icon={MapPin} label="Address" value={patient.address_1 || "—"} />
+                    <InfoTile icon={MapPin} label="City" value={patient.city || "—"} />
                   </div>
                 </Card>
 
@@ -281,67 +491,74 @@ const AdminPatientDetails = () => {
                   </div>
 
                   <TabsContent value="appointments" className="m-0 p-6 pt-4">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="relative w-48">
-                        <Input placeholder="Search" value={apptSearch} onChange={(e) => setApptSearch(e.target.value)} />
+                    {!registered ? (
+                      <div className="py-10 text-center text-sm text-muted-foreground">
+                        Appointments become available after the patient registers an account.
                       </div>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <CalendarDays className="w-4 h-4" />
-                        Date range
-                      </Button>
-                      <div className="flex-1" />
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Filter className="w-4 h-4" />
-                        Filters
-                      </Button>
-                    </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="relative w-48">
+                            <Input placeholder="Search" value={apptSearch} onChange={(e) => setApptSearch(e.target.value)} />
+                          </div>
+                          <Button variant="outline" size="sm" className="gap-2">
+                            <CalendarDays className="w-4 h-4" />
+                            Date range
+                          </Button>
+                          <div className="flex-1" />
+                          <Button variant="outline" size="sm" className="gap-2">
+                            <Filter className="w-4 h-4" />
+                            Filters
+                          </Button>
+                        </div>
 
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="border-b border-border text-left">
-                            <th className="pb-3 font-bold">Date &amp; Time</th>
-                            <th className="pb-3 font-bold">Doctor Name</th>
-                            <th className="pb-3 font-bold">Mode</th>
-                            <th className="pb-3 font-bold">Status</th>
-                            <th className="pb-3"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredAppts.map((a: any) => (
-                            <tr key={a.id} className="border-b border-border last:border-0">
-                              <td className="py-4 text-muted-foreground">
-                                {new Date(a.appointment_date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} -{" "}
-                                {a.appointment_time?.slice(0, 5)}
-                              </td>
-                              <td className="py-4">
-                                <div className="flex items-center gap-3">
-                                  <Avatar className="w-9 h-9">
-                                    <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
-                                      {(a.doctors?.full_name || "D").split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
-                                    </AvatarFallback>
-                                  </Avatar>
-                                  <div>
-                                    <div className="font-semibold">Dr. {a.doctors?.full_name || "—"}</div>
-                                    <div className="text-xs text-muted-foreground">
-                                      {a.doctors?.specialties?.name || "General"}
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-border text-left">
+                                <th className="pb-3 font-bold">Date &amp; Time</th>
+                                <th className="pb-3 font-bold">Doctor Name</th>
+                                <th className="pb-3 font-bold">Mode</th>
+                                <th className="pb-3 font-bold">Status</th>
+                                <th className="pb-3"></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {filteredAppts.map((a: any) => (
+                                <tr key={a.id} className="border-b border-border last:border-0">
+                                  <td className="py-4 text-muted-foreground">
+                                    {fmtDate(a.appointment_date)} - {a.appointment_time?.slice(0, 5)}
+                                  </td>
+                                  <td className="py-4">
+                                    <div className="flex items-center gap-3">
+                                      <Avatar className="w-9 h-9">
+                                        <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+                                          {(a.doctors?.full_name || "D").split(" ").map((s: string) => s[0]).slice(0, 2).join("")}
+                                        </AvatarFallback>
+                                      </Avatar>
+                                      <div>
+                                        <div className="font-semibold">Dr. {a.doctors?.full_name || "—"}</div>
+                                        <div className="text-xs text-muted-foreground">
+                                          {a.doctors?.specialties?.name || "General"}
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="py-4 text-muted-foreground">In-person</td>
-                              <td className="py-4">{statusPill(a.status)}</td>
-                              <td className="py-4">
-                                <Button size="icon" variant="ghost" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
-                              </td>
-                            </tr>
-                          ))}
-                          {filteredAppts.length === 0 && (
-                            <tr><td colSpan={5} className="py-10 text-center text-muted-foreground">No appointments</td></tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
+                                  </td>
+                                  <td className="py-4 text-muted-foreground">In-person</td>
+                                  <td className="py-4">{statusPill(a.status)}</td>
+                                  <td className="py-4">
+                                    <Button size="icon" variant="ghost" className="h-8 w-8"><MoreVertical className="w-4 h-4" /></Button>
+                                  </td>
+                                </tr>
+                              ))}
+                              {filteredAppts.length === 0 && (
+                                <tr><td colSpan={5} className="py-10 text-center text-muted-foreground">No appointments</td></tr>
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    )}
                   </TabsContent>
 
                   <TabsContent value="transactions" className="m-0 p-10 text-center text-muted-foreground">
@@ -358,11 +575,11 @@ const AdminPatientDetails = () => {
         </div>
       </div>
 
-      {id && (
+      {patient?.profileId && (
         <EditPatientDialog
           open={editOpen}
           onOpenChange={setEditOpen}
-          patientId={id}
+          patientId={patient.profileId}
           onSaved={() => setReloadTick((t) => t + 1)}
         />
       )}
