@@ -1,15 +1,17 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Printer, Wallet, ArrowLeft, XCircle } from "lucide-react";
+import { Printer, Wallet, ArrowLeft, XCircle, Download, Loader2 } from "lucide-react";
 import { formatMoney } from "@/lib/currency";
 import PaymentDialog from "@/components/admin/PaymentDialog";
 import { toast } from "sonner";
 import logo from "@/assets/logo.png";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 const STATUS_COLORS: Record<string, string> = {
   draft: "bg-slate-500/15 text-slate-600",
@@ -27,6 +29,8 @@ export default function InvoiceDetails() {
   const [clinic, setClinic] = useState<any>(null);
   const [payOpen, setPayOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -59,6 +63,40 @@ export default function InvoiceDetails() {
     load();
   };
 
+  const exportPDF = async () => {
+    if (!printRef.current || !inv) return;
+    setExporting(true);
+    try {
+      const canvas = await html2canvas(printRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      pdf.save(`${inv.invoice_number}.pdf`);
+      toast.success("PDF downloaded");
+    } catch (e: any) {
+      toast.error(e.message || "Failed to export PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) return <Skeleton className="h-96 w-full" />;
   if (!inv) return <div className="p-6">Invoice not found</div>;
 
@@ -73,14 +111,18 @@ export default function InvoiceDetails() {
           {inv.status !== "cancelled" && inv.status !== "paid" && (
             <Button onClick={() => setPayOpen(true)}><Wallet className="w-4 h-4 mr-2" />Record Payment</Button>
           )}
-          <Button variant="outline" onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" />Print / PDF</Button>
+          <Button variant="outline" onClick={() => window.print()}><Printer className="w-4 h-4 mr-2" />Print</Button>
+          <Button variant="outline" onClick={exportPDF} disabled={exporting}>
+            {exporting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            {exporting ? "Generating…" : "Download PDF"}
+          </Button>
           {inv.status !== "cancelled" && (
             <Button variant="outline" className="text-destructive" onClick={cancel}><XCircle className="w-4 h-4 mr-2" />Cancel</Button>
           )}
         </div>
       </div>
 
-      <Card className="p-8 print:shadow-none print:border-0" id="invoice-print">
+      <Card ref={printRef} className="p-8 print:shadow-none print:border-0 bg-white text-slate-900" id="invoice-print">
         <div className="flex justify-between items-start mb-8">
           <div>
             <img src={logo} alt="La Dune" className="h-10 mb-3" />
