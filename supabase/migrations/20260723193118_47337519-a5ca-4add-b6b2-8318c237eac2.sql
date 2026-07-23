@@ -1,0 +1,1 @@
+CREATE POLICY "Patients view own intake" ON public.patient_intake FOR SELECT TO authenticated USING (auth.uid() = user_id);
