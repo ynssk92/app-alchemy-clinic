@@ -65,7 +65,9 @@ const AdminPatients = () => {
     const profileRows: Row[] = (profiles || [])
       .filter((p: any) => {
         const r = rmap.get(p.id) || [];
-        if (r.includes("admin") || r.includes("assistant")) return false;
+        // Must be a patient AND must NOT be staff (admin/assistant/doctor)
+        if (!r.includes("patient")) return false;
+        if (r.includes("admin") || r.includes("assistant") || r.includes("doctor")) return false;
         if (intakeUserIds.has(p.id)) return false; // already represented by intake
         return true;
       })
