@@ -78,6 +78,7 @@ const sections: Section[] = [
       {
         to: "/admin/users", icon: User, label: "Users", adminOnly: true,
         children: [
+          { to: "/admin/users", label: "Users", end: true },
           { to: "/admin/roles", label: "Roles & Permissions" },
           { to: "/admin/delete-requests", label: "Delete Account Request" },
         ],
@@ -289,7 +290,7 @@ const AdminLayout = () => {
               <DropdownMenuSeparator />
               {isAdmin && (
                 <>
-                  <DropdownMenuItem onClick={() => navigate("/admin/patients")}>
+                  <DropdownMenuItem onClick={() => navigate("/admin/users")}>
                     <UserPlus className="w-4 h-4 mr-2" />Manage admin invites
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => navigate("/admin/patients")}>

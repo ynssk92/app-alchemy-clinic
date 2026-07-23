@@ -46,6 +46,7 @@ import {
   AdminLocation, AdminTestimonials, AdminFaq,
 } from "./pages/admin/AdminStubs";
 import AdminRoles from "./pages/admin/AdminRoles";
+import AdminUsers from "./pages/admin/AdminUsers";
 import { PermissionRoute } from "./components/permissions";
 
 const queryClient = new QueryClient();
@@ -98,6 +99,7 @@ const App = () => (
               <Route path="messages" element={<PermissionRoute module="Messages"><AdminMessages /></PermissionRoute>} />
               <Route path="verify-assistants" element={<ProtectedRoute adminOnly><AdminAssistantVerifier /></ProtectedRoute>} />
               <Route path="roles" element={<ProtectedRoute adminOnly><AdminRoles /></ProtectedRoute>} />
+              <Route path="users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
               <Route path="delete-requests" element={<ProtectedRoute adminOnly><AdminDeleteRequests /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>} />
               <Route path="pages" element={<ProtectedRoute adminOnly><AdminPages /></ProtectedRoute>} />
