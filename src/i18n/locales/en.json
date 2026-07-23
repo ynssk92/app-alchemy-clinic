@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "about": "About",
+    "soins": "Our Care",
+    "expertise": "Expertise",
+    "team": "Our Team",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "contact": "Contact",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "profile": "Profile",
+    "dashboard": "Dashboard",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Book Your\u00a0\nAppointments\u00a0\nin Seconds",
+    "subtitle": "Book your consultation online with our dental care experts.",
+    "cta": "Book an appointment",
+    "learnMore": "Learn more"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "search": "Search",
+    "loading": "Loading…",
+    "back": "Back",
+    "yes": "Yes",
+    "no": "No",
+    "confirm": "Confirm",
+    "create": "Create",
+    "update": "Update",
+    "close": "Close",
+    "add": "Add",
+    "view": "View",
+    "language": "Language"
+  },
+  "admin": {
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "doctors": "Doctors",
+    "appointments": "Appointments",
+    "billing": "Billing",
+    "invoices": "Invoices",
+    "payments": "Payments",
+    "services": "Services",
+    "clinics": "Clinics",
+    "messages": "Messages",
+    "blog": "Blog",
+    "users": "Users",
+    "roles": "Roles & Permissions",
+    "settings": "Settings",
+    "quickActions": "Quick Actions",
+    "commonTasks": "Common tasks",
+    "searchPlaceholder": "Search patients, doctors, appointments…",
+    "toggleTheme": "Toggle theme"
+  }
+}
