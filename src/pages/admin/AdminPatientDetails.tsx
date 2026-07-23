@@ -123,9 +123,18 @@ const AdminPatientDetails = () => {
           .order("created_at", { ascending: false }),
         supabase.from("user_roles").select("user_id, role"),
       ]);
-      const staff = new Set(
-        (roles || []).filter((r: any) => r.role === "admin" || r.role === "assistant").map((r: any) => r.user_id)
-      );
+      const rolesByUser = new Map<string, Set<string>>();
+      (roles || []).forEach((r: any) => {
+        const s = rolesByUser.get(r.user_id) || new Set<string>();
+        s.add(r.role);
+        rolesByUser.set(r.user_id, s);
+      });
+      const isPatientOnly = (uid: string) => {
+        const s = rolesByUser.get(uid);
+        if (!s || !s.has("patient")) return false;
+        if (s.has("admin") || s.has("assistant") || s.has("doctor")) return false;
+        return true;
+      };
       const intakeByUser = new Map<string, any>();
       const intakeRows: ListRow[] = (intake || []).map((i: any) => {
         if (i.user_id) intakeByUser.set(i.user_id, i);
@@ -139,7 +148,7 @@ const AdminPatientDetails = () => {
         };
       });
       const profileRows: ListRow[] = (profiles || [])
-        .filter((p: any) => !staff.has(p.id) && !intakeByUser.has(p.id))
+        .filter((p: any) => isPatientOnly(p.id) && !intakeByUser.has(p.id))
         .map((p: any) => ({
           key: `profile:${p.id}`,
           id: p.id,
@@ -160,17 +169,27 @@ const AdminPatientDetails = () => {
     if (!id) return;
     (async () => {
       setNotFound(false);
-      // 1) Try as profile
+      // 1) Try as profile — but only accept it if the account is patient-only
       const { data: prof } = await supabase
         .from("profiles")
         .select("id, full_name, phone, created_at, avatar_url")
         .eq("id", id)
         .maybeSingle();
+      let profileIsPatient = false;
+      if (prof) {
+        const { data: pr } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", id);
+        const rs = new Set((pr || []).map((r: any) => r.role));
+        profileIsPatient =
+          rs.has("patient") && !rs.has("admin") && !rs.has("assistant") && !rs.has("doctor");
+      }
 
       let intakeRow: any = null;
-      let profileRow: any = prof;
+      let profileRow: any = profileIsPatient ? prof : null;
 
-      if (prof) {
+      if (profileIsPatient) {
         const { data } = await supabase
           .from("patient_intake")
           .select("*")
@@ -191,7 +210,15 @@ const AdminPatientDetails = () => {
             .select("id, full_name, phone, created_at, avatar_url")
             .eq("id", intakeRow.user_id)
             .maybeSingle();
-          profileRow = linked;
+          // verify linked account is patient-only too
+          const { data: lr } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", intakeRow.user_id);
+          const lrs = new Set((lr || []).map((r: any) => r.role));
+          if (lrs.has("patient") && !lrs.has("admin") && !lrs.has("assistant") && !lrs.has("doctor")) {
+            profileRow = linked;
+          }
         }
       }
 
