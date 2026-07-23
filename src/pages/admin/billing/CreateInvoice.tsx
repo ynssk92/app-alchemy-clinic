@@ -35,13 +35,16 @@ export default function CreateInvoice() {
 
   useEffect(() => {
     (async () => {
-      const [p, d, s, c] = await Promise.all([
+      const [p, staff, d, s, c] = await Promise.all([
         supabase.from("profiles").select("id, full_name, phone").order("full_name"),
+        supabase.from("user_roles").select("user_id, role").in("role", ["admin", "assistant", "doctor"]),
         supabase.from("doctors").select("id, full_name").order("full_name"),
         supabase.from("services").select("id, name, price, tax_rate").eq("active", true).order("name"),
         supabase.from("clinics").select("id, name").order("name"),
       ]);
-      setPatients(p.data || []);
+      const staffIds = new Set((staff.data || []).map((r: any) => r.user_id));
+      const patientsOnly = (p.data || []).filter((pr: any) => !staffIds.has(pr.id));
+      setPatients(patientsOnly);
       setDoctors(d.data || []);
       setServices(s.data || []);
       setClinics(c.data || []);
