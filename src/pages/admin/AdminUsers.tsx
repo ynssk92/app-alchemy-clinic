@@ -44,7 +44,7 @@ type Invite = {
   full_name?: string | null;
 };
 
-type RoleFilter = "all" | "admin" | "assistant" | "doctor" | "patient";
+type RoleFilter = "staff" | "all" | "admin" | "assistant" | "doctor" | "patient";
 type SortKey = "created_at" | "full_name";
 
 const PAGE_SIZES = [10, 25, 50, 100];
