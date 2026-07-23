@@ -60,7 +60,7 @@ const AdminUsers = () => {
   // Server-side controls
   const [search, setSearch] = useState("");
   const [debounced, setDebounced] = useState("");
-  const [filter, setFilter] = useState<RoleFilter>("all");
+  const [filter, setFilter] = useState<RoleFilter>("staff");
   const [sortKey, setSortKey] = useState<SortKey>("created_at");
   const [sortAsc, setSortAsc] = useState(false);
   const [page, setPage] = useState(0);
