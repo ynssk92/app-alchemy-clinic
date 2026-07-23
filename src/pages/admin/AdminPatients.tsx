@@ -185,9 +185,12 @@ const AdminPatients = () => {
             </Button>
           </Card>
         ))}
-        {rows.length === 0 && (
-          <p className="text-muted-foreground text-center py-8">No patients yet.</p>
+        {visibleRows.length === 0 && (
+          <p className="text-muted-foreground text-center py-8">
+            {rows.length === 0 ? "No patients yet." : "No patients match this filter."}
+          </p>
         )}
+
       </div>
 
       {editingId && (
