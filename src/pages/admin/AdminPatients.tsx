@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Pencil, UserPlus, Search } from "lucide-react";
+import { Trash2, Pencil, UserPlus, Search, Eye } from "lucide-react";
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
@@ -174,6 +175,12 @@ const AdminPatients = () => {
                 {new Date(p.created_at).toLocaleDateString()}
               </p>
             </div>
+            <Button size="sm" variant="outline" asChild>
+              <Link to={`/admin/patients/details/${p.profile_id || p.intake_id}`}>
+                <Eye className="w-4 h-4 mr-2" />
+                View
+              </Link>
+            </Button>
             {p.profile_id && (
               <Button size="sm" variant="outline" onClick={() => setEditingId(p.profile_id!)}>
                 <Pencil className="w-4 h-4 mr-2" />
@@ -183,6 +190,7 @@ const AdminPatients = () => {
             <Button size="sm" variant="outline" onClick={() => remove(p)}>
               <Trash2 className="w-4 h-4" />
             </Button>
+
           </Card>
         ))}
         {visibleRows.length === 0 && (
