@@ -29,6 +29,8 @@ export default function InvoiceDetails() {
   const [clinic, setClinic] = useState<any>(null);
   const [payOpen, setPayOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [exporting, setExporting] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
