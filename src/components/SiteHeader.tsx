@@ -1,18 +1,22 @@
 import { Link, NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import LanguageToggle from "@/components/LanguageToggle";
 import logo from "@/assets/logo.png";
 
-const navItems = [
-  { label: "À Propos", to: "/about" },
-  { label: "Nos Soins", to: "/soins" },
-  { label: "Expertise", to: "/expertise" },
-  { label: "L'Équipe", to: "/equipe" },
-  { label: "FAQ", to: "/faq" },
-  { label: "Blog", to: "/blog" },
-  { label: "Contact", to: "/contact" },
-];
-
 export const SiteHeader = () => {
+  const { t } = useTranslation();
+
+  const navItems = [
+    { label: t("nav.about"), to: "/about" },
+    { label: t("nav.soins"), to: "/soins" },
+    { label: t("nav.expertise"), to: "/expertise" },
+    { label: t("nav.team"), to: "/equipe" },
+    { label: t("nav.faq"), to: "/faq" },
+    { label: t("nav.blog"), to: "/blog" },
+    { label: t("nav.contact"), to: "/contact" },
+  ];
+
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -36,10 +40,11 @@ export const SiteHeader = () => {
             </NavLink>
           ))}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <LanguageToggle />
           <Link to="/auth">
             <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5">
-              Sign In
+              {t("nav.signIn")}
             </Button>
           </Link>
         </div>

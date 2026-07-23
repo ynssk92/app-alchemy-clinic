@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "about": "À Propos",
+    "soins": "Nos Soins",
+    "expertise": "Expertise",
+    "team": "L'Équipe",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "contact": "Contact",
+    "signIn": "Connexion",
+    "signOut": "Déconnexion",
+    "profile": "Profil",
+    "dashboard": "Tableau de bord",
+    "admin": "Administration"
+  },
+  "hero": {
+    "title": "Prenez vos\u00a0\nRendez-vous\u00a0\nen quelques secondes",
+    "subtitle": "Réservez votre consultation en ligne avec nos experts en soins dentaires.",
+    "cta": "Prendre rendez-vous",
+    "learnMore": "En savoir plus"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "search": "Rechercher",
+    "loading": "Chargement…",
+    "back": "Retour",
+    "yes": "Oui",
+    "no": "Non",
+    "confirm": "Confirmer",
+    "create": "Créer",
+    "update": "Mettre à jour",
+    "close": "Fermer",
+    "add": "Ajouter",
+    "view": "Voir",
+    "language": "Langue"
+  },
+  "admin": {
+    "dashboard": "Tableau de bord",
+    "patients": "Patients",
+    "doctors": "Médecins",
+    "appointments": "Rendez-vous",
+    "billing": "Facturation",
+    "invoices": "Factures",
+    "payments": "Paiements",
+    "services": "Services",
+    "clinics": "Cabinets",
+    "messages": "Messages",
+    "blog": "Blog",
+    "users": "Utilisateurs",
+    "roles": "Rôles & Permissions",
+    "settings": "Paramètres",
+    "quickActions": "Actions rapides",
+    "commonTasks": "Tâches courantes",
+    "searchPlaceholder": "Rechercher patients, médecins, rendez-vous…",
+    "toggleTheme": "Changer le thème"
+  }
+}
