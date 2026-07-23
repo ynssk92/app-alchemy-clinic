@@ -169,12 +169,22 @@ const AdminPatientDetails = () => {
     if (!id) return;
     (async () => {
       setNotFound(false);
-      // 1) Try as profile
+      // 1) Try as profile — but only accept it if the account is patient-only
       const { data: prof } = await supabase
         .from("profiles")
         .select("id, full_name, phone, created_at, avatar_url")
         .eq("id", id)
         .maybeSingle();
+      let profileIsPatient = false;
+      if (prof) {
+        const { data: pr } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", id);
+        const rs = new Set((pr || []).map((r: any) => r.role));
+        profileIsPatient =
+          rs.has("patient") && !rs.has("admin") && !rs.has("assistant") && !rs.has("doctor");
+      }
 
       let intakeRow: any = null;
       let profileRow: any = prof;
