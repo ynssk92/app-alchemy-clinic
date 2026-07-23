@@ -8,6 +8,7 @@ type AuthCtx = {
   isAdmin: boolean;
   isAssistant: boolean;
   isStaff: boolean;
+  profileStatus: "pending" | "approved" | "rejected" | null;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -18,6 +19,7 @@ const Ctx = createContext<AuthCtx>({
   isAdmin: false,
   isAssistant: false,
   isStaff: false,
+  profileStatus: null,
   loading: true,
   signOut: async () => {},
 });
@@ -27,16 +29,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAssistant, setIsAssistant] = useState(false);
+  const [profileStatus, setProfileStatus] = useState<"pending" | "approved" | "rejected" | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadRole = async (uid: string) => {
-    const { data } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", uid);
-    const roles = (data || []).map((r: any) => r.role);
-    setIsAdmin(roles.includes("admin"));
-    setIsAssistant(roles.includes("assistant"));
+    const [{ data: roles }, { data: prof }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+      supabase.from("profiles").select("status").eq("id", uid).maybeSingle(),
+    ]);
+    const list = (roles || []).map((r: any) => r.role);
+    setIsAdmin(list.includes("admin"));
+    setIsAssistant(list.includes("assistant"));
+    setProfileStatus(((prof as any)?.status as any) ?? null);
   };
 
   useEffect(() => {
@@ -48,6 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setIsAdmin(false);
         setIsAssistant(false);
+        setProfileStatus(null);
       }
     });
 
@@ -66,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isStaff: isAdmin || isAssistant, loading, signOut }}>
+    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isStaff: isAdmin || isAssistant, profileStatus, loading, signOut }}>
       {children}
     </Ctx.Provider>
   );

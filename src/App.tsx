@@ -47,6 +47,8 @@ import {
 } from "./pages/admin/AdminStubs";
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminApprovals from "./pages/admin/AdminApprovals";
+import PendingApproval from "./pages/PendingApproval";
 import { PermissionRoute } from "./components/permissions";
 import BillingDashboard from "./pages/admin/billing/BillingDashboard";
 import Invoices from "./pages/admin/billing/Invoices";
@@ -74,6 +76,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/pending-approval" element={<PendingApproval />} />
             <Route path="/about" element={<About />} />
             <Route path="/soins" element={<Soins />} />
             <Route path="/expertise" element={<Expertise />} />
@@ -99,6 +102,7 @@ const App = () => (
               <Route path="patients/details" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
               <Route path="patients/details/:id" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
               <Route path="patients/create" element={<PermissionRoute module="Patients" action="create"><AdminPatientCreate /></PermissionRoute>} />
+              <Route path="patients/approvals" element={<PermissionRoute module="Patients" action="edit"><AdminApprovals /></PermissionRoute>} />
               <Route path="specialties" element={<PermissionRoute module="Specialties"><AdminSpecialties /></PermissionRoute>} />
               <Route path="clinics" element={<PermissionRoute module="Clinics"><AdminClinics /></PermissionRoute>} />
               <Route path="clinics/audit" element={<PermissionRoute module="Clinics"><AdminClinicAudit /></PermissionRoute>} />

@@ -10,7 +10,7 @@ export const ProtectedRoute = ({
   adminOnly?: boolean;
   staffOnly?: boolean;
 }) => {
-  const { user, isAdmin, isAssistant, loading } = useAuth();
+  const { user, isAdmin, isAssistant, isStaff, profileStatus, loading } = useAuth();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -21,6 +21,10 @@ export const ProtectedRoute = ({
   if (!user) return <Navigate to="/auth" replace />;
   if (!user.email_confirmed_at && !(user as any).confirmed_at) {
     return <Navigate to="/verify-email" replace />;
+  }
+  // Patients (non-staff) must be approved before accessing the app
+  if (!isStaff && profileStatus && profileStatus !== "approved") {
+    return <Navigate to="/pending-approval" replace />;
   }
   if (adminOnly && !isAdmin) return <Navigate to="/patient-dashboard" replace />;
   if (staffOnly && !isAdmin && !isAssistant) return <Navigate to="/patient-dashboard" replace />;
