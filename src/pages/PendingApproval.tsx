@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Clock, XCircle, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 export default function PendingApproval() {
   const { user, signOut } = useAuth();
@@ -31,7 +32,8 @@ export default function PendingApproval() {
   const rejected = status === "rejected";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-primary/5 to-accent/5">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-primary/5 to-accent/5 relative">
+      <div className="absolute top-4 right-4 z-10"><LanguageToggle variant="outline" /></div>
       <Card className="max-w-md w-full p-8 text-center space-y-4">
         <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center bg-primary/10">
           {rejected ? <XCircle className="w-8 h-8 text-destructive" /> : <Clock className="w-8 h-8 text-primary" />}
