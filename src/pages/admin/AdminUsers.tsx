@@ -51,6 +51,18 @@ const AdminUsers = () => {
     load();
   }, []);
 
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((p) => {
+      if (filter !== "all" && !p.roles.includes(filter)) return false;
+      if (!q) return true;
+      return (
+        (p.full_name || "").toLowerCase().includes(q) ||
+        (p.phone || "").toLowerCase().includes(q)
+      );
+    });
+  }, [rows, search, filter]);
+
   const toggleRole = async (id: string, role: "admin" | "assistant", has: boolean) => {
     if (has) {
       const { error } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", role);
