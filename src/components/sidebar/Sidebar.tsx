@@ -13,24 +13,32 @@ type SidebarProps = {
   children: ReactNode;
 };
 
+const RAIL_BG = "#0F172A";
+
 const SidebarShell = ({ header, footer, children }: SidebarProps) => {
   const { collapsed } = useSidebar();
   return (
     <aside
       aria-label="Primary"
+      data-collapsed={collapsed}
       style={{
         width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED,
+        backgroundColor: collapsed ? RAIL_BG : undefined,
       }}
       className={cn(
-        "hidden md:flex flex-col shrink-0 bg-card border-r border-border overflow-hidden",
-        "transition-[width] duration-300 ease-in-out will-change-[width]",
+        "hidden md:flex flex-col shrink-0 overflow-hidden",
+        "transition-[width,background-color] duration-300 ease-in-out will-change-[width]",
+        collapsed
+          ? "border-r border-slate-800/80 text-slate-400"
+          : "bg-card border-r border-border",
       )}
     >
       <div className="shrink-0">{header}</div>
       <nav
+        aria-label="Sections"
         className={cn(
-          "flex-1 overflow-y-auto overflow-x-hidden py-4 space-y-5",
-          collapsed ? "px-2" : "px-3",
+          "flex-1 overflow-y-auto overflow-x-hidden py-4",
+          collapsed ? "px-0 space-y-4 scrollbar-none" : "px-3 space-y-5",
         )}
       >
         {children}
@@ -46,7 +54,7 @@ const SidebarDrawer = ({ header, footer, children }: SidebarProps) => {
     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
       <SheetContent
         side="bottom"
-        className="p-0 h-[85vh] rounded-t-2xl border-t border-border bg-card flex flex-col"
+        className="p-0 h-[85dvh] rounded-t-2xl border-t border-border bg-card flex flex-col"
       >
         <div className="relative shrink-0 pt-3">
           <span

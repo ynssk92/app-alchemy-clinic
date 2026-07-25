@@ -138,56 +138,129 @@ const SidebarHeader = () => {
   return (
     <div
       className={cn(
-        "flex items-center border-b border-border py-3 gap-2",
-        collapsed ? "px-2 justify-center" : "px-3",
+        "flex items-center border-b py-3 gap-2",
+        collapsed
+          ? "flex-col px-2 border-slate-800/80"
+          : "px-3 border-border",
       )}
     >
-      {!collapsed && (
-        <Link
-          to="/"
-          aria-label="La Dune home"
-          className="flex items-center gap-2 min-w-0 flex-1 rounded-md px-1 py-1 hover:bg-muted transition-colors"
-        >
-          <img
-            src={logoUrl}
-            alt="La Dune Clinique Dentaire"
-            className="shrink-0 object-contain h-10 w-auto max-w-full"
-          />
-        </Link>
+      {collapsed ? (
+        <>
+          <Link
+            to="/"
+            aria-label="La Dune home"
+            className="flex items-center justify-center h-10 w-10 rounded-[12px] transition-transform duration-200 motion-safe:hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+          >
+            <img
+              src={logoUrl}
+              alt="La Dune Clinique Dentaire"
+              className="h-8 w-8 object-contain"
+            />
+          </Link>
+          <SidebarToggle />
+        </>
+      ) : (
+        <>
+          <Link
+            to="/"
+            aria-label="La Dune home"
+            className="flex items-center gap-2 min-w-0 flex-1 rounded-md px-1 py-1 hover:bg-muted transition-colors"
+          >
+            <img
+              src={logoUrl}
+              alt="La Dune Clinique Dentaire"
+              className="shrink-0 object-contain h-10 w-auto max-w-full"
+            />
+          </Link>
+          <SidebarToggle />
+        </>
       )}
-      <SidebarToggle />
     </div>
   );
 };
 
-const SidebarFooterContent = () => {
+const SidebarFooterContent = ({
+  adminName,
+  avatarUrl,
+  initials,
+  isAdmin,
+}: {
+  adminName: string;
+  avatarUrl: string | null;
+  initials: string;
+  isAdmin: boolean;
+}) => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { collapsed } = useSidebar();
 
+  // Collapsed rail: Settings, Profile avatar (tooltip = name), Logout
+  if (collapsed) {
+    return (
+      <SidebarFooter>
+        {isAdmin && (
+          <SidebarTooltip label="Settings">
+            <button
+              type="button"
+              onClick={() => navigate("/admin/settings")}
+              aria-label="Settings"
+              className="group relative flex items-center justify-center w-12 h-12 rounded-[14px] text-slate-400 hover:bg-slate-700 hover:text-white transition-[transform,background-color,color] duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+            >
+              <Settings className="h-5 w-5" strokeWidth={2} />
+            </button>
+          </SidebarTooltip>
+        )}
+        <SidebarTooltip label={adminName || "Profile"}>
+          <Link
+            to="/profile"
+            aria-label={`Profile — ${adminName}`}
+            className="group flex items-center justify-center w-12 h-12 rounded-full transition-transform duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+          >
+            <Avatar className="w-10 h-10 ring-2 ring-slate-700 group-hover:ring-primary transition-colors">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
+              <AvatarFallback className="bg-primary/20 text-primary text-xs font-semibold">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
+        </SidebarTooltip>
+        <SidebarTooltip label="Sign out">
+          <button
+            type="button"
+            onClick={async () => { await signOut(); navigate("/"); }}
+            aria-label="Sign out"
+            className="group flex items-center justify-center w-12 h-12 rounded-[14px] text-slate-400 hover:bg-destructive/20 hover:text-destructive transition-[transform,background-color,color] duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/70"
+          >
+            <LogOut className="h-5 w-5" strokeWidth={2} />
+          </button>
+        </SidebarTooltip>
+      </SidebarFooter>
+    );
+  }
+
+  // Expanded: unchanged behavior
   const Btn = ({
     icon: Icon, label, onClick, destructive,
   }: { icon: any; label: string; onClick: () => void; destructive?: boolean }) => (
-    <SidebarTooltip label={label}>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={onClick}
-        aria-label={label}
-        className={cn(
-          "transition-colors",
-          collapsed ? "w-11 h-11 justify-center p-0" : "w-full justify-start",
-          destructive && "text-destructive hover:text-destructive",
-        )}
-      >
-        <Icon className={cn("h-4 w-4", !collapsed && "mr-2")} />
-        {!collapsed && label}
-      </Button>
-    </SidebarTooltip>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={onClick}
+      aria-label={label}
+      className={cn(
+        "w-full justify-start transition-colors",
+        destructive && "text-destructive hover:text-destructive",
+      )}
+    >
+      <Icon className="h-4 w-4 mr-2" />
+      {label}
+    </Button>
   );
 
   return (
     <SidebarFooter>
+      {isAdmin && <Btn icon={Settings} label="Settings" onClick={() => navigate("/admin/settings")} />}
+      <Btn icon={User} label="Profile" onClick={() => navigate("/profile")} />
       <Btn icon={Home} label="View Site" onClick={() => navigate("/")} />
       <Btn icon={LogOut} label="Sign Out" destructive onClick={async () => { await signOut(); navigate("/"); }} />
     </SidebarFooter>
@@ -234,7 +307,17 @@ const AdminShell = () => {
 
   return (
     <div className="min-h-screen flex bg-muted/30">
-      <Sidebar header={<SidebarHeader />} footer={<SidebarFooterContent />}>
+      <Sidebar
+        header={<SidebarHeader />}
+        footer={
+          <SidebarFooterContent
+            adminName={adminName}
+            avatarUrl={avatarUrl}
+            initials={initials}
+            isAdmin={isAdmin}
+          />
+        }
+      >
         {sections.map((section) => {
           const visible = section.items.filter((l) => {
             if (isAdmin) return true;

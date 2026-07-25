@@ -23,11 +23,14 @@ export const SidebarTooltip = ({
     <TooltipProvider delayDuration={reduced ? 0 : 80}>
       <Tooltip>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side="right" className="font-medium">
+        <TooltipContent
+          side="right"
+          sideOffset={12}
+          className="rounded-lg border-slate-700 bg-slate-900 px-3 py-1.5 text-xs font-medium text-white shadow-lg shadow-black/40"
+        >
           {label}
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
 };
-
