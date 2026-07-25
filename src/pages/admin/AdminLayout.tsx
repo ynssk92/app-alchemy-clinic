@@ -84,7 +84,7 @@ const sections: Section[] = [
         to: "/admin/billing", icon: Receipt, label: "Billing", module: "Billing",
         children: [
           { to: "/admin/billing", label: "Dashboard", end: true },
-          { to: "/admin/billing/invoices", label: "Invoices", end: true },
+          { to: "/admin/billing/invoices", label: "Invoices" },
           { to: "/admin/billing/invoices/new", label: "New Invoice" },
           { to: "/admin/billing/payments", label: "Payments" },
           { to: "/admin/billing/services", label: "Services" },
