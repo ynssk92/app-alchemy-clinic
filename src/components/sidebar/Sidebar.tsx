@@ -44,10 +44,25 @@ const SidebarDrawer = ({ header, footer, children }: SidebarProps) => {
   const { mobileOpen, setMobileOpen } = useSidebar();
   return (
     <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-      <SheetContent side="left" className="p-0 w-[280px] flex flex-col bg-card">
-        <div className="shrink-0">{header}</div>
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">{children}</nav>
-        {footer && <div className="shrink-0">{footer}</div>}
+      <SheetContent
+        side="bottom"
+        className="p-0 h-[85vh] rounded-t-2xl border-t border-border bg-card flex flex-col"
+      >
+        <div className="relative shrink-0 pt-3">
+          <span
+            aria-hidden="true"
+            className="absolute left-1/2 top-2 -translate-x-1/2 h-1.5 w-12 rounded-full bg-muted"
+          />
+          {header}
+        </div>
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5 text-base [&_a]:min-h-12 [&_button]:min-h-12">
+          {children}
+        </nav>
+        {footer && (
+          <div className="shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+            {footer}
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );
