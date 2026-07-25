@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.touch_app_settings() FROM PUBLIC, anon, authenticated;
