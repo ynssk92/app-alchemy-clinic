@@ -136,21 +136,25 @@ const SidebarHeader = () => {
   const { collapsed } = useSidebar();
   const { logoUrl } = useAppSettings();
   return (
-    <div className="flex items-center gap-2 border-b border-border px-3 py-3">
-      <Link
-        to="/"
-        aria-label="La Dune home"
-        className={cn(
-          "flex items-center gap-2 min-w-0 flex-1 rounded-md px-1 py-1 hover:bg-muted transition-colors",
-          collapsed && "justify-center",
-        )}
-      >
-        <img
-          src={logoUrl}
-          alt="La Dune Clinique Dentaire"
-          className={cn("shrink-0 object-contain transition-all", collapsed ? "h-8 w-8" : "h-10 w-auto")}
-        />
-      </Link>
+    <div
+      className={cn(
+        "flex items-center border-b border-border py-3 gap-2",
+        collapsed ? "px-2 justify-center" : "px-3",
+      )}
+    >
+      {!collapsed && (
+        <Link
+          to="/"
+          aria-label="La Dune home"
+          className="flex items-center gap-2 min-w-0 flex-1 rounded-md px-1 py-1 hover:bg-muted transition-colors"
+        >
+          <img
+            src={logoUrl}
+            alt="La Dune Clinique Dentaire"
+            className="shrink-0 object-contain h-10 w-auto max-w-full"
+          />
+        </Link>
+      )}
       <SidebarToggle />
     </div>
   );

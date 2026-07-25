@@ -22,12 +22,17 @@ const SidebarShell = ({ header, footer, children }: SidebarProps) => {
         width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED,
       }}
       className={cn(
-        "hidden md:flex flex-col shrink-0 bg-card border-r border-border",
+        "hidden md:flex flex-col shrink-0 bg-card border-r border-border overflow-hidden",
         "transition-[width] duration-300 ease-in-out will-change-[width]",
       )}
     >
       <div className="shrink-0">{header}</div>
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-4 space-y-5">
+      <nav
+        className={cn(
+          "flex-1 overflow-y-auto overflow-x-hidden py-4 space-y-5",
+          collapsed ? "px-2" : "px-3",
+        )}
+      >
         {children}
       </nav>
       {footer && <div className="shrink-0">{footer}</div>}
