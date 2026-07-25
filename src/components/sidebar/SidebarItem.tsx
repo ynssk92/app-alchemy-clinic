@@ -20,14 +20,24 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
   const { collapsed, setMobileOpen, device } = useSidebar();
   const { pathname } = useLocation();
 
-  const isChildActive = useMemo(
-    () =>
-      !!children?.some((c) =>
-        c.end ? pathname === c.to : pathname.startsWith(c.to),
-      ),
-    [children, pathname],
-  );
+  const matches = (target: string, exact?: boolean) =>
+    exact ? pathname === target : pathname === target || pathname.startsWith(target + "/");
+
+  // Pick the single best (longest) matching child so only one child highlights.
+  const activeChildTo = useMemo(() => {
+    if (!children?.length) return null;
+    let best: { to: string; len: number } | null = null;
+    for (const c of children) {
+      if (!matches(c.to, c.end)) continue;
+      if (!best || c.to.length > best.len) best = { to: c.to, len: c.to.length };
+    }
+    return best?.to ?? null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [children, pathname]);
+
+  const isChildActive = activeChildTo !== null;
   const [open, setOpen] = useState(isChildActive);
+
 
   const closeMobile = () => device === "mobile" && setMobileOpen(false);
 
