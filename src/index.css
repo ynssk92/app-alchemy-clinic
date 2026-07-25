@@ -131,3 +131,18 @@ All colors MUST be HSL.
   }
 }
 
+/* Global reduced-motion safety net: neutralize CSS transitions & animations
+   for users who set prefers-reduced-motion. Covers Tailwind transitions,
+   Radix/tailwindcss-animate keyframes (tooltip, sheet, accordion), and the
+   sidebar width transition. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
+
