@@ -27,13 +27,13 @@ All colors MUST be HSL.
     --accent-foreground: 0 0% 100%;
 
     --muted: 220 30% 96%;
-    --muted-foreground: 220 15% 45%;
+    --muted-foreground: 220 12% 46%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 30% 90%;
-    --input: 220 30% 90%;
+    --border: 220 22% 91%;
+    --input: 220 22% 91%;
     --ring: 230 60% 34%;
 
     --radius: 0.75rem;
@@ -41,12 +41,13 @@ All colors MUST be HSL.
     --gradient-primary: linear-gradient(135deg, hsl(230 60% 34%), hsl(220 70% 55%));
     --gradient-accent: linear-gradient(135deg, hsl(210 90% 60%), hsl(220 70% 55%));
     --gradient-hero: linear-gradient(135deg, hsl(230 60% 34% / 0.1), hsl(220 70% 55% / 0.1));
-    
-    --shadow-soft: 0 2px 8px hsl(222 47% 11% / 0.08);
-    --shadow-medium: 0 4px 16px hsl(222 47% 11% / 0.12);
-    --shadow-large: 0 8px 32px hsl(222 47% 11% / 0.16);
 
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Very soft SaaS-style shadows */
+    --shadow-soft: 0 1px 2px hsl(222 47% 11% / 0.04), 0 1px 3px hsl(222 47% 11% / 0.03);
+    --shadow-medium: 0 2px 4px hsl(222 47% 11% / 0.05), 0 4px 12px hsl(222 47% 11% / 0.06);
+    --shadow-large: 0 4px 8px hsl(222 47% 11% / 0.06), 0 12px 32px hsl(222 47% 11% / 0.08);
+
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Admin stat accents (Preclinic style) */
     --stat-blue: 220 90% 56%;
@@ -57,42 +58,55 @@ All colors MUST be HSL.
     --stat-violet: 262 72% 60%;
     --positive: 152 60% 42%;
     --negative: 352 84% 60%;
+
+    --sidebar-background: 0 0% 100%;
   }
 
   .dark {
-    --background: 222 47% 11%;
-    --foreground: 210 40% 98%;
+    /* Deep neutral dark inspired by Linear / Vercel dashboards */
+    --background: 224 22% 7%;
+    --foreground: 210 20% 96%;
 
-    --card: 222 47% 15%;
-    --card-foreground: 210 40% 98%;
+    --card: 224 20% 10%;
+    --card-foreground: 210 20% 96%;
 
-    --popover: 222 47% 15%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 224 20% 10%;
+    --popover-foreground: 210 20% 96%;
 
-    --primary: 220 70% 60%;
-    --primary-foreground: 222 47% 11%;
+    --primary: 220 90% 66%;
+    --primary-foreground: 224 22% 7%;
 
-    --secondary: 230 60% 50%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 220 30% 18%;
+    --secondary-foreground: 210 20% 96%;
 
-    --accent: 210 90% 65%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 220 30% 18%;
+    --accent-foreground: 210 20% 96%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 220 18% 14%;
+    --muted-foreground: 220 10% 66%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 55%;
+    --destructive-foreground: 210 20% 96%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 220 70% 60%;
+    --border: 220 18% 16%;
+    --input: 220 18% 16%;
+    --ring: 220 90% 66%;
+
+    --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.4), 0 1px 3px hsl(0 0% 0% / 0.3);
+    --shadow-medium: 0 2px 4px hsl(0 0% 0% / 0.4), 0 4px 12px hsl(0 0% 0% / 0.35);
+    --shadow-large: 0 4px 8px hsl(0 0% 0% / 0.45), 0 12px 32px hsl(0 0% 0% / 0.5);
+
+    --sidebar-background: 224 22% 8%;
   }
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: "cv02","cv03","cv04","cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   * {
     @apply border-border;
@@ -107,6 +121,11 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    letter-spacing: -0.02em;
   }
 }
 
