@@ -74,10 +74,10 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 }
 
 export default function AdminSettings() {
-  const { settings, logoUrl, refresh } = useAppSettings();
+  const { settings, logoUrl, mobileLogoUrl, faviconUrl, refresh } = useAppSettings();
   const [draft, setDraft] = useState<AppSettings>(settings);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
 
   useEffect(() => { setDraft(settings); }, [settings]);
 
@@ -98,6 +98,8 @@ export default function AdminSettings() {
     const { error } = await supabase.from("app_settings").update({
       site_name: draft.site_name,
       logo_url: draft.logo_url,
+      mobile_logo_url: draft.mobile_logo_url,
+      favicon_url: draft.favicon_url,
       primary_hsl: draft.primary_hsl,
       secondary_hsl: draft.secondary_hsl,
       accent_hsl: draft.accent_hsl,
@@ -111,16 +113,17 @@ export default function AdminSettings() {
     await refresh();
   };
 
-  const onLogoUpload = async (file: File) => {
-    setUploading(true);
+  const uploadAsset = async (file: File, prefix: string, field: "logo_url" | "mobile_logo_url" | "favicon_url") => {
+    setUploadingKey(field);
     const ext = file.name.split(".").pop() ?? "png";
-    const path = `logo-${Date.now()}.${ext}`;
+    const path = `${prefix}-${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("branding").upload(path, file, { upsert: true, contentType: file.type });
-    setUploading(false);
+    setUploadingKey(null);
     if (error) { toast.error(error.message); return; }
-    update({ logo_url: path });
-    toast.success("Logo uploaded — click Save to apply");
+    update({ [field]: path } as Partial<AppSettings>);
+    toast.success("Uploaded — click Save to apply");
   };
+
 
   const resetDefaults = () => {
     update({
@@ -158,36 +161,46 @@ export default function AdminSettings() {
         <TabsContent value="branding" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Logo</CardTitle>
-              <CardDescription>PNG or SVG, transparent background recommended.</CardDescription>
+              <CardTitle>Logos & Favicon</CardTitle>
+              <CardDescription>PNG or SVG with transparent background recommended. Favicon should be square (32–512px).</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-6">
-                <div className="h-20 w-20 rounded-lg border border-border bg-muted/40 flex items-center justify-center overflow-hidden">
-                  <img src={logoUrl} alt="Current logo" className="max-h-full max-w-full object-contain" />
+            <CardContent className="space-y-6">
+              {[
+                { key: "logo_url" as const, label: "Desktop logo", prefix: "logo", preview: logoUrl, current: draft.logo_url, bg: "bg-muted/40", box: "h-20 w-40" },
+                { key: "mobile_logo_url" as const, label: "Mobile logo", prefix: "mobile-logo", preview: mobileLogoUrl, current: draft.mobile_logo_url, bg: "bg-muted/40", box: "h-20 w-20" },
+                { key: "favicon_url" as const, label: "Favicon (browser tab)", prefix: "favicon", preview: faviconUrl ?? logoUrl, current: draft.favicon_url, bg: "bg-background border", box: "h-12 w-12" },
+              ].map((row) => (
+                <div key={row.key} className="flex items-center gap-6 flex-wrap">
+                  <div className="min-w-[140px]">
+                    <Label>{row.label}</Label>
+                  </div>
+                  <div className={`${row.box} rounded-lg border border-border ${row.bg} flex items-center justify-center overflow-hidden shrink-0`}>
+                    <img src={row.preview} alt={`${row.label} preview`} className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept={row.key === "favicon_url" ? "image/png,image/x-icon,image/svg+xml,image/vnd.microsoft.icon" : "image/*"}
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadAsset(f, row.prefix, row.key); }}
+                    />
+                    <Button asChild variant="outline" disabled={uploadingKey === row.key}>
+                      <span><Upload className="w-4 h-4 mr-2" />{uploadingKey === row.key ? "Uploading…" : "Upload"}</span>
+                    </Button>
+                  </label>
+                  {row.current && (
+                    <Button variant="ghost" onClick={() => update({ [row.key]: null } as Partial<AppSettings>)}>Remove</Button>
+                  )}
                 </div>
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) onLogoUpload(f); }}
-                  />
-                  <Button asChild variant="outline" disabled={uploading}>
-                    <span><Upload className="w-4 h-4 mr-2" />{uploading ? "Uploading…" : "Upload new logo"}</span>
-                  </Button>
-                </label>
-                {draft.logo_url && (
-                  <Button variant="ghost" onClick={() => update({ logo_url: null })}>Remove</Button>
-                )}
-              </div>
-              <div className="space-y-2">
+              ))}
+              <div className="space-y-2 pt-2 border-t border-border">
                 <Label>Site name</Label>
                 <Input value={draft.site_name} onChange={(e) => update({ site_name: e.target.value })} />
               </div>
             </CardContent>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="theme" className="space-y-4 mt-4">
           <Card>

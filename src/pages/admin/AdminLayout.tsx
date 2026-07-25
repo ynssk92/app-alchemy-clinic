@@ -195,7 +195,7 @@ const AdminShell = () => {
   const { can } = usePermissions();
   const navigate = useNavigate();
   const { setMobileOpen } = useSidebar();
-  const { logoUrl } = useAppSettings();
+  const { logoUrl, mobileLogoUrl } = useAppSettings();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [dark, setDark] = useState<boolean>(
@@ -263,7 +263,7 @@ const AdminShell = () => {
             <Menu className="w-4 h-4" />
           </Button>
           <Link to="/" aria-label="La Dune home" className="md:hidden flex items-center shrink-0">
-            <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
+            <img src={mobileLogoUrl} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
           </Link>
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

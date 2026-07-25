@@ -4,6 +4,8 @@ import defaultLogo from "@/assets/logo.png";
 
 export type AppSettings = {
   logo_url: string | null;
+  mobile_logo_url: string | null;
+  favicon_url: string | null;
   site_name: string;
   primary_hsl: string;
   secondary_hsl: string;
@@ -15,6 +17,8 @@ export type AppSettings = {
 
 const DEFAULTS: AppSettings = {
   logo_url: null,
+  mobile_logo_url: null,
+  favicon_url: null,
   site_name: "La Dune Clinique Dentaire",
   primary_hsl: "230 60% 34%",
   secondary_hsl: "220 70% 55%",
@@ -27,6 +31,8 @@ const DEFAULTS: AppSettings = {
 type Ctx = {
   settings: AppSettings;
   logoUrl: string;
+  mobileLogoUrl: string;
+  faviconUrl: string | null;
   loading: boolean;
   refresh: () => Promise<void>;
 };
@@ -34,15 +40,17 @@ type Ctx = {
 const AppSettingsContext = createContext<Ctx>({
   settings: DEFAULTS,
   logoUrl: defaultLogo,
+  mobileLogoUrl: defaultLogo,
+  faviconUrl: null,
   loading: true,
   refresh: async () => {},
 });
 
-async function resolveLogo(path: string | null): Promise<string> {
-  if (!path) return defaultLogo;
+async function resolveAsset(path: string | null, fallback: string | null = null): Promise<string | null> {
+  if (!path) return fallback;
   if (path.startsWith("http")) return path;
   const { data } = await supabase.storage.from("branding").createSignedUrl(path, 60 * 60 * 24 * 365);
-  return data?.signedUrl ?? defaultLogo;
+  return data?.signedUrl ?? fallback;
 }
 
 function applyTheme(s: AppSettings) {
@@ -56,9 +64,22 @@ function applyTheme(s: AppSettings) {
   root.style.setProperty("--radius", s.radius);
 }
 
+function applyFavicon(url: string | null) {
+  if (!url) return;
+  let link = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
+  if (!link) {
+    link = document.createElement("link");
+    link.rel = "icon";
+    document.head.appendChild(link);
+  }
+  link.href = url;
+}
+
 export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<AppSettings>(DEFAULTS);
   const [logoUrl, setLogoUrl] = useState<string>(defaultLogo);
+  const [mobileLogoUrl, setMobileLogoUrl] = useState<string>(defaultLogo);
+  const [faviconUrl, setFaviconUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -67,7 +88,12 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       const merged: AppSettings = { ...DEFAULTS, ...data };
       setSettings(merged);
       applyTheme(merged);
-      setLogoUrl(await resolveLogo(merged.logo_url));
+      const desktop = (await resolveAsset(merged.logo_url, defaultLogo))!;
+      setLogoUrl(desktop);
+      setMobileLogoUrl((await resolveAsset(merged.mobile_logo_url, desktop))!);
+      const fav = await resolveAsset(merged.favicon_url);
+      setFaviconUrl(fav);
+      applyFavicon(fav);
     }
     setLoading(false);
   }, []);
@@ -77,7 +103,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
   }, [load]);
 
   return (
-    <AppSettingsContext.Provider value={{ settings, logoUrl, loading, refresh: load }}>
+    <AppSettingsContext.Provider value={{ settings, logoUrl, mobileLogoUrl, faviconUrl, loading, refresh: load }}>
       {children}
     </AppSettingsContext.Provider>
   );

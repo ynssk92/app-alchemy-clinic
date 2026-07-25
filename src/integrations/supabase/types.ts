@@ -45,9 +45,11 @@ export type Database = {
         Row: {
           accent_hsl: string
           background_hsl: string
+          favicon_url: string | null
           foreground_hsl: string
           id: boolean
           logo_url: string | null
+          mobile_logo_url: string | null
           primary_hsl: string
           radius: string
           secondary_hsl: string
@@ -58,9 +60,11 @@ export type Database = {
         Insert: {
           accent_hsl?: string
           background_hsl?: string
+          favicon_url?: string | null
           foreground_hsl?: string
           id?: boolean
           logo_url?: string | null
+          mobile_logo_url?: string | null
           primary_hsl?: string
           radius?: string
           secondary_hsl?: string
@@ -71,9 +75,11 @@ export type Database = {
         Update: {
           accent_hsl?: string
           background_hsl?: string
+          favicon_url?: string | null
           foreground_hsl?: string
           id?: boolean
           logo_url?: string | null
+          mobile_logo_url?: string | null
           primary_hsl?: string
           radius?: string
           secondary_hsl?: string
