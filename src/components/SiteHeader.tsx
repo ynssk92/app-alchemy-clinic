@@ -15,6 +15,8 @@ import {
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import LanguageToggle from "@/components/LanguageToggle";
 import { useAppSettings } from "@/hooks/useAppSettings";
+import { cn } from "@/lib/utils";
+
 
 
 export const SiteHeader = () => {
