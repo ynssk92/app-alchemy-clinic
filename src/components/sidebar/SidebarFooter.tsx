@@ -7,8 +7,9 @@ export const SidebarFooter = ({ children }: { children: ReactNode }) => {
   return (
     <div
       className={cn(
-        "border-t border-border p-3 space-y-1",
-        collapsed && "flex flex-col items-center",
+        collapsed
+          ? "border-t border-slate-800/80 py-3 flex flex-col items-center gap-3"
+          : "border-t border-border p-3 space-y-1",
       )}
     >
       {children}

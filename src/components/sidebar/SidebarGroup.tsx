@@ -11,7 +11,7 @@ export const SidebarGroup = ({
 }) => {
   const { collapsed } = useSidebar();
   return (
-    <div className="space-y-1">
+    <div className={collapsed ? "" : "space-y-1"}>
       <div
         className={cn(
           "px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition-opacity duration-200",
@@ -21,7 +21,18 @@ export const SidebarGroup = ({
       >
         {title}
       </div>
-      <div className="space-y-1">{children}</div>
+      <div
+        className={cn(
+          collapsed ? "flex flex-col items-center gap-3" : "space-y-1",
+        )}
+        role="group"
+        aria-label={title}
+      >
+        {children}
+      </div>
+      {collapsed && (
+        <div className="mx-auto mt-3 h-px w-8 bg-slate-800/80" aria-hidden="true" />
+      )}
     </div>
   );
 };
