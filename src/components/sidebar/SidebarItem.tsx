@@ -121,7 +121,9 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
             collapsed ? "justify-center px-0 py-2.5 mx-auto w-11 h-11" : "gap-3 px-3 py-2",
             isActive
               ? "bg-primary text-primary-foreground shadow-soft"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              : collapsed
+                ? "text-primary hover:bg-primary/10"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground",
           )
         }
       >
@@ -131,6 +133,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
               <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary-foreground/70" />
             )}
             <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+
             <span
               className={cn(
                 "truncate transition-[opacity,width] duration-200",
