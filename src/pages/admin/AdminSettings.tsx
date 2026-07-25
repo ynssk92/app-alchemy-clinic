@@ -161,36 +161,46 @@ export default function AdminSettings() {
         <TabsContent value="branding" className="space-y-4 mt-4">
           <Card>
             <CardHeader>
-              <CardTitle>Logo</CardTitle>
-              <CardDescription>PNG or SVG, transparent background recommended.</CardDescription>
+              <CardTitle>Logos & Favicon</CardTitle>
+              <CardDescription>PNG or SVG with transparent background recommended. Favicon should be square (32–512px).</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-6">
-                <div className="h-20 w-20 rounded-lg border border-border bg-muted/40 flex items-center justify-center overflow-hidden">
-                  <img src={logoUrl} alt="Current logo" className="max-h-full max-w-full object-contain" />
+            <CardContent className="space-y-6">
+              {[
+                { key: "logo_url" as const, label: "Desktop logo", prefix: "logo", preview: logoUrl, current: draft.logo_url, bg: "bg-muted/40", box: "h-20 w-40" },
+                { key: "mobile_logo_url" as const, label: "Mobile logo", prefix: "mobile-logo", preview: mobileLogoUrl, current: draft.mobile_logo_url, bg: "bg-muted/40", box: "h-20 w-20" },
+                { key: "favicon_url" as const, label: "Favicon (browser tab)", prefix: "favicon", preview: faviconUrl ?? logoUrl, current: draft.favicon_url, bg: "bg-background border", box: "h-12 w-12" },
+              ].map((row) => (
+                <div key={row.key} className="flex items-center gap-6 flex-wrap">
+                  <div className="min-w-[140px]">
+                    <Label>{row.label}</Label>
+                  </div>
+                  <div className={`${row.box} rounded-lg border border-border ${row.bg} flex items-center justify-center overflow-hidden shrink-0`}>
+                    <img src={row.preview} alt={`${row.label} preview`} className="max-h-full max-w-full object-contain" />
+                  </div>
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept={row.key === "favicon_url" ? "image/png,image/x-icon,image/svg+xml,image/vnd.microsoft.icon" : "image/*"}
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadAsset(f, row.prefix, row.key); }}
+                    />
+                    <Button asChild variant="outline" disabled={uploadingKey === row.key}>
+                      <span><Upload className="w-4 h-4 mr-2" />{uploadingKey === row.key ? "Uploading…" : "Upload"}</span>
+                    </Button>
+                  </label>
+                  {row.current && (
+                    <Button variant="ghost" onClick={() => update({ [row.key]: null } as Partial<AppSettings>)}>Remove</Button>
+                  )}
                 </div>
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => { const f = e.target.files?.[0]; if (f) onLogoUpload(f); }}
-                  />
-                  <Button asChild variant="outline" disabled={uploading}>
-                    <span><Upload className="w-4 h-4 mr-2" />{uploading ? "Uploading…" : "Upload new logo"}</span>
-                  </Button>
-                </label>
-                {draft.logo_url && (
-                  <Button variant="ghost" onClick={() => update({ logo_url: null })}>Remove</Button>
-                )}
-              </div>
-              <div className="space-y-2">
+              ))}
+              <div className="space-y-2 pt-2 border-t border-border">
                 <Label>Site name</Label>
                 <Input value={draft.site_name} onChange={(e) => update({ site_name: e.target.value })} />
               </div>
             </CardContent>
           </Card>
         </TabsContent>
+
 
         <TabsContent value="theme" className="space-y-4 mt-4">
           <Card>
