@@ -24,7 +24,6 @@ export const SiteHeader = () => {
         <Link to="/" className="flex items-center gap-3 transition-transform duration-300 hover:scale-105">
           <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-10" />
         </Link>
-        </Link>
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (
             <NavLink
