@@ -174,9 +174,9 @@ export const SiteHeader = () => {
                   </span>
                   <LanguageToggle />
                 </div>
-                <Link to="/auth" onClick={() => setOpen(false)} className="block">
-                  <Button variant="outline" className="w-full h-12 text-base">
-                    {t("nav.signIn")}
+                <Link to="/booking" onClick={() => setOpen(false)} className="block">
+                  <Button className="w-full h-12 text-base shadow-soft">
+                    Rendez-vous
                   </Button>
                 </Link>
 
