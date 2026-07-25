@@ -1,12 +1,12 @@
-import { Link, NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
-  UserCheck, Search, Moon, Sun, Plus, ChevronDown, User, UserX, BarChart3,
-  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt,
+  UserCheck, Search, Moon, Sun, User, BarChart3,
+  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,13 +20,23 @@ import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 import LanguageToggle from "@/components/LanguageToggle";
 import { usePermissions } from "@/hooks/usePermissions";
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarGroup,
+  SidebarItem,
+  SidebarFooter,
+  SidebarToggle,
+  SidebarTooltip,
+  useSidebar,
+} from "@/components/sidebar/Sidebar";
 
 type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
   {
-    title: "Main Menu",
+    title: "Main",
     items: [
       { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
     ],
@@ -59,7 +69,7 @@ const sections: Section[] = [
           { to: "/admin/appointments/new", label: "New Appointment" },
           { to: "/admin/appointments/calendar", label: "Calendar" },
           { to: "/admin/appointments/kanban", label: "Kanban View" },
-          { to: "/admin/appointments/requests", label: "Appointment Requests" },
+          { to: "/admin/appointments/requests", label: "Requests" },
         ],
       },
       { to: "/admin/specialties", icon: Tag, label: "Specialties", module: "Specialties" },
@@ -98,7 +108,7 @@ const sections: Section[] = [
         children: [
           { to: "/admin/users", label: "Users", end: true },
           { to: "/admin/roles", label: "Roles & Permissions" },
-          { to: "/admin/delete-requests", label: "Delete Account Request" },
+          { to: "/admin/delete-requests", label: "Delete Requests" },
         ],
       },
       { to: "/admin/reports", icon: BarChart3, label: "Reports", module: "Reports" },
@@ -121,14 +131,74 @@ const sections: Section[] = [
   },
 ];
 
-const AdminLayout = () => {
+const SidebarHeader = () => {
+  const { collapsed } = useSidebar();
+  return (
+    <div className="flex items-center gap-2 border-b border-border px-3 py-3">
+      <Link
+        to="/"
+        aria-label="La Dune home"
+        className={cn(
+          "flex items-center gap-2 min-w-0 flex-1 rounded-md px-1 py-1 hover:bg-muted transition-colors",
+          collapsed && "justify-center",
+        )}
+      >
+        <div className="h-9 w-9 rounded-lg bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
+          LD
+        </div>
+        <span
+          className={cn(
+            "text-sm font-semibold truncate transition-opacity duration-200",
+            collapsed ? "w-0 opacity-0" : "opacity-100",
+          )}
+        >
+          La Dune Clinic
+        </span>
+      </Link>
+      <SidebarToggle />
+    </div>
+  );
+};
+
+const SidebarFooterContent = () => {
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+  const { collapsed } = useSidebar();
+
+  const Btn = ({
+    icon: Icon, label, onClick, destructive,
+  }: { icon: any; label: string; onClick: () => void; destructive?: boolean }) => (
+    <SidebarTooltip label={label}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onClick}
+        aria-label={label}
+        className={cn(
+          "transition-colors",
+          collapsed ? "w-11 h-11 justify-center p-0" : "w-full justify-start",
+          destructive && "text-destructive hover:text-destructive",
+        )}
+      >
+        <Icon className={cn("h-4 w-4", !collapsed && "mr-2")} />
+        {!collapsed && label}
+      </Button>
+    </SidebarTooltip>
+  );
+
+  return (
+    <SidebarFooter>
+      <Btn icon={Home} label="View Site" onClick={() => navigate("/")} />
+      <Btn icon={LogOut} label="Sign Out" destructive onClick={async () => { await signOut(); navigate("/"); }} />
+    </SidebarFooter>
+  );
+};
+
+const AdminShell = () => {
   const { signOut, user, isAdmin, isAssistant } = useAuth();
   const { can } = usePermissions();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
-  const toggleGroup = (label: string) =>
-    setOpenGroups((g) => ({ ...g, [label]: !g[label] }));
+  const { setMobileOpen } = useSidebar();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [dark, setDark] = useState<boolean>(
@@ -150,7 +220,6 @@ const AdminLayout = () => {
   }, [user]);
 
   const initials = (adminName || "A").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
-
   const toggleTheme = () => {
     const next = !dark;
     document.documentElement.classList.toggle("dark", next);
@@ -159,149 +228,58 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen flex bg-muted/30">
-      {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col">
-        <Link to="/" className="p-5 flex items-center gap-3">
-          <img src={logo} alt="La Dune" className="h-9" />
-        </Link>
+      <Sidebar header={<SidebarHeader />} footer={<SidebarFooterContent />}>
+        {sections.map((section) => {
+          const visible = section.items.filter((l) => {
+            if (isAdmin) return true;
+            if (l.adminOnly) return false;
+            if (l.module) return can(l.module, "view");
+            return !!l.staff;
+          });
+          if (visible.length === 0) return null;
+          return (
+            <SidebarGroup key={section.title} title={section.title}>
+              {visible.map((l) => (
+                <SidebarItem
+                  key={l.to}
+                  to={l.to}
+                  icon={l.icon}
+                  label={l.label}
+                  end={l.end}
+                  children={l.children}
+                />
+              ))}
+            </SidebarGroup>
+          );
+        })}
+      </Sidebar>
 
-        {/* Clinic switcher card */}
-        <div className="mx-4 mb-4 p-3 rounded-xl border border-border bg-muted/40 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold">
-            LD
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold truncate">La Dune Clinic</div>
-            <div className="text-[11px] text-muted-foreground truncate">Dental Care</div>
-          </div>
-        </div>
-
-        <nav className="flex-1 px-3 overflow-y-auto pb-4 space-y-5">
-          {sections.map((section) => {
-            const visible = section.items.filter((l) => {
-              if (isAdmin) return true;
-              if (l.adminOnly) return false;
-              if (l.module) return can(l.module, "view");
-              return !!l.staff;
-            });
-            if (visible.length === 0) return null;
-            return (
-              <div key={section.title}>
-                <div className="px-3 mb-2 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
-                  {section.title}
-                </div>
-                <div className="space-y-1">
-                  {visible.map((l) => {
-                    if (l.children && l.children.length) {
-                      const groupActive = l.children.some((c) =>
-                        c.end ? location.pathname === c.to : location.pathname.startsWith(c.to)
-                      );
-                      const open = openGroups[l.label] ?? groupActive;
-                      return (
-                        <div key={l.to}>
-                          <button
-                            type="button"
-                            onClick={() => toggleGroup(l.label)}
-                            className={cn(
-                              "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-                              groupActive
-                                ? "bg-primary/10 text-primary"
-                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                            )}
-                          >
-                            <l.icon className="w-4 h-4" />
-                            <span className="flex-1 text-left">{l.label}</span>
-                            <ChevronDown
-                              className={cn("w-4 h-4 transition-transform", open && "rotate-180")}
-                            />
-                          </button>
-                          {open && (
-                            <div className="mt-1 ml-4 pl-4 border-l border-border space-y-0.5">
-                              {l.children.map((c) => (
-                                <NavLink
-                                  key={c.to}
-                                  to={c.to}
-                                  end={c.end}
-                                  className={({ isActive }) =>
-                                    cn(
-                                      "flex items-center gap-3 pl-3 pr-3 py-1.5 rounded-md text-sm transition-colors relative",
-                                      isActive
-                                        ? "text-primary font-semibold"
-                                        : "text-muted-foreground hover:text-foreground"
-                                    )
-                                  }
-                                >
-                                  {({ isActive }) => (
-                                    <>
-                                      <span
-                                        className={cn(
-                                          "w-1.5 h-1.5 rounded-full",
-                                          isActive ? "bg-primary" : "bg-muted-foreground/30"
-                                        )}
-                                      />
-                                      {c.label}
-                                    </>
-                                  )}
-                                </NavLink>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    }
-                    return (
-                      <NavLink
-                        key={l.to}
-                        to={l.to}
-                        end={l.end}
-                        className={({ isActive }) =>
-                          cn(
-                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all",
-                            isActive
-                              ? "bg-primary text-primary-foreground shadow-soft"
-                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                          )
-                        }
-                      >
-                        <l.icon className="w-4 h-4" />
-                        {l.label}
-                      </NavLink>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </nav>
-
-        <div className="p-3 border-t border-border space-y-1">
-          <Button variant="ghost" size="sm" className="w-full justify-start" onClick={() => navigate("/")}>
-            <Home className="w-4 h-4 mr-2" />View Site
+      <main className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <header className="sticky top-0 z-10 bg-card/90 backdrop-blur border-b border-border px-4 md:px-6 py-3 flex items-center gap-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" className="w-full justify-start text-destructive hover:text-destructive"
-            onClick={async () => { await signOut(); navigate("/"); }}>
-            <LogOut className="w-4 h-4 mr-2" />Sign Out
-          </Button>
-        </div>
-      </aside>
-
-      {/* Main */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <header className="sticky top-0 z-10 bg-card/90 backdrop-blur border-b border-border px-6 py-3 flex items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <Input placeholder="Search patients, doctors, appointments…" className="pl-9 bg-muted/50 border-0" />
           </div>
           <div className="flex-1" />
           <LanguageToggle />
-          <Button variant="ghost" size="icon" onClick={toggleTheme} title="Toggle theme">
+          <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
             {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </Button>
           <AdminNotifications />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" className="gap-2 bg-gradient-primary text-primary-foreground">
-                <Zap className="w-4 h-4" />Quick Actions
+                <Zap className="w-4 h-4" />
+                <span className="hidden sm:inline">Quick Actions</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-popover">
@@ -337,7 +315,7 @@ const AdminLayout = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Link to="/profile" className="flex items-center gap-2 pl-2 border-l border-border ml-1" title="Edit profile">
+          <Link to="/profile" className="flex items-center gap-2 pl-2 border-l border-border ml-1" aria-label="Edit profile">
             <Avatar className="w-9 h-9 border border-border">
               {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">{initials}</AvatarFallback>
@@ -361,5 +339,11 @@ const AdminLayout = () => {
     </div>
   );
 };
+
+const AdminLayout = () => (
+  <SidebarProvider>
+    <AdminShell />
+  </SidebarProvider>
+);
 
 export default AdminLayout;
