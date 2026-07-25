@@ -120,9 +120,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
             "group relative flex items-center rounded-lg text-sm font-medium transition-colors duration-200",
             collapsed ? "justify-center px-0 py-2.5 mx-auto w-11 h-11" : "gap-3 px-3 py-2",
             isActive
-              ? collapsed
-                ? "bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30 ring-offset-2 ring-offset-card"
-                : "bg-primary text-primary-foreground shadow-soft"
+              ? "bg-primary text-primary-foreground shadow-soft"
               : collapsed
                 ? "text-primary hover:bg-primary/10"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground",
@@ -131,16 +129,14 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
       >
         {({ isActive }) => (
           <>
-            {isActive && (
+            {isActive && !collapsed && (
               <span
                 aria-hidden="true"
-                className={cn(
-                  "absolute left-0 rounded-r bg-primary-foreground/80",
-                  collapsed ? "top-2 bottom-2 w-1" : "top-1.5 bottom-1.5 w-0.5",
-                )}
+                className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary-foreground/80"
               />
             )}
             <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+
 
 
             <span
