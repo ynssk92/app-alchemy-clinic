@@ -263,7 +263,7 @@ const AdminShell = () => {
             <Menu className="w-4 h-4" />
           </Button>
           <Link to="/" aria-label="La Dune home" className="md:hidden flex items-center shrink-0">
-            <img src={logo} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
+            <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
           </Link>
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
