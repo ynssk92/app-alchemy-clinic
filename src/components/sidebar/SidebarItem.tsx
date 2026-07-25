@@ -16,6 +16,22 @@ export type SidebarItemProps = {
   children?: SidebarChild[];
 };
 
+/**
+ * Collapsed rail button: 48x48, radius 14px, 20px icon, centered, slate-400
+ * default, slate-700 hover with scale-105, primary + glow when active.
+ */
+export const collapsedItemClasses = ({ isActive }: { isActive: boolean }) =>
+  cn(
+    "group relative flex items-center justify-center mx-auto",
+    "w-12 h-12 rounded-[14px] cursor-pointer",
+    "transition-[transform,background-color,color,box-shadow] duration-200 ease-out",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+    "motion-safe:hover:scale-[1.05]",
+    isActive
+      ? "bg-primary text-white shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_8px_24px_-6px_hsl(var(--primary)/0.55)]"
+      : "text-slate-400 hover:bg-slate-700 hover:text-white",
+  );
+
 export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarItemProps) => {
   const { collapsed, setMobileOpen, device } = useSidebar();
   const { pathname } = useLocation();
@@ -23,7 +39,6 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
   const matches = (target: string, exact?: boolean) =>
     exact ? pathname === target : pathname === target || pathname.startsWith(target + "/");
 
-  // Pick the single best (longest) matching child so only one child highlights.
   const activeChildTo = useMemo(() => {
     if (!children?.length) return null;
     let best: { to: string; len: number } | null = null;
@@ -38,11 +53,37 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
   const isChildActive = activeChildTo !== null;
   const [open, setOpen] = useState(isChildActive);
 
-
   const closeMobile = () => device === "mobile" && setMobileOpen(false);
 
-  // When collapsed, groups collapse into a single icon link to the parent route.
-  if (children && children.length && !collapsed) {
+  // ---------- COLLAPSED RAIL ----------
+  if (collapsed) {
+    return (
+      <SidebarTooltip label={label}>
+        <NavLink
+          to={to}
+          end={end}
+          onClick={closeMobile}
+          aria-label={label}
+          className={collapsedItemClasses}
+        >
+          {({ isActive }) => (
+            <>
+              {isActive && (
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-0.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-white/90 shadow-[0_0_8px_hsl(var(--primary))]"
+                />
+              )}
+              <Icon className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+            </>
+          )}
+        </NavLink>
+      </SidebarTooltip>
+    );
+  }
+
+  // ---------- EXPANDED (groups) ----------
+  if (children && children.length) {
     return (
       <div>
         <button
@@ -100,7 +141,6 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
                   </NavLink>
                 );
               })}
-
             </div>
           </div>
         </div>
@@ -109,47 +149,32 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
   }
 
   return (
-    <SidebarTooltip label={label}>
-      <NavLink
-        to={to}
-        end={end}
-        onClick={closeMobile}
-        aria-label={label}
-        className={({ isActive }) =>
-          cn(
-            "group relative flex items-center rounded-lg text-sm font-medium transition-colors duration-200",
-            collapsed ? "justify-center px-0 py-2.5 mx-auto w-11 h-11" : "gap-3 px-3 py-2",
-            isActive
-              ? "bg-primary text-primary-foreground shadow-soft"
-              : collapsed
-                ? "text-primary hover:bg-primary/10"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-          )
-        }
-      >
-        {({ isActive }) => (
-          <>
-            {isActive && !collapsed && (
-              <span
-                aria-hidden="true"
-                className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary-foreground/80"
-              />
-            )}
-            <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-
-
-
+    <NavLink
+      to={to}
+      end={end}
+      onClick={closeMobile}
+      aria-label={label}
+      className={({ isActive }) =>
+        cn(
+          "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
+          isActive
+            ? "bg-primary text-primary-foreground shadow-soft"
+            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+        )
+      }
+    >
+      {({ isActive }) => (
+        <>
+          {isActive && (
             <span
-              className={cn(
-                "truncate transition-[opacity,width] duration-200",
-                collapsed ? "w-0 opacity-0" : "w-auto opacity-100",
-              )}
-            >
-              {label}
-            </span>
-          </>
-        )}
-      </NavLink>
-    </SidebarTooltip>
+              aria-hidden="true"
+              className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary-foreground/80"
+            />
+          )}
+          <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+          <span className="truncate">{label}</span>
+        </>
+      )}
+    </NavLink>
   );
 };
