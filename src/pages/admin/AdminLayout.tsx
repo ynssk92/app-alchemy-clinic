@@ -47,7 +47,7 @@ const sections: Section[] = [
       {
         to: "/admin/doctors", icon: Stethoscope, label: "Doctors", module: "Doctors",
         children: [
-          { to: "/admin/doctors", label: "Doctors", end: true },
+          { to: "/admin/doctors", label: "Doctors" },
           { to: "/admin/doctors/details", label: "Doctor Details" },
           { to: "/admin/doctors/new", label: "Add Doctor" },
           { to: "/admin/doctors/schedule", label: "Doctor Schedule" },
@@ -56,7 +56,7 @@ const sections: Section[] = [
       {
         to: "/admin/patients", icon: Users, label: "Patients", module: "Patients",
         children: [
-          { to: "/admin/patients", label: "Patients", end: true },
+          { to: "/admin/patients", label: "Patients" },
           { to: "/admin/patients/details", label: "Patient Details" },
           { to: "/admin/patients/create", label: "Create Patient" },
           { to: "/admin/patients/approvals", label: "Approvals" },
@@ -65,7 +65,7 @@ const sections: Section[] = [
       {
         to: "/admin/appointments", icon: Calendar, label: "Appointments", module: "Appointments", staff: true,
         children: [
-          { to: "/admin/appointments", label: "Appointments", end: true },
+          { to: "/admin/appointments", label: "Appointments" },
           { to: "/admin/appointments/new", label: "New Appointment" },
           { to: "/admin/appointments/calendar", label: "Calendar" },
           { to: "/admin/appointments/kanban", label: "Kanban View" },
@@ -84,7 +84,7 @@ const sections: Section[] = [
         to: "/admin/billing", icon: Receipt, label: "Billing", module: "Billing",
         children: [
           { to: "/admin/billing", label: "Dashboard", end: true },
-          { to: "/admin/billing/invoices", label: "Invoices", end: true },
+          { to: "/admin/billing/invoices", label: "Invoices" },
           { to: "/admin/billing/invoices/new", label: "New Invoice" },
           { to: "/admin/billing/payments", label: "Payments" },
           { to: "/admin/billing/services", label: "Services" },
@@ -106,7 +106,7 @@ const sections: Section[] = [
       {
         to: "/admin/users", icon: User, label: "Users", adminOnly: true,
         children: [
-          { to: "/admin/users", label: "Users", end: true },
+          { to: "/admin/users", label: "Users" },
           { to: "/admin/roles", label: "Roles & Permissions" },
           { to: "/admin/delete-requests", label: "Delete Requests" },
         ],

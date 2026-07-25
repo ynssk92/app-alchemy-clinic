@@ -20,14 +20,24 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
   const { collapsed, setMobileOpen, device } = useSidebar();
   const { pathname } = useLocation();
 
-  const isChildActive = useMemo(
-    () =>
-      !!children?.some((c) =>
-        c.end ? pathname === c.to : pathname.startsWith(c.to),
-      ),
-    [children, pathname],
-  );
+  const matches = (target: string, exact?: boolean) =>
+    exact ? pathname === target : pathname === target || pathname.startsWith(target + "/");
+
+  // Pick the single best (longest) matching child so only one child highlights.
+  const activeChildTo = useMemo(() => {
+    if (!children?.length) return null;
+    let best: { to: string; len: number } | null = null;
+    for (const c of children) {
+      if (!matches(c.to, c.end)) continue;
+      if (!best || c.to.length > best.len) best = { to: c.to, len: c.to.length };
+    }
+    return best?.to ?? null;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [children, pathname]);
+
+  const isChildActive = activeChildTo !== null;
   const [open, setOpen] = useState(isChildActive);
+
 
   const closeMobile = () => device === "mobile" && setMobileOpen(false);
 
@@ -64,34 +74,33 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
         >
           <div className="overflow-hidden">
             <div className="mt-1 ml-4 space-y-0.5 border-l border-border pl-3">
-              {children.map((c) => (
-                <NavLink
-                  key={c.to}
-                  to={c.to}
-                  end={c.end}
-                  onClick={closeMobile}
-                  className={({ isActive }) =>
-                    cn(
+              {children.map((c) => {
+                const isActive = activeChildTo === c.to;
+                return (
+                  <NavLink
+                    key={c.to}
+                    to={c.to}
+                    end={c.end}
+                    onClick={closeMobile}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
                       "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
                       isActive
                         ? "font-semibold text-primary"
                         : "text-muted-foreground hover:text-foreground",
-                    )
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span
-                        className={cn(
-                          "h-1.5 w-1.5 rounded-full transition-colors",
-                          isActive ? "bg-primary" : "bg-muted-foreground/30",
-                        )}
-                      />
-                      {c.label}
-                    </>
-                  )}
-                </NavLink>
-              ))}
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full transition-colors",
+                        isActive ? "bg-primary" : "bg-muted-foreground/30",
+                      )}
+                    />
+                    {c.label}
+                  </NavLink>
+                );
+              })}
+
             </div>
           </div>
         </div>
