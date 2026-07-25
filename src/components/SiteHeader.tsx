@@ -98,7 +98,7 @@ export const SiteHeader = () => {
                 const el = document.getElementById("mobile-nav-close");
                 el?.focus();
               }}
-              className={cnClass(
+              className={cn(
                 "p-0 rounded-t-2xl border-t border-border bg-background h-[85dvh] flex flex-col",
                 // Smoother, spring-like slide + fade for the drawer itself
                 "data-[state=open]:duration-400 data-[state=closed]:duration-250",
