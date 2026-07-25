@@ -56,12 +56,13 @@ export const SiteHeader = () => {
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
             <LanguageToggle />
-            <Link to="/auth">
-              <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5">
-                {t("nav.signIn")}
-              </Button>
-            </Link>
           </div>
+          <Link to="/booking">
+            <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10">
+              Rendez-vous
+            </Button>
+          </Link>
+
 
           {/* Mobile menu trigger */}
           <Sheet open={open} onOpenChange={setOpen}>
@@ -128,10 +129,11 @@ export const SiteHeader = () => {
                   <LanguageToggle />
                 </div>
                 <Link to="/auth" onClick={() => setOpen(false)} className="block">
-                  <Button className="w-full h-12 text-base shadow-soft">
+                  <Button variant="outline" className="w-full h-12 text-base">
                     {t("nav.signIn")}
                   </Button>
                 </Link>
+
               </div>
             </SheetContent>
           </Sheet>
