@@ -65,7 +65,7 @@ const sections: Section[] = [
       {
         to: "/admin/appointments", icon: Calendar, label: "Appointments", module: "Appointments", staff: true,
         children: [
-          { to: "/admin/appointments", label: "Appointments", end: true },
+          { to: "/admin/appointments", label: "Appointments" },
           { to: "/admin/appointments/new", label: "New Appointment" },
           { to: "/admin/appointments/calendar", label: "Calendar" },
           { to: "/admin/appointments/kanban", label: "Kanban View" },
