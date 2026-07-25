@@ -74,10 +74,10 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 }
 
 export default function AdminSettings() {
-  const { settings, logoUrl, refresh } = useAppSettings();
+  const { settings, logoUrl, mobileLogoUrl, faviconUrl, refresh } = useAppSettings();
   const [draft, setDraft] = useState<AppSettings>(settings);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [uploadingKey, setUploadingKey] = useState<string | null>(null);
 
   useEffect(() => { setDraft(settings); }, [settings]);
 
@@ -98,6 +98,8 @@ export default function AdminSettings() {
     const { error } = await supabase.from("app_settings").update({
       site_name: draft.site_name,
       logo_url: draft.logo_url,
+      mobile_logo_url: draft.mobile_logo_url,
+      favicon_url: draft.favicon_url,
       primary_hsl: draft.primary_hsl,
       secondary_hsl: draft.secondary_hsl,
       accent_hsl: draft.accent_hsl,
@@ -111,16 +113,17 @@ export default function AdminSettings() {
     await refresh();
   };
 
-  const onLogoUpload = async (file: File) => {
-    setUploading(true);
+  const uploadAsset = async (file: File, prefix: string, field: "logo_url" | "mobile_logo_url" | "favicon_url") => {
+    setUploadingKey(field);
     const ext = file.name.split(".").pop() ?? "png";
-    const path = `logo-${Date.now()}.${ext}`;
+    const path = `${prefix}-${Date.now()}.${ext}`;
     const { error } = await supabase.storage.from("branding").upload(path, file, { upsert: true, contentType: file.type });
-    setUploading(false);
+    setUploadingKey(null);
     if (error) { toast.error(error.message); return; }
-    update({ logo_url: path });
-    toast.success("Logo uploaded — click Save to apply");
+    update({ [field]: path } as Partial<AppSettings>);
+    toast.success("Uploaded — click Save to apply");
   };
+
 
   const resetDefaults = () => {
     update({
