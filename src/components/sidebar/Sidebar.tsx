@@ -13,7 +13,7 @@ type SidebarProps = {
   children: ReactNode;
 };
 
-const RAIL_BG = "#2B388F";
+const RAIL_BG = "#0F172A";
 
 const SidebarShell = ({ header, footer, children }: SidebarProps) => {
   const { collapsed } = useSidebar();
@@ -23,14 +23,14 @@ const SidebarShell = ({ header, footer, children }: SidebarProps) => {
       data-collapsed={collapsed}
       style={{
         width: collapsed ? SIDEBAR_WIDTH_COLLAPSED : SIDEBAR_WIDTH_EXPANDED,
-        backgroundColor: RAIL_BG,
+        backgroundColor: collapsed ? RAIL_BG : undefined,
       }}
       className={cn(
         "hidden md:flex flex-col shrink-0 overflow-hidden",
         "transition-[width,background-color] duration-300 ease-in-out will-change-[width]",
         collapsed
-          ? "border-r border-white/10 text-slate-200"
-          : "border-r border-white/10 text-slate-100",
+          ? "border-r border-slate-800/80 text-slate-400"
+          : "bg-card border-r border-border",
       )}
     >
       <div className="shrink-0">{header}</div>
