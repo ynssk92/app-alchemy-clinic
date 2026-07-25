@@ -2,7 +2,7 @@ import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import LanguageToggle from "@/components/LanguageToggle";
-import logo from "@/assets/logo.png";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 export const SiteHeader = () => {
   const { t } = useTranslation();
