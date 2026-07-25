@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
-  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu,
+  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
