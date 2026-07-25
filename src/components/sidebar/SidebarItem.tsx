@@ -74,34 +74,33 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
         >
           <div className="overflow-hidden">
             <div className="mt-1 ml-4 space-y-0.5 border-l border-border pl-3">
-              {children.map((c) => (
-                <NavLink
-                  key={c.to}
-                  to={c.to}
-                  end={c.end}
-                  onClick={closeMobile}
-                  className={({ isActive }) =>
-                    cn(
+              {children.map((c) => {
+                const isActive = activeChildTo === c.to;
+                return (
+                  <NavLink
+                    key={c.to}
+                    to={c.to}
+                    end={c.end}
+                    onClick={closeMobile}
+                    aria-current={isActive ? "page" : undefined}
+                    className={cn(
                       "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
                       isActive
                         ? "font-semibold text-primary"
                         : "text-muted-foreground hover:text-foreground",
-                    )
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span
-                        className={cn(
-                          "h-1.5 w-1.5 rounded-full transition-colors",
-                          isActive ? "bg-primary" : "bg-muted-foreground/30",
-                        )}
-                      />
-                      {c.label}
-                    </>
-                  )}
-                </NavLink>
-              ))}
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full transition-colors",
+                        isActive ? "bg-primary" : "bg-muted-foreground/30",
+                      )}
+                    />
+                    {c.label}
+                  </NavLink>
+                );
+              })}
+
             </div>
           </div>
         </div>
