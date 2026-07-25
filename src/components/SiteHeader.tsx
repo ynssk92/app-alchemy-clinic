@@ -2,10 +2,11 @@ import { Link, NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import LanguageToggle from "@/components/LanguageToggle";
-import logo from "@/assets/logo.png";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 export const SiteHeader = () => {
   const { t } = useTranslation();
+  const { logoUrl } = useAppSettings();
 
   const navItems = [
     { label: t("nav.about"), to: "/about" },
@@ -21,7 +22,7 @@ export const SiteHeader = () => {
     <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-3 transition-transform duration-300 hover:scale-105">
-          <img src={logo} alt="La Dune Clinique Dentaire" className="h-10" />
+          <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-10" />
         </Link>
         <div className="hidden md:flex items-center gap-8">
           {navItems.map((item) => (

@@ -41,6 +41,48 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          accent_hsl: string
+          background_hsl: string
+          foreground_hsl: string
+          id: boolean
+          logo_url: string | null
+          primary_hsl: string
+          radius: string
+          secondary_hsl: string
+          site_name: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          accent_hsl?: string
+          background_hsl?: string
+          foreground_hsl?: string
+          id?: boolean
+          logo_url?: string | null
+          primary_hsl?: string
+          radius?: string
+          secondary_hsl?: string
+          site_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          accent_hsl?: string
+          background_hsl?: string
+          foreground_hsl?: string
+          id?: boolean
+          logo_url?: string | null
+          primary_hsl?: string
+          radius?: string
+          secondary_hsl?: string
+          site_name?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           appointment_date: string

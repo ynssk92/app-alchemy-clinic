@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
-  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu,
+  FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,7 +15,7 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import logo from "@/assets/logo.png";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -126,6 +126,7 @@ const sections: Section[] = [
   {
     title: "System",
     items: [
+      { to: "/admin/settings", icon: Settings, label: "Settings", adminOnly: true },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants", adminOnly: true },
     ],
   },
@@ -133,6 +134,7 @@ const sections: Section[] = [
 
 const SidebarHeader = () => {
   const { collapsed } = useSidebar();
+  const { logoUrl } = useAppSettings();
   return (
     <div className="flex items-center gap-2 border-b border-border px-3 py-3">
       <Link
@@ -144,7 +146,7 @@ const SidebarHeader = () => {
         )}
       >
         <img
-          src={logo}
+          src={logoUrl}
           alt="La Dune Clinique Dentaire"
           className={cn("shrink-0 object-contain transition-all", collapsed ? "h-8 w-8" : "h-10 w-auto")}
         />
@@ -193,6 +195,7 @@ const AdminShell = () => {
   const { can } = usePermissions();
   const navigate = useNavigate();
   const { setMobileOpen } = useSidebar();
+  const { logoUrl } = useAppSettings();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [dark, setDark] = useState<boolean>(
@@ -260,7 +263,7 @@ const AdminShell = () => {
             <Menu className="w-4 h-4" />
           </Button>
           <Link to="/" aria-label="La Dune home" className="md:hidden flex items-center shrink-0">
-            <img src={logo} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
+            <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
           </Link>
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />

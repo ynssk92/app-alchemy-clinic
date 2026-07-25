@@ -23,8 +23,10 @@ import AdminBlog from "./pages/admin/AdminBlog";
 import AdminMessages from "./pages/admin/AdminMessages";
 import Contact from "./pages/Contact";
 import { AuthProvider } from "./hooks/useAuth";
+import { AppSettingsProvider } from "./hooks/useAppSettings";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import AdminLayout from "./pages/admin/AdminLayout";
+import AdminSettings from "./pages/admin/AdminSettings";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminDoctors from "./pages/admin/AdminDoctors";
 import AdminAppointments from "./pages/admin/AdminAppointments";
@@ -67,6 +69,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <AppSettingsProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/doctors" element={<Doctors />} />
@@ -124,9 +127,11 @@ const App = () => (
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
+              <Route path="settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </AppSettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
