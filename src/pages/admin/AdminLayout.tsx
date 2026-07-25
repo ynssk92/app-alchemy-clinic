@@ -307,7 +307,17 @@ const AdminShell = () => {
 
   return (
     <div className="min-h-screen flex bg-muted/30">
-      <Sidebar header={<SidebarHeader />} footer={<SidebarFooterContent />}>
+      <Sidebar
+        header={<SidebarHeader />}
+        footer={
+          <SidebarFooterContent
+            adminName={adminName}
+            avatarUrl={avatarUrl}
+            initials={initials}
+            isAdmin={isAdmin}
+          />
+        }
+      >
         {sections.map((section) => {
           const visible = section.items.filter((l) => {
             if (isAdmin) return true;
