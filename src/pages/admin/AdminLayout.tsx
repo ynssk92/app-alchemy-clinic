@@ -146,7 +146,7 @@ const SidebarHeader = () => {
         )}
       >
         <img
-          src={logo}
+          src={logoUrl}
           alt="La Dune Clinique Dentaire"
           className={cn("shrink-0 object-contain transition-all", collapsed ? "h-8 w-8" : "h-10 w-auto")}
         />
