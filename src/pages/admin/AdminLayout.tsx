@@ -47,7 +47,7 @@ const sections: Section[] = [
       {
         to: "/admin/doctors", icon: Stethoscope, label: "Doctors", module: "Doctors",
         children: [
-          { to: "/admin/doctors", label: "Doctors", end: true },
+          { to: "/admin/doctors", label: "Doctors" },
           { to: "/admin/doctors/details", label: "Doctor Details" },
           { to: "/admin/doctors/new", label: "Add Doctor" },
           { to: "/admin/doctors/schedule", label: "Doctor Schedule" },
