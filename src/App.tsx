@@ -127,9 +127,11 @@ const App = () => (
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
+              <Route path="settings" element={<ProtectedRoute adminOnly><AdminSettings /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </AppSettingsProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
