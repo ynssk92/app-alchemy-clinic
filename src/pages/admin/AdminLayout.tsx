@@ -195,7 +195,7 @@ const AdminShell = () => {
   const { can } = usePermissions();
   const navigate = useNavigate();
   const { setMobileOpen } = useSidebar();
-  const { logoUrl } = useAppSettings();
+  const { logoUrl, mobileLogoUrl } = useAppSettings();
   const [adminName, setAdminName] = useState<string>("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [dark, setDark] = useState<boolean>(
