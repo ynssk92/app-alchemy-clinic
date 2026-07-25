@@ -129,10 +129,11 @@ export const SiteHeader = () => {
                   <LanguageToggle />
                 </div>
                 <Link to="/auth" onClick={() => setOpen(false)} className="block">
-                  <Button className="w-full h-12 text-base shadow-soft">
+                  <Button variant="outline" className="w-full h-12 text-base">
                     {t("nav.signIn")}
                   </Button>
                 </Link>
+
               </div>
             </SheetContent>
           </Sheet>
