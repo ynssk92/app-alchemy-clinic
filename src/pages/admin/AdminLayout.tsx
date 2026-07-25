@@ -106,7 +106,7 @@ const sections: Section[] = [
       {
         to: "/admin/users", icon: User, label: "Users", adminOnly: true,
         children: [
-          { to: "/admin/users", label: "Users", end: true },
+          { to: "/admin/users", label: "Users" },
           { to: "/admin/roles", label: "Roles & Permissions" },
           { to: "/admin/delete-requests", label: "Delete Requests" },
         ],
