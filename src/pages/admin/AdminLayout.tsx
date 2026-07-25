@@ -143,17 +143,11 @@ const SidebarHeader = () => {
           collapsed && "justify-center",
         )}
       >
-        <div className="h-9 w-9 rounded-lg bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold shrink-0">
-          LD
-        </div>
-        <span
-          className={cn(
-            "text-sm font-semibold truncate transition-opacity duration-200",
-            collapsed ? "w-0 opacity-0" : "opacity-100",
-          )}
-        >
-          La Dune Clinic
-        </span>
+        <img
+          src={logo}
+          alt="La Dune Clinique Dentaire"
+          className={cn("shrink-0 object-contain transition-all", collapsed ? "h-8 w-8" : "h-10 w-auto")}
+        />
       </Link>
       <SidebarToggle />
     </div>
