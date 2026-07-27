@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Menu, X } from "lucide-react";
+import { CalendarPlus, Menu, Stethoscope, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -50,9 +50,9 @@ export const SiteHeader = () => {
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-3 transition-transform duration-300 hover:scale-105">
-          <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-10" />
+      <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
+        <Link to="/" className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
+          <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 md:h-10" />
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -80,10 +80,10 @@ export const SiteHeader = () => {
           <div className="hidden md:flex items-center gap-2">
             <LanguageToggle />
           </div>
-          <Link to="/booking" aria-current={bookingActive ? "page" : undefined}>
+          <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="shrink-0">
             <Button
               className={cn(
-                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10",
+                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-11 px-3 text-sm md:h-10 md:px-4",
                 bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-medium",
               )}
             >
@@ -98,13 +98,17 @@ export const SiteHeader = () => {
             <SheetTrigger asChild>
               <button
                 type="button"
-                aria-label="Open menu"
-                className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-background/60 text-foreground active:scale-95 transition"
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                aria-controls="mobile-nav-sheet"
+                className="md:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Menu className="h-5 w-5" />
+                {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </SheetTrigger>
+
             <SheetContent
+              id="mobile-nav-sheet"
               side="bottom"
               aria-label="Main navigation"
               onOpenAutoFocus={(e) => {
@@ -152,7 +156,38 @@ export const SiteHeader = () => {
                 aria-label="Mobile"
                 className="flex-1 overflow-y-auto px-4 pb-4"
               >
+                <div className="grid grid-cols-2 gap-3 pb-4">
+                  <Link
+                    to="/booking"
+                    onClick={() => setOpen(false)}
+                    aria-current={bookingActive ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      bookingActive
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "bg-card text-foreground hover:bg-muted",
+                    )}
+                  >
+                    <CalendarPlus className="h-5 w-5" aria-hidden="true" />
+                    Rendez-vous
+                  </Link>
+                  <Link
+                    to="/doctors"
+                    onClick={() => setOpen(false)}
+                    aria-current={matches("/doctors") ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      matches("/doctors")
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "bg-card text-foreground hover:bg-muted",
+                    )}
+                  >
+                    <Stethoscope className="h-5 w-5" aria-hidden="true" />
+                    {t("nav.doctors", { defaultValue: "Médecins" })}
+                  </Link>
+                </div>
                 <ul className="flex flex-col gap-1">
+
                   {navItems.map((item, i) => {
                     const active = matches(item.to, item.alsoMatch);
                     return (
