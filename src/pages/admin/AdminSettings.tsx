@@ -97,17 +97,7 @@ export default function AdminSettings() {
 
   const save = async () => {
     setSaving(true);
-    const { error } = await supabase.from("app_settings").update({
-      site_name: draft.site_name,
-      logo_url: draft.logo_url,
-      mobile_logo_url: draft.mobile_logo_url,
-      favicon_url: draft.favicon_url,
-      primary_hsl: draft.primary_hsl,
-      secondary_hsl: draft.secondary_hsl,
-      accent_hsl: draft.accent_hsl,
-      background_hsl: draft.background_hsl,
-      foreground_hsl: draft.foreground_hsl,
-      radius: draft.radius,
+    const contactPayload = {
       contact_phone: draft.contact_phone,
       contact_phone_secondary: draft.contact_phone_secondary,
       contact_email: draft.contact_email,
@@ -117,7 +107,25 @@ export default function AdminSettings() {
       hours_weekdays: draft.hours_weekdays,
       hours_saturday: draft.hours_saturday,
       hours_sunday: draft.hours_sunday,
-    }).eq("id", true);
+    };
+    const adminPayload = isAdmin
+      ? {
+          site_name: draft.site_name,
+          logo_url: draft.logo_url,
+          mobile_logo_url: draft.mobile_logo_url,
+          favicon_url: draft.favicon_url,
+          primary_hsl: draft.primary_hsl,
+          secondary_hsl: draft.secondary_hsl,
+          accent_hsl: draft.accent_hsl,
+          background_hsl: draft.background_hsl,
+          foreground_hsl: draft.foreground_hsl,
+          radius: draft.radius,
+        }
+      : {};
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ ...contactPayload, ...adminPayload })
+      .eq("id", true);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Settings saved");
