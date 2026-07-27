@@ -319,19 +319,23 @@ const Index = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Douleur aiguë, dent cassée ou traumatisme ? Nous vous recevons en priorité.
             </p>
-            <Link to="/contact" className="text-sm font-bold text-primary inline-flex items-center gap-1">
-              Nous appeler <ArrowRight className="w-4 h-4" />
-            </Link>
+            <a
+              href={`tel:${(settings.emergency_phone || settings.contact_phone).replace(/\s/g, "")}`}
+              className="text-sm font-bold text-primary inline-flex items-center gap-1"
+            >
+              {settings.emergency_phone || settings.contact_phone} <ArrowRight className="w-4 h-4" />
+            </a>
           </Card>
           <Card className="reveal p-8 bg-card border-none shadow-large" style={{ transitionDelay: "90ms" }}>
             <Clock className="w-8 h-8 text-primary mb-4" />
             <h3 className="text-lg font-bold text-card-foreground mb-4">Horaires d'ouverture</h3>
             <ul className="space-y-2 text-sm">
               {[
-                ["Lun - Ven", "9:00 - 19:00"],
-                ["Samedi", "9:00 - 14:00"],
-                ["Dimanche", "Fermé"],
+                ["Lun - Ven", settings.hours_weekdays],
+                ["Samedi", settings.hours_saturday],
+                ["Dimanche", settings.hours_sunday],
               ].map(([d, h]) => (
+
                 <li key={d} className="flex justify-between border-b border-border pb-2 last:border-0">
                   <span className="text-muted-foreground">{d}</span>
                   <span className="font-semibold text-card-foreground">{h}</span>
