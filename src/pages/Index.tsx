@@ -168,7 +168,7 @@ const Index = () => {
               Une équipe experte, un plateau technique moderne et un parcours de soins pensé
               pour votre confort — réservez votre consultation en quelques secondes.
             </p>
-            <HeroCta className="reveal items-center sm:items-start" style={{ transitionDelay: "240ms" }} />
+            <HeroCta className="reveal" style={{ transitionDelay: "240ms" }} />
 
           </div>
         </div>
