@@ -31,7 +31,7 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
   const specialty = doctor.specialties?.name || "Praticien";
 
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-8 text-center shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-strong">
+    <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-8 text-center shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-large">
       {/* decorative glow */}
       <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/10 blur-3xl transition-opacity duration-300 group-hover:opacity-100 opacity-60" />
 
@@ -51,8 +51,8 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
             </div>
           )}
         </div>
-        <span className="absolute bottom-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-card bg-success">
-          <span className="h-2 w-2 rounded-full bg-success-foreground/80" />
+        <span className="absolute bottom-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-card bg-stat-green">
+          <span className="h-2 w-2 rounded-full bg-stat-green-foreground/80" />
         </span>
       </div>
 
@@ -71,7 +71,7 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
           {doctor.experience_years ? `${doctor.experience_years} ans d'expérience` : "Praticien certifié"}
         </span>
         <span className="inline-flex items-center gap-1.5">
-          <Star className="h-4 w-4 fill-warning text-warning" />
+          <Star className="h-4 w-4 fill-stat-amber text-stat-amber" />
           <span className="font-semibold text-foreground">4.9</span>
           <span>(124 avis)</span>
         </span>
