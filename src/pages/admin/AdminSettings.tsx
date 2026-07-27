@@ -160,22 +160,28 @@ export default function AdminSettings() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-sm text-muted-foreground">Manage branding, theme colors, and UI appearance.</p>
+          <p className="text-sm text-muted-foreground">
+            {isAdmin
+              ? "Manage branding, theme colors, and UI appearance."
+              : "You can update the clinic contact details and opening hours."}
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={resetDefaults}><RotateCcw className="w-4 h-4 mr-2" />Reset</Button>
+          {isAdmin && (
+            <Button variant="outline" onClick={resetDefaults}><RotateCcw className="w-4 h-4 mr-2" />Reset</Button>
+          )}
           <Button onClick={save} disabled={saving} className="bg-gradient-primary text-primary-foreground">
             <Save className="w-4 h-4 mr-2" />{saving ? "Saving…" : "Save changes"}
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="branding">
+      <Tabs defaultValue={isAdmin ? "branding" : "contact"}>
         <TabsList>
-          <TabsTrigger value="branding">Branding</TabsTrigger>
+          {isAdmin && <TabsTrigger value="branding">Branding</TabsTrigger>}
           <TabsTrigger value="contact">Contact</TabsTrigger>
-          <TabsTrigger value="theme">Theme</TabsTrigger>
-          <TabsTrigger value="ui">UI</TabsTrigger>
+          {isAdmin && <TabsTrigger value="theme">Theme</TabsTrigger>}
+          {isAdmin && <TabsTrigger value="ui">UI</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="contact" className="space-y-4 mt-4">
