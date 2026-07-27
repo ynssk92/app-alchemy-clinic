@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import esthetique from "@/assets/soin-esthetique.jpg";
@@ -167,19 +168,8 @@ const Index = () => {
               Une équipe experte, un plateau technique moderne et un parcours de soins pensé
               pour votre confort — réservez votre consultation en quelques secondes.
             </p>
-            <div className="reveal flex flex-col sm:flex-row gap-4" style={{ transitionDelay: "240ms" }}>
-              <Link to="/booking">
-                <Button size="lg" className="text-base px-8 h-13 shadow-medium hover:shadow-large transition-all">
-                  Prendre rendez-vous
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Button>
-              </Link>
-              <Link to="/contact">
-                <Button size="lg" variant="outline" className="text-base px-8 bg-card">
-                  Nous contacter
-                </Button>
-              </Link>
-            </div>
+            <HeroCta className="reveal" style={{ transitionDelay: "240ms" }} />
+
           </div>
         </div>
       </section>
