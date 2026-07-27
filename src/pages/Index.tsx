@@ -348,47 +348,75 @@ const Index = () => {
 
       {/* Doctors */}
       {doctors.length > 0 && (
-        <section className="py-20 md:py-28">
+        <section className="py-20 md:py-28 bg-muted/30 border-y border-border">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-14 reveal">
-              <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">
-                Praticiens
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Nos experts</h2>
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 reveal">
+              <div>
+                <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">
+                  Praticiens
+                </span>
+                <h2 className="text-3xl md:text-4xl font-bold text-foreground">Nos experts</h2>
+                <p className="text-muted-foreground mt-3 max-w-xl">
+                  Des spécialistes passionnés, formés aux techniques les plus avancées pour prendre
+                  soin de votre sourire.
+                </p>
+              </div>
+              <Link to="/equipe" className="shrink-0">
+                <Button variant="outline" className="rounded-full font-semibold">
+                  Voir toute l'équipe <ArrowRight className="w-4 h-4 ml-1" />
+                </Button>
+              </Link>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {doctors.map((d, i) => (
-                <Card
+                <article
                   key={d.id}
-                  className="reveal reveal-scale overflow-hidden border-border bg-card text-center hover:shadow-large transition-all"
+                  className="reveal reveal-scale group relative overflow-hidden rounded-3xl bg-card border border-border shadow-soft hover:shadow-large hover:-translate-y-1 transition-all duration-300"
                   style={{ transitionDelay: `${i * 90}ms` }}
                 >
-                  <div className="bg-muted aspect-[4/3] flex items-center justify-center overflow-hidden">
+                  <div className="relative aspect-[4/5] bg-muted overflow-hidden">
                     {d.avatar_url ? (
-                      <img src={d.avatar_url} alt={d.full_name} loading="lazy" className="w-full h-full object-cover" />
+                      <img
+                        src={d.avatar_url}
+                        alt={`Portrait de ${d.full_name}`}
+                        loading="lazy"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                     ) : (
-                      <span className="text-4xl font-bold text-primary">{initialsOf(d.full_name)}</span>
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-primary">
+                        <span className="text-5xl font-bold text-primary-foreground">
+                          {initialsOf(d.full_name)}
+                        </span>
+                      </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/25 to-transparent" />
+                    <span className="absolute top-4 left-4 rounded-full bg-background/90 backdrop-blur px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
+                      {d.specialties?.name || "Chirurgien-dentiste"}
+                    </span>
+                    <div className="absolute inset-x-0 bottom-0 p-5">
+                      <h3 className="text-xl font-bold text-background">{d.full_name}</h3>
+                      <p className="text-sm text-background/75">
+                        {d.specialties?.name || "Chirurgien-dentiste"}
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <h3 className="text-lg font-bold text-card-foreground">{d.full_name}</h3>
-                    <p className="text-sm text-primary mb-4">{d.specialties?.name || "Chirurgien-dentiste"}</p>
+                  <div className="p-5">
                     <Link to={`/booking?doctor=${d.id}`}>
-                      <Button size="sm" variant="outline" className="w-full">
+                      <Button
+                        className="w-full rounded-full font-semibold"
+                        aria-label={`Prendre rendez-vous avec ${d.full_name}`}
+                      >
+                        <Calendar className="w-4 h-4 mr-1" />
                         Prendre rendez-vous
                       </Button>
                     </Link>
                   </div>
-                </Card>
+                </article>
               ))}
-            </div>
-            <div className="text-center mt-10 reveal">
-              <Link to="/equipe">
-                <Button variant="ghost">Voir toute l'équipe</Button>
-              </Link>
             </div>
           </div>
         </section>
+
       )}
 
       {/* Counters */}
