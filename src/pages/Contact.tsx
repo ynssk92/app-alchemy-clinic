@@ -52,10 +52,14 @@ const Contact = () => {
       <div className="grid md:grid-cols-2 gap-8">
         <div className="space-y-4">
           {[
-            { icon: MapPin, title: "Adresse", text: "Avenue Mohammed VI, Casablanca" },
-            { icon: Phone, title: "Téléphone", text: "+212 5 22 00 00 00" },
-            { icon: Mail, title: "Email", text: "contact@ladune-clinique.com" },
-            { icon: Clock, title: "Horaires", text: "Lun-Ven : 9h-19h · Sam : 9h-13h" },
+            { icon: MapPin, title: "Adresse", text: settings.contact_address },
+            { icon: Phone, title: "Téléphone", text: settings.contact_phone },
+            { icon: Mail, title: "Email", text: settings.contact_email },
+            {
+              icon: Clock,
+              title: "Horaires",
+              text: `Lun-Ven : ${settings.hours_weekdays} · Sam : ${settings.hours_saturday}`,
+            },
           ].map((c) => (
             <Card key={c.title} className="p-5 flex items-start gap-4 hover:shadow-medium transition-shadow">
               <div className="w-11 h-11 rounded-lg bg-gradient-primary flex items-center justify-center shrink-0">
