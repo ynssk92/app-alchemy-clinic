@@ -13,6 +13,7 @@ import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
 import { WidgetCard, EmptyState } from "@/components/dashboard/WidgetCard";
 import { format, isToday, parseISO } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Appt = {
   id: string;
@@ -41,11 +42,20 @@ const PatientDashboard = () => {
   const { user, isAdmin, signOut } = useAuth();
   const [appointments, setAppointments] = useState<Appt[]>([]);
   const [profileName, setProfileName] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("full_name").eq("id", user.id).maybeSingle()
-      .then(({ data }) => setProfileName(data?.full_name || user.email || ""));
+    supabase.from("profiles").select("full_name, avatar_url").eq("id", user.id).maybeSingle()
+      .then(async ({ data }) => {
+        setProfileName(data?.full_name || user.email || "");
+        if (data?.avatar_url) {
+          const { data: signed } = await supabase.storage.from("avatars").createSignedUrl(data.avatar_url, 3600);
+          setAvatarUrl(signed?.signedUrl ?? null);
+        } else {
+          setAvatarUrl(null);
+        }
+      });
     supabase
       .from("appointments")
       .select("id, appointment_date, appointment_time, status, doctors(full_name, specialties(name))")
@@ -124,9 +134,12 @@ const PatientDashboard = () => {
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-gradient-primary text-sm font-bold text-primary-foreground">
-              {initials(profileName)}
-            </span>
+            <Avatar className="h-11 w-11 shrink-0 rounded-2xl">
+              {avatarUrl && <AvatarImage src={avatarUrl} alt={profileName || "Profile photo"} className="object-cover" />}
+              <AvatarFallback className="rounded-2xl bg-gradient-primary text-sm font-bold text-primary-foreground">
+                {initials(profileName)}
+              </AvatarFallback>
+            </Avatar>
             <div className="min-w-0">
               <h1 className="truncate text-xl font-bold tracking-tight text-foreground md:text-2xl">
                 {greeting}, {profileName?.split(" ")[0] || "there"} 👋
