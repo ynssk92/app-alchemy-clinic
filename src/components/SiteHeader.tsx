@@ -156,7 +156,38 @@ export const SiteHeader = () => {
                 aria-label="Mobile"
                 className="flex-1 overflow-y-auto px-4 pb-4"
               >
+                <div className="grid grid-cols-2 gap-3 pb-4">
+                  <Link
+                    to="/booking"
+                    onClick={() => setOpen(false)}
+                    aria-current={bookingActive ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      bookingActive
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "bg-card text-foreground hover:bg-muted",
+                    )}
+                  >
+                    <CalendarPlus className="h-5 w-5" aria-hidden="true" />
+                    Rendez-vous
+                  </Link>
+                  <Link
+                    to="/doctors"
+                    onClick={() => setOpen(false)}
+                    aria-current={matches("/doctors") ? "page" : undefined}
+                    className={cn(
+                      "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      matches("/doctors")
+                        ? "border-primary/40 bg-primary/10 text-primary"
+                        : "bg-card text-foreground hover:bg-muted",
+                    )}
+                  >
+                    <Stethoscope className="h-5 w-5" aria-hidden="true" />
+                    {t("nav.doctors", { defaultValue: "Médecins" })}
+                  </Link>
+                </div>
                 <ul className="flex flex-col gap-1">
+
                   {navItems.map((item, i) => {
                     const active = matches(item.to, item.alsoMatch);
                     return (
