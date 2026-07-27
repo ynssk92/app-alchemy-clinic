@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
+import { SiteHeader } from "@/components/SiteHeader";
 
 type Doctor = {
   id: string;
@@ -56,17 +57,7 @@ const Doctors = () => {
           url: "https://app-alchemy-clinic.lovable.app/doctors",
         }}
       />
-      <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3">
-            <img src={logo} alt="HealthBook Logo" className="h-10" />
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link to="/patient-dashboard"><Button variant="ghost">Dashboard</Button></Link>
-            <Link to="/auth"><Button>Sign In</Button></Link>
-          </div>
-        </div>
-      </nav>
+      <SiteHeader />
 
       <section className="bg-gradient-hero py-12">
         <div className="container mx-auto px-4">
