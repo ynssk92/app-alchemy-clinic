@@ -50,9 +50,9 @@ export const SiteHeader = () => {
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between gap-2">
-        <Link to="/" className="flex items-center gap-3 transition-transform duration-300 hover:scale-105">
-          <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-10" />
+      <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
+        <Link to="/" className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
+          <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 md:h-10" />
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -80,10 +80,10 @@ export const SiteHeader = () => {
           <div className="hidden md:flex items-center gap-2">
             <LanguageToggle />
           </div>
-          <Link to="/booking" aria-current={bookingActive ? "page" : undefined}>
+          <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="shrink-0">
             <Button
               className={cn(
-                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10",
+                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-11 px-3 text-sm md:h-10 md:px-4",
                 bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-medium",
               )}
             >
@@ -98,12 +98,15 @@ export const SiteHeader = () => {
             <SheetTrigger asChild>
               <button
                 type="button"
-                aria-label="Open menu"
-                className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg border border-border bg-background/60 text-foreground active:scale-95 transition"
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                aria-controls="mobile-nav-sheet"
+                className="md:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Menu className="h-5 w-5" />
+                {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
             </SheetTrigger>
+
             <SheetContent
               side="bottom"
               aria-label="Main navigation"
