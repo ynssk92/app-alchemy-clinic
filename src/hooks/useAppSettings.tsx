@@ -104,7 +104,17 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const load = useCallback(async () => {
     const { data } = await supabase.from("app_settings").select("*").maybeSingle();
     if (data) {
-      const merged: AppSettings = { ...DEFAULTS, ...data };
+      // Keep asset fields nullable, but never let NULL text columns wipe defaults.
+      const clean = Object.fromEntries(
+        Object.entries(data).filter(
+          ([k, v]) =>
+            v !== null ||
+            k === "logo_url" ||
+            k === "mobile_logo_url" ||
+            k === "favicon_url",
+        ),
+      );
+      const merged: AppSettings = { ...DEFAULTS, ...(clean as Partial<AppSettings>) };
       setSettings(merged);
       applyTheme(merged);
       const desktop = (await resolveAsset(merged.logo_url, defaultLogo))!;
