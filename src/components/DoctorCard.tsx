@@ -52,7 +52,7 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
           )}
         </div>
         <span className="absolute bottom-2 right-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-card bg-stat-green">
-          <span className="h-2 w-2 rounded-full bg-stat-green-foreground/80" />
+          <span className="h-2 w-2 rounded-full bg-card/80" />
         </span>
       </div>
 
