@@ -14,6 +14,7 @@ import {
   Ambulance,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
