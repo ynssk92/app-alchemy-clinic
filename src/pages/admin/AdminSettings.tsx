@@ -106,6 +106,15 @@ export default function AdminSettings() {
       background_hsl: draft.background_hsl,
       foreground_hsl: draft.foreground_hsl,
       radius: draft.radius,
+      contact_phone: draft.contact_phone,
+      contact_phone_secondary: draft.contact_phone_secondary,
+      contact_email: draft.contact_email,
+      contact_address: draft.contact_address,
+      map_url: draft.map_url,
+      emergency_phone: draft.emergency_phone,
+      hours_weekdays: draft.hours_weekdays,
+      hours_saturday: draft.hours_saturday,
+      hours_sunday: draft.hours_sunday,
     }).eq("id", true);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
