@@ -29,16 +29,24 @@ export const SiteHeader = () => {
     { label: t("nav.about"), to: "/about" },
     { label: t("nav.soins"), to: "/soins" },
     { label: t("nav.expertise"), to: "/expertise" },
-    { label: t("nav.team"), to: "/equipe" },
+    { label: t("nav.team"), to: "/equipe", alsoMatch: ["/doctors"] },
     { label: t("nav.faq"), to: "/faq" },
     { label: t("nav.blog"), to: "/blog" },
     { label: t("nav.contact"), to: "/contact" },
   ];
 
+  const matches = (to: string, alsoMatch?: string[]) =>
+    [to, ...(alsoMatch ?? [])].some(
+      (p) => pathname === p || pathname.startsWith(`${p}/`),
+    );
+
+  const bookingActive = matches("/booking");
+
   // Close mobile drawer whenever the route changes.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
