@@ -167,7 +167,7 @@ const AdminOverview = () => {
   ];
 
   const quickActions = [
-    { label: "New Patient", to: "/admin/patients/new", icon: UserPlus, tint: "stat-blue" },
+    { label: "New Patient", to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
     { label: "Book Appointment", to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan" },
     { label: "Create Invoice", to: "/admin/billing/invoices", icon: FileText, tint: "stat-green" },
     { label: "Doctors", to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet" },
@@ -215,7 +215,7 @@ const AdminOverview = () => {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm" className="h-9 rounded-xl text-xs font-semibold">
-            <Link to="/admin/patients/new"><UserPlus className="mr-1.5 h-3.5 w-3.5" />New Patient</Link>
+            <Link to="/admin/patients/create"><UserPlus className="mr-1.5 h-3.5 w-3.5" />New Patient</Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
             <Link to="/admin/billing/invoices"><FileText className="mr-1.5 h-3.5 w-3.5" />Invoice</Link>
