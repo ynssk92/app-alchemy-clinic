@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, CalendarPlus, PhoneCall } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { CSSProperties } from "react";
 
 interface HeroCtaProps {
   className?: string;
+  style?: CSSProperties;
   primaryLabel?: string;
   secondaryLabel?: string;
   primaryTo?: string;
@@ -15,13 +17,14 @@ const base =
 
 export const HeroCta = ({
   className,
+  style,
   primaryLabel = "Prendre rendez-vous",
   secondaryLabel = "Nous contacter",
   primaryTo = "/booking",
   secondaryTo = "/contact",
 }: HeroCtaProps) => {
   return (
-    <div className={cn("flex flex-col sm:flex-row gap-3 sm:gap-4", className)}>
+    <div className={cn("flex flex-col sm:flex-row gap-3 sm:gap-4", className)} style={style}>
       <Link
         to={primaryTo}
         aria-label={primaryLabel}

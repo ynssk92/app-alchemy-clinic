@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import esthetique from "@/assets/soin-esthetique.jpg";
