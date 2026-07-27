@@ -29,16 +29,24 @@ export const SiteHeader = () => {
     { label: t("nav.about"), to: "/about" },
     { label: t("nav.soins"), to: "/soins" },
     { label: t("nav.expertise"), to: "/expertise" },
-    { label: t("nav.team"), to: "/equipe" },
+    { label: t("nav.team"), to: "/equipe", alsoMatch: ["/doctors"] },
     { label: t("nav.faq"), to: "/faq" },
     { label: t("nav.blog"), to: "/blog" },
     { label: t("nav.contact"), to: "/contact" },
   ];
 
+  const matches = (to: string, alsoMatch?: string[]) =>
+    [to, ...(alsoMatch ?? [])].some(
+      (p) => pathname === p || pathname.startsWith(`${p}/`),
+    );
+
+  const bookingActive = matches("/booking");
+
   // Close mobile drawer whenever the route changes.
   useEffect(() => {
     setOpen(false);
   }, [pathname]);
+
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
@@ -48,32 +56,41 @@ export const SiteHeader = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `relative text-sm font-bold transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left ${
-                  isActive
-                    ? "text-primary after:scale-x-100"
-                    : "text-foreground after:scale-x-0 after:origin-right"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {navItems.map((item) => {
+            const active = matches(item.to, item.alsoMatch);
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "relative text-sm font-bold transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left",
+                  active
+                    ? "text-primary after:scale-x-100 after:origin-left"
+                    : "text-foreground after:scale-x-0 after:origin-right",
+                )}
+              >
+                {item.label}
+              </NavLink>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
             <LanguageToggle />
           </div>
-          <Link to="/booking">
-            <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10">
+          <Link to="/booking" aria-current={bookingActive ? "page" : undefined}>
+            <Button
+              className={cn(
+                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10",
+                bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-medium",
+              )}
+            >
               Rendez-vous
             </Button>
           </Link>
+
 
 
           {/* Mobile menu trigger */}
@@ -136,34 +153,40 @@ export const SiteHeader = () => {
                 className="flex-1 overflow-y-auto px-4 pb-4"
               >
                 <ul className="flex flex-col gap-1">
-                  {navItems.map((item, i) => (
-                    <li
-                      key={item.to}
-                      className="opacity-0 animate-fade-in motion-reduce:animate-none motion-reduce:opacity-100"
-                      style={{
-                        animationDelay: `${80 + i * 40}ms`,
-                        animationFillMode: "forwards",
-                      }}
-                    >
-                      <NavLink
-                        to={item.to}
-                        onClick={() => setOpen(false)}
-                        className={({ isActive }) =>
-                          `flex items-center justify-between rounded-xl px-4 min-h-14 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                            isActive
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted"
-                          }`
-                        }
+                  {navItems.map((item, i) => {
+                    const active = matches(item.to, item.alsoMatch);
+                    return (
+                      <li
+                        key={item.to}
+                        className="opacity-0 animate-fade-in motion-reduce:animate-none motion-reduce:opacity-100"
+                        style={{
+                          animationDelay: `${80 + i * 40}ms`,
+                          animationFillMode: "forwards",
+                        }}
                       >
-                        <span>{item.label}</span>
-                        <span
-                          aria-hidden="true"
-                          className="h-2 w-2 rounded-full bg-current opacity-40"
-                        />
-                      </NavLink>
-                    </li>
-                  ))}
+                        <NavLink
+                          to={item.to}
+                          onClick={() => setOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "relative flex items-center justify-between rounded-xl px-4 min-h-14 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            active
+                              ? "bg-primary/10 text-primary before:absolute before:left-0 before:top-3 before:bottom-3 before:w-1 before:rounded-full before:bg-primary"
+                              : "text-foreground hover:bg-muted",
+                          )}
+                        >
+                          <span>{item.label}</span>
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              "h-2 w-2 rounded-full bg-current",
+                              active ? "opacity-100" : "opacity-40",
+                            )}
+                          />
+                        </NavLink>
+                      </li>
+                    );
+                  })}
                 </ul>
               </nav>
 
@@ -174,11 +197,22 @@ export const SiteHeader = () => {
                   </span>
                   <LanguageToggle />
                 </div>
-                <Link to="/booking" onClick={() => setOpen(false)} className="block">
-                  <Button className="w-full h-12 text-base shadow-soft">
+                <Link
+                  to="/booking"
+                  onClick={() => setOpen(false)}
+                  aria-current={bookingActive ? "page" : undefined}
+                  className="block"
+                >
+                  <Button
+                    className={cn(
+                      "w-full h-12 text-base shadow-soft",
+                      bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background",
+                    )}
+                  >
                     Rendez-vous
                   </Button>
                 </Link>
+
 
 
               </div>
