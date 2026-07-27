@@ -28,6 +28,7 @@ type Role = {
 const MODULES = [
   "Dashboard", "Doctors", "Patients", "Appointments",
   "Specialties", "Clinics", "Blog", "Messages", "Reports", "Users",
+  "settings",
 ];
 
 const AdminRoles = () => {
