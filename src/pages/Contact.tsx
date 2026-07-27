@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { FormEvent, useState } from "react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Nom requis").max(100),
@@ -18,6 +19,7 @@ const schema = z.object({
 
 const Contact = () => {
   const [busy, setBusy] = useState(false);
+  const { settings } = useAppSettings();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
