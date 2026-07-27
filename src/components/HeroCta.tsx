@@ -24,7 +24,11 @@ export const HeroCta = ({
   secondaryTo = "/contact",
 }: HeroCtaProps) => {
   return (
-    <div className={cn("flex flex-col sm:flex-row gap-3 sm:gap-4", className)} style={style}>
+    <div className={cn(
+        "flex w-full max-w-sm mx-auto flex-col items-stretch gap-3",
+        "sm:mx-0 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:gap-4",
+        className,
+      )} style={style}>
       <Link
         to={primaryTo}
         aria-label={primaryLabel}
