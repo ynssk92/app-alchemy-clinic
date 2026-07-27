@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Menu, X } from "lucide-react";
+import { CalendarPlus, Menu, Stethoscope, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
