@@ -31,7 +31,7 @@ import {
   useSidebar,
 } from "@/components/sidebar/Sidebar";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; children?: { to: string; label: string; end?: boolean }[] };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; action?: "view" | "create" | "edit" | "delete"; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
