@@ -56,32 +56,41 @@ export const SiteHeader = () => {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `relative text-sm font-bold transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left ${
-                  isActive
-                    ? "text-primary after:scale-x-100"
-                    : "text-foreground after:scale-x-0 after:origin-right"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {navItems.map((item) => {
+            const active = matches(item.to, item.alsoMatch);
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "relative text-sm font-bold transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left",
+                  active
+                    ? "text-primary after:scale-x-100 after:origin-left"
+                    : "text-foreground after:scale-x-0 after:origin-right",
+                )}
+              >
+                {item.label}
+              </NavLink>
+            );
+          })}
         </div>
 
         <div className="flex items-center gap-2">
           <div className="hidden md:flex items-center gap-2">
             <LanguageToggle />
           </div>
-          <Link to="/booking">
-            <Button className="shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10">
+          <Link to="/booking" aria-current={bookingActive ? "page" : undefined}>
+            <Button
+              className={cn(
+                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 md:h-10",
+                bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-medium",
+              )}
+            >
               Rendez-vous
             </Button>
           </Link>
+
 
 
           {/* Mobile menu trigger */}
