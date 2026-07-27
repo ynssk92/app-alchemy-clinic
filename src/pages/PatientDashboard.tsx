@@ -185,7 +185,7 @@ const PatientDashboard = () => {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
           {/* Appointments list */}
           <WidgetCard
-            className="lg:col-span-8"
+            className="self-start lg:col-span-8"
             title="Your Appointments"
             description={`${appointments.length} total · ${upcoming} upcoming`}
             icon={Calendar}
