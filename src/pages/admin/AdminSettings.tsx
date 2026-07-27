@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Upload, Palette, Save, RotateCcw } from "lucide-react";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const PRESETS = [
   { name: "Royal Blue", primary: "230 60% 34%", secondary: "220 70% 55%", accent: "210 90% 60%" },
@@ -75,6 +76,7 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 
 export default function AdminSettings() {
   const { settings, logoUrl, mobileLogoUrl, faviconUrl, refresh } = useAppSettings();
+  const { isAdmin } = usePermissions();
   const [draft, setDraft] = useState<AppSettings>(settings);
   const [saving, setSaving] = useState(false);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
@@ -95,17 +97,7 @@ export default function AdminSettings() {
 
   const save = async () => {
     setSaving(true);
-    const { error } = await supabase.from("app_settings").update({
-      site_name: draft.site_name,
-      logo_url: draft.logo_url,
-      mobile_logo_url: draft.mobile_logo_url,
-      favicon_url: draft.favicon_url,
-      primary_hsl: draft.primary_hsl,
-      secondary_hsl: draft.secondary_hsl,
-      accent_hsl: draft.accent_hsl,
-      background_hsl: draft.background_hsl,
-      foreground_hsl: draft.foreground_hsl,
-      radius: draft.radius,
+    const contactPayload = {
       contact_phone: draft.contact_phone,
       contact_phone_secondary: draft.contact_phone_secondary,
       contact_email: draft.contact_email,
@@ -115,7 +107,25 @@ export default function AdminSettings() {
       hours_weekdays: draft.hours_weekdays,
       hours_saturday: draft.hours_saturday,
       hours_sunday: draft.hours_sunday,
-    }).eq("id", true);
+    };
+    const adminPayload = isAdmin
+      ? {
+          site_name: draft.site_name,
+          logo_url: draft.logo_url,
+          mobile_logo_url: draft.mobile_logo_url,
+          favicon_url: draft.favicon_url,
+          primary_hsl: draft.primary_hsl,
+          secondary_hsl: draft.secondary_hsl,
+          accent_hsl: draft.accent_hsl,
+          background_hsl: draft.background_hsl,
+          foreground_hsl: draft.foreground_hsl,
+          radius: draft.radius,
+        }
+      : {};
+    const { error } = await supabase
+      .from("app_settings")
+      .update({ ...contactPayload, ...adminPayload })
+      .eq("id", true);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Settings saved");
@@ -150,22 +160,28 @@ export default function AdminSettings() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Settings</h1>
-          <p className="text-sm text-muted-foreground">Manage branding, theme colors, and UI appearance.</p>
+          <p className="text-sm text-muted-foreground">
+            {isAdmin
+              ? "Manage branding, theme colors, and UI appearance."
+              : "You can update the clinic contact details and opening hours."}
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={resetDefaults}><RotateCcw className="w-4 h-4 mr-2" />Reset</Button>
+          {isAdmin && (
+            <Button variant="outline" onClick={resetDefaults}><RotateCcw className="w-4 h-4 mr-2" />Reset</Button>
+          )}
           <Button onClick={save} disabled={saving} className="bg-gradient-primary text-primary-foreground">
             <Save className="w-4 h-4 mr-2" />{saving ? "Saving…" : "Save changes"}
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="branding">
+      <Tabs defaultValue={isAdmin ? "branding" : "contact"}>
         <TabsList>
-          <TabsTrigger value="branding">Branding</TabsTrigger>
+          {isAdmin && <TabsTrigger value="branding">Branding</TabsTrigger>}
           <TabsTrigger value="contact">Contact</TabsTrigger>
-          <TabsTrigger value="theme">Theme</TabsTrigger>
-          <TabsTrigger value="ui">UI</TabsTrigger>
+          {isAdmin && <TabsTrigger value="theme">Theme</TabsTrigger>}
+          {isAdmin && <TabsTrigger value="ui">UI</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="contact" className="space-y-4 mt-4">

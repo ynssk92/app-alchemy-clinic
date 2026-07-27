@@ -31,7 +31,7 @@ import {
   useSidebar,
 } from "@/components/sidebar/Sidebar";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; children?: { to: string; label: string; end?: boolean }[] };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; action?: "view" | "create" | "edit" | "delete"; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
@@ -126,7 +126,7 @@ const sections: Section[] = [
   {
     title: "System",
     items: [
-      { to: "/admin/settings", icon: Settings, label: "Settings", adminOnly: true },
+      { to: "/admin/settings", icon: Settings, label: "Settings", module: "settings", action: "edit" },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants", adminOnly: true },
     ],
   },
@@ -322,7 +322,7 @@ const AdminShell = () => {
           const visible = section.items.filter((l) => {
             if (isAdmin) return true;
             if (l.adminOnly) return false;
-            if (l.module) return can(l.module, "view");
+            if (l.module) return can(l.module, l.action ?? "view");
             return !!l.staff;
           });
           if (visible.length === 0) return null;

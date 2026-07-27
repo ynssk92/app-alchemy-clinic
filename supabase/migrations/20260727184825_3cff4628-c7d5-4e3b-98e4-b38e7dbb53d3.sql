@@ -1,0 +1,1 @@
+REVOKE ALL ON FUNCTION public.enforce_app_settings_scope() FROM PUBLIC, anon, authenticated;
