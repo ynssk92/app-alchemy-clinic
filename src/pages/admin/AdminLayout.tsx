@@ -322,7 +322,7 @@ const AdminShell = () => {
           const visible = section.items.filter((l) => {
             if (isAdmin) return true;
             if (l.adminOnly) return false;
-            if (l.module) return can(l.module, "view");
+            if (l.module) return can(l.module, l.action ?? "view");
             return !!l.staff;
           });
           if (visible.length === 0) return null;
