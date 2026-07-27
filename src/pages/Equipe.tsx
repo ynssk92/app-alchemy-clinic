@@ -29,7 +29,7 @@ const Equipe = () => {
       heading="L'Équipe La Dune"
       subheading="Des professionnels passionnés, unis par une même exigence : votre satisfaction."
     >
-      <section className="relative -mx-4 overflow-hidden px-4 py-16 md:py-24 lg:py-30">
+      <section className="relative -mx-4 overflow-hidden px-4 py-16 md:py-24 lg:py-32">
         {/* soft medical background */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-hero opacity-40" />
         <div className="pointer-events-none absolute -left-24 top-10 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
