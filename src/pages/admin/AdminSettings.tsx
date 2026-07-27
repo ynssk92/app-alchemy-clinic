@@ -75,6 +75,7 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
 
 export default function AdminSettings() {
   const { settings, logoUrl, mobileLogoUrl, faviconUrl, refresh } = useAppSettings();
+  const { isAdmin } = usePermissions();
   const [draft, setDraft] = useState<AppSettings>(settings);
   const [saving, setSaving] = useState(false);
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
