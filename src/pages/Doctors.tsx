@@ -6,7 +6,6 @@ import { Search, MapPin, Star, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 
