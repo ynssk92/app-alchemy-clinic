@@ -106,6 +106,15 @@ export default function AdminSettings() {
       background_hsl: draft.background_hsl,
       foreground_hsl: draft.foreground_hsl,
       radius: draft.radius,
+      contact_phone: draft.contact_phone,
+      contact_phone_secondary: draft.contact_phone_secondary,
+      contact_email: draft.contact_email,
+      contact_address: draft.contact_address,
+      map_url: draft.map_url,
+      emergency_phone: draft.emergency_phone,
+      hours_weekdays: draft.hours_weekdays,
+      hours_saturday: draft.hours_saturday,
+      hours_sunday: draft.hours_sunday,
     }).eq("id", true);
     setSaving(false);
     if (error) { toast.error(error.message); return; }
@@ -154,9 +163,59 @@ export default function AdminSettings() {
       <Tabs defaultValue="branding">
         <TabsList>
           <TabsTrigger value="branding">Branding</TabsTrigger>
+          <TabsTrigger value="contact">Contact</TabsTrigger>
           <TabsTrigger value="theme">Theme</TabsTrigger>
           <TabsTrigger value="ui">UI</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="contact" className="space-y-4 mt-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Coordonnées</CardTitle>
+              <CardDescription>Phone, email and address shown on the public website.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {([
+                ["contact_phone", "Téléphone"],
+                ["contact_phone_secondary", "Téléphone secondaire"],
+                ["emergency_phone", "Urgences"],
+                ["contact_email", "Email"],
+                ["contact_address", "Adresse"],
+                ["map_url", "Lien Google Maps"],
+              ] as const).map(([key, label]) => (
+                <div key={key} className="space-y-2">
+                  <Label>{label}</Label>
+                  <Input
+                    value={draft[key] ?? ""}
+                    onChange={(e) => update({ [key]: e.target.value } as Partial<AppSettings>)}
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Horaires d'ouverture</CardTitle>
+              <CardDescription>Free text, e.g. “9:00 - 19:00” or “Fermé”.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {([
+                ["hours_weekdays", "Lundi - Vendredi"],
+                ["hours_saturday", "Samedi"],
+                ["hours_sunday", "Dimanche"],
+              ] as const).map(([key, label]) => (
+                <div key={key} className="space-y-2">
+                  <Label>{label}</Label>
+                  <Input
+                    value={draft[key] ?? ""}
+                    onChange={(e) => update({ [key]: e.target.value } as Partial<AppSettings>)}
+                  />
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
 
         <TabsContent value="branding" className="space-y-4 mt-4">
           <Card>

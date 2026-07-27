@@ -13,6 +13,15 @@ export type AppSettings = {
   background_hsl: string;
   foreground_hsl: string;
   radius: string;
+  contact_phone: string;
+  contact_phone_secondary: string;
+  contact_email: string;
+  contact_address: string;
+  map_url: string;
+  emergency_phone: string;
+  hours_weekdays: string;
+  hours_saturday: string;
+  hours_sunday: string;
 };
 
 const DEFAULTS: AppSettings = {
@@ -26,7 +35,17 @@ const DEFAULTS: AppSettings = {
   background_hsl: "210 40% 98%",
   foreground_hsl: "222 47% 11%",
   radius: "0.75rem",
+  contact_phone: "+212 5 28 00 00 00",
+  contact_phone_secondary: "",
+  contact_email: "contact@ladune.ma",
+  contact_address: "Agadir, Maroc",
+  map_url: "",
+  emergency_phone: "",
+  hours_weekdays: "9:00 - 19:00",
+  hours_saturday: "9:00 - 13:00",
+  hours_sunday: "Fermé",
 };
+
 
 type Ctx = {
   settings: AppSettings;
@@ -85,7 +104,17 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const load = useCallback(async () => {
     const { data } = await supabase.from("app_settings").select("*").maybeSingle();
     if (data) {
-      const merged: AppSettings = { ...DEFAULTS, ...data };
+      // Keep asset fields nullable, but never let NULL text columns wipe defaults.
+      const clean = Object.fromEntries(
+        Object.entries(data).filter(
+          ([k, v]) =>
+            v !== null ||
+            k === "logo_url" ||
+            k === "mobile_logo_url" ||
+            k === "favicon_url",
+        ),
+      );
+      const merged: AppSettings = { ...DEFAULTS, ...(clean as Partial<AppSettings>) };
       setSettings(merged);
       applyTheme(merged);
       const desktop = (await resolveAsset(merged.logo_url, defaultLogo))!;

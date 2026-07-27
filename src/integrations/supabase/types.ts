@@ -45,10 +45,19 @@ export type Database = {
         Row: {
           accent_hsl: string
           background_hsl: string
+          contact_address: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          contact_phone_secondary: string | null
+          emergency_phone: string | null
           favicon_url: string | null
           foreground_hsl: string
+          hours_saturday: string | null
+          hours_sunday: string | null
+          hours_weekdays: string | null
           id: boolean
           logo_url: string | null
+          map_url: string | null
           mobile_logo_url: string | null
           primary_hsl: string
           radius: string
@@ -60,10 +69,19 @@ export type Database = {
         Insert: {
           accent_hsl?: string
           background_hsl?: string
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_phone_secondary?: string | null
+          emergency_phone?: string | null
           favicon_url?: string | null
           foreground_hsl?: string
+          hours_saturday?: string | null
+          hours_sunday?: string | null
+          hours_weekdays?: string | null
           id?: boolean
           logo_url?: string | null
+          map_url?: string | null
           mobile_logo_url?: string | null
           primary_hsl?: string
           radius?: string
@@ -75,10 +93,19 @@ export type Database = {
         Update: {
           accent_hsl?: string
           background_hsl?: string
+          contact_address?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          contact_phone_secondary?: string | null
+          emergency_phone?: string | null
           favicon_url?: string | null
           foreground_hsl?: string
+          hours_saturday?: string | null
+          hours_sunday?: string | null
+          hours_weekdays?: string | null
           id?: boolean
           logo_url?: string | null
+          map_url?: string | null
           mobile_logo_url?: string | null
           primary_hsl?: string
           radius?: string

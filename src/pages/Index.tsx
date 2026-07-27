@@ -14,6 +14,7 @@ import {
   Ambulance,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -86,6 +87,7 @@ const counters = [
 ];
 
 const Index = () => {
+  const { settings } = useAppSettings();
   useScrollReveal();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
@@ -120,9 +122,10 @@ const Index = () => {
       <div className="hidden lg:block border-b border-border bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center justify-end gap-10">
           {[
-            { icon: Mail, label: "Email", value: "contact@ladune.ma" },
-            { icon: Phone, label: "Téléphone", value: "+212 5 28 00 00 00" },
-            { icon: Clock, label: "Horaires", value: "Lun - Sam : 9:00 - 19:00" },
+            { icon: Mail, label: "Email", value: settings.contact_email },
+            { icon: Phone, label: "Téléphone", value: settings.contact_phone },
+            { icon: Clock, label: "Horaires", value: `Lun - Sam : ${settings.hours_weekdays}` },
+
           ].map((it) => (
             <div key={it.label} className="flex items-center gap-3">
               <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -316,19 +319,23 @@ const Index = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Douleur aiguë, dent cassée ou traumatisme ? Nous vous recevons en priorité.
             </p>
-            <Link to="/contact" className="text-sm font-bold text-primary inline-flex items-center gap-1">
-              Nous appeler <ArrowRight className="w-4 h-4" />
-            </Link>
+            <a
+              href={`tel:${(settings.emergency_phone || settings.contact_phone).replace(/\s/g, "")}`}
+              className="text-sm font-bold text-primary inline-flex items-center gap-1"
+            >
+              {settings.emergency_phone || settings.contact_phone} <ArrowRight className="w-4 h-4" />
+            </a>
           </Card>
           <Card className="reveal p-8 bg-card border-none shadow-large" style={{ transitionDelay: "90ms" }}>
             <Clock className="w-8 h-8 text-primary mb-4" />
             <h3 className="text-lg font-bold text-card-foreground mb-4">Horaires d'ouverture</h3>
             <ul className="space-y-2 text-sm">
               {[
-                ["Lun - Ven", "9:00 - 19:00"],
-                ["Samedi", "9:00 - 14:00"],
-                ["Dimanche", "Fermé"],
+                ["Lun - Ven", settings.hours_weekdays],
+                ["Samedi", settings.hours_saturday],
+                ["Dimanche", settings.hours_sunday],
               ].map(([d, h]) => (
+
                 <li key={d} className="flex justify-between border-b border-border pb-2 last:border-0">
                   <span className="text-muted-foreground">{d}</span>
                   <span className="font-semibold text-card-foreground">{h}</span>
