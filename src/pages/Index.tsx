@@ -86,6 +86,7 @@ const counters = [
 ];
 
 const Index = () => {
+  const { settings } = useAppSettings();
   useScrollReveal();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
