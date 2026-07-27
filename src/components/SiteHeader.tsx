@@ -108,6 +108,7 @@ export const SiteHeader = () => {
             </SheetTrigger>
 
             <SheetContent
+              id="mobile-nav-sheet"
               side="bottom"
               aria-label="Main navigation"
               onOpenAutoFocus={(e) => {
