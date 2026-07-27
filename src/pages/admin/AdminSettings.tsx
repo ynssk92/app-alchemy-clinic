@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { Upload, Palette, Save, RotateCcw } from "lucide-react";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const PRESETS = [
   { name: "Royal Blue", primary: "230 60% 34%", secondary: "220 70% 55%", accent: "210 90% 60%" },
