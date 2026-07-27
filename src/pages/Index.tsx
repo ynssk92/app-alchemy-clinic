@@ -120,9 +120,10 @@ const Index = () => {
       <div className="hidden lg:block border-b border-border bg-card">
         <div className="container mx-auto px-4 py-3 flex items-center justify-end gap-10">
           {[
-            { icon: Mail, label: "Email", value: "contact@ladune.ma" },
-            { icon: Phone, label: "Téléphone", value: "+212 5 28 00 00 00" },
-            { icon: Clock, label: "Horaires", value: "Lun - Sam : 9:00 - 19:00" },
+            { icon: Mail, label: "Email", value: settings.contact_email },
+            { icon: Phone, label: "Téléphone", value: settings.contact_phone },
+            { icon: Clock, label: "Horaires", value: `Lun - Sam : ${settings.hours_weekdays}` },
+
           ].map((it) => (
             <div key={it.label} className="flex items-center gap-3">
               <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
