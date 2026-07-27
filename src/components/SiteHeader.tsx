@@ -153,34 +153,40 @@ export const SiteHeader = () => {
                 className="flex-1 overflow-y-auto px-4 pb-4"
               >
                 <ul className="flex flex-col gap-1">
-                  {navItems.map((item, i) => (
-                    <li
-                      key={item.to}
-                      className="opacity-0 animate-fade-in motion-reduce:animate-none motion-reduce:opacity-100"
-                      style={{
-                        animationDelay: `${80 + i * 40}ms`,
-                        animationFillMode: "forwards",
-                      }}
-                    >
-                      <NavLink
-                        to={item.to}
-                        onClick={() => setOpen(false)}
-                        className={({ isActive }) =>
-                          `flex items-center justify-between rounded-xl px-4 min-h-14 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                            isActive
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted"
-                          }`
-                        }
+                  {navItems.map((item, i) => {
+                    const active = matches(item.to, item.alsoMatch);
+                    return (
+                      <li
+                        key={item.to}
+                        className="opacity-0 animate-fade-in motion-reduce:animate-none motion-reduce:opacity-100"
+                        style={{
+                          animationDelay: `${80 + i * 40}ms`,
+                          animationFillMode: "forwards",
+                        }}
                       >
-                        <span>{item.label}</span>
-                        <span
-                          aria-hidden="true"
-                          className="h-2 w-2 rounded-full bg-current opacity-40"
-                        />
-                      </NavLink>
-                    </li>
-                  ))}
+                        <NavLink
+                          to={item.to}
+                          onClick={() => setOpen(false)}
+                          aria-current={active ? "page" : undefined}
+                          className={cn(
+                            "relative flex items-center justify-between rounded-xl px-4 min-h-14 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            active
+                              ? "bg-primary/10 text-primary before:absolute before:left-0 before:top-3 before:bottom-3 before:w-1 before:rounded-full before:bg-primary"
+                              : "text-foreground hover:bg-muted",
+                          )}
+                        >
+                          <span>{item.label}</span>
+                          <span
+                            aria-hidden="true"
+                            className={cn(
+                              "h-2 w-2 rounded-full bg-current",
+                              active ? "opacity-100" : "opacity-40",
+                            )}
+                          />
+                        </NavLink>
+                      </li>
+                    );
+                  })}
                 </ul>
               </nav>
 
@@ -191,11 +197,22 @@ export const SiteHeader = () => {
                   </span>
                   <LanguageToggle />
                 </div>
-                <Link to="/booking" onClick={() => setOpen(false)} className="block">
-                  <Button className="w-full h-12 text-base shadow-soft">
+                <Link
+                  to="/booking"
+                  onClick={() => setOpen(false)}
+                  aria-current={bookingActive ? "page" : undefined}
+                  className="block"
+                >
+                  <Button
+                    className={cn(
+                      "w-full h-12 text-base shadow-soft",
+                      bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background",
+                    )}
+                  >
                     Rendez-vous
                   </Button>
                 </Link>
+
 
 
               </div>
