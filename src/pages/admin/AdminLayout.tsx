@@ -126,7 +126,7 @@ const sections: Section[] = [
   {
     title: "System",
     items: [
-      { to: "/admin/settings", icon: Settings, label: "Settings", adminOnly: true },
+      { to: "/admin/settings", icon: Settings, label: "Settings", module: "settings" },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants", adminOnly: true },
     ],
   },
