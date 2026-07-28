@@ -106,12 +106,16 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
               Prendre RDV
             </Link>
           </Button>
-          <Button asChild variant="outline" className="group/btn flex-1 rounded-xl font-semibold">
-            <Link to={`/doctors?doctor=${doctor.id}`}>
-              Voir le profil
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
-            </Link>
+          <Button
+            variant="outline"
+            className="group/btn flex-1 rounded-xl font-semibold"
+            onClick={() => setProfileOpen(true)}
+            aria-label={`Voir le profil de ${doctor.full_name}`}
+          >
+            Voir le profil
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
           </Button>
+
         </div>
 
         <div className="mt-3 flex items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus-within:opacity-100">
