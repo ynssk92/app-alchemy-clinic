@@ -70,12 +70,8 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
           <Award className="h-4 w-4 text-primary" />
           {doctor.experience_years ? `${doctor.experience_years} ans d'expérience` : "Praticien certifié"}
         </span>
-        <span className="inline-flex items-center gap-1.5">
-          <Star className="h-4 w-4 fill-stat-amber text-stat-amber" />
-          <span className="font-semibold text-foreground">4.9</span>
-          <span>(124 avis)</span>
-        </span>
       </div>
+
 
       {/* languages */}
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
