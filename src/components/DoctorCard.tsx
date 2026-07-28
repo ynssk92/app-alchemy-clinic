@@ -135,7 +135,10 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
           </a>
         </div>
       </div>
+
+      <DoctorProfileDialog doctor={doctor} open={profileOpen} onOpenChange={setProfileOpen} />
     </article>
+
   );
 };
 
