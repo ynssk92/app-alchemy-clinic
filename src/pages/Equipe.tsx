@@ -25,10 +25,10 @@ const Equipe = () => {
       title="L'Équipe — La Dune Clinique Dentaire"
       description="Rencontrez l'équipe de La Dune Clinique Dentaire : praticiens, assistants et coordinateurs."
       path="/equipe"
-      eyebrow="Notre équipe"
       heading="L'Équipe La Dune"
-      subheading="Des professionnels passionnés, unis par une même exigence : votre satisfaction."
+      hideHero
     >
+
       <section className="relative -mx-4 overflow-hidden px-4 py-16 md:py-24 lg:py-32">
         {/* soft medical background */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-hero opacity-40" />
@@ -42,10 +42,11 @@ const Equipe = () => {
               <Stethoscope className="h-3.5 w-3.5" />
               Nos experts médicaux
             </span>
-            <h2 className="mt-5 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+            <h1 className="mt-5 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
               Rencontrez nos{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">spécialistes</span>
-            </h2>
+            </h1>
+
             <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
               Une équipe pluridisciplinaire de praticiens diplômés, formés aux dernières technologies
               dentaires, qui vous accompagne avec précision, écoute et bienveillance.
