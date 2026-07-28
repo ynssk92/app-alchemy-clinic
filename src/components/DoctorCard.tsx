@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Award, ArrowRight, Calendar, Languages, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DoctorProfileDialog } from "@/components/DoctorProfileDialog";
+
 
 export type DoctorCardData = {
   id: string;
@@ -29,6 +32,9 @@ const LANGUAGES = [
 
 export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
   const specialty = doctor.specialties?.name || "Praticien";
+  const [profileOpen, setProfileOpen] = useState(false);
+
+
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-8 text-center shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-large">
@@ -100,12 +106,16 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
               Prendre RDV
             </Link>
           </Button>
-          <Button asChild variant="outline" className="group/btn flex-1 rounded-xl font-semibold">
-            <Link to={`/doctors?doctor=${doctor.id}`}>
-              Voir le profil
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
-            </Link>
+          <Button
+            variant="outline"
+            className="group/btn flex-1 rounded-xl font-semibold"
+            onClick={() => setProfileOpen(true)}
+            aria-label={`Voir le profil de ${doctor.full_name}`}
+          >
+            Voir le profil
+            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
           </Button>
+
         </div>
 
         <div className="mt-3 flex items-center justify-center gap-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 focus-within:opacity-100">
@@ -125,7 +135,10 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
           </a>
         </div>
       </div>
+
+      <DoctorProfileDialog doctor={doctor} open={profileOpen} onOpenChange={setProfileOpen} />
     </article>
+
   );
 };
 
