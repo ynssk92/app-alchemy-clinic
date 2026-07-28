@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Award, ArrowRight, Calendar, Languages, Mail, Phone, Star } from "lucide-react";
+import { Award, ArrowRight, Calendar, Languages, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export type DoctorCardData = {
