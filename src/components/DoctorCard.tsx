@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Award, ArrowRight, Calendar, Languages, Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DoctorProfileDialog } from "@/components/DoctorProfileDialog";
+
 
 export type DoctorCardData = {
   id: string;
