@@ -32,6 +32,9 @@ const LANGUAGES = [
 
 export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
   const specialty = doctor.specialties?.name || "Praticien";
+  const [profileOpen, setProfileOpen] = useState(false);
+
+
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-8 text-center shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-large">
