@@ -118,7 +118,7 @@ const Auth = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4 relative">
+    <div className="relative flex min-h-screen w-full flex-1 items-center justify-center overflow-hidden bg-gradient-hero p-4">
       <div className="absolute top-4 right-4 z-10"><LanguageToggle variant="outline" /></div>
       <Seo
         title="Sign In or Sign Up — HealthBook"

@@ -98,7 +98,7 @@ const PatientDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-muted/30">
       <Seo
         title="Your Dashboard — HealthBook"
         description="Track your health score, upcoming appointments, and achievements in your HealthBook dashboard."

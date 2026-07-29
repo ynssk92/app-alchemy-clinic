@@ -44,7 +44,7 @@ const Doctors = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title="Find Doctors — HealthBook"
         description="Browse verified healthcare professionals by name or specialty and book an appointment in seconds."

@@ -193,7 +193,7 @@ const BookingConfirmed = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title="Rendez-vous confirmé — La Dune"
         description="Récapitulatif de votre rendez-vous et prochaines étapes avant votre visite."
