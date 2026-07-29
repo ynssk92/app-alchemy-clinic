@@ -18,4 +18,3 @@ export const AdminReports = () => <Stub title="Reports" description="Clinic acti
 export const AdminPages = () => <Stub title="Pages" description="Manage static pages of the public website." />;
 export const AdminLocation = () => <Stub title="Location" description="Manage clinic locations and map settings." />;
 export const AdminTestimonials = () => <Stub title="Testimonials" description="Manage patient testimonials shown on the website." />;
-export const AdminFaq = () => <Stub title="FAQ" description="Manage frequently asked questions." />;
