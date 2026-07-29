@@ -92,18 +92,23 @@ const Booking = () => {
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from("appointments").insert({
-      patient_id: user.id,
-      doctor_id: doctorId,
-      appointment_date: date.toISOString().slice(0, 10),
-      appointment_time: selectedTime,
-      reason,
-      status: "upcoming",
-    });
+    const { data, error } = await supabase
+      .from("appointments")
+      .insert({
+        patient_id: user.id,
+        doctor_id: doctorId,
+        appointment_date: date.toISOString().slice(0, 10),
+        appointment_time: selectedTime,
+        reason,
+        status: "upcoming",
+      })
+      .select("id")
+      .single();
     setBusy(false);
     if (error) return toast.error(error.message);
+    localStorage.removeItem("booking_draft");
     toast.success("Appointment booked successfully!");
-    setTimeout(() => navigate("/patient-dashboard"), 1000);
+    navigate(data?.id ? `/booking/confirmed/${data.id}` : "/patient-dashboard");
   };
 
   return (
