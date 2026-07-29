@@ -37,7 +37,7 @@ const Soins = () => {
           <header className="mx-auto max-w-3xl text-center">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary">
               <Sparkles className="h-3.5 w-3.5" aria-hidden />
-              {page?.eyebrow || "Soins dentaires premium"}
+              Soins dentaires premium
             </span>
             <h1 className="mt-6 text-[34px] font-extrabold leading-[1.08] tracking-tight text-foreground sm:text-[44px] lg:text-[54px]">
               Des{" "}

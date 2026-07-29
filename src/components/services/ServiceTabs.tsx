@@ -1,3 +1,4 @@
+import { Activity, Gem, Microscope, Smile, Sparkles, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface ServiceTabItem {
@@ -11,7 +12,7 @@ interface ServiceTabsProps {
   onChange: (id: string) => void;
 }
 
-const EMOJIS = ["✨", "🦷", "😁", "🔬", "💎", "🩺", "🧬"];
+const ICONS = [Sparkles, Stethoscope, Smile, Microscope, Gem, Activity];
 
 export const ServiceTabs = ({ items, activeId, onChange }: ServiceTabsProps) => (
   <div
@@ -21,6 +22,7 @@ export const ServiceTabs = ({ items, activeId, onChange }: ServiceTabsProps) => 
   >
     {items.map((item, i) => {
       const active = item.id === activeId;
+      const Icon = ICONS[i % ICONS.length];
       return (
         <button
           key={item.id}
@@ -37,9 +39,10 @@ export const ServiceTabs = ({ items, activeId, onChange }: ServiceTabsProps) => 
               : "border-border bg-card text-foreground/80 hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground hover:shadow-soft"
           )}
         >
-          <span aria-hidden className="text-base leading-none">
-            {EMOJIS[i % EMOJIS.length]}
-          </span>
+          <Icon
+            className={cn("h-4 w-4", active ? "text-primary-foreground" : "text-primary")}
+            aria-hidden
+          />
           <span className="whitespace-nowrap">{item.label}</span>
         </button>
       );
