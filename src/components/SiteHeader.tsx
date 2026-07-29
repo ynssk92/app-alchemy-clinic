@@ -101,7 +101,7 @@ export const SiteHeader = () => {
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 aria-controls="mobile-nav-sheet"
-                className="md:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="lg:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
