@@ -32,7 +32,7 @@ export default function PendingApproval() {
   const rejected = status === "rejected";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-gradient-to-br from-primary/5 to-accent/5 relative">
+    <div className="relative flex min-h-screen w-full flex-1 items-center justify-center overflow-hidden bg-background bg-gradient-to-br from-primary/5 to-accent/5 p-6">
       <div className="absolute top-4 right-4 z-10"><LanguageToggle variant="outline" /></div>
       <Card className="max-w-md w-full p-8 text-center space-y-4">
         <div className="mx-auto w-16 h-16 rounded-full flex items-center justify-center bg-primary/10">

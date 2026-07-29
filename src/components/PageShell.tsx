@@ -15,7 +15,7 @@ interface PageShellProps {
 
 export const PageShell = ({ title, description, path, eyebrow, heading, subheading, hideHero, children }: PageShellProps) => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo title={title} description={description} path={path} />
       <SiteHeader />
       {!hideHero && (
@@ -35,8 +35,8 @@ export const PageShell = ({ title, description, path, eyebrow, heading, subheadi
         </section>
       )}
 
-      <main className="container mx-auto px-4 py-16">{children}</main>
-      <footer className="border-t border-border py-8 mt-16">
+      <main className="container mx-auto w-full max-w-7xl flex-1 px-4 py-16">{children}</main>
+      <footer className="mt-16 border-t border-border bg-background py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
           © {new Date().getFullYear()} La Dune Clinique Dentaire. Tous droits réservés.
         </div>

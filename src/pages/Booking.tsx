@@ -112,7 +112,7 @@ const Booking = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title="Book an Appointment — HealthBook"
         description="Choose a doctor, pick a date and time, and confirm your appointment in seconds."

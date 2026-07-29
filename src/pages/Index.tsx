@@ -113,7 +113,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title="La Dune Clinique Dentaire — Rendez-vous en quelques secondes"
         description="Clinique dentaire moderne : esthétique du sourire, implantologie, orthodontie. Prenez rendez-vous en ligne avec nos praticiens en quelques secondes."
