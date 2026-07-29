@@ -45,10 +45,11 @@ import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
 import {
-  AdminDeleteRequests, AdminReports, AdminPages,
+  AdminDeleteRequests, AdminReports,
   AdminLocation, AdminTestimonials,
 } from "./pages/admin/AdminStubs";
 import AdminFaq from "./pages/admin/AdminFaq";
+import AdminPages from "./pages/admin/AdminPages";
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApprovals from "./pages/admin/AdminApprovals";
