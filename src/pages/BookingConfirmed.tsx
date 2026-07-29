@@ -33,7 +33,7 @@ const BookingConfirmed = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const settings = useAppSettings();
+  const { settings } = useAppSettings();
   const [appt, setAppt] = useState<Appt | null>(null);
   const [loading, setLoading] = useState(true);
 
