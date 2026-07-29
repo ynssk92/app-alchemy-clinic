@@ -118,7 +118,7 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "normal").setFontSize(12);
       doc.text("Confirmation de rendez-vous", textX, 84);
       doc.setFontSize(10);
-      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 84, { align: "right" });
+      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
 
       y = headerH + 40;
       doc.setTextColor(20, 20, 20);
