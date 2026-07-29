@@ -643,6 +643,62 @@ export type Database = {
           },
         ]
       }
+      page_blocks: {
+        Row: {
+          body: string | null
+          created_at: string
+          icon: string | null
+          id: string
+          image_url: string | null
+          items: string[]
+          kind: string
+          page_slug: string
+          published: boolean
+          sort_order: number
+          subtitle: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          items?: string[]
+          kind?: string
+          page_slug: string
+          published?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          icon?: string | null
+          id?: string
+          image_url?: string | null
+          items?: string[]
+          kind?: string
+          page_slug?: string
+          published?: boolean
+          sort_order?: number
+          subtitle?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "page_blocks_page_slug_fkey"
+            columns: ["page_slug"]
+            isOneToOne: false
+            referencedRelation: "site_pages"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       patient_intake: {
         Row: {
           address_1: string | null
@@ -943,6 +999,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_pages: {
+        Row: {
+          created_at: string
+          eyebrow: string | null
+          heading: string
+          intro: string | null
+          name: string
+          seo_description: string
+          seo_title: string
+          slug: string
+          subheading: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          eyebrow?: string | null
+          heading: string
+          intro?: string | null
+          name: string
+          seo_description: string
+          seo_title: string
+          slug: string
+          subheading?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          eyebrow?: string | null
+          heading?: string
+          intro?: string | null
+          name?: string
+          seo_description?: string
+          seo_title?: string
+          slug?: string
+          subheading?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       specialties: {
         Row: {
