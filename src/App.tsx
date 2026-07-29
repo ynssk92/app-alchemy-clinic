@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
 import Booking from "./pages/Booking";
+import BookingConfirmed from "./pages/BookingConfirmed";
 import PatientDashboard from "./pages/PatientDashboard";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -74,6 +75,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/doctors" element={<Doctors />} />
             <Route path="/booking" element={<ProtectedRoute><Booking /></ProtectedRoute>} />
+            <Route path="/booking/confirmed/:id" element={<ProtectedRoute><BookingConfirmed /></ProtectedRoute>} />
             <Route path="/patient-dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
