@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   CalendarCheck, CalendarDays, Clock, UserRound, MapPin, Phone, Mail,
-  CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus,
+  CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,6 +36,7 @@ const BookingConfirmed = () => {
   const { settings } = useAppSettings();
   const [appt, setAppt] = useState<Appt | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -61,6 +62,98 @@ const BookingConfirmed = () => {
     : "";
 
   const address = appt?.doctors?.clinics?.address || settings.contact_address;
+
+  const handleDownloadPdf = async () => {
+    if (!appt) return;
+    setDownloading(true);
+    try {
+      const { jsPDF } = await import("jspdf");
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+      const W = doc.internal.pageSize.getWidth();
+      const M = 48;
+      let y = 64;
+
+      doc.setFillColor(32, 48, 128);
+      doc.rect(0, 0, W, 110, "F");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold").setFontSize(20);
+      doc.text(settings.site_name || "La Dune", M, 52);
+      doc.setFont("helvetica", "normal").setFontSize(12);
+      doc.text("Confirmation de rendez-vous", M, 76);
+      doc.setFontSize(10);
+      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 76, { align: "right" });
+
+      y = 150;
+      doc.setTextColor(20, 20, 20);
+      doc.setFont("helvetica", "bold").setFontSize(13);
+      doc.text("Details du rendez-vous", M, y);
+      y += 10;
+      doc.setDrawColor(220, 224, 235);
+      doc.line(M, y, W - M, y);
+      y += 24;
+
+      const rows: [string, string][] = [
+        ["Praticien", appt.doctors?.full_name ?? "-"],
+        ["Specialite", appt.doctors?.specialties?.name ?? "-"],
+        ["Date", dateLabel],
+        ["Heure", appt.appointment_time],
+        ["Lieu", appt.doctors?.clinics?.name ?? settings.site_name],
+        ["Adresse", address || "-"],
+        ["Motif", appt.reason || "-"],
+        ["Statut", appt.status],
+      ];
+      rows.forEach(([label, value]) => {
+        doc.setFont("helvetica", "bold").setFontSize(10).setTextColor(110, 116, 135);
+        doc.text(label.toUpperCase(), M, y);
+        doc.setFont("helvetica", "normal").setFontSize(12).setTextColor(20, 20, 20);
+        const lines = doc.splitTextToSize(String(value), W - M - 190);
+        doc.text(lines, M + 150, y);
+        y += 20 + (lines.length - 1) * 14;
+      });
+
+      y += 16;
+      doc.setFont("helvetica", "bold").setFontSize(13).setTextColor(20, 20, 20);
+      doc.text("Prochaines etapes", M, y);
+      y += 10;
+      doc.line(M, y, W - M, y);
+      y += 24;
+
+      nextSteps.forEach((s, i) => {
+        doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(32, 48, 128);
+        doc.text(`${i + 1}. ${s.title}`, M, y);
+        y += 16;
+        doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(70, 74, 90);
+        const lines = doc.splitTextToSize(s.text, W - M * 2);
+        doc.text(lines, M, y);
+        y += lines.length * 13 + 12;
+      });
+
+      y += 8;
+      doc.setDrawColor(220, 224, 235);
+      doc.line(M, y, W - M, y);
+      y += 22;
+      doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(20, 20, 20);
+      doc.text("Contact", M, y);
+      y += 16;
+      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(70, 74, 90);
+      doc.text(`Telephone : ${settings.contact_phone}`, M, y);
+      y += 14;
+      doc.text(`Email : ${settings.contact_email}`, M, y);
+      y += 14;
+      doc.text("Modification ou annulation : merci de nous prevenir au moins 24h a l'avance.", M, y);
+
+      doc.setFontSize(9).setTextColor(150, 154, 168);
+      doc.text(
+        `Document genere le ${new Date().toLocaleDateString("fr-FR")}`,
+        M,
+        doc.internal.pageSize.getHeight() - 36,
+      );
+
+      doc.save(`rendez-vous-${appt.id.slice(0, 8)}.pdf`);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,12 +218,23 @@ const BookingConfirmed = () => {
                         Mon espace patient <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>
                     </Button>
-                    <Button asChild variant="outline" className="h-12 flex-1 rounded-xl">
-                      <Link to="/booking">
-                        <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau rendez-vous
-                      </Link>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-12 flex-1 rounded-xl"
+                      disabled={!appt || downloading}
+                      onClick={handleDownloadPdf}
+                    >
+                      {downloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+                      Télécharger le PDF
                     </Button>
                   </div>
+                  <Button asChild variant="ghost" className="mt-3 h-11 w-full rounded-xl">
+                    <Link to="/booking">
+                      <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau rendez-vous
+                    </Link>
+                  </Button>
+
                 </Card>
 
                 <Card className="rounded-3xl p-6 lg:col-span-2">
