@@ -77,7 +77,7 @@ export const SiteHeader = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             <LanguageToggle />
           </div>
           <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="shrink-0">
