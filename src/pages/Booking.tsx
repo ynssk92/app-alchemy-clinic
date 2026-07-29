@@ -1,22 +1,30 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar } from "@/components/ui/calendar";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Calendar as CalendarIcon, Clock, User } from "lucide-react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { CalendarDays, Clock, UserRound } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { BookingStepper } from "@/components/booking/BookingStepper";
+import { DoctorCard, BookingDoctor } from "@/components/booking/DoctorCard";
+import { BookingCalendar } from "@/components/booking/BookingCalendar";
+import { TimeSlotGrid } from "@/components/booking/TimeSlotGrid";
+import { BookingSummary } from "@/components/booking/BookingSummary";
 
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
   "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM",
+];
+
+const steps = [
+  { id: 1, label: "Praticien" },
+  { id: 2, label: "Date" },
+  { id: 3, label: "Heure" },
+  { id: 4, label: "Confirmation" },
 ];
 
 const Booking = () => {
@@ -26,7 +34,7 @@ const Booking = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [doctorId, setDoctorId] = useState(params.get("doctor") || "");
-  const [doctors, setDoctors] = useState<{ id: string; full_name: string }[]>([]);
+  const [doctors, setDoctors] = useState<BookingDoctor[]>([]);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -35,10 +43,46 @@ const Booking = () => {
   }, [user, authLoading, navigate]);
 
   useEffect(() => {
-    supabase.from("doctors").select("id, full_name").eq("is_available", true).then(({ data }) => {
-      setDoctors(data || []);
-    });
+    supabase
+      .from("doctors")
+      .select("id, full_name, avatar_url, experience_years, rating, specialties(name), clinics(name)")
+      .eq("is_available", true)
+      .then(({ data }) => {
+        setDoctors(
+          ((data as any[]) || []).map((d) => ({
+            id: d.id,
+            full_name: d.full_name,
+            avatar_url: d.avatar_url,
+            experience_years: d.experience_years,
+            rating: d.rating,
+            specialty: d.specialties?.name ?? null,
+            clinic: d.clinics?.name ?? null,
+          }))
+        );
+      });
   }, []);
+
+  const selectedDoctor = useMemo(() => doctors.find((d) => d.id === doctorId), [doctors, doctorId]);
+
+  const dateLabel = date
+    ? date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
+    : undefined;
+
+  const completed = [
+    doctorId ? 1 : 0,
+    date ? 2 : 0,
+    selectedTime ? 3 : 0,
+  ].filter(Boolean) as number[];
+  const currentStep = !doctorId ? 1 : !date ? 2 : !selectedTime ? 3 : 4;
+  const ready = Boolean(doctorId && date && selectedTime);
+
+  const handleSaveForLater = () => {
+    localStorage.setItem(
+      "booking_draft",
+      JSON.stringify({ doctorId, date: date?.toISOString() ?? null, selectedTime, reason })
+    );
+    toast.success("Sélection enregistrée. Vous pourrez la reprendre plus tard.");
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,79 +115,113 @@ const Booking = () => {
       />
       <SiteHeader />
 
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-foreground mb-2">Book Your Appointment</h1>
-              <p className="text-lg text-muted-foreground">Choose a convenient time and we'll take care of the rest</p>
+      <main className="relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
+
+        <div className="relative mx-auto w-full max-w-[1280px] px-4 py-14 md:py-20">
+          <header className="max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
+              <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+              Rendez-vous en ligne
+            </span>
+            <h1 className="mt-6 text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl">
+              Réservez votre{" "}
+              <span className="bg-gradient-primary bg-clip-text text-transparent">visite</span>
+            </h1>
+            <p className="mt-4 text-lg text-muted-foreground">
+              Choisissez votre praticien, la date et l'heure qui vous conviennent — en quelques clics.
+            </p>
+          </header>
+
+          <div className="mt-10">
+            <BookingStepper steps={steps} current={currentStep} completed={completed} />
+          </div>
+
+          <form onSubmit={handleSubmit} className="mt-10 grid gap-6 lg:grid-cols-10">
+            {/* Left — doctor */}
+            <div className="space-y-6 lg:col-span-3">
+              <div className="rounded-3xl border border-border bg-card p-8 shadow-soft">
+                <Label htmlFor="doctor" className="flex items-center gap-2 text-sm font-semibold">
+                  <UserRound className="h-4 w-4 text-primary" aria-hidden="true" />
+                  Praticien
+                </Label>
+                <Select value={doctorId} onValueChange={setDoctorId}>
+                  <SelectTrigger id="doctor" className="mt-2 h-14 rounded-2xl border-transparent bg-muted/70 text-base focus:ring-4 focus:ring-primary/15">
+                    <SelectValue placeholder="Choisir un praticien" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {doctors.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>{d.full_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <DoctorCard doctor={selectedDoctor} nextAvailable={selectedDoctor ? "Aujourd'hui" : undefined} />
+
+              <div className="rounded-3xl border border-border bg-card p-8 shadow-soft">
+                <Label htmlFor="reason" className="text-sm font-semibold">Motif de la consultation</Label>
+                <Textarea
+                  id="reason"
+                  required
+                  rows={5}
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  placeholder="Décrivez brièvement votre besoin…"
+                  className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-250 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
+                />
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="grid md:grid-cols-2 gap-8">
-                <Card className="p-6 border-border bg-card">
-                  <div className="flex items-center gap-2 mb-6">
-                    <User className="w-5 h-5 text-primary" />
-                    <h2 className="text-xl font-bold text-card-foreground">Appointment Details</h2>
-                  </div>
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Doctor</Label>
-                      <Select value={doctorId} onValueChange={setDoctorId}>
-                        <SelectTrigger><SelectValue placeholder="Choose a doctor" /></SelectTrigger>
-                        <SelectContent>
-                          {doctors.map((d) => (
-                            <SelectItem key={d.id} value={d.id}>{d.full_name}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="reason">Reason for Visit</Label>
-                      <Textarea id="reason" required rows={6}
-                        value={reason} onChange={(e) => setReason(e.target.value)} />
-                    </div>
-                  </div>
-                </Card>
-
-                <div className="space-y-6">
-                  <Card className="p-6 border-border bg-card">
-                    <div className="flex items-center gap-2 mb-4">
-                      <CalendarIcon className="w-5 h-5 text-primary" />
-                      <h2 className="text-xl font-bold text-card-foreground">Select Date</h2>
-                    </div>
-                    <Calendar mode="single" selected={date} onSelect={setDate}
-                      className="rounded-md border-border" disabled={(d) => d < new Date()} />
-                  </Card>
-
-                  <Card className="p-6 border-border bg-card">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Clock className="w-5 h-5 text-primary" />
-                      <h2 className="text-xl font-bold text-card-foreground">Select Time</h2>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {timeSlots.map((time) => (
-                        <Button key={time} type="button"
-                          variant={selectedTime === time ? "default" : "outline"}
-                          className="h-12" onClick={() => setSelectedTime(time)}>
-                          {time}
-                        </Button>
-                      ))}
-                    </div>
-                  </Card>
+            {/* Center — calendar + slots */}
+            <div className="space-y-6 lg:col-span-4">
+              <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+                <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                  <CalendarDays className="h-5 w-5 text-primary" aria-hidden="true" />
+                  Choisir une date
+                </h2>
+                <div className="mt-5">
+                  <BookingCalendar
+                    date={date}
+                    onSelect={setDate}
+                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                  />
                 </div>
               </div>
 
-              <div className="mt-8 text-center">
-                <Button type="submit" size="lg" className="px-12" disabled={busy}>
-                  {busy ? "Booking..." : "Confirm Booking"}
-                  <Sparkles className="ml-2 w-5 h-5" />
-                </Button>
+              <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                    <Clock className="h-5 w-5 text-primary" aria-hidden="true" />
+                    Choisir un horaire
+                  </h2>
+                  <span className="text-xs font-medium text-muted-foreground">{timeSlots.length} créneaux</span>
+                </div>
+                <div className="mt-5">
+                  <TimeSlotGrid slots={timeSlots} selected={selectedTime} onSelect={setSelectedTime} />
+                </div>
               </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Right — summary */}
+            <div className="lg:col-span-3">
+              <div className="lg:sticky lg:top-24">
+                <BookingSummary
+                  doctorName={selectedDoctor?.full_name}
+                  dateLabel={dateLabel}
+                  timeLabel={selectedTime || undefined}
+                  clinic={selectedDoctor?.clinic || "La Dune Clinique Dentaire"}
+                  ready={ready}
+                  busy={busy}
+                  onSaveForLater={handleSaveForLater}
+                />
+              </div>
+            </div>
+          </form>
         </div>
-      </section>
+      </main>
     </div>
   );
 };
