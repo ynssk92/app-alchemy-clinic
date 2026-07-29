@@ -33,7 +33,7 @@ const BookingConfirmed = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { settings } = useAppSettings();
+  const { settings, logoUrl } = useAppSettings();
   const [appt, setAppt] = useState<Appt | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -63,6 +63,28 @@ const BookingConfirmed = () => {
 
   const address = appt?.doctors?.clinics?.address || settings.contact_address;
 
+  const loadLogo = async (): Promise<{ data: string; w: number; h: number } | null> => {
+    try {
+      const res = await fetch(logoUrl);
+      const blob = await res.blob();
+      const data: string = await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(String(fr.result));
+        fr.onerror = reject;
+        fr.readAsDataURL(blob);
+      });
+      const dims = await new Promise<{ w: number; h: number }>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+        img.onerror = reject;
+        img.src = data;
+      });
+      return { data, ...dims };
+    } catch {
+      return null;
+    }
+  };
+
   const handleDownloadPdf = async () => {
     if (!appt) return;
     setDownloading(true);
@@ -73,17 +95,32 @@ const BookingConfirmed = () => {
       const M = 48;
       let y = 64;
 
+      const logo = await loadLogo();
+      const headerH = 130;
       doc.setFillColor(32, 48, 128);
-      doc.rect(0, 0, W, 110, "F");
-      doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold").setFontSize(20);
-      doc.text(settings.site_name || "La Dune", M, 52);
-      doc.setFont("helvetica", "normal").setFontSize(12);
-      doc.text("Confirmation de rendez-vous", M, 76);
-      doc.setFontSize(10);
-      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 76, { align: "right" });
+      doc.rect(0, 0, W, headerH, "F");
 
-      y = 150;
+      let textX = M;
+      if (logo) {
+        const boxH = 64;
+        const logoH = 48;
+        const logoW = Math.min(160, (logo.w / logo.h) * logoH);
+        const boxW = logoW + 28;
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(M, 33, boxW, boxH, 12, 12, "F");
+        doc.addImage(logo.data, M + 14, 33 + (boxH - logoH) / 2, logoW, logoH, undefined, "FAST");
+        textX = M + boxW + 20;
+      }
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold").setFontSize(19);
+      doc.text(settings.site_name || "La Dune", textX, 62);
+      doc.setFont("helvetica", "normal").setFontSize(12);
+      doc.text("Confirmation de rendez-vous", textX, 84);
+      doc.setFontSize(10);
+      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
+
+      y = headerH + 40;
       doc.setTextColor(20, 20, 20);
       doc.setFont("helvetica", "bold").setFontSize(13);
       doc.text("Details du rendez-vous", M, y);
