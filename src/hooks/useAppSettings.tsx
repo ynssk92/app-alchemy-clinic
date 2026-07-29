@@ -102,7 +102,13 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    const { data } = await supabase.from("app_settings").select("*").maybeSingle();
+    // Explicit column list: `updated_by` is intentionally excluded (internal admin UUID).
+    const { data } = await supabase
+      .from("app_settings")
+      .select(
+        "id,logo_url,site_name,primary_hsl,secondary_hsl,accent_hsl,background_hsl,foreground_hsl,radius,updated_at,mobile_logo_url,favicon_url,contact_phone,contact_phone_secondary,contact_email,contact_address,map_url,emergency_phone,hours_weekdays,hours_saturday,hours_sunday",
+      )
+      .maybeSingle();
     if (data) {
       // Keep asset fields nullable, but never let NULL text columns wipe defaults.
       const clean = Object.fromEntries(
