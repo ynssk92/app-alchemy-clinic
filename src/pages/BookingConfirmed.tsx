@@ -33,7 +33,7 @@ const BookingConfirmed = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { settings } = useAppSettings();
+  const { settings, logoUrl } = useAppSettings();
   const [appt, setAppt] = useState<Appt | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -120,7 +120,7 @@ const BookingConfirmed = () => {
       doc.setFontSize(10);
       doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 84, { align: "right" });
 
-      y = 150;
+      y = headerH + 40;
       doc.setTextColor(20, 20, 20);
       doc.setFont("helvetica", "bold").setFontSize(13);
       doc.text("Details du rendez-vous", M, y);
