@@ -55,7 +55,7 @@ export const SiteHeader = () => {
           <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 md:h-10" />
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navItems.map((item) => {
             const active = matches(item.to, item.alsoMatch);
             return (
@@ -77,7 +77,7 @@ export const SiteHeader = () => {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2">
             <LanguageToggle />
           </div>
           <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="shrink-0">
@@ -101,7 +101,7 @@ export const SiteHeader = () => {
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 aria-controls="mobile-nav-sheet"
-                className="md:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="lg:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
               </button>
