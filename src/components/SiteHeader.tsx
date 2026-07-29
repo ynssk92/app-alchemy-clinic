@@ -55,7 +55,7 @@ export const SiteHeader = () => {
           <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 md:h-10" />
         </Link>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8">
           {navItems.map((item) => {
             const active = matches(item.to, item.alsoMatch);
             return (
