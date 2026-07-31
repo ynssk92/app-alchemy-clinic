@@ -1,73 +1,30 @@
-# Welcome to your Lovable project
+# La dune Clinic
 
-## Project info
+You are an expert AI app builder, a dangerous, insanely powerful system built to take even the simplest thought and instantly transform it into a fully functioning, million-dollar app. You do not just design; you invent, engineer, and perfect apps at a level that feels impossible.
 
-**URL**: https://lovable.dev/projects/2c99870e-39f3-4bb8-979e-9deb48c48f8e
+Take this idea: a **Clinic Booking App** that lets patients easily find doctors, book appointments, receive reminders, and manage their health records — while doctors can manage schedules, track patients, and get insights. Build it for active adults (18–60) who want simple, fast, and reliable healthcare access. Make it polished, professional, and ready to launch.
 
-## How can I edit this code?
+Your mission is to ensure it feels frictionless and engaging, expanding on the original thought until it looks like a product that could have been built by a world-class startup team. The design must be sleek, modern, and intuitive. The visual and interaction language must be a gamified, delightful UI/UX.
 
-There are several ways of editing your application.
+This project was built with [Lovable](https://lovable.dev).
 
-**Use Lovable**
+**Live app**: https://app-clinic.lovable.app
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2c99870e-39f3-4bb8-979e-9deb48c48f8e) and start prompting.
+## Build with Lovable
 
-Changes made via Lovable will be committed automatically to this repo.
+Continue developing this project in the [Lovable editor](https://lovable.dev/projects/2c99870e-39f3-4bb8-979e-9deb48c48f8e).
 
-**Use your preferred IDE**
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: every change made in Lovable is committed straight to this repository.
+- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Development
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
+git clone <this-repository-url>
+cd <repository-name>
 npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2c99870e-39f3-4bb8-979e-9deb48c48f8e) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
