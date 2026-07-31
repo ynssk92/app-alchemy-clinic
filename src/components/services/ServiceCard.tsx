@@ -15,22 +15,26 @@ interface ServiceCardProps {
 }
 
 export const ServiceCard = ({ name, description, features, imageSrc, popular = true }: ServiceCardProps) => (
-  <article className="overflow-hidden rounded-[32px] border border-border bg-card/80 p-5 shadow-large backdrop-blur-xl transition-all duration-[250ms] sm:p-8 lg:p-10">
-    <div className="grid items-stretch gap-8 lg:grid-cols-[55fr_45fr] lg:gap-10">
+  <article className="overflow-hidden rounded-3xl border border-border bg-card/80 p-4 shadow-large backdrop-blur-xl transition-all duration-[250ms] sm:rounded-[32px] sm:p-8 lg:p-10">
+    <div className="grid items-stretch gap-6 sm:gap-8 lg:grid-cols-[55fr_45fr] lg:gap-10">
       <ServiceImage src={imageSrc} alt={name} name={name} />
 
-      <div className="flex flex-col justify-center gap-6">
+      <div className="flex min-w-0 flex-col justify-center gap-5 sm:gap-6">
         {popular && (
-          <span className="inline-flex w-fit items-center gap-2 rounded-full bg-gradient-primary px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-primary-foreground shadow-[0_10px_24px_-14px_hsl(var(--primary)/0.8)]">
-            <Sparkles className="h-3.5 w-3.5" aria-hidden />
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-primary-foreground shadow-[0_10px_24px_-14px_hsl(var(--primary)/0.8)] sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-xs">
+            <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" aria-hidden />
             Le plus demandé
           </span>
         )}
 
-        <div>
-          <h2 className="text-[28px] font-bold leading-[1.15] tracking-tight text-foreground sm:text-[34px]">{name}</h2>
+        <div className="min-w-0">
+          <h2 className="text-[24px] font-bold leading-[1.15] tracking-tight text-foreground sm:text-[30px] lg:text-[34px]">
+            {name}
+          </h2>
           {description && (
-            <p className="mt-3 line-clamp-3 text-[17px] leading-relaxed text-muted-foreground">{description}</p>
+            <p className="mt-2.5 line-clamp-4 text-[15px] leading-relaxed text-muted-foreground sm:mt-3 sm:line-clamp-3 sm:text-[17px]">
+              {description}
+            </p>
           )}
         </div>
 
@@ -38,11 +42,11 @@ export const ServiceCard = ({ name, description, features, imageSrc, popular = t
 
         <ServiceStats />
 
-        <div className="flex flex-col gap-3 sm:flex-row">
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:gap-3">
           <Button
             asChild
             size="lg"
-            className="group h-12 flex-1 rounded-2xl bg-gradient-primary text-base font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_hsl(var(--primary)/0.9)] transition-all duration-[250ms] hover:-translate-y-0.5 hover:shadow-[0_22px_50px_-16px_hsl(var(--primary)/0.95)]"
+            className="group h-12 flex-1 rounded-xl bg-gradient-primary text-[15px] font-semibold text-primary-foreground shadow-[0_16px_40px_-18px_hsl(var(--primary)/0.9)] transition-all duration-[250ms] hover:-translate-y-0.5 hover:shadow-[0_22px_50px_-16px_hsl(var(--primary)/0.95)] sm:rounded-2xl sm:text-base"
           >
             <Link to="/booking">
               <CalendarPlus className="mr-2 h-5 w-5" aria-hidden />
@@ -53,7 +57,7 @@ export const ServiceCard = ({ name, description, features, imageSrc, popular = t
             asChild
             size="lg"
             variant="outline"
-            className="group h-12 flex-1 rounded-2xl border-border text-base font-semibold transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-primary/50 hover:bg-muted/60"
+            className="group h-12 flex-1 rounded-xl border-border text-[15px] font-semibold transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-primary/50 hover:bg-muted/60 sm:rounded-2xl sm:text-base"
           >
             <Link to="/expertise">
               En savoir plus
