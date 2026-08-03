@@ -238,19 +238,42 @@ const Booking = () => {
 
                 <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
                   <Label htmlFor="reason" className="text-sm font-semibold">Motif de la consultation *</Label>
-                  <Textarea
-                    id="reason"
-                    rows={5}
-                    {...methods.register("reason")}
-                    placeholder="Décrivez brièvement votre besoin…"
-                    className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-250 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
+                  <ReasonSelect
+                    value={reason?.id}
+                    invalid={Boolean(methods.formState.errors.reason_id)}
+                    onChange={(r) => {
+                      setReason(r);
+                      methods.setValue("reason_id", r?.id ?? "", { shouldValidate: true });
+                      if (!r?.is_other) methods.setValue("custom_reason", "");
+                    }}
                   />
-                  {methods.formState.errors.reason ? (
+                  {methods.formState.errors.reason_id ? (
                     <p className="mt-1.5 text-xs font-medium text-destructive">
-                      {methods.formState.errors.reason.message}
+                      {methods.formState.errors.reason_id.message}
                     </p>
                   ) : null}
+
+                  {reason?.is_other ? (
+                    <div className="mt-4 animate-fade-in">
+                      <Label htmlFor="custom_reason" className="text-sm font-semibold">
+                        Précisez votre motif *
+                      </Label>
+                      <Textarea
+                        id="custom_reason"
+                        rows={5}
+                        {...methods.register("custom_reason")}
+                        placeholder="Décrivez brièvement votre besoin…"
+                        className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-200 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
+                      />
+                      {methods.formState.errors.custom_reason ? (
+                        <p className="mt-1.5 text-xs font-medium text-destructive">
+                          {methods.formState.errors.custom_reason.message}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
+
               </div>
 
               {/* Center — calendar + slots */}
