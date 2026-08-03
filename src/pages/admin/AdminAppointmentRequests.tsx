@@ -17,7 +17,7 @@ const AdminAppointmentRequests = () => {
 
   const load = () => supabase.from("appointments")
     .select("id, appointment_date, appointment_time, status, reason, created_at, doctors(full_name)")
-    .eq("status", "upcoming")
+    .in("status", ["pending", "upcoming"])
     .order("created_at", { ascending: false })
     .then(({ data }) => setRows((data as any) || []));
 
