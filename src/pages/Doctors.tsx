@@ -132,11 +132,11 @@ const Doctors = () => {
       heading="Find Your Doctor"
       hideHero
     >
-      <section className="relative -mx-4 overflow-hidden px-4 py-16 md:py-24 lg:py-32">
-        {/* soft medical background */}
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-hero opacity-40" />
-        <div className="pointer-events-none absolute -left-24 top-10 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute -right-24 bottom-0 -z-10 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+      <section className="relative -mx-4 overflow-hidden bg-background px-4 py-16 md:py-24 lg:py-32">
+        {/* soft medical background (matched to booking page) */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="pointer-events-none absolute -top-24 left-1/4 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
 
         <div className="mx-auto max-w-[1280px]">
           {/* header */}
