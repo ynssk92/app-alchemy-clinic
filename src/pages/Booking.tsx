@@ -4,6 +4,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CalendarDays, Clock, UserRound } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,6 +17,7 @@ import { DoctorCard, BookingDoctor } from "@/components/booking/DoctorCard";
 import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { TimeSlotGrid } from "@/components/booking/TimeSlotGrid";
 import { BookingSummary } from "@/components/booking/BookingSummary";
+import { GuestDetailsForm } from "@/components/booking/GuestDetailsForm";
 
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
@@ -21,26 +25,56 @@ const timeSlots = [
 ];
 
 const steps = [
-  { id: 1, label: "Praticien" },
-  { id: 2, label: "Date" },
-  { id: 3, label: "Heure" },
+  { id: 1, label: "Coordonnées" },
+  { id: 2, label: "Praticien" },
+  { id: 3, label: "Date & heure" },
   { id: 4, label: "Confirmation" },
 ];
+
+const schema = z.object({
+  first_name: z.string().trim().min(2, "Prénom requis").max(80),
+  last_name: z.string().trim().min(2, "Nom requis").max(80),
+  email: z.string().trim().email("Email invalide").max(255),
+  phone: z.string().trim().min(6, "Téléphone invalide").max(40),
+  dob: z.string().optional().or(z.literal("")),
+  gender: z.enum(["male", "female", "other"]).optional(),
+  reason: z.string().trim().min(3, "Merci d'indiquer le motif").max(1000),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 const Booking = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [doctorId, setDoctorId] = useState(params.get("doctor") || "");
   const [doctors, setDoctors] = useState<BookingDoctor[]>([]);
-  const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const methods = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", reason: "" },
+    mode: "onBlur",
+  });
+
+  // Prefill for signed-in patients
   useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [user, authLoading, navigate]);
+    if (!user) return;
+    methods.setValue("email", user.email ?? "");
+    supabase
+      .from("profiles")
+      .select("full_name, phone")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const parts = String((data as any)?.full_name ?? "").trim().split(" ");
+        if (parts[0]) methods.setValue("first_name", parts[0]);
+        if (parts.length > 1) methods.setValue("last_name", parts.slice(1).join(" "));
+        if ((data as any)?.phone) methods.setValue("phone", (data as any).phone);
+      });
+  }, [user]);
 
   useEffect(() => {
     supabase
@@ -68,54 +102,81 @@ const Booking = () => {
     ? date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })
     : undefined;
 
-  const completed = [
-    doctorId ? 1 : 0,
-    date ? 2 : 0,
-    selectedTime ? 3 : 0,
-  ].filter(Boolean) as number[];
-  const currentStep = !doctorId ? 1 : !date ? 2 : !selectedTime ? 3 : 4;
-  const ready = Boolean(doctorId && date && selectedTime);
+  const values = methods.watch();
+  const detailsFilled = Boolean(values.first_name && values.last_name && values.email && values.phone);
+  const completed = [detailsFilled ? 1 : 0, doctorId ? 2 : 0, date && selectedTime ? 3 : 0].filter(Boolean) as number[];
+  const currentStep = !detailsFilled ? 1 : !doctorId ? 2 : !(date && selectedTime) ? 3 : 4;
+  const ready = Boolean(detailsFilled && doctorId && date && selectedTime);
 
   const handleSaveForLater = () => {
     localStorage.setItem(
       "booking_draft",
-      JSON.stringify({ doctorId, date: date?.toISOString() ?? null, selectedTime, reason })
+      JSON.stringify({ doctorId, date: date?.toISOString() ?? null, selectedTime, ...methods.getValues() })
     );
     toast.success("Sélection enregistrée. Vous pourrez la reprendre plus tard.");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-    if (!date || !selectedTime || !doctorId) {
-      toast.error("Please select a doctor, date, and time");
+  const onSubmit = async (v: FormValues) => {
+    if (!doctorId || !date || !selectedTime) {
+      toast.error("Choisissez un praticien, une date et un horaire");
       return;
     }
     setBusy(true);
-    const { data, error } = await supabase
-      .from("appointments")
-      .insert({
-        patient_id: user.id,
+    const localDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+    const { data, error } = await supabase.functions.invoke("guest-booking", {
+      body: {
+        first_name: v.first_name,
+        last_name: v.last_name,
+        email: v.email,
+        phone: v.phone,
+        dob: v.dob || null,
+        gender: v.gender ?? null,
         doctor_id: doctorId,
-        appointment_date: date.toISOString().slice(0, 10),
+        appointment_date: localDate,
         appointment_time: selectedTime,
-        reason,
-        status: "upcoming",
-      })
-      .select("id")
-      .single();
+        reason: v.reason,
+        redirect_to: `${window.location.origin}/reset-password`,
+      },
+    });
     setBusy(false);
-    if (error) return toast.error(error.message);
+
+    const payload = data as any;
+    if (error || payload?.error) {
+      const message =
+        payload?.error ??
+        (error && "context" in (error as any)
+          ? await (error as any).context?.text?.().catch(() => null)
+          : null);
+      toast.error(message || "La réservation a échoué. Merci de réessayer.");
+      return;
+    }
+
     localStorage.removeItem("booking_draft");
-    toast.success("Appointment booked successfully!");
-    navigate(data?.id ? `/booking/confirmed/${data.id}` : "/patient-dashboard");
+    toast.success("Rendez-vous enregistré !");
+    navigate(`/booking/confirmed/${payload.appointment_id}`, {
+      state: {
+        guest: {
+          reference: payload.reference,
+          isNewAccount: payload.is_new_account,
+          emailSent: payload.email_sent,
+          email: v.email,
+          doctorName: payload.doctor_name ?? selectedDoctor?.full_name,
+          specialty: selectedDoctor?.specialty ?? null,
+          clinic: selectedDoctor?.clinic ?? null,
+          appointment_date: localDate,
+          appointment_time: selectedTime,
+          reason: v.reason,
+        },
+      },
+    });
   };
 
   return (
     <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
-        title="Book an Appointment — HealthBook"
-        description="Choose a doctor, pick a date and time, and confirm your appointment in seconds."
+        title="Prendre rendez-vous — La Dune"
+        description="Réservez votre consultation en ligne sans créer de compte : choisissez un praticien, une date et un horaire."
         path="/booking"
       />
       <SiteHeader />
@@ -129,14 +190,15 @@ const Booking = () => {
           <header className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
               <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
-              Rendez-vous en ligne
+              Rendez-vous en ligne — sans compte
             </span>
             <h1 className="mt-6 text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl">
               Réservez votre{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">visite</span>
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              Choisissez votre praticien, la date et l'heure qui vous conviennent — en quelques clics.
+              Renseignez vos coordonnées, choisissez votre praticien et votre créneau. Votre espace patient est créé
+              automatiquement.
             </p>
           </header>
 
@@ -144,87 +206,94 @@ const Booking = () => {
             <BookingStepper steps={steps} current={currentStep} completed={completed} />
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-10 grid gap-6 lg:grid-cols-10">
-            {/* Left — doctor */}
-            <div className="space-y-6 lg:col-span-3">
-              <div className="rounded-3xl border border-border bg-card p-8 shadow-soft">
-                <Label htmlFor="doctor" className="flex items-center gap-2 text-sm font-semibold">
-                  <UserRound className="h-4 w-4 text-primary" aria-hidden="true" />
-                  Praticien
-                </Label>
-                <Select value={doctorId} onValueChange={setDoctorId}>
-                  <SelectTrigger id="doctor" className="mt-2 h-14 rounded-2xl border-transparent bg-muted/70 text-base focus:ring-4 focus:ring-primary/15">
-                    <SelectValue placeholder="Choisir un praticien" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {doctors.map((d) => (
-                      <SelectItem key={d.id} value={d.id}>{d.full_name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-10 grid gap-6 lg:grid-cols-10">
+              {/* Left — patient + doctor */}
+              <div className="space-y-6 lg:col-span-4">
+                <GuestDetailsForm />
+
+                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+                  <Label htmlFor="doctor" className="flex items-center gap-2 text-sm font-semibold">
+                    <UserRound className="h-4 w-4 text-primary" aria-hidden="true" />
+                    Praticien
+                  </Label>
+                  <Select value={doctorId} onValueChange={setDoctorId}>
+                    <SelectTrigger id="doctor" className="mt-2 h-14 rounded-2xl border-transparent bg-muted/70 text-base focus:ring-4 focus:ring-primary/15">
+                      <SelectValue placeholder="Choisir un praticien" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {doctors.map((d) => (
+                        <SelectItem key={d.id} value={d.id}>{d.full_name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <DoctorCard doctor={selectedDoctor} nextAvailable={selectedDoctor ? "Aujourd'hui" : undefined} />
+
+                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+                  <Label htmlFor="reason" className="text-sm font-semibold">Motif de la consultation *</Label>
+                  <Textarea
+                    id="reason"
+                    rows={5}
+                    {...methods.register("reason")}
+                    placeholder="Décrivez brièvement votre besoin…"
+                    className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-250 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
+                  />
+                  {methods.formState.errors.reason ? (
+                    <p className="mt-1.5 text-xs font-medium text-destructive">
+                      {methods.formState.errors.reason.message}
+                    </p>
+                  ) : null}
+                </div>
               </div>
 
-              <DoctorCard doctor={selectedDoctor} nextAvailable={selectedDoctor ? "Aujourd'hui" : undefined} />
+              {/* Center — calendar + slots */}
+              <div className="space-y-6 lg:col-span-3">
+                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+                  <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                    <CalendarDays className="h-5 w-5 text-primary" aria-hidden="true" />
+                    Choisir une date
+                  </h2>
+                  <div className="mt-5">
+                    <BookingCalendar
+                      date={date}
+                      onSelect={setDate}
+                      disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                    />
+                  </div>
+                </div>
 
-              <div className="rounded-3xl border border-border bg-card p-8 shadow-soft">
-                <Label htmlFor="reason" className="text-sm font-semibold">Motif de la consultation</Label>
-                <Textarea
-                  id="reason"
-                  required
-                  rows={5}
-                  value={reason}
-                  onChange={(e) => setReason(e.target.value)}
-                  placeholder="Décrivez brièvement votre besoin…"
-                  className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-250 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
-                />
+                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+                  <div className="flex items-center justify-between">
+                    <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
+                      <Clock className="h-5 w-5 text-primary" aria-hidden="true" />
+                      Choisir un horaire
+                    </h2>
+                    <span className="text-xs font-medium text-muted-foreground">{timeSlots.length} créneaux</span>
+                  </div>
+                  <div className="mt-5">
+                    <TimeSlotGrid slots={timeSlots} selected={selectedTime} onSelect={setSelectedTime} />
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Center — calendar + slots */}
-            <div className="space-y-6 lg:col-span-4">
-              <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-                <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                  <CalendarDays className="h-5 w-5 text-primary" aria-hidden="true" />
-                  Choisir une date
-                </h2>
-                <div className="mt-5">
-                  <BookingCalendar
-                    date={date}
-                    onSelect={setDate}
-                    disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+              {/* Right — summary */}
+              <div className="lg:col-span-3">
+                <div className="lg:sticky lg:top-24">
+                  <BookingSummary
+                    doctorName={selectedDoctor?.full_name}
+                    dateLabel={dateLabel}
+                    timeLabel={selectedTime || undefined}
+                    clinic={selectedDoctor?.clinic || "La Dune Clinique Dentaire"}
+                    ready={ready}
+                    busy={busy}
+                    onSaveForLater={handleSaveForLater}
                   />
                 </div>
               </div>
-
-              <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-                <div className="flex items-center justify-between">
-                  <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
-                    <Clock className="h-5 w-5 text-primary" aria-hidden="true" />
-                    Choisir un horaire
-                  </h2>
-                  <span className="text-xs font-medium text-muted-foreground">{timeSlots.length} créneaux</span>
-                </div>
-                <div className="mt-5">
-                  <TimeSlotGrid slots={timeSlots} selected={selectedTime} onSelect={setSelectedTime} />
-                </div>
-              </div>
-            </div>
-
-            {/* Right — summary */}
-            <div className="lg:col-span-3">
-              <div className="lg:sticky lg:top-24">
-                <BookingSummary
-                  doctorName={selectedDoctor?.full_name}
-                  dateLabel={dateLabel}
-                  timeLabel={selectedTime || undefined}
-                  clinic={selectedDoctor?.clinic || "La Dune Clinique Dentaire"}
-                  ready={ready}
-                  busy={busy}
-                  onSaveForLater={handleSaveForLater}
-                />
-              </div>
-            </div>
-          </form>
+            </form>
+          </FormProvider>
         </div>
       </main>
     </div>
