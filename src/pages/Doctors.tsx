@@ -171,11 +171,16 @@ const Doctors = () => {
               />
             </div>
 
-            {!loading && filtered.length > 0 && (
-              <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">
-                {shown.length} / {filtered.length} praticiens affichés
-              </p>
-            )}
+            <p className="mt-4 flex items-center justify-center gap-2 text-sm text-muted-foreground" aria-live="polite">
+              {searching || loading ? (
+                <>
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+                  Recherche en cours…
+                </>
+              ) : (
+                `${shown.length} / ${total} praticiens affichés`
+              )}
+            </p>
           </div>
 
           {loading ? (
@@ -184,11 +189,14 @@ const Doctors = () => {
                 <DoctorCardSkeleton key={i} />
               ))}
             </div>
-          ) : filtered.length === 0 ? (
+          ) : total === 0 ? (
             <p className="py-12 text-center text-muted-foreground">
-              Aucun praticien à afficher pour le moment.
+              {debouncedQuery.trim()
+                ? `Aucun praticien ne correspond à « ${debouncedQuery.trim()} ».`
+                : "Aucun praticien à afficher pour le moment."}
             </p>
           ) : (
+
             <>
               <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
                 {shown.map((doctor) => (
