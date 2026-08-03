@@ -15,10 +15,10 @@ const Contact = () => {
       heading="Contact"
       hideHero
     >
-      <section className="relative -mx-4 overflow-hidden px-4 py-16 md:py-[120px]">
+      <section className="relative -mx-4 -mt-8 overflow-hidden px-4 py-10 sm:py-16 md:-mt-10 lg:py-24">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
-        <div className="pointer-events-none absolute -top-24 left-1/4 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
+        <div className="pointer-events-none absolute -top-16 left-0 -z-10 h-48 w-48 rounded-full bg-primary/10 blur-2xl sm:-top-20 sm:left-1/4 sm:h-64 sm:w-64 sm:blur-3xl lg:-top-24 lg:h-72 lg:w-72" />
+        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-52 w-52 rounded-full bg-secondary/10 blur-2xl sm:h-72 sm:w-72 sm:blur-3xl lg:h-80 lg:w-80" />
 
         <div className="relative mx-auto w-full max-w-[1280px]">
           <header className="max-w-3xl">
