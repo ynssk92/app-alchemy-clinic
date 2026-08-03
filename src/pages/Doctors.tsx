@@ -238,7 +238,7 @@ const Doctors = () => {
                     )}
                   </Button>
                 ) : (
-                  filtered.length > PAGE_SIZE && (
+                  total > PAGE_SIZE && (
                     <p className="text-sm text-muted-foreground">
                       Vous avez vu tous nos praticiens.
                     </p>
