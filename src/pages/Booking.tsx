@@ -207,7 +207,7 @@ const Booking = () => {
           </div>
 
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-10">
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-12">
 
               {/* Left — patient + doctor */}
               <div className="space-y-6 lg:col-span-4">
@@ -250,8 +250,8 @@ const Booking = () => {
               </div>
 
               {/* Center — calendar + slots */}
-              <div className="space-y-6 lg:col-span-3">
-                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
+              <div className="space-y-6 lg:col-span-5">
+                <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
                   <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                     <CalendarDays className="h-5 w-5 text-primary" aria-hidden="true" />
                     Choisir une date
@@ -261,8 +261,15 @@ const Booking = () => {
                       date={date}
                       onSelect={setDate}
                       disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                      getAvailability={(d) => {
+                        const day = d.getDay();
+                        if (day === 0) return "none";
+                        if (day === 6) return "few";
+                        return "many";
+                      }}
                     />
                   </div>
+
                 </div>
 
                 <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
