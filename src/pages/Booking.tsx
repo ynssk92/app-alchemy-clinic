@@ -18,6 +18,8 @@ import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { TimeSlotGrid } from "@/components/booking/TimeSlotGrid";
 import { BookingSummary } from "@/components/booking/BookingSummary";
 import { GuestDetailsForm } from "@/components/booking/GuestDetailsForm";
+import { ReasonSelect, type ConsultationReason } from "@/components/booking/ReasonSelect";
+
 
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
