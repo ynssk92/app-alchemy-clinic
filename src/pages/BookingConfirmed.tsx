@@ -151,7 +151,7 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "normal").setFontSize(12);
       doc.text("Confirmation de rendez-vous", textX, 84);
       doc.setFontSize(10);
-      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
+      doc.text(`Reference : ${appt.reference ?? "#" + appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
 
       y = headerH + 40;
       doc.setTextColor(20, 20, 20);
@@ -290,7 +290,7 @@ const BookingConfirmed = () => {
                       {appt.reason ? <Row icon={FileText} label="Motif" value={appt.reason} /> : null}
                       <div className="flex items-center justify-between rounded-2xl bg-muted/50 px-4 py-3 text-sm">
                         <span className="text-muted-foreground">Référence</span>
-                        <span className="font-mono font-medium">#{appt.id.slice(0, 8).toUpperCase()}</span>
+                        <span className="font-mono font-medium">{appt.reference ?? `#${appt.id.slice(0, 8).toUpperCase()}`}</span>
                       </div>
                     </div>
                   ) : (

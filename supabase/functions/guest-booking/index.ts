@@ -99,6 +99,7 @@ Deno.serve(async (req) => {
     // 3. Send the set-password / access email (best effort)
     let emailSent = false;
     try {
+      if (!isNewAccount) throw new Error("skip");
       const anon = createClient(SUPABASE_URL, ANON_KEY, {
         auth: { autoRefreshToken: false, persistSession: false },
       });
