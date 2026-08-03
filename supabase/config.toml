@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.translate-batch]
 verify_jwt = false
+
+[functions.guest-booking]
+verify_jwt = false

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
   CalendarCheck, CalendarDays, Clock, UserRound, MapPin, Phone, Mail,
-  CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download,
+  CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download, KeyRound, Home,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,7 +19,21 @@ type Appt = {
   appointment_time: string;
   reason: string | null;
   status: string;
+  reference?: string | null;
   doctors: { full_name: string; avatar_url: string | null; specialties: { name: string } | null; clinics: { name: string; address: string | null } | null } | null;
+};
+
+type GuestState = {
+  reference: string;
+  isNewAccount: boolean;
+  emailSent: boolean;
+  email: string;
+  doctorName?: string;
+  specialty?: string | null;
+  clinic?: string | null;
+  appointment_date: string;
+  appointment_time: string;
+  reason?: string;
 };
 
 const nextSteps = [
@@ -31,35 +45,54 @@ const nextSteps = [
 
 const BookingConfirmed = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const location = useLocation();
+  const guest = (location.state as { guest?: GuestState } | null)?.guest ?? null;
   const { user, loading: authLoading } = useAuth();
   const { settings, logoUrl } = useAppSettings();
-  const [appt, setAppt] = useState<Appt | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [appt, setAppt] = useState<Appt | null>(
+    guest
+      ? {
+          id: id ?? "",
+          appointment_date: guest.appointment_date,
+          appointment_time: guest.appointment_time,
+          reason: guest.reason ?? null,
+          status: "pending",
+          reference: guest.reference,
+          doctors: {
+            full_name: guest.doctorName ?? "—",
+            avatar_url: null,
+            specialties: guest.specialty ? { name: guest.specialty } : null,
+            clinics: guest.clinic ? { name: guest.clinic, address: null } : null,
+          },
+        }
+      : null,
+  );
+  const [loading, setLoading] = useState(!guest);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [user, authLoading, navigate]);
-
-  useEffect(() => {
-    if (!id || !user) return;
+    if (guest || !id || authLoading) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, reason, status, doctors(full_name, avatar_url, specialties(name), clinics(name, address))")
+      .select("id, appointment_date, appointment_time, reason, status, reference, doctors(full_name, avatar_url, specialties(name), clinics(name, address))")
       .eq("id", id)
       .maybeSingle()
       .then(({ data }) => {
         setAppt((data as any) ?? null);
         setLoading(false);
       });
-  }, [id, user]);
+  }, [id, user, authLoading, guest]);
 
   const dateLabel = appt
     ? new Date(appt.appointment_date + "T00:00:00").toLocaleDateString("fr-FR", {
         weekday: "long", day: "numeric", month: "long", year: "numeric",
       })
     : "";
+
 
   const address = appt?.doctors?.clinics?.address || settings.contact_address;
 
@@ -118,7 +151,7 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "normal").setFontSize(12);
       doc.text("Confirmation de rendez-vous", textX, 84);
       doc.setFontSize(10);
-      doc.text(`Reference : #${appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
+      doc.text(`Reference : ${appt.reference ?? "#" + appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
 
       y = headerH + 40;
       doc.setTextColor(20, 20, 20);
@@ -216,14 +249,31 @@ const BookingConfirmed = () => {
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <CheckCircle2 className="h-9 w-9" />
                 </div>
-                <Badge variant="secondary" className="mb-4">Réservation confirmée</Badge>
+                <Badge variant="secondary" className="mb-4">Demande enregistrée</Badge>
                 <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  Votre rendez-vous est <span className="bg-gradient-primary bg-clip-text text-transparent">confirmé</span>
+                  🎉 Rendez-vous <span className="bg-gradient-primary bg-clip-text text-transparent">confirmé</span>
                 </h1>
                 <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-                  Merci ! Voici le récapitulatif de votre visite et les prochaines étapes.
+                  {guest?.isNewAccount
+                    ? "Votre demande a bien été reçue et votre dossier patient a été créé. Consultez votre email pour définir votre mot de passe et accéder à votre espace."
+                    : "Merci ! Voici le récapitulatif de votre visite et les prochaines étapes."}
                 </p>
+                {guest?.isNewAccount ? (
+                  <div className="mx-auto mt-6 flex max-w-xl flex-col justify-center gap-3 sm:flex-row">
+                    <Button asChild className="h-12 rounded-xl px-6">
+                      <Link to="/auth">
+                        <KeyRound className="mr-2 h-4 w-4" /> Compléter mon compte
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="h-12 rounded-xl px-6">
+                      <Link to="/">
+                        <Home className="mr-2 h-4 w-4" /> Retour à l'accueil
+                      </Link>
+                    </Button>
+                  </div>
+                ) : null}
               </div>
+
 
               <div className="mt-10 grid gap-6 lg:grid-cols-5">
                 <Card className="rounded-3xl p-6 lg:col-span-3">
@@ -240,7 +290,7 @@ const BookingConfirmed = () => {
                       {appt.reason ? <Row icon={FileText} label="Motif" value={appt.reason} /> : null}
                       <div className="flex items-center justify-between rounded-2xl bg-muted/50 px-4 py-3 text-sm">
                         <span className="text-muted-foreground">Référence</span>
-                        <span className="font-mono font-medium">#{appt.id.slice(0, 8).toUpperCase()}</span>
+                        <span className="font-mono font-medium">{appt.reference ?? `#${appt.id.slice(0, 8).toUpperCase()}`}</span>
                       </div>
                     </div>
                   ) : (
