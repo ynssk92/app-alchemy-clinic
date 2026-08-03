@@ -182,32 +182,33 @@ const Booking = () => {
       <SiteHeader />
 
       <main className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-primary/5 via-background to-background" />
-        <div className="pointer-events-none absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 right-0 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="pointer-events-none absolute -top-16 left-0 -z-10 h-48 w-48 rounded-full bg-primary/10 blur-2xl sm:-top-20 sm:left-1/4 sm:h-64 sm:w-64 sm:blur-3xl lg:-top-24 lg:h-72 lg:w-72" />
+        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-52 w-52 rounded-full bg-secondary/10 blur-2xl sm:h-72 sm:w-72 sm:blur-3xl lg:h-80 lg:w-80" />
 
-        <div className="relative mx-auto w-full max-w-[1280px] px-4 py-14 md:py-20">
+        <div className="relative mx-auto w-full max-w-[1280px] px-4 py-10 sm:py-14 lg:py-20">
           <header className="max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
-              <CalendarDays className="h-3.5 w-3.5" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-primary sm:px-4 sm:text-xs">
+              <CalendarDays className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               Rendez-vous en ligne — sans compte
             </span>
-            <h1 className="mt-6 text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl">
+            <h1 className="mt-4 text-[1.9rem] font-bold leading-[1.12] tracking-tight text-foreground xs:text-4xl sm:mt-6 sm:text-5xl lg:text-[3.25rem]">
               Réservez votre{" "}
               <span className="bg-gradient-primary bg-clip-text text-transparent">visite</span>
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground">
+            <p className="mt-3 max-w-prose text-base leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg">
               Renseignez vos coordonnées, choisissez votre praticien et votre créneau. Votre espace patient est créé
               automatiquement.
             </p>
           </header>
 
-          <div className="mt-10">
+          <div className="mt-8 sm:mt-10">
             <BookingStepper steps={steps} current={currentStep} completed={completed} />
           </div>
 
           <FormProvider {...methods}>
-            <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-10 grid gap-6 lg:grid-cols-10">
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="mt-8 grid gap-6 sm:mt-10 lg:grid-cols-10">
+
               {/* Left — patient + doctor */}
               <div className="space-y-6 lg:col-span-4">
                 <GuestDetailsForm />
