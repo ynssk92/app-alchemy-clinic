@@ -180,7 +180,7 @@ const Booking = () => {
           clinic: selectedDoctor?.clinic ?? null,
           appointment_date: localDate,
           appointment_time: selectedTime,
-          reason: v.reason,
+          reason: reasonText,
         },
       },
     });
