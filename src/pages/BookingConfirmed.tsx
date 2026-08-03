@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
   CalendarCheck, CalendarDays, Clock, UserRound, MapPin, Phone, Mail,
-  CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download,
+  CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download, KeyRound, Home,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -19,7 +19,21 @@ type Appt = {
   appointment_time: string;
   reason: string | null;
   status: string;
+  reference?: string | null;
   doctors: { full_name: string; avatar_url: string | null; specialties: { name: string } | null; clinics: { name: string; address: string | null } | null } | null;
+};
+
+type GuestState = {
+  reference: string;
+  isNewAccount: boolean;
+  emailSent: boolean;
+  email: string;
+  doctorName?: string;
+  specialty?: string | null;
+  clinic?: string | null;
+  appointment_date: string;
+  appointment_time: string;
+  reason?: string;
 };
 
 const nextSteps = [
@@ -31,35 +45,54 @@ const nextSteps = [
 
 const BookingConfirmed = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const location = useLocation();
+  const guest = (location.state as { guest?: GuestState } | null)?.guest ?? null;
   const { user, loading: authLoading } = useAuth();
   const { settings, logoUrl } = useAppSettings();
-  const [appt, setAppt] = useState<Appt | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [appt, setAppt] = useState<Appt | null>(
+    guest
+      ? {
+          id: id ?? "",
+          appointment_date: guest.appointment_date,
+          appointment_time: guest.appointment_time,
+          reason: guest.reason ?? null,
+          status: "pending",
+          reference: guest.reference,
+          doctors: {
+            full_name: guest.doctorName ?? "—",
+            avatar_url: null,
+            specialties: guest.specialty ? { name: guest.specialty } : null,
+            clinics: guest.clinic ? { name: guest.clinic, address: null } : null,
+          },
+        }
+      : null,
+  );
+  const [loading, setLoading] = useState(!guest);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !user) navigate("/auth");
-  }, [user, authLoading, navigate]);
-
-  useEffect(() => {
-    if (!id || !user) return;
+    if (guest || !id || authLoading) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, reason, status, doctors(full_name, avatar_url, specialties(name), clinics(name, address))")
+      .select("id, appointment_date, appointment_time, reason, status, reference, doctors(full_name, avatar_url, specialties(name), clinics(name, address))")
       .eq("id", id)
       .maybeSingle()
       .then(({ data }) => {
         setAppt((data as any) ?? null);
         setLoading(false);
       });
-  }, [id, user]);
+  }, [id, user, authLoading, guest]);
 
   const dateLabel = appt
     ? new Date(appt.appointment_date + "T00:00:00").toLocaleDateString("fr-FR", {
         weekday: "long", day: "numeric", month: "long", year: "numeric",
       })
     : "";
+
 
   const address = appt?.doctors?.clinics?.address || settings.contact_address;
 
