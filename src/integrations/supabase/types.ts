@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity: string | null
+          entity_id: string | null
+          id: string
+          meta: Json
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          meta?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity?: string | null
+          entity_id?: string | null
+          id?: string
+          meta?: Json
+        }
+        Relationships: []
+      }
       admin_invites: {
         Row: {
           claimed_at: string | null
@@ -116,6 +146,41 @@ export type Database = {
         }
         Relationships: []
       }
+      appointment_history: {
+        Row: {
+          appointment_id: string
+          changed_by: string | null
+          created_at: string
+          id: string
+          note: string | null
+          status: string
+        }
+        Insert: {
+          appointment_id: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          status: string
+        }
+        Update: {
+          appointment_id?: string
+          changed_by?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointment_history_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       appointments: {
         Row: {
           appointment_date: string
@@ -125,6 +190,8 @@ export type Database = {
           id: string
           patient_id: string
           reason: string | null
+          reference: string | null
+          source: string
           status: string
           updated_at: string
         }
@@ -136,6 +203,8 @@ export type Database = {
           id?: string
           patient_id: string
           reason?: string | null
+          reference?: string | null
+          source?: string
           status?: string
           updated_at?: string
         }
@@ -147,6 +216,8 @@ export type Database = {
           id?: string
           patient_id?: string
           reason?: string | null
+          reference?: string | null
+          source?: string
           status?: string
           updated_at?: string
         }
@@ -643,6 +714,50 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          appointment_id: string | null
+          audience: string
+          body: string | null
+          created_at: string
+          id: string
+          read: boolean
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          appointment_id?: string | null
+          audience?: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title: string
+          type?: string
+          user_id?: string | null
+        }
+        Update: {
+          appointment_id?: string | null
+          audience?: string
+          body?: string | null
+          created_at?: string
+          id?: string
+          read?: boolean
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_blocks: {
         Row: {
           body: string | null
@@ -1115,6 +1230,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_guest_booking: {
+        Args: {
+          _date: string
+          _dob: string
+          _doctor_id: string
+          _email: string
+          _first_name: string
+          _gender: string
+          _last_name: string
+          _phone: string
+          _reason: string
+          _time: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       has_permission: {
         Args: { _action: string; _module: string; _user_id: string }
         Returns: boolean
