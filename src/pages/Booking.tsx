@@ -261,8 +261,15 @@ const Booking = () => {
                       date={date}
                       onSelect={setDate}
                       disabled={(d) => d < new Date(new Date().setHours(0, 0, 0, 0))}
+                      getAvailability={(d) => {
+                        const day = d.getDay();
+                        if (day === 0) return "none";
+                        if (day === 6) return "few";
+                        return "many";
+                      }}
                     />
                   </div>
+
                 </div>
 
                 <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
