@@ -1,11 +1,12 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Stethoscope, Loader2 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageShell } from "@/components/PageShell";
 import { DoctorCard, type DoctorCardData } from "@/components/DoctorCard";
 import { DoctorCardSkeleton } from "@/components/DoctorCardSkeleton";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 
 type Doctor = DoctorCardData & {
   rating: number | null;
@@ -14,52 +15,96 @@ type Doctor = DoctorCardData & {
 };
 
 const PAGE_SIZE = 6;
+const SELECT =
+  "id, full_name, bio, avatar_url, experience_years, rating, is_available, specialties(name), clinics(name)";
+
+/** Keeps supabase-js from parsing the select string at the type level. */
+const sel = (s: string): string => s;
+
+/** Strip characters that would break PostgREST filter syntax. */
+const sanitize = (q: string) => q.trim().replace(/[,()%*\\]/g, " ").replace(/\s+/g, " ").slice(0, 80);
 
 const Doctors = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(searchQuery, 350);
   const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [visible, setVisible] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const requestId = useRef(0);
 
-  useEffect(() => {
-    supabase
-      .from("doctors")
-      .select("id, full_name, bio, avatar_url, experience_years, rating, is_available, specialties(name), clinics(name)")
+  const fetchPage = useCallback(async (rawQuery: string, offset: number) => {
+    const q = sanitize(rawQuery);
+    let specialtyIds: string[] = [];
+
+    if (q) {
+      const { data: specs } = await supabase
+        .from("specialties")
+        .select(sel("id"))
+        .ilike("name", `%${q}%`)
+        .returns<{ id: string }[]>();
+      specialtyIds = (specs || []).map((s) => s.id);
+    }
+
+    let query = supabase.from("doctors").select(sel(SELECT), { count: "exact" });
+
+    if (q) {
+      const ors = [`full_name.ilike.%${q}%`, `bio.ilike.%${q}%`];
+      if (specialtyIds.length) ors.push(`specialty_id.in.(${specialtyIds.join(",")})`);
+      query = query.or(ors.join(","));
+    }
+
+    const { data, count, error } = await query
+      .order("is_available", { ascending: false })
       .order("created_at", { ascending: true })
-      .then(({ data }) => {
-        setDoctors((data as any) || []);
-        setLoading(false);
-      });
+      .range(offset, offset + PAGE_SIZE - 1)
+      .returns<Doctor[]>();
+
+    if (error) throw error;
+    return { rows: data || [], count: count ?? 0 };
   }, []);
 
-  const filtered = useMemo(() => {
-    const q = searchQuery.trim().toLowerCase();
-    if (!q) return doctors;
-    return doctors.filter(
-      (d) =>
-        d.full_name.toLowerCase().includes(q) ||
-        d.specialties?.name.toLowerCase().includes(q)
-    );
-  }, [doctors, searchQuery]);
-
-  // Reset pagination whenever the search changes
+  // Server-side search — refetch page 1 whenever the debounced query changes
   useEffect(() => {
-    setVisible(PAGE_SIZE);
-  }, [searchQuery]);
+    const id = ++requestId.current;
+    setLoading(true);
+    fetchPage(debouncedQuery, 0)
+      .then(({ rows, count }) => {
+        if (requestId.current !== id) return;
+        setDoctors(rows);
+        setTotal(count);
+      })
+      .catch(() => {
+        if (requestId.current !== id) return;
+        setDoctors([]);
+        setTotal(0);
+      })
+      .finally(() => {
+        if (requestId.current === id) setLoading(false);
+      });
+  }, [debouncedQuery, fetchPage]);
 
-  const hasMore = visible < filtered.length;
+  const hasMore = doctors.length < total;
 
   const loadMore = useCallback(() => {
-    if (!hasMore || loadingMore) return;
+    if (!hasMore || loadingMore || loading) return;
+    const id = requestId.current;
     setLoadingMore(true);
-    // brief tick so skeleton placeholders paint before the next batch
-    window.setTimeout(() => {
-      setVisible((v) => v + PAGE_SIZE);
-      setLoadingMore(false);
-    }, 250);
-  }, [hasMore, loadingMore]);
+    fetchPage(debouncedQuery, doctors.length)
+      .then(({ rows, count }) => {
+        if (requestId.current !== id) return;
+        setDoctors((prev) => {
+          const seen = new Set(prev.map((d) => d.id));
+          return [...prev, ...rows.filter((r) => !seen.has(r.id))];
+        });
+        setTotal(count);
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (requestId.current === id) setLoadingMore(false);
+      });
+  }, [hasMore, loadingMore, loading, fetchPage, debouncedQuery, doctors.length]);
 
   // Infinite scroll
   useEffect(() => {
@@ -75,7 +120,9 @@ const Doctors = () => {
     return () => io.disconnect();
   }, [hasMore, loadMore]);
 
-  const shown = filtered.slice(0, visible);
+  const searching = searchQuery !== debouncedQuery;
+  const shown = doctors;
+
 
   return (
     <PageShell
