@@ -1,9 +1,11 @@
 import { Input } from "@/components/ui/input";
-import { Search, Stethoscope } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Search, Stethoscope, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageShell } from "@/components/PageShell";
 import { DoctorCard, type DoctorCardData } from "@/components/DoctorCard";
+import { DoctorCardSkeleton } from "@/components/DoctorCardSkeleton";
 
 type Doctor = DoctorCardData & {
   rating: number | null;
@@ -11,10 +13,15 @@ type Doctor = DoctorCardData & {
   clinics: { name: string } | null;
 };
 
+const PAGE_SIZE = 6;
+
 const Doctors = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visible, setVisible] = useState(PAGE_SIZE);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     supabase
@@ -27,11 +34,48 @@ const Doctors = () => {
       });
   }, []);
 
-  const filtered = doctors.filter(
-    (d) =>
-      d.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.specialties?.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return doctors;
+    return doctors.filter(
+      (d) =>
+        d.full_name.toLowerCase().includes(q) ||
+        d.specialties?.name.toLowerCase().includes(q)
+    );
+  }, [doctors, searchQuery]);
+
+  // Reset pagination whenever the search changes
+  useEffect(() => {
+    setVisible(PAGE_SIZE);
+  }, [searchQuery]);
+
+  const hasMore = visible < filtered.length;
+
+  const loadMore = useCallback(() => {
+    if (!hasMore || loadingMore) return;
+    setLoadingMore(true);
+    // brief tick so skeleton placeholders paint before the next batch
+    window.setTimeout(() => {
+      setVisible((v) => v + PAGE_SIZE);
+      setLoadingMore(false);
+    }, 250);
+  }, [hasMore, loadingMore]);
+
+  // Infinite scroll
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasMore) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) loadMore();
+      },
+      { rootMargin: "300px 0px" }
+    );
+    io.observe(node);
+    return () => io.disconnect();
+  }, [hasMore, loadMore]);
+
+  const shown = filtered.slice(0, visible);
 
   return (
     <PageShell
@@ -79,12 +123,18 @@ const Doctors = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
+
+            {!loading && filtered.length > 0 && (
+              <p className="mt-4 text-sm text-muted-foreground" aria-live="polite">
+                {shown.length} / {filtered.length} praticiens affichés
+              </p>
+            )}
           </div>
 
           {loading ? (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-[420px] animate-pulse rounded-3xl border border-border bg-muted/40" />
+              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                <DoctorCardSkeleton key={i} />
               ))}
             </div>
           ) : filtered.length === 0 ? (
@@ -92,21 +142,55 @@ const Doctors = () => {
               Aucun praticien à afficher pour le moment.
             </p>
           ) : (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((doctor) => (
-                <div
-                  key={doctor.id}
-                  className={doctor.is_available ? "" : "relative opacity-60 grayscale"}
-                >
-                  {!doctor.is_available && (
-                    <span className="absolute right-6 top-6 z-10 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
-                      Indisponible
-                    </span>
-                  )}
-                  <DoctorCard doctor={doctor} />
-                </div>
-              ))}
-            </div>
+            <>
+              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+                {shown.map((doctor) => (
+                  <div
+                    key={doctor.id}
+                    className={doctor.is_available ? "" : "relative opacity-60 grayscale"}
+                  >
+                    {!doctor.is_available && (
+                      <span className="absolute right-6 top-6 z-10 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+                        Indisponible
+                      </span>
+                    )}
+                    <DoctorCard doctor={doctor} />
+                  </div>
+                ))}
+
+                {loadingMore &&
+                  Array.from({ length: Math.min(PAGE_SIZE, filtered.length - visible) }).map((_, i) => (
+                    <DoctorCardSkeleton key={`more-${i}`} />
+                  ))}
+              </div>
+
+              {/* sentinel + fallback button */}
+              <div ref={sentinelRef} className="mt-12 flex justify-center">
+                {hasMore ? (
+                  <Button
+                    variant="outline"
+                    className="rounded-xl px-8 font-semibold"
+                    onClick={loadMore}
+                    disabled={loadingMore}
+                  >
+                    {loadingMore ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Chargement…
+                      </>
+                    ) : (
+                      "Afficher plus de praticiens"
+                    )}
+                  </Button>
+                ) : (
+                  filtered.length > PAGE_SIZE && (
+                    <p className="text-sm text-muted-foreground">
+                      Vous avez vu tous nos praticiens.
+                    </p>
+                  )
+                )}
+              </div>
+            </>
           )}
         </div>
       </section>
