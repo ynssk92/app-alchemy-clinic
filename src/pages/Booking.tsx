@@ -18,6 +18,8 @@ import { BookingCalendar } from "@/components/booking/BookingCalendar";
 import { TimeSlotGrid } from "@/components/booking/TimeSlotGrid";
 import { BookingSummary } from "@/components/booking/BookingSummary";
 import { GuestDetailsForm } from "@/components/booking/GuestDetailsForm";
+import { ReasonSelect, type ConsultationReason } from "@/components/booking/ReasonSelect";
+
 
 const timeSlots = [
   "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM",
@@ -38,10 +40,12 @@ const schema = z.object({
   phone: z.string().trim().min(6, "Téléphone invalide").max(40),
   dob: z.string().optional().or(z.literal("")),
   gender: z.enum(["male", "female", "other"]).optional(),
-  reason: z.string().trim().min(3, "Merci d'indiquer le motif").max(1000),
+  reason_id: z.string().uuid("Merci de choisir un motif"),
+  custom_reason: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
 type FormValues = z.infer<typeof schema>;
+
 
 const Booking = () => {
   const navigate = useNavigate();
@@ -52,12 +56,14 @@ const Booking = () => {
   const [doctorId, setDoctorId] = useState(params.get("doctor") || "");
   const [doctors, setDoctors] = useState<BookingDoctor[]>([]);
   const [busy, setBusy] = useState(false);
+  const [reason, setReason] = useState<ConsultationReason | undefined>();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", reason: "" },
+    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", reason_id: undefined, custom_reason: "" },
     mode: "onBlur",
   });
+
 
   // Prefill for signed-in patients
   useEffect(() => {
@@ -121,6 +127,11 @@ const Booking = () => {
       toast.error("Choisissez un praticien, une date et un horaire");
       return;
     }
+    if (reason?.is_other && (v.custom_reason ?? "").trim().length < 3) {
+      methods.setError("custom_reason", { message: "Merci de préciser votre motif" });
+      return;
+    }
+    const reasonText = reason?.is_other ? (v.custom_reason ?? "").trim() : reason?.label ?? "";
     setBusy(true);
     const localDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
@@ -135,10 +146,13 @@ const Booking = () => {
         doctor_id: doctorId,
         appointment_date: localDate,
         appointment_time: selectedTime,
-        reason: v.reason,
+        reason: reasonText,
+        reason_id: v.reason_id,
+        custom_reason: reason?.is_other ? (v.custom_reason ?? "").trim() : null,
         redirect_to: `${window.location.origin}/reset-password`,
       },
     });
+
     setBusy(false);
 
     const payload = data as any;
@@ -166,7 +180,7 @@ const Booking = () => {
           clinic: selectedDoctor?.clinic ?? null,
           appointment_date: localDate,
           appointment_time: selectedTime,
-          reason: v.reason,
+          reason: reasonText,
         },
       },
     });
@@ -234,19 +248,42 @@ const Booking = () => {
 
                 <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
                   <Label htmlFor="reason" className="text-sm font-semibold">Motif de la consultation *</Label>
-                  <Textarea
-                    id="reason"
-                    rows={5}
-                    {...methods.register("reason")}
-                    placeholder="Décrivez brièvement votre besoin…"
-                    className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-250 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
+                  <ReasonSelect
+                    value={reason?.id}
+                    invalid={Boolean(methods.formState.errors.reason_id)}
+                    onChange={(r) => {
+                      setReason(r);
+                      methods.setValue("reason_id", r?.id ?? "", { shouldValidate: true });
+                      if (!r?.is_other) methods.setValue("custom_reason", "");
+                    }}
                   />
-                  {methods.formState.errors.reason ? (
+                  {methods.formState.errors.reason_id ? (
                     <p className="mt-1.5 text-xs font-medium text-destructive">
-                      {methods.formState.errors.reason.message}
+                      {methods.formState.errors.reason_id.message}
                     </p>
                   ) : null}
+
+                  {reason?.is_other ? (
+                    <div className="mt-4 animate-fade-in">
+                      <Label htmlFor="custom_reason" className="text-sm font-semibold">
+                        Précisez votre motif *
+                      </Label>
+                      <Textarea
+                        id="custom_reason"
+                        rows={5}
+                        {...methods.register("custom_reason")}
+                        placeholder="Décrivez brièvement votre besoin…"
+                        className="mt-2 min-h-[140px] resize-none rounded-2xl border-transparent bg-muted/70 p-4 text-base transition-all duration-200 focus-visible:border-primary focus-visible:bg-card focus-visible:ring-4 focus-visible:ring-primary/15"
+                      />
+                      {methods.formState.errors.custom_reason ? (
+                        <p className="mt-1.5 text-xs font-medium text-destructive">
+                          {methods.formState.errors.custom_reason.message}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
+
               </div>
 
               {/* Center — calendar + slots */}

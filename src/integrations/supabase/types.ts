@@ -186,10 +186,12 @@ export type Database = {
           appointment_date: string
           appointment_time: string
           created_at: string
+          custom_reason: string | null
           doctor_id: string
           id: string
           patient_id: string
           reason: string | null
+          reason_id: string | null
           reference: string | null
           source: string
           status: string
@@ -199,10 +201,12 @@ export type Database = {
           appointment_date: string
           appointment_time: string
           created_at?: string
+          custom_reason?: string | null
           doctor_id: string
           id?: string
           patient_id: string
           reason?: string | null
+          reason_id?: string | null
           reference?: string | null
           source?: string
           status?: string
@@ -212,10 +216,12 @@ export type Database = {
           appointment_date?: string
           appointment_time?: string
           created_at?: string
+          custom_reason?: string | null
           doctor_id?: string
           id?: string
           patient_id?: string
           reason?: string | null
+          reason_id?: string | null
           reference?: string | null
           source?: string
           status?: string
@@ -227,6 +233,13 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_reason_id_fkey"
+            columns: ["reason_id"]
+            isOneToOne: false
+            referencedRelation: "consultation_reasons"
             referencedColumns: ["id"]
           },
         ]
@@ -363,6 +376,42 @@ export type Database = {
           id?: string
           name?: string
           phone?: string | null
+        }
+        Relationships: []
+      }
+      consultation_reasons: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          icon: string | null
+          id: string
+          is_other: boolean
+          label: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_other?: boolean
+          label: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          icon?: string | null
+          id?: string
+          is_other?: boolean
+          label?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1230,22 +1279,41 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_guest_booking: {
-        Args: {
-          _date: string
-          _dob: string
-          _doctor_id: string
-          _email: string
-          _first_name: string
-          _gender: string
-          _last_name: string
-          _phone: string
-          _reason: string
-          _time: string
-          _user_id: string
-        }
-        Returns: Json
-      }
+      create_guest_booking:
+        | {
+            Args: {
+              _date: string
+              _dob: string
+              _doctor_id: string
+              _email: string
+              _first_name: string
+              _gender: string
+              _last_name: string
+              _phone: string
+              _reason: string
+              _time: string
+              _user_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              _custom_reason?: string
+              _date: string
+              _dob: string
+              _doctor_id: string
+              _email: string
+              _first_name: string
+              _gender: string
+              _last_name: string
+              _phone: string
+              _reason: string
+              _reason_id?: string
+              _time: string
+              _user_id: string
+            }
+            Returns: Json
+          }
       has_permission: {
         Args: { _action: string; _module: string; _user_id: string }
         Returns: boolean
