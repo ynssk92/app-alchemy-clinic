@@ -249,14 +249,31 @@ const BookingConfirmed = () => {
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <CheckCircle2 className="h-9 w-9" />
                 </div>
-                <Badge variant="secondary" className="mb-4">Réservation confirmée</Badge>
+                <Badge variant="secondary" className="mb-4">Demande enregistrée</Badge>
                 <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                  Votre rendez-vous est <span className="bg-gradient-primary bg-clip-text text-transparent">confirmé</span>
+                  🎉 Rendez-vous <span className="bg-gradient-primary bg-clip-text text-transparent">confirmé</span>
                 </h1>
                 <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-                  Merci ! Voici le récapitulatif de votre visite et les prochaines étapes.
+                  {guest?.isNewAccount
+                    ? "Votre demande a bien été reçue et votre dossier patient a été créé. Consultez votre email pour définir votre mot de passe et accéder à votre espace."
+                    : "Merci ! Voici le récapitulatif de votre visite et les prochaines étapes."}
                 </p>
+                {guest?.isNewAccount ? (
+                  <div className="mx-auto mt-6 flex max-w-xl flex-col justify-center gap-3 sm:flex-row">
+                    <Button asChild className="h-12 rounded-xl px-6">
+                      <Link to="/auth">
+                        <KeyRound className="mr-2 h-4 w-4" /> Compléter mon compte
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="h-12 rounded-xl px-6">
+                      <Link to="/">
+                        <Home className="mr-2 h-4 w-4" /> Retour à l'accueil
+                      </Link>
+                    </Button>
+                  </div>
+                ) : null}
               </div>
+
 
               <div className="mt-10 grid gap-6 lg:grid-cols-5">
                 <Card className="rounded-3xl p-6 lg:col-span-3">
