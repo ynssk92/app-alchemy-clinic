@@ -127,6 +127,11 @@ const Booking = () => {
       toast.error("Choisissez un praticien, une date et un horaire");
       return;
     }
+    if (reason?.is_other && (v.custom_reason ?? "").trim().length < 3) {
+      methods.setError("custom_reason", { message: "Merci de préciser votre motif" });
+      return;
+    }
+    const reasonText = reason?.is_other ? (v.custom_reason ?? "").trim() : reason?.label ?? "";
     setBusy(true);
     const localDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
@@ -141,10 +146,13 @@ const Booking = () => {
         doctor_id: doctorId,
         appointment_date: localDate,
         appointment_time: selectedTime,
-        reason: v.reason,
+        reason: reasonText,
+        reason_id: v.reason_id,
+        custom_reason: reason?.is_other ? (v.custom_reason ?? "").trim() : null,
         redirect_to: `${window.location.origin}/reset-password`,
       },
     });
+
     setBusy(false);
 
     const payload = data as any;
