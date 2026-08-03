@@ -214,7 +214,7 @@ const Doctors = () => {
                 ))}
 
                 {loadingMore &&
-                  Array.from({ length: Math.min(PAGE_SIZE, filtered.length - visible) }).map((_, i) => (
+                  Array.from({ length: Math.min(PAGE_SIZE, total - doctors.length) }).map((_, i) => (
                     <DoctorCardSkeleton key={`more-${i}`} />
                   ))}
               </div>
