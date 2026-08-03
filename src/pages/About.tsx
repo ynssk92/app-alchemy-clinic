@@ -1,8 +1,15 @@
 import { PageShell } from "@/components/PageShell";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePageContent } from "@/hooks/usePageContent";
-import { resolveIcon } from "@/lib/pageContent";
+import { AboutHero } from "@/components/about/AboutHero";
+import { StorySection } from "@/components/about/StorySection";
+import { MissionVision } from "@/components/about/MissionVision";
+import { StatsSection } from "@/components/about/StatsSection";
+import { ValuesGrid } from "@/components/about/ValuesGrid";
+import { WhyChooseUs } from "@/components/about/WhyChooseUs";
+import { CertificationBadges } from "@/components/about/CertificationBadges";
+import { TestimonialsPreview } from "@/components/about/TestimonialsPreview";
+import { AboutCTA } from "@/components/about/AboutCTA";
 
 const About = () => {
   const { page, blocks, loading } = usePageContent("about");
@@ -13,43 +20,38 @@ const About = () => {
   return (
     <PageShell
       title={page?.seo_title || "À Propos — La Dune Clinique Dentaire"}
-      description={page?.seo_description || "Découvrez l'histoire, la mission et les valeurs de La Dune Clinique Dentaire."}
+      description={
+        page?.seo_description ||
+        "Découvrez l'histoire, la mission et les valeurs de La Dune Clinique Dentaire."
+      }
       path="/about"
-      eyebrow={page?.eyebrow || undefined}
       heading={page?.heading || "À Propos"}
-      subheading={page?.subheading || undefined}
+      hideHero
     >
       {loading ? (
-        <div className="space-y-6">
-          <Skeleton className="h-48 w-full" />
-          <Skeleton className="h-32 w-full" />
+        <div className="space-y-6 py-10">
+          <Skeleton className="h-72 w-full rounded-[28px]" />
+          <div className="grid gap-6 md:grid-cols-2">
+            <Skeleton className="h-48 w-full rounded-[28px]" />
+            <Skeleton className="h-48 w-full rounded-[28px]" />
+          </div>
         </div>
       ) : (
-        <>
-          <div className="grid md:grid-cols-2 gap-8 items-center mb-16">
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
-              {paragraphs.map((p, i) => <p key={i}>{p}</p>)}
-            </div>
-            {mission && (
-              <Card className="p-8 bg-gradient-primary text-primary-foreground">
-                <h2 className="text-2xl font-bold mb-2">{mission.title}</h2>
-                <p className="opacity-90 whitespace-pre-line">{mission.body}</p>
-              </Card>
-            )}
-          </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {values.map((v) => {
-              const Icon = resolveIcon(v.icon);
-              return (
-                <Card key={v.id} className="p-6 hover:shadow-medium transition-shadow">
-                  <Icon className="w-10 h-10 text-primary mb-4" />
-                  <h3 className="text-xl font-bold mb-2">{v.title}</h3>
-                  <p className="text-muted-foreground whitespace-pre-line">{v.body}</p>
-                </Card>
-              );
-            })}
-          </div>
-        </>
+        <div className="-mx-4 overflow-hidden">
+          <AboutHero
+            eyebrow={page?.eyebrow}
+            heading={page?.heading}
+            subheading={page?.subheading}
+          />
+          <StorySection paragraphs={paragraphs} />
+          <MissionVision missionTitle={mission?.title} missionBody={mission?.body} />
+          <StatsSection />
+          <ValuesGrid values={values} />
+          <WhyChooseUs />
+          <CertificationBadges />
+          <TestimonialsPreview />
+          <AboutCTA />
+        </div>
       )}
     </PageShell>
   );
