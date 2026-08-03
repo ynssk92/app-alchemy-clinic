@@ -31,17 +31,24 @@ const steps = [
   { id: 4, label: "Confirmation" },
 ];
 
-const schema = z.object({
-  first_name: z.string().trim().min(2, "Prénom requis").max(80),
-  last_name: z.string().trim().min(2, "Nom requis").max(80),
-  email: z.string().trim().email("Email invalide").max(255),
-  phone: z.string().trim().min(6, "Téléphone invalide").max(40),
-  dob: z.string().optional().or(z.literal("")),
-  gender: z.enum(["male", "female", "other"]).optional(),
-  reason: z.string().trim().min(3, "Merci d'indiquer le motif").max(1000),
-});
+const schema = z
+  .object({
+    first_name: z.string().trim().min(2, "Prénom requis").max(80),
+    last_name: z.string().trim().min(2, "Nom requis").max(80),
+    email: z.string().trim().email("Email invalide").max(255),
+    phone: z.string().trim().min(6, "Téléphone invalide").max(40),
+    dob: z.string().optional().or(z.literal("")),
+    gender: z.enum(["male", "female", "other"]).optional(),
+    reason_id: z.string().uuid("Merci de choisir un motif"),
+    custom_reason: z.string().trim().max(1000).optional().or(z.literal("")),
+  })
+  .refine((v) => !v.__isOther || (v.custom_reason && v.custom_reason.length >= 3), {
+    message: "Merci de préciser votre motif",
+    path: ["custom_reason"],
+  } as never);
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof schema> & { __isOther?: boolean };
+
 
 const Booking = () => {
   const navigate = useNavigate();
