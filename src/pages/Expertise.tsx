@@ -19,9 +19,9 @@ const Expertise = () => {
       hideHero
     >
       <section className="relative -mx-4 overflow-hidden px-4">
-        <div className="pointer-events-none absolute inset-0 bg-gradient-hero opacity-70" />
-        <div className="pointer-events-none absolute -left-24 top-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl" />
-        <div className="pointer-events-none absolute -right-20 bottom-0 h-80 w-80 rounded-full bg-accent/15 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="pointer-events-none absolute -top-24 left-1/4 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
 
         <div className="relative mx-auto max-w-[1280px] py-20 md:py-[140px]">
           <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
