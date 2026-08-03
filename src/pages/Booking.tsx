@@ -31,23 +31,18 @@ const steps = [
   { id: 4, label: "Confirmation" },
 ];
 
-const schema = z
-  .object({
-    first_name: z.string().trim().min(2, "Prénom requis").max(80),
-    last_name: z.string().trim().min(2, "Nom requis").max(80),
-    email: z.string().trim().email("Email invalide").max(255),
-    phone: z.string().trim().min(6, "Téléphone invalide").max(40),
-    dob: z.string().optional().or(z.literal("")),
-    gender: z.enum(["male", "female", "other"]).optional(),
-    reason_id: z.string().uuid("Merci de choisir un motif"),
-    custom_reason: z.string().trim().max(1000).optional().or(z.literal("")),
-  })
-  .refine((v) => !v.__isOther || (v.custom_reason && v.custom_reason.length >= 3), {
-    message: "Merci de préciser votre motif",
-    path: ["custom_reason"],
-  } as never);
+const schema = z.object({
+  first_name: z.string().trim().min(2, "Prénom requis").max(80),
+  last_name: z.string().trim().min(2, "Nom requis").max(80),
+  email: z.string().trim().email("Email invalide").max(255),
+  phone: z.string().trim().min(6, "Téléphone invalide").max(40),
+  dob: z.string().optional().or(z.literal("")),
+  gender: z.enum(["male", "female", "other"]).optional(),
+  reason_id: z.string().uuid("Merci de choisir un motif"),
+  custom_reason: z.string().trim().max(1000).optional().or(z.literal("")),
+});
 
-type FormValues = z.infer<typeof schema> & { __isOther?: boolean };
+type FormValues = z.infer<typeof schema>;
 
 
 const Booking = () => {
@@ -59,12 +54,14 @@ const Booking = () => {
   const [doctorId, setDoctorId] = useState(params.get("doctor") || "");
   const [doctors, setDoctors] = useState<BookingDoctor[]>([]);
   const [busy, setBusy] = useState(false);
+  const [reason, setReason] = useState<ConsultationReason | undefined>();
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", reason: "" },
+    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", reason_id: undefined, custom_reason: "" },
     mode: "onBlur",
   });
+
 
   // Prefill for signed-in patients
   useEffect(() => {
