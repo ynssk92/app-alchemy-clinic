@@ -71,6 +71,38 @@ export type Database = {
         }
         Relationships: []
       }
+      admin_profiles: {
+        Row: {
+          access_level: string | null
+          created_at: string | null
+          office_location: string | null
+          profile_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          access_level?: string | null
+          created_at?: string | null
+          office_location?: string | null
+          profile_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          access_level?: string | null
+          created_at?: string | null
+          office_location?: string | null
+          profile_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_settings: {
         Row: {
           accent_hsl: string
@@ -511,6 +543,51 @@ export type Database = {
             columns: ["doctor_id"]
             isOneToOne: false
             referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctor_profiles: {
+        Row: {
+          biography: string | null
+          created_at: string | null
+          experience_years: number | null
+          license_number: string | null
+          profile_id: string
+          specialty_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          biography?: string | null
+          created_at?: string | null
+          experience_years?: number | null
+          license_number?: string | null
+          profile_id: string
+          specialty_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          biography?: string | null
+          created_at?: string | null
+          experience_years?: number | null
+          license_number?: string | null
+          profile_id?: string
+          specialty_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "doctor_profiles_specialty_id_fkey"
+            columns: ["specialty_id"]
+            isOneToOne: false
+            referencedRelation: "specialties"
             referencedColumns: ["id"]
           },
         ]
@@ -1478,6 +1555,44 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_profiles: {
+        Row: {
+          allergies: string | null
+          blood_group: string | null
+          created_at: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          profile_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          allergies?: string | null
+          blood_group?: string | null
+          created_at?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          profile_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          allergies?: string | null
+          blood_group?: string | null
+          created_at?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          profile_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
