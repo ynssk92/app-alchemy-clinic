@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { User, Activity, ShieldCheck, Check } from "lucide-react";
+import { User, Activity, ShieldCheck, Check, Upload } from "lucide-react";
 
 interface ProgressIndicatorProps {
   currentStep: number;
@@ -10,6 +10,7 @@ const ProgressIndicator = ({ currentStep }: ProgressIndicatorProps) => {
     { id: 1, label: "Personal", icon: User },
     { id: 2, label: "Medical", icon: Activity },
     { id: 3, label: "Emergency", icon: ShieldCheck },
+    { id: 4, label: "Documents", icon: Upload },
   ];
 
   return (
