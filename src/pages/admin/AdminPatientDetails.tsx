@@ -37,6 +37,35 @@ const AdminPatientDetails = () => {
   const [patient, setPatient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Fetch real statistics
+  const { data: stats } = useQuery({
+    queryKey: ["patient-quick-stats", id],
+    queryFn: async () => {
+      if (!id) return { appts: 0, paid: 0 };
+      
+      const [apptsRes, invoicesRes] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("patient_id", id),
+        supabase
+          .from("invoices")
+          .select("total_amount")
+          .eq("patient_id", id)
+          .eq("status", "paid")
+      ]);
+
+      const apptsCount = apptsRes.count || 0;
+      const totalPaid = invoicesRes.data?.reduce((sum, inv) => sum + (inv.total_amount || 0), 0) || 0;
+
+      return {
+        appts: apptsCount,
+        paid: totalPaid
+      };
+    },
+    enabled: !!id,
+  });
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
@@ -198,12 +227,19 @@ const AdminPatientDetails = () => {
           <Card className="p-6 border-none bg-white/50 dark:bg-slate-900/50 backdrop-blur-xl shadow-xl rounded-[24px] space-y-4">
             <h3 className="font-bold text-sm uppercase tracking-widest text-muted-foreground mb-4">Quick Stats</h3>
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
-                <div className="text-primary font-bold text-xl">12</div>
+              <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 transition-all hover:scale-105">
+                <div className="text-primary font-bold text-xl">{stats?.appts || 0}</div>
                 <div className="text-[10px] uppercase font-bold text-muted-foreground">Appts</div>
               </div>
-              <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10">
-                <div className="text-emerald-600 font-bold text-xl">$1.2k</div>
+              <div className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 transition-all hover:scale-105">
+                <div className="text-emerald-600 font-bold text-xl">
+                  {new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    maximumFractionDigits: 1,
+                    notation: 'compact'
+                  }).format(stats?.paid || 0)}
+                </div>
                 <div className="text-[10px] uppercase font-bold text-muted-foreground">Paid</div>
               </div>
             </div>
