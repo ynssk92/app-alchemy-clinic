@@ -36,6 +36,7 @@ import { MedicalInfoCard } from "@/components/profile/MedicalInfoCard";
 import { ProfessionalInfoCard } from "@/components/profile/ProfessionalInfoCard";
 import { SecurityCard } from "@/components/profile/SecurityCard";
 import { NotificationSettingsCard } from "@/components/profile/NotificationSettingsCard";
+import NotificationInbox from "@/components/profile/NotificationInbox";
 import { PrivacySettingsCard } from "@/components/profile/PrivacySettingsCard";
 import { StickySaveBar } from "@/components/profile/StickySaveBar";
 import logo from "@/assets/logo.png";
@@ -397,6 +398,8 @@ const Profile = () => {
               onUpdatePassword={handleUpdatePassword} 
               loading={saving} 
             />
+
+            <NotificationInbox />
 
             <NotificationSettingsCard 
               preferences={profileData.notification_preferences} 
