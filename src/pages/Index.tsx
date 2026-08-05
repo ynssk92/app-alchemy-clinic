@@ -22,6 +22,7 @@ import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { Gallery } from "@/components/Gallery";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import esthetique from "@/assets/soin-esthetique.jpg";
 import implant from "@/assets/soin-implant.jpg";
@@ -408,6 +409,9 @@ const Index = () => {
           ))}
         </div>
       </section>
+
+      {/* Gallery Section */}
+      <Gallery />
 
       {/* Blog */}
       {posts.length > 0 && (
