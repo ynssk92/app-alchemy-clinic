@@ -464,61 +464,82 @@ const AdminPatientDetails = () => {
             </TabsContent>
             
             <TabsContent value="timeline" className="mt-6">
-              <Card className="p-8 border-none bg-white dark:bg-slate-900 shadow-xl rounded-[24px]">
-                <div className="flex items-center gap-2 mb-8 text-primary">
-                  <History className="w-5 h-5" />
-                  <h3 className="font-bold">Patient Activity Timeline</h3>
-                </div>
-                
-                <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary/20 before:via-primary/10 before:to-transparent">
-                  {loadingTimeline ? (
-                    <div className="flex justify-center p-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Upcoming Appointments */}
+                <Card className="p-8 border-none bg-white dark:bg-slate-900 shadow-xl rounded-[24px]">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-2 text-primary">
+                      <CalendarPlus className="w-5 h-5" />
+                      <h3 className="font-bold">Upcoming Appointments</h3>
                     </div>
-                  ) : (
-                    <>
-                      {timelineEvents?.map((event: any) => (
-                        <div key={event.id} className="relative flex items-center gap-6 group">
-                          <div className={cn(
-                            "absolute left-0 w-10 h-10 rounded-full border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110",
-                            event.status === 'completed' ? "bg-emerald-500" : 
-                            event.status === 'cancelled' ? "bg-destructive" : "bg-blue-500"
-                          )}>
-                            <CalendarDays className="w-4 h-4" />
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                      {timelineEvents?.filter((e: any) => new Date(e.appointment_date) >= new Date() && e.status !== 'cancelled').length || 0} Scheduled
+                    </Badge>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {loadingTimeline ? (
+                      <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+                    ) : (
+                      timelineEvents?.filter((e: any) => new Date(e.appointment_date) >= new Date() && e.status !== 'cancelled').length > 0 ? (
+                        timelineEvents?.filter((e: any) => new Date(e.appointment_date) >= new Date() && e.status !== 'cancelled').map((event: any) => (
+                          <div key={event.id} className="p-4 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-bold">{event.reason_for_visit || "Consultation"}</span>
+                              <Badge className="bg-blue-500 text-[10px] uppercase font-bold">{event.status}</Badge>
+                            </div>
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(event.appointment_date).toLocaleDateString()}</div>
+                              <div className="flex items-center gap-1"><Clock className="w-3 h-3" /> {event.appointment_time}</div>
+                            </div>
+                            {event.doctors && <p className="text-[10px] text-primary mt-2 font-bold uppercase tracking-wider">Dr. {event.doctors.first_name} {event.doctors.last_name}</p>}
                           </div>
-                          <div className="ml-12 p-4 rounded-2xl bg-muted/30 border border-border/50 flex-1 group-hover:bg-muted/50 transition-colors">
-                            <div className="flex items-center justify-between mb-1">
-                              <p className="font-bold text-sm">Appointment: {event.reason_for_visit || "General Checkup"}</p>
-                              <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground italic text-sm">No upcoming appointments</div>
+                      )
+                    )}
+                  </div>
+                </Card>
+
+                {/* Appointment History */}
+                <Card className="p-8 border-none bg-white dark:bg-slate-900 shadow-xl rounded-[24px]">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-2 text-primary">
+                      <History className="w-5 h-5" />
+                      <h3 className="font-bold">Appointment History</h3>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                    {loadingTimeline ? (
+                      <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+                    ) : (
+                      timelineEvents?.filter((e: any) => new Date(e.appointment_date) < new Date() || e.status === 'cancelled').length > 0 ? (
+                        timelineEvents?.filter((e: any) => new Date(e.appointment_date) < new Date() || e.status === 'cancelled').map((event: any) => (
+                          <div key={event.id} className="p-4 rounded-2xl bg-muted/30 border border-border/50 opacity-80 hover:opacity-100 transition-opacity">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-sm font-bold">{event.reason_for_visit || "Past Visit"}</span>
+                              <Badge variant="outline" className={cn(
+                                "text-[10px] uppercase font-bold",
+                                event.status === 'completed' ? "border-emerald-500 text-emerald-600 bg-emerald-50" : "border-destructive text-destructive bg-destructive/5"
+                              )}>
                                 {event.status}
                               </Badge>
                             </div>
-                            <p className="text-xs text-muted-foreground flex items-center gap-2">
-                              <Clock className="w-3 h-3" />
-                              {new Date(event.appointment_date).toLocaleDateString()} at {event.appointment_time}
-                            </p>
-                            {event.doctors && (
-                              <p className="text-xs text-primary mt-2 font-medium">
-                                With Dr. {event.doctors.first_name} {event.doctors.last_name}
-                              </p>
-                            )}
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(event.appointment_date).toLocaleDateString()}</div>
+                              <div className="flex items-center gap-1"><Clock className="w-3 h-3" /> {event.appointment_time}</div>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-
-                      <div className="relative flex items-center gap-6 group">
-                        <div className="absolute left-0 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
-                          <UserCheck className="w-4 h-4" />
-                        </div>
-                        <div className="ml-12 p-4 rounded-2xl bg-primary/5 border border-primary/10 flex-1">
-                          <p className="font-bold text-sm text-primary">Patient Record Created</p>
-                          <p className="text-xs text-muted-foreground">{new Date(patient.created_at).toLocaleString()}</p>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </Card>
+                        ))
+                      ) : (
+                        <div className="text-center py-8 text-muted-foreground italic text-sm">No past records</div>
+                      )
+                    )}
+                  </div>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
