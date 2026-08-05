@@ -114,7 +114,13 @@ const Index = () => {
       // On desktop (3 cards): clientWidth / 3
       // But for simplicity and smoothness, scrolling by clientWidth is often better for "pages"
       // The user asked for smooth sliding.
-      const scrollAmount = clientWidth; 
+      // Desktop (3 cards): clientWidth / 3
+      // Tablet (2 cards): clientWidth / 2
+      // Mobile (1 card): clientWidth
+      let scrollAmount = clientWidth;
+      if (window.innerWidth >= 1024) scrollAmount = clientWidth / 3;
+      else if (window.innerWidth >= 640) scrollAmount = clientWidth / 2;
+      
       const scrollTo = direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
       
       scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
