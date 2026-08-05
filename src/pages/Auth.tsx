@@ -86,7 +86,7 @@ const Auth = () => {
         if (roleStr === "admin") navigate("/admin");
         else if (roleStr === "doctor") navigate("/admin"); // Or specific doctor route if separate
         else if (roleStr === "patient") navigate("/patient-dashboard");
-        else navigate("/profile"); // Default to profile if role missing
+        else navigate("/admin"); // Default to admin if role missing for staff, or changed from /profile to /admin per request
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
