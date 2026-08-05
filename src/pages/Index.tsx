@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,6 +25,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { Gallery } from "@/components/Gallery";
+import { motion, AnimatePresence } from "framer-motion";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import esthetique from "@/assets/soin-esthetique.jpg";
 import implant from "@/assets/soin-implant.jpg";
