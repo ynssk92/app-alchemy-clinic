@@ -68,6 +68,31 @@ const AdminPatientDetails = () => {
     },
     enabled: !!id,
   });
+
+  // Fetch real appointments for timeline
+  const { data: timelineEvents, isLoading: loadingTimeline } = useQuery({
+    queryKey: ["patient-timeline", id],
+    queryFn: async () => {
+      if (!id) return [];
+      
+      const { data, error } = await supabase
+        .from("appointments" as any)
+        .select(`
+          id,
+          appointment_date,
+          appointment_time,
+          status,
+          reason_for_visit,
+          doctors(first_name, last_name)
+        `)
+        .eq("patient_id", id)
+        .order("appointment_date", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!id,
+  });
   const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
@@ -381,15 +406,52 @@ const AdminPatientDetails = () => {
                 </div>
                 
                 <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary/20 before:via-primary/10 before:to-transparent">
-                  <div className="relative flex items-center gap-6">
-                    <div className="absolute left-0 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg">
-                      <UserCheck className="w-4 h-4" />
+                  {loadingTimeline ? (
+                    <div className="flex justify-center p-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
                     </div>
-                    <div className="ml-12">
-                      <p className="font-bold text-sm">Patient Created</p>
-                      <p className="text-xs text-muted-foreground">{new Date(patient.created_at).toLocaleString()}</p>
-                    </div>
-                  </div>
+                  ) : (
+                    <>
+                      {timelineEvents?.map((event: any) => (
+                        <div key={event.id} className="relative flex items-center gap-6 group">
+                          <div className={cn(
+                            "absolute left-0 w-10 h-10 rounded-full border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg transition-transform group-hover:scale-110",
+                            event.status === 'completed' ? "bg-emerald-500" : 
+                            event.status === 'cancelled' ? "bg-destructive" : "bg-blue-500"
+                          )}>
+                            <CalendarDays className="w-4 h-4" />
+                          </div>
+                          <div className="ml-12 p-4 rounded-2xl bg-muted/30 border border-border/50 flex-1 group-hover:bg-muted/50 transition-colors">
+                            <div className="flex items-center justify-between mb-1">
+                              <p className="font-bold text-sm">Appointment: {event.reason_for_visit || "General Checkup"}</p>
+                              <Badge variant="outline" className="text-[10px] uppercase font-bold">
+                                {event.status}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-muted-foreground flex items-center gap-2">
+                              <Clock className="w-3 h-3" />
+                              {new Date(event.appointment_date).toLocaleDateString()} at {event.appointment_time}
+                            </p>
+                            {event.doctors && (
+                              <p className="text-xs text-primary mt-2 font-medium">
+                                With Dr. {event.doctors.first_name} {event.doctors.last_name}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className="relative flex items-center gap-6 group">
+                        <div className="absolute left-0 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                          <UserCheck className="w-4 h-4" />
+                        </div>
+                        <div className="ml-12 p-4 rounded-2xl bg-primary/5 border border-primary/10 flex-1">
+                          <p className="font-bold text-sm text-primary">Patient Record Created</p>
+                          <p className="text-xs text-muted-foreground">{new Date(patient.created_at).toLocaleString()}</p>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               </Card>
             </TabsContent>
