@@ -59,34 +59,13 @@ const Auth = () => {
 
     try {
       if (mode === "login") {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
         if (error) throw error;
-        
-        // Load profile to check role and status
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .maybeSingle();
-
-        const status = (prof as any)?.status;
-        const roleStr = (prof as any)?.role;
-
-        if (status === "blocked" || status === "inactive") {
-          await supabase.auth.signOut();
-          throw new Error(`Your account is ${prof.status}. Please contact support.`);
-        }
-
-        toast.success(`Welcome back!`);
-        
-        // Role-based redirect
-        if (roleStr === "admin") navigate("/admin");
-        else if (roleStr === "doctor") navigate("/admin"); // Or specific doctor route if separate
-        else if (roleStr === "patient") navigate("/patient-dashboard");
-        else navigate("/profile"); // Default to profile if role missing
+        toast.success("Welcome back!");
+        navigate(accountType === "doctor" ? "/admin" : "/patient-dashboard");
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
@@ -99,7 +78,7 @@ const Auth = () => {
               dob: formData.dob,
               role: accountType
             },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/patient-dashboard`,
           },
         });
         if (error) throw error;
