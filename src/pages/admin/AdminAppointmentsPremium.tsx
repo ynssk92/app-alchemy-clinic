@@ -35,17 +35,29 @@ import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
 const AdminAppointmentsPremium = () => {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateFilter, setDateFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const { data: allAppointments = [], isLoading, refetch } = useQuery({
+  const { data: allAppointments = [], isLoading, error, refetch } = useQuery({
     queryKey: ["appointments-premium"],
     queryFn: async () => {
+      console.log("Fetching appointments...");
       const { data, error } = await supabase
         .from("appointments" as any)
         .select(`
-          id, appointment_date, appointment_time, status, reason, 
-          patients (first_name, last_name),
+          id, 
+          appointment_date, 
+          appointment_time, 
+          status, 
+          reason,
+          created_at,
+          patients (
+            first_name, 
+            last_name, 
+            avatar_url
+          ),
           doctors (
             full_name,
             specialties (name),
@@ -53,10 +65,34 @@ const AdminAppointmentsPremium = () => {
           )
         `)
         .order("appointment_date", { ascending: false });
-      if (error) throw error;
+
+      if (error) {
+        console.error("Database error fetching appointments:", error);
+        throw error;
+      }
+      
+      console.log(`Successfully loaded ${data?.length || 0} appointments`);
       return (data || []) as any[];
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-appointments-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'appointments' },
+        () => {
+          console.log("Real-time update received, refetching...");
+          queryClient.invalidateQueries({ queryKey: ["appointments-premium"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
 
   const updateStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: string }) => {
@@ -65,13 +101,51 @@ const AdminAppointmentsPremium = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointments-premium"] });
-      toast.success("Status updated");
+      toast.success("Status updated successfully");
+    },
+    onError: (err: any) => {
+      toast.error(`Failed to update status: ${err.message}`);
+    }
+  });
+
+  const removeAppointment = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("appointments" as any).delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["appointments-premium"] });
+      toast.success("Appointment deleted");
+    },
+    onError: (err: any) => {
+      toast.error(`Failed to delete: ${err.message}`);
     }
   });
 
   const filtered = allAppointments.filter((a) => {
-    const name = `${a.patients?.first_name} ${a.patients?.last_name}`.toLowerCase();
-    return name.includes(searchTerm.toLowerCase());
+    // Search filter
+    const searchLower = searchTerm.toLowerCase();
+    const patientName = `${a.patients?.first_name} ${a.patients?.last_name}`.toLowerCase();
+    const doctorName = (a.doctors?.full_name || "").toLowerCase();
+    const reason = (a.reason || "").toLowerCase();
+    
+    const matchesSearch = patientName.includes(searchLower) || 
+                          doctorName.includes(searchLower) || 
+                          reason.includes(searchLower);
+
+    // Status filter
+    const matchesStatus = statusFilter === "all" || a.status === statusFilter;
+
+    // Date filter
+    let matchesDate = true;
+    if (dateFilter !== "all" && a.appointment_date) {
+      const apptDate = new Date(a.appointment_date);
+      if (dateFilter === "today") matchesDate = isToday(apptDate);
+      else if (dateFilter === "week") matchesDate = isThisWeek(apptDate);
+      else if (dateFilter === "month") matchesDate = isThisMonth(apptDate);
+    }
+
+    return matchesSearch && matchesStatus && matchesDate;
   });
 
   const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
