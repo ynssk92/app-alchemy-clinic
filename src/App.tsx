@@ -36,11 +36,12 @@ import AdminAppointmentCalendar from "./pages/admin/AdminAppointmentCalendar";
 import AdminAppointmentKanban from "./pages/admin/AdminAppointmentKanban";
 import AdminAppointmentRequests from "./pages/admin/AdminAppointmentRequests";
 import AdminPatients from "./pages/admin/AdminPatients";
+import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
+import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
+import AdminPatientEdit from "./pages/admin/AdminPatientEdit";
 import { AdminSpecialties, AdminClinics } from "./pages/admin/AdminCatalog";
 import AdminClinicAudit from "./pages/admin/AdminClinicAudit";
 import AdminAssistantVerifier from "./pages/admin/AdminAssistantVerifier";
-import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
-import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
 import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
@@ -111,6 +112,7 @@ const App = () => (
               <Route path="patients/details" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
               <Route path="patients/details/:id" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
               <Route path="patients/create" element={<PermissionRoute module="Patients" action="create"><AdminPatientCreate /></PermissionRoute>} />
+              <Route path="patients/edit/:id" element={<PermissionRoute module="Patients" action="edit"><AdminPatientEdit /></PermissionRoute>} />
               <Route path="patients/approvals" element={<PermissionRoute module="Patients" action="edit"><AdminApprovals /></PermissionRoute>} />
               <Route path="specialties" element={<PermissionRoute module="Specialties"><AdminSpecialties /></PermissionRoute>} />
               <Route path="clinics" element={<PermissionRoute module="Clinics"><AdminClinics /></PermissionRoute>} />
