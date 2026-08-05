@@ -96,9 +96,25 @@ export default function NotificationInbox() {
         .eq("is_read", false);
       if (error) throw error;
       setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
-      toast.success("All marked as read");
+      toast.success("Tout est marqué comme lu");
     } catch (error: any) {
-      toast.error("Operation failed");
+      toast.error("L'opération a échoué");
+    }
+  };
+
+  const markAllAsUnread = async () => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from("app_notifications")
+        .update({ is_read: false })
+        .eq("user_id", user.id)
+        .eq("is_read", true);
+      if (error) throw error;
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: false })));
+      toast.success("Tout est marqué comme non lu");
+    } catch (error: any) {
+      toast.error("L'opération a échoué");
     }
   };
 
@@ -155,11 +171,29 @@ export default function NotificationInbox() {
           </div>
         </div>
         
-        {unreadCount > 0 && (
-          <div className="flex justify-end mt-2">
-            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="h-8 text-xs text-primary hover:text-primary hover:bg-primary/5">
-              Tout marquer comme lu
-            </Button>
+        {notifications.length > 0 && (
+          <div className="flex items-center justify-end gap-2 mt-2">
+            {unreadCount > 0 ? (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={markAllAsRead} 
+                className="h-8 text-xs text-primary hover:text-primary hover:bg-primary/5 gap-1.5"
+              >
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Tout marquer comme lu
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={markAllAsUnread} 
+                className="h-8 text-xs text-slate-500 hover:text-slate-700 hover:bg-slate-100 gap-1.5"
+              >
+                <Clock className="w-3.5 h-3.5" />
+                Tout marquer comme non lu
+              </Button>
+            )}
           </div>
         )}
       </CardHeader>
