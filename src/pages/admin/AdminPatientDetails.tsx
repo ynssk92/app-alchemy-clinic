@@ -139,8 +139,10 @@ const AdminPatientDetails = () => {
             {generatingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
             Generate EMR PDF
           </Button>
-          <Button variant="outline" className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80">
-            <Pencil className="w-4 h-4 mr-2" /> Edit Record
+          <Button variant="outline" asChild className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80">
+            <Link to={`/admin/patients/edit/${patient.id}`}>
+              <Pencil className="w-4 h-4 mr-2" /> Edit Record
+            </Link>
           </Button>
           <Button className="bg-gradient-primary text-white rounded-xl h-11 px-6 shadow-lg shadow-primary/20">
             <CalendarPlus className="w-4 h-4 mr-2" /> Book Appointment
