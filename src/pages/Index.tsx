@@ -389,22 +389,6 @@ const Index = () => {
           </div>
         </section>
       )}
-                      <Button
-                        className="w-full rounded-full font-semibold"
-                        aria-label={`Prendre rendez-vous avec ${d.full_name}`}
-                      >
-                        <Calendar className="w-4 h-4 mr-1" />
-                        Prendre rendez-vous
-                      </Button>
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-      )}
 
       {/* Counters */}
       <section className="py-16 bg-muted/40 border-y border-border">
