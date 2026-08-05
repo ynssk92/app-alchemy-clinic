@@ -57,8 +57,8 @@ export const generatePatientEMR = async (patient: any) => {
         theme: 'plain',
         styles: { fontSize: template.bodyFontSize, cellPadding: 2 },
         columnStyles: { 
-          0: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 },
-          2: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 }
+          0: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 },
+          2: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 }
         }
       });
       currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -83,8 +83,8 @@ export const generatePatientEMR = async (patient: any) => {
         theme: 'plain',
         styles: { fontSize: template.bodyFontSize, cellPadding: 2 },
         columnStyles: { 
-          0: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 },
-          2: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 }
+          0: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 },
+          2: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 }
         }
       });
       currentY = (doc as any).lastAutoTable.finalY + 15;
