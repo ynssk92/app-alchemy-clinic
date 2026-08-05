@@ -291,6 +291,7 @@ const Booking = () => {
                 <div className="rounded-3xl border border-border bg-card p-6 shadow-soft">
                   <h2 className="flex items-center gap-2 text-lg font-semibold text-foreground">
                     <CalendarDays className="h-5 w-5 text-primary" aria-hidden="true" />
+                    Choisir une date
                   </h2>
                   <div className="mt-5">
                     <BookingCalendar
