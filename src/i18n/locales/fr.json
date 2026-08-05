@@ -35,7 +35,7 @@
     "close": "Fermer",
     "add": "Ajouter",
     "view": "Voir",
-    "language": "Add analytics to record image clicks and lightbox open/next/previous events to measure gallery engagement."
+    "language": "Add an admin dashboard that shows gallery engagement metrics (opens, next/previous navigation, top images, and engagement rates) with filters by date range."
   },
   "admin": {
     "dashboard": "Tableau de bord",
