@@ -31,7 +31,7 @@ import {
   useSidebar,
 } from "@/components/sidebar/Sidebar";
 
-type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; action?: "view" | "create" | "edit" | "delete"; children?: { to: string; label: string; end?: boolean; adminOnly?: boolean }[] };
+type LinkItem = { to: string; icon: any; label: string; end?: boolean; staff?: boolean; adminOnly?: boolean; module?: string; action?: "view" | "create" | "edit" | "delete"; children?: { to: string; label: string; end?: boolean }[] };
 type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
@@ -335,16 +335,25 @@ const AdminShell = () => {
           if (visible.length === 0) return null;
           return (
             <SidebarGroup key={section.title} title={section.title}>
-              {visible.map((l) => (
-                <SidebarItem
-                  key={l.to}
-                  to={l.to}
-                  icon={l.icon}
-                  label={l.label}
-                  end={l.end}
-                  children={l.children}
-                />
-              ))}
+              {visible.map((l) => {
+                const filteredChildren = l.children?.filter(c => {
+                  if (isAdmin) return true;
+                  // We can add specific child visibility logic here if needed
+                  // For now, if a child route is "/admin/gallery/analytics", only admins see it
+                  if (c.to === "/admin/gallery/analytics") return isAdmin;
+                  return true;
+                });
+                return (
+                  <SidebarItem
+                    key={l.to}
+                    to={l.to}
+                    icon={l.icon}
+                    label={l.label}
+                    end={l.end}
+                    children={filteredChildren}
+                  />
+                );
+              })}
             </SidebarGroup>
           );
         })}
