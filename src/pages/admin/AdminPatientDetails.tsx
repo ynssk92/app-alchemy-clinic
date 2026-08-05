@@ -18,6 +18,7 @@ import { generatePatientEMR } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 const InfoTile = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
   <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-border/50 shadow-sm">
@@ -36,11 +37,13 @@ const AdminPatientDetails = () => {
   const navigate = useNavigate();
   const [patient, setPatient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("overview");
   const [generatingPdf, setGeneratingPdf] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [fetchTrigger, setFetchTrigger] = useState(0);
 
   useEffect(() => {
     const fetchPatient = async () => {
+      console.log("Fetching patient details for ID:", id);
       if (!id) return;
       setLoading(true);
       try {
@@ -68,15 +71,16 @@ const AdminPatientDetails = () => {
         } else {
           setPatient(data);
         }
-      } catch (err) {
-        console.error(err);
+      } catch (err: any) {
+        console.error("Error fetching patient:", err);
+        toast.error("Failed to load patient data: " + err.message);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPatient();
-  }, [id, navigate]);
+  }, [id, navigate, fetchTrigger]);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -100,15 +104,16 @@ const AdminPatientDetails = () => {
   };
 
   const handleGenerateEMR = async () => {
+    console.log("Generating EMR Summary for patient:", patient.id);
     setGeneratingPdf(true);
     try {
-      await generatePatientEMR(patient);
+      const result = await generatePatientEMR(patient);
+      console.log("EMR Summary generated successfully:", result);
       toast.success("EMR Summary generated and saved to documents");
-      // Refresh patient data to show new document
-      window.location.reload();
+      setFetchTrigger(prev => prev + 1);
     } catch (error: any) {
-      console.error(error);
-      toast.error("Failed to generate EMR Summary");
+      console.error("EMR Generation Error:", error);
+      toast.error(`Failed to generate EMR Summary: ${error.message || "Unknown error"}`);
     } finally {
       setGeneratingPdf(false);
     }
@@ -139,7 +144,11 @@ const AdminPatientDetails = () => {
             {generatingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
             Generate EMR PDF
           </Button>
-          <Button variant="outline" className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80">
+          <Button 
+            variant="outline" 
+            className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80"
+            onClick={() => setIsEditDialogOpen(true)}
+          >
             <Pencil className="w-4 h-4 mr-2" /> Edit Record
           </Button>
           <Button className="bg-gradient-primary text-white rounded-xl h-11 px-6 shadow-lg shadow-primary/20">
@@ -345,6 +354,26 @@ const AdminPatientDetails = () => {
                     <div className="absolute left-0 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg">
                       <UserCheck className="w-4 h-4" />
                     </div>
+                  </div>
+                </div>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+
+      <EditPatientDialog 
+        open={isEditDialogOpen} 
+        onOpenChange={setIsEditDialogOpen}
+        intakeId={patient.id}
+        profileId={patient.user_id}
+        onSaved={() => setFetchTrigger(prev => prev + 1)}
+      />
+    </div>
+  );
+};
+
+export default AdminPatientDetails;
                     <div className="ml-12">
                       <p className="font-bold text-sm">Patient Created</p>
                       <p className="text-xs text-muted-foreground">{new Date(patient.created_at).toLocaleString()}</p>
