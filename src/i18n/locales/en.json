@@ -35,7 +35,7 @@
     "close": "Close",
     "add": "Add",
     "view": "View",
-    "language": "Implement automatic syncing of the CMS-managed content into my database for the app to display the latest doctors and sections."
+    "language": "Set up scheduled background jobs to periodically reconcile CMS content with my database to prevent drift."
   },
   "admin": {
     "dashboard": "Dashboard",
