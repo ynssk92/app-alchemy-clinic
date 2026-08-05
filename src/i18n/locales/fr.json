@@ -35,7 +35,7 @@
     "close": "Fermer",
     "add": "Ajouter",
     "view": "Voir",
-    "language": "Set up scheduled background jobs to periodically reconcile CMS content with my database to prevent drift."
+    "language": "Store an audit log of each sync run with timestamps, changes applied, and failure reasons for traceability."
   },
   "admin": {
     "dashboard": "Tableau de bord",
