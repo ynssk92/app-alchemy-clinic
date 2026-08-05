@@ -88,6 +88,7 @@ export type Database = {
           id: boolean
           logo_url: string | null
           map_url: string | null
+          meta: Json | null
           mobile_logo_url: string | null
           primary_hsl: string
           radius: string
@@ -112,6 +113,7 @@ export type Database = {
           id?: boolean
           logo_url?: string | null
           map_url?: string | null
+          meta?: Json | null
           mobile_logo_url?: string | null
           primary_hsl?: string
           radius?: string
@@ -136,6 +138,7 @@ export type Database = {
           id?: boolean
           logo_url?: string | null
           map_url?: string | null
+          meta?: Json | null
           mobile_logo_url?: string | null
           primary_hsl?: string
           radius?: string
