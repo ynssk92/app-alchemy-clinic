@@ -14,8 +14,6 @@ function hexToRgb(hex: string) {
 }
 
 export const generatePatientEMR = async (patient: any) => {
-  console.log("PDF Generator started for patient:", patient);
-  try {
   const template = await getPdfTemplate();
   const doc = new jsPDF() as any;
   const fullName = `${patient.first_name} ${patient.last_name}`;
@@ -136,46 +134,30 @@ export const generatePatientEMR = async (patient: any) => {
     }
   }
 
-    // Convert to Blob
-    console.log("Generating PDF blob...");
-    const pdfBlob = doc.output('blob');
-    const fileName = `EMR_${patientCode}_${new Date().getTime()}.pdf`;
-    const filePath = `${patient.id}/${fileName}`;
+  // Convert to Blob
+  const pdfBlob = doc.output('blob');
+  const fileName = `EMR_${patientCode}_${new Date().getTime()}.pdf`;
+  const filePath = `${patient.id}/${fileName}`;
 
-    // Upload to Supabase
-    console.log("Uploading PDF to storage:", filePath);
-    const { error: uploadError } = await supabase.storage
-      .from('patient_documents')
-      .upload(filePath, pdfBlob, {
-        contentType: 'application/pdf',
-        cacheControl: '3600',
-        upsert: false
-      });
-
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
-      throw new Error(`Storage upload failed: ${uploadError.message}`);
-    }
-
-    // Save record in DB
-    console.log("Saving document record in database...");
-    const { error: dbError } = await supabase.from("patient_documents").insert({
-      patient_id: patient.id,
-      document_name: `EMR Summary - ${new Date().toLocaleDateString()}`,
-      document_type: 'application/pdf',
-      category: 'medical_record',
-      file_path: filePath
+  // Upload to Supabase
+  const { error: uploadError } = await supabase.storage
+    .from('patient_documents')
+    .upload(filePath, pdfBlob, {
+      contentType: 'application/pdf'
     });
 
-    if (dbError) {
-      console.error("Database insert error:", dbError);
-      throw new Error(`Database record creation failed: ${dbError.message}`);
-    }
+  if (uploadError) throw uploadError;
 
-    console.log("EMR Summary generation completed successfully");
-    return { fileName, filePath };
-  } catch (err: any) {
-    console.error("Detailed PDF Generation Error:", err);
-    throw err;
-  }
+  // Save record in DB
+  const { error: dbError } = await supabase.from("patient_documents").insert({
+    patient_id: patient.id,
+    document_name: `EMR Summary - ${new Date().toLocaleDateString()}`,
+    document_type: 'application/pdf',
+    category: 'medical_record',
+    file_path: filePath
+  });
+
+  if (dbError) throw dbError;
+
+  return { fileName, filePath };
 };

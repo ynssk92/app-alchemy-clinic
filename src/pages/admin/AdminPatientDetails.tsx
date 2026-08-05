@@ -18,7 +18,6 @@ import { generatePatientEMR } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 const InfoTile = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
   <div className="flex items-center gap-3 p-4 rounded-2xl bg-white/50 dark:bg-slate-900/50 border border-border/50 shadow-sm">
@@ -39,13 +38,10 @@ const AdminPatientDetails = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const [generatingPdf, setGeneratingPdf] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [fetchTrigger, setFetchTrigger] = useState(0);
 
   useEffect(() => {
     const fetchPatient = async () => {
       if (!id) return;
-      console.log("Fetching patient details for ID:", id);
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -72,16 +68,15 @@ const AdminPatientDetails = () => {
         } else {
           setPatient(data);
         }
-      } catch (err: any) {
-        console.error("Error fetching patient:", err);
-        toast.error("Failed to load patient data: " + err.message);
+      } catch (err) {
+        console.error(err);
       } finally {
         setLoading(false);
       }
     };
 
     fetchPatient();
-  }, [id, navigate, fetchTrigger]);
+  }, [id, navigate]);
 
   if (loading) return (
     <div className="flex items-center justify-center min-h-[400px]">
@@ -105,16 +100,15 @@ const AdminPatientDetails = () => {
   };
 
   const handleGenerateEMR = async () => {
-    console.log("Generating EMR Summary for patient:", patient.id);
     setGeneratingPdf(true);
     try {
-      const result = await generatePatientEMR(patient);
-      console.log("EMR Summary generated successfully:", result);
+      await generatePatientEMR(patient);
       toast.success("EMR Summary generated and saved to documents");
-      setFetchTrigger(prev => prev + 1);
+      // Refresh patient data to show new document
+      window.location.reload();
     } catch (error: any) {
-      console.error("EMR Generation Error:", error);
-      toast.error(`Failed to generate EMR Summary: ${error.message || "Unknown error"}`);
+      console.error(error);
+      toast.error("Failed to generate EMR Summary");
     } finally {
       setGeneratingPdf(false);
     }
@@ -145,11 +139,7 @@ const AdminPatientDetails = () => {
             {generatingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
             Generate EMR PDF
           </Button>
-          <Button 
-            variant="outline" 
-            className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80"
-            onClick={() => setIsEditDialogOpen(true)}
-          >
+          <Button variant="outline" className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80">
             <Pencil className="w-4 h-4 mr-2" /> Edit Record
           </Button>
           <Button className="bg-gradient-primary text-white rounded-xl h-11 px-6 shadow-lg shadow-primary/20">
@@ -366,14 +356,6 @@ const AdminPatientDetails = () => {
           </Tabs>
         </div>
       </div>
-
-      <EditPatientDialog 
-        open={isEditDialogOpen} 
-        onOpenChange={setIsEditDialogOpen}
-        intakeId={patient.id}
-        profileId={patient.user_id}
-        onSaved={() => setFetchTrigger(prev => prev + 1)}
-      />
     </div>
   );
 };

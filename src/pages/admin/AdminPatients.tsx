@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Pencil, UserPlus, Search, Eye, Filter, Loader2 } from "lucide-react";
-import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
+import { Trash2, Pencil, UserPlus, Search, Eye, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -26,14 +25,13 @@ const AdminPatients = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "active" | "inactive" | "blocked">("all");
   const [query, setQuery] = useState("");
-  const [editingPatient, setEditingPatient] = useState<{id: string, user_id?: string} | null>(null);
 
   const load = async () => {
     setLoading(true);
     try {
       const { data, error } = await supabase
         .from("patients")
-        .select("id, patient_number, first_name, last_name, phone, email, status, created_at, user_id")
+        .select("id, patient_number, first_name, last_name, phone, email, status, created_at")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -44,9 +42,8 @@ const AdminPatients = () => {
         full_name: `${p.first_name} ${p.last_name}`,
         phone: p.phone,
         email: p.email,
-         status: p.status || 'active',
+        status: p.status || 'active',
         created_at: p.created_at,
-        user_id: p.user_id,
       }));
 
       setRows(mapped);
@@ -163,12 +160,7 @@ const AdminPatients = () => {
                   <Eye className="w-4 h-4 mr-2" /> View
                 </Link>
               </Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-xl h-10 px-4 hover:bg-primary/5 hover:text-primary"
-                onClick={() => setEditingPatient({ id: p.id, user_id: (p as any).user_id })}
-              >
+              <Button size="sm" variant="ghost" className="rounded-xl h-10 px-4 hover:bg-primary/5 hover:text-primary">
                 <Pencil className="w-4 h-4 mr-2" /> Edit
               </Button>
               <Button size="icon" variant="ghost" onClick={() => remove(p.id)} className="rounded-xl h-10 w-10 hover:bg-destructive/5 hover:text-destructive">
@@ -188,14 +180,6 @@ const AdminPatients = () => {
           </Card>
         )}
       </div>
-
-      <EditPatientDialog
-        open={!!editingPatient}
-        onOpenChange={(open) => !open && setEditingPatient(null)}
-        intakeId={editingPatient?.id}
-        profileId={editingPatient?.user_id}
-        onSaved={load}
-      />
     </div>
   );
 };
