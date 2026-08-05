@@ -68,11 +68,14 @@ const Auth = () => {
         // Load profile to check role and status
         const { data: prof } = await supabase
           .from("profiles")
-          .select("role, status")
+          .select("*")
           .eq("id", data.user.id)
           .maybeSingle();
 
-        if (prof?.status === "blocked" || prof?.status === "inactive") {
+        const status = (prof as any)?.status;
+        const roleStr = (prof as any)?.role;
+
+        if (status === "blocked" || status === "inactive") {
           await supabase.auth.signOut();
           throw new Error(`Your account is ${prof.status}. Please contact support.`);
         }
@@ -80,9 +83,9 @@ const Auth = () => {
         toast.success(`Welcome back!`);
         
         // Role-based redirect
-        if (prof?.role === "admin") navigate("/admin");
-        else if (prof?.role === "doctor") navigate("/admin"); // Or specific doctor route if separate
-        else if (prof?.role === "patient") navigate("/patient-dashboard");
+        if (roleStr === "admin") navigate("/admin");
+        else if (roleStr === "doctor") navigate("/admin"); // Or specific doctor route if separate
+        else if (roleStr === "patient") navigate("/patient-dashboard");
         else navigate("/profile"); // Default to profile if role missing
       } else {
         const { data, error } = await supabase.auth.signUp({

@@ -13,7 +13,8 @@ type AuthCtx = {
   isDoctor: boolean;
   isPatient: boolean;
   isStaff: boolean;
-  profileStatus: "active" | "inactive" | "blocked" | "pending" | null;
+  roleText: string | null;
+  profileStatus: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -27,6 +28,7 @@ const Ctx = createContext<AuthCtx>({
   isDoctor: false,
   isPatient: false,
   isStaff: false,
+  roleText: null,
   profileStatus: null,
   loading: true,
   signOut: async () => {},
@@ -73,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setTimeout(() => loadRole(s.user.id), 0);
       } else {
         setRole(null);
+        setRoleText(null);
         setIsAdmin(false);
         setIsAssistant(false);
         setIsDoctor(false);
@@ -96,7 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, role, isAdmin, isAssistant, isDoctor, isPatient, isStaff: isAdmin || isAssistant || isDoctor, profileStatus, loading, signOut }}>
+    <Ctx.Provider value={{ user, session, role, isAdmin, isAssistant, isDoctor, isPatient, isStaff: isAdmin || isAssistant || isDoctor, roleText, profileStatus, loading, signOut }}>
       {children}
     </Ctx.Provider>
   );
