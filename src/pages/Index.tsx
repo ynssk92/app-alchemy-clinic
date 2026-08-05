@@ -15,7 +15,7 @@ import {
   Ambulance,
   UserRound,
 } from "lucide-react";
-import { DoctorCard } from "@/components/DoctorCard";
+import { HomeDoctorCard } from "@/components/HomeDoctorCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
@@ -372,7 +372,7 @@ const Index = () => {
       {/* Gallery Section */}
       <Gallery />
 
-      {/* Doctors */}
+      {/* Doctors Preview Section */}
       {doctors.length > 0 && (
         <section className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32">
           {/* subtle blue radial gradients */}
@@ -382,32 +382,43 @@ const Index = () => {
           </div>
 
           <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-[60px] reveal">
-              <div className="max-w-2xl">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6">
-                  <UserRound className="h-3.5 w-3.5" />
-                  👨‍⚕️ OUR DOCTORS
-                </span>
-                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px]">
+            <div className="mb-16 flex flex-col items-center text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/10 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6 reveal">
+                👨‍⚕️ OUR DOCTORS
+              </span>
+              <div className="relative w-full flex flex-col items-center">
+                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px] mb-6 reveal">
                   Meet Our Medical Experts
                 </h2>
-                <p className="mt-6 text-lg leading-relaxed text-slate-500">
-                  Our experienced specialists are committed to delivering personalized, high-quality healthcare with the latest medical technologies.
+                <p className="max-w-2xl text-lg leading-relaxed text-slate-500 reveal">
+                  Meet experienced specialists dedicated to providing exceptional dental care using the latest technology.
                 </p>
+                
+                {/* Desktop View All Button - Positioned Right */}
+                <div className="hidden lg:block absolute right-0 bottom-0">
+                  <Link to="/doctors">
+                    <Button variant="ghost" className="group h-12 rounded-xl px-6 font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all">
+                      View all doctors 
+                      <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </Link>
+                </div>
               </div>
-              <Link to="/equipe" className="shrink-0 mb-2">
-                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] hover:bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all">
-                  Voir toute l'équipe <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
             </div>
             
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {doctors.map((d) => (
-                <div key={d.id} className="reveal reveal-scale">
-                  <DoctorCard doctor={d} />
-                </div>
+              {doctors.map((d, idx) => (
+                <HomeDoctorCard key={d.id} doctor={d} index={idx} />
               ))}
+            </div>
+
+            {/* Mobile/Tablet View All Button - Centered below grid */}
+            <div className="mt-12 flex justify-center lg:hidden">
+              <Link to="/doctors">
+                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] text-[#2563EB] hover:bg-white hover:border-[#2563EB] transition-all">
+                  View all doctors <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
