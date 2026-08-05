@@ -7,6 +7,8 @@ type AuthCtx = {
   session: Session | null;
   isAdmin: boolean;
   isAssistant: boolean;
+  isDoctor: boolean;
+  isPatient: boolean;
   isStaff: boolean;
   profileStatus: "pending" | "approved" | "rejected" | null;
   loading: boolean;
@@ -18,6 +20,8 @@ const Ctx = createContext<AuthCtx>({
   session: null,
   isAdmin: false,
   isAssistant: false,
+  isDoctor: false,
+  isPatient: false,
   isStaff: false,
   profileStatus: null,
   loading: true,
@@ -29,6 +33,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAssistant, setIsAssistant] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
+  const [isPatient, setIsPatient] = useState(false);
   const [profileStatus, setProfileStatus] = useState<"pending" | "approved" | "rejected" | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,6 +46,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const list = (roles || []).map((r: any) => r.role);
     setIsAdmin(list.includes("admin"));
     setIsAssistant(list.includes("assistant"));
+    setIsDoctor(list.includes("doctor"));
+    setIsPatient(list.includes("patient"));
     setProfileStatus(((prof as any)?.status as any) ?? null);
   };
 
@@ -52,6 +60,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setIsAdmin(false);
         setIsAssistant(false);
+        setIsDoctor(false);
+        setIsPatient(false);
         setProfileStatus(null);
       }
     });
@@ -71,7 +81,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isStaff: isAdmin || isAssistant, profileStatus, loading, signOut }}>
+    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isDoctor, isPatient, isStaff: isAdmin || isAssistant || isDoctor, profileStatus, loading, signOut }}>
       {children}
     </Ctx.Provider>
   );
