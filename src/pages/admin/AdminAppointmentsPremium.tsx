@@ -30,7 +30,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { format, isToday, isThisWeek, isThisMonth } from "date-fns";
+import { format, isToday, isThisWeek, isThisMonth, parseISO } from "date-fns";
 
 const AdminAppointmentsPremium = () => {
   const queryClient = useQueryClient();
