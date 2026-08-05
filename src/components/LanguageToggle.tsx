@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Premium medical Kanban dashboard implemented with real-time drag-and-drop and database synchronization.">
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="SYNC THE KANBAN VIEW WITH THE DATA BASE AND SHOW ME THE UP COMING , CONFIRMED,COMPLETED AND CANCELLED APPOINTMENT">
           <Globe className="w-4 h-4" />
           {current}
         </Button>

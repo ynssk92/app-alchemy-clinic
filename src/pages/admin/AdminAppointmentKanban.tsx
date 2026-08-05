@@ -35,7 +35,7 @@ const AdminAppointmentKanban = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const { data: appointments = [], isLoading, refetch } = useQuery({
-    queryKey: ["appointments-kanban"],
+    queryKey: ["appointments-kanban", searchTerm],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("appointments" as any)
