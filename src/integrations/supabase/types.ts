@@ -103,6 +103,36 @@ export type Database = {
           },
         ]
       }
+      app_notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           accent_hsl: string
@@ -922,6 +952,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_settings: {
+        Row: {
+          app_dm_enabled: boolean | null
+          created_at: string | null
+          email_enabled: boolean | null
+          id: string
+          reminder_lead_time_hours: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          app_dm_enabled?: boolean | null
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          reminder_lead_time_hours?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          app_dm_enabled?: boolean | null
+          created_at?: string | null
+          email_enabled?: boolean | null
+          id?: string
+          reminder_lead_time_hours?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
