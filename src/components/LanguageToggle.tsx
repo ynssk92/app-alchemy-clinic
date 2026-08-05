@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title={t("common.language")}>
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Verify that after any login or signup I land directly on my correct dashboard based on profiles.role, with zero role selector shown.">
           <Globe className="w-4 h-4" />
           {current}
         </Button>
