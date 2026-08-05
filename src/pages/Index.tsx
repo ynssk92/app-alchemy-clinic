@@ -33,7 +33,12 @@ interface Doctor {
   id: string;
   full_name: string;
   avatar_url: string | null;
+  bio: string | null;
+  experience_years: number | null;
   specialties: { name: string } | null;
+  rating?: number | null;
+  clinics?: { name: string } | null;
+  is_available?: boolean;
 }
 
 interface Post {
