@@ -53,7 +53,7 @@ const Booking = () => {
   const { user } = useAuth();
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [selectedTime, setSelectedTime] = useState("");
-  const [doctorId, setDoctorId] = useState(params.get("doctor") || "");
+  const [doctorId, setDoctorId] = useState(params.get("doctor_id") || params.get("doctor") || "");
   const [doctors, setDoctors] = useState<BookingDoctor[]>([]);
   const [busy, setBusy] = useState(false);
   const [reason, setReason] = useState<ConsultationReason | undefined>();
