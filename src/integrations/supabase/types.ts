@@ -516,12 +516,16 @@ export type Database = {
         Row: {
           avatar_url: string | null
           bio: string | null
+          biography: string | null
           clinic_id: string | null
+          consultation_duration: number | null
           created_at: string
           experience_years: number | null
           full_name: string
           id: string
           is_available: boolean
+          languages: string[] | null
+          license_number: string | null
           rating: number | null
           specialty_id: string | null
           updated_at: string
@@ -529,12 +533,16 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          biography?: string | null
           clinic_id?: string | null
+          consultation_duration?: number | null
           created_at?: string
           experience_years?: number | null
           full_name: string
           id?: string
           is_available?: boolean
+          languages?: string[] | null
+          license_number?: string | null
           rating?: number | null
           specialty_id?: string | null
           updated_at?: string
@@ -542,12 +550,16 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          biography?: string | null
           clinic_id?: string | null
+          consultation_duration?: number | null
           created_at?: string
           experience_years?: number | null
           full_name?: string
           id?: string
           is_available?: boolean
+          languages?: string[] | null
+          license_number?: string | null
           rating?: number | null
           specialty_id?: string | null
           updated_at?: string
@@ -935,6 +947,7 @@ export type Database = {
         Row: {
           address_1: string | null
           address_2: string | null
+          allergies: string | null
           avatar_url: string | null
           blood_group: string | null
           city: string | null
@@ -943,10 +956,15 @@ export type Database = {
           created_by: string | null
           dob: string | null
           email: string
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           first_name: string
           gender: string | null
           id: string
+          insurance_number: string | null
+          insurance_provider: string | null
           last_name: string
+          medical_conditions: string | null
           phone: string | null
           pincode: string | null
           primary_doctor_id: string | null
@@ -958,6 +976,7 @@ export type Database = {
         Insert: {
           address_1?: string | null
           address_2?: string | null
+          allergies?: string | null
           avatar_url?: string | null
           blood_group?: string | null
           city?: string | null
@@ -966,10 +985,15 @@ export type Database = {
           created_by?: string | null
           dob?: string | null
           email: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name: string
           gender?: string | null
           id?: string
+          insurance_number?: string | null
+          insurance_provider?: string | null
           last_name: string
+          medical_conditions?: string | null
           phone?: string | null
           pincode?: string | null
           primary_doctor_id?: string | null
@@ -981,6 +1005,7 @@ export type Database = {
         Update: {
           address_1?: string | null
           address_2?: string | null
+          allergies?: string | null
           avatar_url?: string | null
           blood_group?: string | null
           city?: string | null
@@ -989,10 +1014,15 @@ export type Database = {
           created_by?: string | null
           dob?: string | null
           email?: string
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           first_name?: string
           gender?: string | null
           id?: string
+          insurance_number?: string | null
+          insurance_provider?: string | null
           last_name?: string
+          medical_conditions?: string | null
           phone?: string | null
           pincode?: string | null
           primary_doctor_id?: string | null
@@ -1070,11 +1100,24 @@ export type Database = {
       }
       profiles: {
         Row: {
+          address: string | null
           avatar_url: string | null
+          city: string | null
+          country: string | null
           created_at: string
+          display_name: string | null
+          dob: string | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
           full_name: string | null
+          gender: string | null
           id: string
+          nationality: string | null
+          notification_preferences: Json | null
           phone: string | null
+          preferred_communication: string | null
+          preferred_language: string | null
+          privacy_settings: Json | null
           status: Database["public"]["Enums"]["profile_status"]
           status_reason: string | null
           status_updated_at: string | null
@@ -1082,11 +1125,24 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          address?: string | null
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
+          display_name?: string | null
+          dob?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           full_name?: string | null
+          gender?: string | null
           id: string
+          nationality?: string | null
+          notification_preferences?: Json | null
           phone?: string | null
+          preferred_communication?: string | null
+          preferred_language?: string | null
+          privacy_settings?: Json | null
           status?: Database["public"]["Enums"]["profile_status"]
           status_reason?: string | null
           status_updated_at?: string | null
@@ -1094,11 +1150,24 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          address?: string | null
           avatar_url?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
+          display_name?: string | null
+          dob?: string | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
           full_name?: string | null
+          gender?: string | null
           id?: string
+          nationality?: string | null
+          notification_preferences?: Json | null
           phone?: string | null
+          preferred_communication?: string | null
+          preferred_language?: string | null
+          privacy_settings?: Json | null
           status?: Database["public"]["Enums"]["profile_status"]
           status_reason?: string | null
           status_updated_at?: string | null
