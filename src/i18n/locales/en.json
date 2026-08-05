@@ -35,7 +35,7 @@
     "close": "Close",
     "add": "Add",
     "view": "View",
-    "language": "fix the issue i want to log in the panel admin page not on the profile page"
+    "language": "Implement role-based redirect logic so admin users land on the admin panel instead of the profile page after login."
   },
   "admin": {
     "dashboard": "Dashboard",

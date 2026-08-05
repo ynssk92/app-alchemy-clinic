@@ -35,7 +35,7 @@
     "close": "Fermer",
     "add": "Ajouter",
     "view": "Voir",
-    "language": "corriger le problème, je veux me connecter sur la page d'administration et non sur la page de profil"
+    "language": "Implémenter la logique de redirection basée sur les rôles afin que les administrateurs arrivent sur le panneau d'administration au lieu de la page de profil après la connexion."
   },
   "admin": {
     "dashboard": "Tableau de bord",
