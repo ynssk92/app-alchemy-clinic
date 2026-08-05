@@ -91,7 +91,10 @@ export const HomeDoctorCard = ({ doctor, index }: HomeDoctorCardProps) => {
           asChild 
           className="mt-auto h-[52px] w-full rounded-[16px] bg-gradient-to-r from-[#203080] to-[#2563EB] text-base font-bold text-white shadow-md transition-all hover:translate-y-[-2px] hover:shadow-lg active:scale-[0.98]"
         >
-          <Link to={`/booking?doctor=${doctor.id}`} className="flex items-center justify-center gap-2">
+          <Link 
+            to={`/booking?doctor_id=${doctor.id}&doctor_name=${encodeURIComponent(doctor.full_name)}&doctor_specialty=${encodeURIComponent(specialty)}`} 
+            className="flex items-center justify-center gap-2"
+          >
             <Calendar className="h-5 w-5" />
             Book Appointment
           </Link>
