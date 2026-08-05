@@ -165,12 +165,86 @@ const initialData: PatientFormData = {
   pending_files: [],
 };
 
-const PatientWizard = () => {
+const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { initialData?: any; isEditing?: boolean }) => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<PatientFormData>(initialData);
   const [isBusy, setIsBusy] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    if (initialEditData && isEditing) {
+      // Map database data to form data
+      const mappedData: PatientFormData = {
+        ...initialData,
+        first_name: initialEditData.first_name || "",
+        last_name: initialEditData.last_name || "",
+        gender: initialEditData.gender || "",
+        dob: initialEditData.dob || "",
+        marital_status: initialEditData.marital_status || "",
+        nationality: initialEditData.nationality || "",
+        national_id: initialEditData.national_id || "",
+        email: initialEditData.email || "",
+        phone: initialEditData.phone || "",
+        alternative_phone: initialEditData.alternative_phone || "",
+        preferred_language: initialEditData.preferred_language || "fr",
+        occupation: initialEditData.occupation || "",
+        status: initialEditData.status || "active",
+        lead_source: initialEditData.lead_source || "website",
+        
+        // Address
+        country: initialEditData.patient_addresses?.[0]?.country || "",
+        city: initialEditData.patient_addresses?.[0]?.city || "",
+        region: initialEditData.patient_addresses?.[0]?.region || "",
+        postal_code: initialEditData.patient_addresses?.[0]?.postal_code || "",
+        street_address: initialEditData.patient_addresses?.[0]?.street_address || "",
+        google_maps_location: initialEditData.patient_addresses?.[0]?.google_maps_location || "",
+        
+        // Medical
+        blood_group: initialEditData.patient_medical_history?.[0]?.blood_group || "",
+        height_cm: initialEditData.patient_medical_history?.[0]?.height_cm?.toString() || "",
+        weight_kg: initialEditData.patient_medical_history?.[0]?.weight_kg?.toString() || "",
+        bmi: initialEditData.patient_medical_history?.[0]?.bmi?.toString() || "",
+        primary_doctor_id: initialEditData.patient_medical_history?.[0]?.primary_doctor_id || "",
+        medical_history: initialEditData.patient_medical_history?.[0]?.conditions || [],
+        custom_conditions: initialEditData.patient_medical_history?.[0]?.custom_conditions || "",
+        
+        // Allergies
+        allergies: initialEditData.patient_allergies?.[0]?.allergies || [],
+        custom_allergies: initialEditData.patient_allergies?.[0]?.custom_allergies || "",
+        
+        // Emergency
+        emergency_name: initialEditData.patient_emergency_contacts?.[0]?.name || "",
+        emergency_relationship: initialEditData.patient_emergency_contacts?.[0]?.relationship || "",
+        emergency_phone: initialEditData.patient_emergency_contacts?.[0]?.phone || "",
+        emergency_alt_phone: initialEditData.patient_emergency_contacts?.[0]?.alternative_phone || "",
+        emergency_email: initialEditData.patient_emergency_contacts?.[0]?.email || "",
+        
+        // Insurance
+        insurance_provider: initialEditData.patient_insurance?.[0]?.provider || "",
+        insurance_number: initialEditData.patient_insurance?.[0]?.policy_number || "",
+        insurance_expiration: initialEditData.patient_insurance?.[0]?.expiration_date || "",
+        
+        // Consent
+        receive_sms: initialEditData.patient_consent?.[0]?.receive_sms || false,
+        receive_email: initialEditData.patient_consent?.[0]?.receive_email || false,
+        marketing_consent: initialEditData.patient_consent?.[0]?.marketing_consent || false,
+        privacy_policy_accepted: initialEditData.patient_consent?.[0]?.privacy_policy_accepted || false,
+        treatment_consent: initialEditData.patient_consent?.[0]?.treatment_consent || false,
+        gdpr_consent: initialEditData.patient_consent?.[0]?.gdpr_consent || false,
+        
+        // Notes
+        doctor_notes: initialEditData.patient_notes?.[0]?.doctor_notes || "",
+        internal_notes: initialEditData.patient_notes?.[0]?.internal_notes || "",
+        warnings: initialEditData.patient_notes?.[0]?.warnings || "",
+        special_instructions: initialEditData.patient_notes?.[0]?.special_instructions || "",
+        
+        // Medications
+        medications: initialEditData.patient_medications || [],
+      };
+      setFormData(mappedData);
+    }
+  }, [initialEditData, isEditing]);
 
   const updateFormData = (data: Partial<PatientFormData>) => {
     setFormData((prev) => ({ ...prev, ...data }));
@@ -326,8 +400,8 @@ const PatientWizard = () => {
     <div className="max-w-6xl mx-auto py-8 px-4 relative pb-32">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Add New Patient</h1>
-          <p className="text-muted-foreground mt-1">Create a premium electronic medical record (EMR)</p>
+          <h1 className="text-3xl font-bold text-foreground">{isEditing ? "Edit Patient" : "Add New Patient"}</h1>
+          <p className="text-muted-foreground mt-1">{isEditing ? `Update the EMR record for ${formData.first_name} ${formData.last_name}` : "Create a premium electronic medical record (EMR)"}</p>
         </div>
         <Button variant="outline" onClick={() => navigate("/admin/patients")} className="gap-2">
           <ArrowLeft className="w-4 h-4" /> Back to Patients
