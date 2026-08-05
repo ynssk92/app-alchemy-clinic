@@ -35,7 +35,7 @@
     "close": "Fermer",
     "add": "Ajouter",
     "view": "Voir",
-    "language": "synchronized all this to data base and CMS panel admin"
+    "language": "Implement automatic syncing of the CMS-managed content into my database for the app to display the latest doctors and sections."
   },
   "admin": {
     "dashboard": "Tableau de bord",
