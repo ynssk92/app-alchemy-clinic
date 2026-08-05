@@ -10,6 +10,7 @@ import ProgressIndicator from "./ProgressIndicator";
 import Step1PersonalInfo from "./Step1PersonalInfo";
 import Step2MedicalInfo from "./Step2MedicalInfo";
 import Step3EmergencyAdmin from "./Step3EmergencyAdmin";
+import DocumentUploadSection, { PendingFile } from "./DocumentUploadSection";
 import StickySaveBar from "./StickySaveBar";
 
 export type PatientFormData = {
@@ -99,6 +100,7 @@ export type PatientFormData = {
   internal_notes: string;
   warnings: string;
   special_instructions: string;
+  pending_files: PendingFile[];
 };
 
 const initialData: PatientFormData = {
@@ -160,6 +162,7 @@ const initialData: PatientFormData = {
   internal_notes: "",
   warnings: "",
   special_instructions: "",
+  pending_files: [],
 };
 
 const PatientWizard = () => {
@@ -174,7 +177,7 @@ const PatientWizard = () => {
     setHasChanges(true);
   };
 
-  const handleNext = () => setStep((s) => Math.min(s + 1, 3));
+  const handleNext = () => setStep((s) => Math.min(s + 1, 4));
   const handleBack = () => setStep((s) => Math.max(s - 1, 1));
 
   const handleSubmit = async () => {
@@ -286,6 +289,29 @@ const PatientWizard = () => {
         ) : Promise.resolve(),
       ]);
 
+      // 3. Handle File Uploads (sequentially or in batch after patient is created)
+      if (formData.pending_files.length > 0) {
+        for (const f of formData.pending_files) {
+          const fileExt = f.file.name.split('.').pop();
+          const fileName = `${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
+          const filePath = `${patient.id}/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('patient_documents')
+            .upload(filePath, f.file);
+
+          if (!uploadError) {
+            await supabase.from("patient_documents").insert({
+              patient_id: patient.id,
+              document_name: f.file.name,
+              document_type: f.file.type,
+              category: f.category,
+              file_path: filePath
+            });
+          }
+        }
+      }
+
       toast.success("Patient created successfully");
       navigate(`/admin/patients/details/${patient.id}`);
     } catch (error: any) {
@@ -328,6 +354,14 @@ const PatientWizard = () => {
             {step === 3 && (
               <Step3EmergencyAdmin formData={formData} onChange={updateFormData} />
             )}
+            {step === 4 && (
+              <Card className="p-8 border-none bg-white/50 dark:bg-slate-900/50 backdrop-blur-md shadow-xl rounded-[20px]">
+                <DocumentUploadSection 
+                  files={formData.pending_files} 
+                  onFilesChange={(files) => updateFormData({ pending_files: files })} 
+                />
+              </Card>
+            )}
           </motion.div>
         </AnimatePresence>
       </div>
@@ -342,7 +376,7 @@ const PatientWizard = () => {
           <ArrowLeft className="w-4 h-4" /> Previous
         </Button>
 
-        {step < 3 ? (
+        {step < 4 ? (
           <Button
             onClick={handleNext}
             disabled={isBusy}
