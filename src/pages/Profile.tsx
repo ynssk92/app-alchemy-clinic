@@ -83,7 +83,7 @@ const Profile = () => {
       
       if (profErr) throw profErr;
 
-      let combinedData = { ...profile };
+      let combinedData: any = { ...profile };
 
       // Fetch specific role data
       if (isPatient) {
