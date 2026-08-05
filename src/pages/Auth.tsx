@@ -50,7 +50,7 @@ const Auth = () => {
       .maybeSingle();
 
     if (error) throw error;
-    const status = profile?.status;
+    const status = profile?.status as string | undefined;
     if (status === "blocked" || status === "inactive" || status === "pending") {
       await supabase.auth.signOut();
       throw new Error(`Your account is ${status}. Please contact support.`);
