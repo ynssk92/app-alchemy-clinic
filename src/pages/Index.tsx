@@ -105,14 +105,40 @@ const Index = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = useCallback((direction: "left" | "right") => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
-      const scrollTo = direction === "left" ? scrollLeft - clientWidth : scrollLeft + clientWidth;
+      // We want to scroll by roughly one card width + gap
+      // On desktop (3 cards): clientWidth / 3
+      // But for simplicity and smoothness, scrolling by clientWidth is often better for "pages"
+      // The user asked for smooth sliding.
+      const scrollAmount = clientWidth; 
+      const scrollTo = direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
+      
       scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     }
-  };
+  }, []);
+
+  // Auto-scroll effect
+  useEffect(() => {
+    if (isPaused || doctors.length === 0) return;
+    
+    const interval = setInterval(() => {
+      if (scrollRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+        // If we are near the end, wrap around to start
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+        } else {
+          scroll("right");
+        }
+      }
+    }, 6000);
+
+    return () => clearInterval(interval);
+  }, [isPaused, doctors.length, scroll]);
 
   useEffect(() => {
     supabase
