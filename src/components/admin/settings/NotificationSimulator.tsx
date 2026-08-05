@@ -30,26 +30,57 @@ export default function NotificationSimulator() {
     const logs: string[] = [];
 
     try {
-      logs.push(`🔍 Looking up profile for ${patientEmail}...`);
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("id, full_name, email")
+      logs.push(`🔍 Looking up user account for ${patientEmail}...`);
+      
+      // Profiles table doesn't have email directly, we look in patients table which DOES have email
+      const { data: patient, error: patientError } = await supabase
+        .from("patients")
+        .select("user_id, first_name, last_name, email")
         .eq("email", patientEmail)
         .maybeSingle();
 
-      if (profileError) throw profileError;
-      if (!profile) {
-        logs.push(`❌ No profile found for ${patientEmail}. Simulation stopped.`);
+      if (patientError) throw patientError;
+      
+      let targetUserId: string | null = null;
+      let fullName = "";
+      let email = patientEmail;
+
+      if (patient && patient.user_id) {
+        targetUserId = patient.user_id;
+        fullName = `${patient.first_name} ${patient.last_name}`;
+        logs.push(`✅ Found patient record linked to user ID: ${targetUserId}`);
+      } else {
+        logs.push(`⚠️ No patient record with email ${patientEmail} found.`);
+        logs.push(`🔍 Searching profiles by display name or metadata...`);
+        
+        // Use ILIKE on display_name or full_name as fallback
+        const searchStr = patientEmail.split('@')[0];
+        const { data: profile, error: profileError } = await supabase
+          .from("profiles")
+          .select("id, full_name")
+          .or(`full_name.ilike.%${searchStr}%,display_name.ilike.%${searchStr}%`)
+          .maybeSingle();
+
+        if (profileError) throw profileError;
+
+        if (profile) {
+          targetUserId = profile.id;
+          fullName = profile.full_name || "Unknown User";
+          logs.push(`✅ Found a matching profile: ${fullName} (${targetUserId})`);
+        }
+      }
+
+      if (!targetUserId) {
+        logs.push(`❌ Could not resolve a user ID for ${patientEmail}. Simulation stopped.`);
         setResults({ success: false, logs });
         return;
       }
-      logs.push(`✅ Found profile: ${profile.full_name} (${profile.id})`);
 
       logs.push(`⚙️ Fetching notification settings for user...`);
       const { data: settings, error: settingsError } = await supabase
         .from("notification_settings")
         .select("*")
-        .eq("user_id", profile.id)
+        .eq("user_id", targetUserId)
         .maybeSingle();
 
       if (settingsError) throw settingsError;
@@ -65,7 +96,6 @@ export default function NotificationSimulator() {
       const chosenLeadTime = parseInt(leadTime);
       logs.push(`🕒 Simulating an appointment scheduled in ${chosenLeadTime} hours...`);
 
-      const now = new Date();
       const isWithinWindow = chosenLeadTime > 0 && chosenLeadTime <= userSettings.reminder_lead_time_hours;
       
       if (!isWithinWindow) {
@@ -83,13 +113,13 @@ export default function NotificationSimulator() {
       logs.push(`🔔 Appointment is WITHIN window. Triggering simulated notification logic...`);
       
       if (userSettings.app_dm_enabled) {
-        logs.push(`📱 App DM: "Bonjour ${profile.full_name}, vous avez rendez-vous..." would be sent.`);
+        logs.push(`📱 App DM: "Bonjour ${fullName}, vous avez rendez-vous..." would be sent.`);
       } else {
         logs.push(`🚫 App DM is disabled for this user.`);
       }
 
       if (userSettings.email_enabled) {
-        logs.push(`📧 Email: A reminder would be queued for ${profile.email}.`);
+        logs.push(`📧 Email: A reminder would be queued for ${email}.`);
       } else {
         logs.push(`🚫 Email is disabled for this user.`);
       }
