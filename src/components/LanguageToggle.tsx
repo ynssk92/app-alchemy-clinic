@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Implement automated appointment reminder notifications (email and/or DM on the app) with configurable lead times.">
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Implement an in-app notification inbox where patients can see upcoming and past appointment reminders and mark them as read.">
           <Globe className="w-4 h-4" />
           {current}
         </Button>
