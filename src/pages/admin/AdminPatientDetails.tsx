@@ -13,8 +13,14 @@ import {
   Weight, CalendarDays, Pencil,
   ShieldCheck, ShieldAlert, MapPin, UserCheck, Clock, FileText,
   CreditCard, ClipboardList, Stethoscope, MessageCircle, ListChecks, History, AlertCircle, Info,
-  Share2, Loader2, Download
+  Share2, Loader2, Download, MoreVertical, XCircle, Calendar, Trash2
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { generatePatientEMR } from "@/utils/pdfGenerator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -94,6 +100,35 @@ const AdminPatientDetails = () => {
     enabled: !!id,
   });
   const [generatingPdf, setGeneratingPdf] = useState(false);
+
+  const handleCancelAppointment = async (appointmentId: string) => {
+    try {
+      const { error } = await supabase
+        .from("appointments" as any)
+        .update({ status: 'cancelled' } as any)
+        .eq('id', appointmentId);
+
+      if (error) throw error;
+
+      // Log the change
+      await supabase.from('clinic_audit_log' as any).insert({
+        action: 'UPDATE',
+        table_name: 'appointments',
+        record_id: appointmentId,
+        change_data: { status: 'cancelled', note: 'Appointment cancelled via patient profile' }
+      } as any);
+
+      toast.success("Appointment cancelled successfully");
+      window.location.reload();
+    } catch (err: any) {
+      toast.error(`Error: ${err.message}`);
+    }
+  };
+
+  const handleReschedule = (appointmentId: string) => {
+    // Navigate to a reschedule view or open a modal (for now navigate to booking with state)
+    toast.info("Rescheduling feature coming soon. Please create a new appointment.");
+  };
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -483,10 +518,29 @@ const AdminPatientDetails = () => {
                     ) : (
                       timelineEvents?.filter((e: any) => new Date(e.appointment_date) >= new Date() && e.status !== 'cancelled').length > 0 ? (
                         timelineEvents?.filter((e: any) => new Date(e.appointment_date) >= new Date() && e.status !== 'cancelled').map((event: any) => (
-                          <div key={event.id} className="p-4 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
+                          <div key={event.id} className="p-4 rounded-2xl bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors relative group/item">
                             <div className="flex items-center justify-between mb-2">
                               <span className="text-sm font-bold">{event.reason_for_visit || "Consultation"}</span>
-                              <Badge className="bg-blue-500 text-[10px] uppercase font-bold">{event.status}</Badge>
+                              <div className="flex items-center gap-2">
+                                <Badge className="bg-blue-500 text-[10px] uppercase font-bold">{event.status}</Badge>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end" className="w-48">
+                                    <DropdownMenuItem className="gap-2 cursor-pointer" onClick={() => handleReschedule(event.id)}>
+                                      <Calendar className="h-4 w-4 text-primary" />
+                                      <span>Reschedule</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="gap-2 cursor-pointer text-destructive focus:text-destructive" onClick={() => handleCancelAppointment(event.id)}>
+                                      <XCircle className="h-4 w-4" />
+                                      <span>Cancel Appointment</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
                             </div>
                             <div className="flex items-center gap-4 text-xs text-muted-foreground">
                               <div className="flex items-center gap-1"><CalendarDays className="w-3 h-3" /> {new Date(event.appointment_date).toLocaleDateString()}</div>
