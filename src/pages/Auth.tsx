@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { AuthFeatureCard } from "@/components/auth/AuthFeatureCard";
-import { AccountTypeSelector } from "@/components/auth/AccountTypeSelector";
 import { AuthInput } from "@/components/auth/AuthInput";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -29,7 +28,6 @@ import logo from "@/assets/logo.png";
 const Auth = () => {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
-  const [accountType, setAccountType] = useState<"patient" | "doctor">("patient");
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [showPassword, setShowPassword] = useState(false);
   
@@ -43,6 +41,42 @@ const Auth = () => {
     gender: "",
     dob: "",
   });
+
+  const redirectToDashboard = async (userId: string) => {
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) throw error;
+    const status = profile?.status;
+    if (status === "blocked" || status === "inactive" || status === "pending") {
+      await supabase.auth.signOut();
+      throw new Error(`Your account is ${status}. Please contact support.`);
+    }
+
+    if (profile?.role === "admin" || profile?.role === "doctor" || profile?.role === "assistant") {
+      navigate("/admin", { replace: true });
+      return;
+    }
+    navigate("/patient-dashboard", { replace: true });
+  };
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (!active || !data.user) return;
+      try {
+        await redirectToDashboard(data.user.id);
+      } catch (error) {
+        if (active) toast.error(error instanceof Error ? error.message : "Unable to open your dashboard");
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,28 +99,8 @@ const Auth = () => {
         });
         if (error) throw error;
         
-        // Load profile to check role and status
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .maybeSingle();
-
-        const status = (prof as any)?.status;
-        const roleStr = (prof as any)?.role;
-
-        if (status === "blocked" || status === "inactive") {
-          await supabase.auth.signOut();
-          throw new Error(`Your account is ${prof.status}. Please contact support.`);
-        }
-
         toast.success(`Welcome back!`);
-        
-        // Role-based redirect
-        if (roleStr === "admin") navigate("/admin");
-        else if (roleStr === "doctor") navigate("/admin"); // Or specific doctor route if separate
-        else if (roleStr === "patient") navigate("/patient-dashboard");
-        else navigate("/profile"); // Default to profile if role missing
+        await redirectToDashboard(data.user.id);
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
@@ -97,7 +111,7 @@ const Auth = () => {
               phone: formData.phone,
               gender: formData.gender,
               dob: formData.dob,
-              role: accountType
+              role: "patient"
             },
             emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
@@ -109,7 +123,7 @@ const Auth = () => {
           navigate("/verify-email");
         } else {
           toast.success("Account created successfully!");
-          navigate(accountType === "doctor" ? "/admin" : "/patient-dashboard");
+          if (data.user) await redirectToDashboard(data.user.id);
         }
       }
     } catch (error: any) {
@@ -122,7 +136,7 @@ const Auth = () => {
   const handleGoogle = async () => {
     setBusy(true);
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: `${window.location.origin}/auth`,
     });
     if (result.error) {
       setBusy(false);
@@ -179,8 +193,6 @@ const Auth = () => {
           <h2 className="text-2xl font-bold text-slate-900">{mode === "login" ? "Welcome Back" : "Create Account"}</h2>
           <p className="text-slate-500 mt-1">{mode === "login" ? "Sign in to continue" : "Sign up to join our clinic"}</p>
         </div>
-
-        <AccountTypeSelector value={accountType} onChange={setAccountType} />
 
         <div className="flex bg-slate-50 p-1.5 rounded-2xl mb-8">
           <button
