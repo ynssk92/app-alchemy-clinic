@@ -108,7 +108,7 @@ const AdminPatientDetails = () => {
       window.location.reload();
     } catch (error: any) {
       console.error(error);
-      toast.error("Failed to generate EMR Summary");
+      toast.error(`Échec de la génération du résumé du DME: ${error.message || error}`);
     } finally {
       setGeneratingPdf(false);
     }

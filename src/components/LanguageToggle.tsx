@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title={t("common.language")}>
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="WHEN I CLIC ON GENERATE EMR PDF ON THIS PAGE, I RECIEVE THIS MSG">
           <Globe className="w-4 h-4" />
           {current}
         </Button>

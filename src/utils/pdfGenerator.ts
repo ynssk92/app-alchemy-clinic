@@ -143,10 +143,14 @@ export const generatePatientEMR = async (patient: any) => {
   const { error: uploadError } = await supabase.storage
     .from('patient_documents')
     .upload(filePath, pdfBlob, {
-      contentType: 'application/pdf'
+      contentType: 'application/pdf',
+      upsert: true
     });
 
-  if (uploadError) throw uploadError;
+  if (uploadError) {
+    console.error("Storage upload error:", uploadError);
+    throw uploadError;
+  }
 
   // Save record in DB
   const { error: dbError } = await supabase.from("patient_documents").insert({
@@ -157,7 +161,10 @@ export const generatePatientEMR = async (patient: any) => {
     file_path: filePath
   });
 
-  if (dbError) throw dbError;
+  if (dbError) {
+    console.error("Database insert error:", dbError);
+    throw dbError;
+  }
 
   return { fileName, filePath };
 };
