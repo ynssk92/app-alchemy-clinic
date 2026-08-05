@@ -59,11 +59,7 @@ const AdminPatientEdit = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Edit Patient Record</h1>
-        <p className="text-muted-foreground mt-1">Modify information for {patient.first_name} {patient.last_name}</p>
-      </div>
+    <div className="container mx-auto">
       <PatientWizard initialData={patient} isEditing={true} />
     </div>
   );
