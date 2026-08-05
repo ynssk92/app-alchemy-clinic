@@ -37,14 +37,15 @@ const AdminPatientDetails = () => {
   const navigate = useNavigate();
   const [patient, setPatient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
   const [generatingPdf, setGeneratingPdf] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [fetchTrigger, setFetchTrigger] = useState(0);
 
   useEffect(() => {
     const fetchPatient = async () => {
-      console.log("Fetching patient details for ID:", id);
       if (!id) return;
+      console.log("Fetching patient details for ID:", id);
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -354,6 +355,10 @@ const AdminPatientDetails = () => {
                     <div className="absolute left-0 w-10 h-10 rounded-full bg-primary border-4 border-white dark:border-slate-800 flex items-center justify-center text-white shadow-lg">
                       <UserCheck className="w-4 h-4" />
                     </div>
+                    <div className="ml-12">
+                      <p className="font-bold text-sm">Patient Created</p>
+                      <p className="text-xs text-muted-foreground">{new Date(patient.created_at).toLocaleString()}</p>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -369,22 +374,6 @@ const AdminPatientDetails = () => {
         profileId={patient.user_id}
         onSaved={() => setFetchTrigger(prev => prev + 1)}
       />
-    </div>
-  );
-};
-
-export default AdminPatientDetails;
-                    <div className="ml-12">
-                      <p className="font-bold text-sm">Patient Created</p>
-                      <p className="text-xs text-muted-foreground">{new Date(patient.created_at).toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        </div>
-      </div>
     </div>
   );
 };
