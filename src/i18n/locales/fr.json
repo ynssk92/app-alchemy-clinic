@@ -35,7 +35,7 @@
     "close": "Fermer",
     "add": "Ajouter",
     "view": "Voir",
-    "language": "Add an admin interface to manage gallery images, titles, and descriptions without editing code."
+    "language": "Add analytics to record image clicks and lightbox open/next/previous events to measure gallery engagement."
   },
   "admin": {
     "dashboard": "Tableau de bord",

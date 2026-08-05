@@ -20,6 +20,17 @@ interface GalleryImage {
   category: string;
 }
 
+const trackGalleryEvent = async (imageId: string | null, eventType: string) => {
+  try {
+    await supabase.from("gallery_events").insert({
+      image_id: imageId,
+      event_type: eventType,
+    });
+  } catch (error) {
+    console.error("Failed to track gallery event:", error);
+  }
+};
+
 export const Gallery = () => {
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,18 +56,27 @@ export const Gallery = () => {
     fetchImages();
   }, []);
 
-  const openLightbox = (index: number) => setSelectedImageIndex(index);
+  const openLightbox = (index: number) => {
+    const image = images[index];
+    trackGalleryEvent(image.id, "open");
+    setSelectedImageIndex(index);
+  };
+
   const closeLightbox = () => setSelectedImageIndex(null);
 
   const nextImage = useCallback(() => {
     if (selectedImageIndex === null || images.length === 0) return;
-    setSelectedImageIndex((prev) => (prev! + 1) % images.length);
-  }, [selectedImageIndex, images.length]);
+    const nextIndex = (selectedImageIndex! + 1) % images.length;
+    trackGalleryEvent(images[nextIndex].id, "next");
+    setSelectedImageIndex(nextIndex);
+  }, [selectedImageIndex, images]);
 
   const prevImage = useCallback(() => {
     if (selectedImageIndex === null || images.length === 0) return;
-    setSelectedImageIndex((prev) => (prev! - 1 + images.length) % images.length);
-  }, [selectedImageIndex, images.length]);
+    const prevIndex = (selectedImageIndex! - 1 + images.length) % images.length;
+    trackGalleryEvent(images[prevIndex].id, "previous");
+    setSelectedImageIndex(prevIndex);
+  }, [selectedImageIndex, images]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

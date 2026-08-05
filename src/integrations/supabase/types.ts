@@ -599,6 +599,41 @@ export type Database = {
         }
         Relationships: []
       }
+      gallery_events: {
+        Row: {
+          created_at: string | null
+          event_type: string
+          id: string
+          image_id: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          event_type: string
+          id?: string
+          image_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          event_type?: string
+          id?: string
+          image_id?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_events_image_id_fkey"
+            columns: ["image_id"]
+            isOneToOne: false
+            referencedRelation: "gallery_images"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gallery_images: {
         Row: {
           category: string
