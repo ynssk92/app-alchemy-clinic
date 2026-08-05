@@ -13,7 +13,12 @@ interface AuthLayoutProps {
 export const AuthLayout = ({ children, leftContent }: AuthLayoutProps) => {
   return (
     <div className="flex min-h-screen w-full flex-col lg:flex-row bg-[#F8FAFC]">
+      <div className="absolute top-6 right-6 z-50">
+        <LanguageToggle variant="outline" className="bg-white/80 backdrop-blur-sm border-slate-200" />
+      </div>
+
       {/* Left Side - Branding & Illustration */}
+
       <div className="relative hidden w-full flex-1 flex-col justify-between overflow-hidden lg:flex p-12 bg-white">
         {/* Background Gradients */}
         <div className="absolute top-[-10%] right-[-10%] h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px]" />
