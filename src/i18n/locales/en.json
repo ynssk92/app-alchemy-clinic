@@ -35,7 +35,7 @@
     "close": "Close",
     "add": "Add",
     "view": "View",
-    "language": "Store an audit log of each sync run with timestamps, changes applied, and failure reasons for traceability."
+    "language": "Add an admin dashboard page to view sync runs, audit logs, and recent failures with filters and search."
   },
   "admin": {
     "dashboard": "Dashboard",
