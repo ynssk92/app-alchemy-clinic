@@ -54,6 +54,7 @@ import AdminRoles from "./pages/admin/AdminRoles";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApprovals from "./pages/admin/AdminApprovals";
 import PendingApproval from "./pages/PendingApproval";
+import AdminGallery from "./pages/admin/AdminGallery";
 import { PermissionRoute } from "./components/permissions";
 import BillingDashboard from "./pages/admin/billing/BillingDashboard";
 import Invoices from "./pages/admin/billing/Invoices";
@@ -131,6 +132,7 @@ const App = () => (
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
+              <Route path="gallery" element={<ProtectedRoute staffOnly><AdminGallery /></ProtectedRoute>} />
               <Route path="settings" element={<ProtectedRoute><PermissionRoute module="settings" action="edit"><AdminSettings /></PermissionRoute></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
