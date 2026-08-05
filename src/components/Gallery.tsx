@@ -2,85 +2,61 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   ArrowUpRight, 
-  Plus, 
   Camera, 
   X, 
   ChevronLeft, 
   ChevronRight,
-  Maximize2,
-  Sparkles
+  Sparkles,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GalleryImage {
   id: string;
-  url: string;
+  image_url: string;
   title: string;
   description: string;
-  tag: string;
+  category: string;
 }
 
-const GALLERY_IMAGES: GalleryImage[] = [
-  {
-    id: "1",
-    url: "https://images.unsplash.com/photo-1629909613654-28e377c37b09?auto=format&fit=crop&q=80&w=800",
-    title: "Reception",
-    description: "A warm and welcoming environment for our patients.",
-    tag: "Premium Care",
-  },
-  {
-    id: "2",
-    url: "https://images.unsplash.com/photo-1588776814546-1ffce47267a5?auto=format&fit=crop&q=80&w=800",
-    title: "Consultation Room",
-    description: "Private spaces for personalized treatment planning.",
-    tag: "Comfort",
-  },
-  {
-    id: "3",
-    url: "https://images.unsplash.com/photo-1629909615184-74f49af3b77e?auto=format&fit=crop&q=80&w=800",
-    title: "Treatment Room",
-    description: "Advanced clinical suites equipped for excellence.",
-    tag: "Technology",
-  },
-  {
-    id: "4",
-    url: "https://images.unsplash.com/photo-1445527815219-ecbfec67492e?auto=format&fit=crop&q=80&w=800",
-    title: "Dental Technology",
-    description: "State-of-the-art diagnostic and surgical equipment.",
-    tag: "Digital Dentistry",
-  },
-  {
-    id: "5",
-    url: "https://images.unsplash.com/photo-1516549655169-df83a0774514?auto=format&fit=crop&q=80&w=800",
-    title: "Sterilization Area",
-    description: "Maximum safety through rigorous hygiene protocols.",
-    tag: "Sterilization",
-  },
-  {
-    id: "6",
-    url: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&q=80&w=800",
-    title: "Patient Lounge",
-    description: "Relaxing environment designed for your comfort.",
-    tag: "Modern Equipment",
-  },
-];
-
 export const Gallery = () => {
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+
+  const fetchImages = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("gallery_images")
+        .select("*")
+        .order("display_order", { ascending: true });
+      
+      if (error) throw error;
+      setImages(data || []);
+    } catch (error) {
+      console.error("Error fetching gallery images:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
 
   const openLightbox = (index: number) => setSelectedImageIndex(index);
   const closeLightbox = () => setSelectedImageIndex(null);
 
   const nextImage = useCallback(() => {
-    if (selectedImageIndex === null) return;
-    setSelectedImageIndex((prev) => (prev! + 1) % GALLERY_IMAGES.length);
-  }, [selectedImageIndex]);
+    if (selectedImageIndex === null || images.length === 0) return;
+    setSelectedImageIndex((prev) => (prev! + 1) % images.length);
+  }, [selectedImageIndex, images.length]);
 
   const prevImage = useCallback(() => {
-    if (selectedImageIndex === null) return;
-    setSelectedImageIndex((prev) => (prev! - 1 + GALLERY_IMAGES.length) % GALLERY_IMAGES.length);
-  }, [selectedImageIndex]);
+    if (selectedImageIndex === null || images.length === 0) return;
+    setSelectedImageIndex((prev) => (prev! - 1 + images.length) % images.length);
+  }, [selectedImageIndex, images.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -93,22 +69,30 @@ export const Gallery = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [selectedImageIndex, nextImage, prevImage]);
 
+  if (loading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (images.length === 0) return null;
+
   return (
     <section className="relative overflow-hidden bg-[#F8FAFC] py-[90px] pb-[100px]">
-      {/* subtle blue radial gradients */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute left-1/4 top-0 h-[600px] w-[600px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 h-[600px] w-[600px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
+        <div className="absolute left-1/4 top-0 h-[600px] w-[600px] rounded-full bg-primary/5 blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 h-[600px] w-[600px] rounded-full bg-accent/5 blur-[120px]" />
       </div>
 
       <div className="container mx-auto max-w-[1400px] px-4">
-        {/* Header */}
         <div className="mb-14 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm"
+            className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-primary shadow-sm"
           >
             <Camera className="h-3.5 w-3.5" />
             📷 GALLERY
@@ -118,7 +102,7 @@ export const Gallery = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mb-6 text-[48px] font-bold leading-[1.1] tracking-tight text-[#111827]"
+            className="mb-6 text-[48px] font-bold leading-[1.1] tracking-tight text-foreground"
           >
             Discover Our Modern Clinic
           </motion.h2>
@@ -127,15 +111,14 @@ export const Gallery = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-500"
+            className="mx-auto max-w-2xl text-lg leading-relaxed text-muted-foreground"
           >
             Take a look inside our clinic and explore our advanced facilities, treatment rooms, technology and patient experience.
           </motion.p>
         </div>
 
-        {/* Grid */}
         <div className="grid grid-cols-1 gap-[28px] md:grid-cols-2 lg:grid-cols-3">
-          {GALLERY_IMAGES.map((image, index) => (
+          {images.map((image, index) => (
             <motion.div
               key={image.id}
               initial={{ opacity: 0, y: 30 }}
@@ -143,39 +126,36 @@ export const Gallery = () => {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               whileHover={{ y: -8 }}
-              className="group relative h-[340px] overflow-hidden rounded-[28px] bg-white shadow-soft transition-all duration-300 hover:shadow-large"
+              className="group relative h-[340px] overflow-hidden rounded-[28px] bg-white shadow-md transition-all duration-300 hover:shadow-xl cursor-pointer"
               onClick={() => openLightbox(index)}
             >
-              {/* Top left badge */}
               <div className="absolute left-6 top-6 z-10">
-                <div className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-[#2563EB] backdrop-blur-md shadow-sm">
+                <div className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-primary backdrop-blur-md shadow-sm">
                   <Sparkles className="h-3 w-3" />
-                  {image.tag}
+                  {image.category}
                 </div>
               </div>
 
-              {/* Image */}
               <motion.img
-                src={image.url}
+                src={image.image_url}
                 alt={image.title}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.08]"
               />
 
-              {/* Bottom Overlay Card */}
               <div className="absolute inset-x-0 bottom-0 p-5 pt-0 transition-transform duration-300 group-hover:-translate-y-2">
                 <div className="relative flex items-center justify-between overflow-hidden rounded-[22px] bg-white/90 p-[22px] shadow-lg backdrop-blur-xl transition-all duration-300 group-hover:shadow-xl">
                   <div className="min-w-0 pr-4">
-                    <h3 className="truncate text-[24px] font-bold tracking-tight text-[#111827]">
+                    <h3 className="truncate text-[24px] font-bold tracking-tight text-foreground">
                       {image.title}
                     </h3>
-                    <p className="mt-1 truncate text-sm text-slate-500">
+                    <p className="mt-1 truncate text-sm text-muted-foreground">
                       {image.description}
                     </p>
                   </div>
-                  <button className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-tr from-[#2563EB] to-[#3B82F6] text-white shadow-lg transition-all duration-300 group-hover:rotate-12 group-hover:scale-110">
+                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[18px] bg-gradient-to-tr from-primary to-primary/80 text-primary-foreground shadow-lg transition-all duration-300 group-hover:rotate-12 group-hover:scale-110">
                     <ArrowUpRight className="h-6 w-6" />
-                  </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -183,7 +163,6 @@ export const Gallery = () => {
         </div>
       </div>
 
-      {/* Lightbox Modal */}
       <AnimatePresence>
         {selectedImageIndex !== null && (
           <motion.div
@@ -218,21 +197,21 @@ export const Gallery = () => {
                 key={selectedImageIndex}
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                src={GALLERY_IMAGES[selectedImageIndex].url}
-                alt={GALLERY_IMAGES[selectedImageIndex].title}
+                src={images[selectedImageIndex].image_url}
+                alt={images[selectedImageIndex].title}
                 className="max-h-full max-w-full rounded-2xl object-contain shadow-2xl"
               />
               
               <div className="absolute bottom-0 left-0 right-0 p-6 text-center text-white md:p-10">
-                <h4 className="text-2xl font-bold">{GALLERY_IMAGES[selectedImageIndex].title}</h4>
-                <p className="mt-2 text-white/70">{GALLERY_IMAGES[selectedImageIndex].description}</p>
+                <h4 className="text-2xl font-bold">{images[selectedImageIndex].title}</h4>
+                <p className="mt-2 text-white/70">{images[selectedImageIndex].description}</p>
                 <div className="mt-4 flex items-center justify-center gap-2">
-                   {GALLERY_IMAGES.map((_, i) => (
+                   {images.map((_, i) => (
                      <div 
                        key={i} 
                        className={cn(
                          "h-1.5 rounded-full transition-all duration-300",
-                         i === selectedImageIndex ? "w-8 bg-[#2563EB]" : "w-1.5 bg-white/30"
+                         i === selectedImageIndex ? "w-8 bg-primary" : "w-1.5 bg-white/30"
                        )}
                      />
                    ))}
