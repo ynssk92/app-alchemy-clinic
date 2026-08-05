@@ -36,7 +36,7 @@ export type PatientFormData = {
   postal_code: string;
   street_address: string;
   google_maps_location: string;
-
+  
   // Medical
   blood_group: string;
   height_cm: string;
@@ -174,7 +174,6 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
 
   useEffect(() => {
     if (initialEditData && isEditing) {
-      // Map database data to form data
       const mappedData: PatientFormData = {
         ...initialData,
         first_name: initialEditData.first_name || "",
@@ -192,7 +191,6 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
         status: initialEditData.status || "active",
         lead_source: initialEditData.lead_source || "website",
         
-        // Address
         country: initialEditData.patient_addresses?.[0]?.country || "",
         city: initialEditData.patient_addresses?.[0]?.city || "",
         region: initialEditData.patient_addresses?.[0]?.region || "",
@@ -200,7 +198,6 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
         street_address: initialEditData.patient_addresses?.[0]?.street_address || "",
         google_maps_location: initialEditData.patient_addresses?.[0]?.google_maps_location || "",
         
-        // Medical
         blood_group: initialEditData.patient_medical_history?.[0]?.blood_group || "",
         height_cm: initialEditData.patient_medical_history?.[0]?.height_cm?.toString() || "",
         weight_kg: initialEditData.patient_medical_history?.[0]?.weight_kg?.toString() || "",
@@ -209,23 +206,19 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
         medical_history: initialEditData.patient_medical_history?.[0]?.conditions || [],
         custom_conditions: initialEditData.patient_medical_history?.[0]?.custom_conditions || "",
         
-        // Allergies
         allergies: initialEditData.patient_allergies?.[0]?.allergies || [],
         custom_allergies: initialEditData.patient_allergies?.[0]?.custom_allergies || "",
         
-        // Emergency
         emergency_name: initialEditData.patient_emergency_contacts?.[0]?.name || "",
         emergency_relationship: initialEditData.patient_emergency_contacts?.[0]?.relationship || "",
         emergency_phone: initialEditData.patient_emergency_contacts?.[0]?.phone || "",
         emergency_alt_phone: initialEditData.patient_emergency_contacts?.[0]?.alternative_phone || "",
         emergency_email: initialEditData.patient_emergency_contacts?.[0]?.email || "",
         
-        // Insurance
         insurance_provider: initialEditData.patient_insurance?.[0]?.provider || "",
         insurance_number: initialEditData.patient_insurance?.[0]?.policy_number || "",
         insurance_expiration: initialEditData.patient_insurance?.[0]?.expiration_date || "",
         
-        // Consent
         receive_sms: initialEditData.patient_consent?.[0]?.receive_sms || false,
         receive_email: initialEditData.patient_consent?.[0]?.receive_email || false,
         marketing_consent: initialEditData.patient_consent?.[0]?.marketing_consent || false,
@@ -233,13 +226,11 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
         treatment_consent: initialEditData.patient_consent?.[0]?.treatment_consent || false,
         gdpr_consent: initialEditData.patient_consent?.[0]?.gdpr_consent || false,
         
-        // Notes
         doctor_notes: initialEditData.patient_notes?.[0]?.doctor_notes || "",
         internal_notes: initialEditData.patient_notes?.[0]?.internal_notes || "",
         warnings: initialEditData.patient_notes?.[0]?.warnings || "",
         special_instructions: initialEditData.patient_notes?.[0]?.special_instructions || "",
         
-        // Medications
         medications: initialEditData.patient_medications || [],
       };
       setFormData(mappedData);
@@ -264,32 +255,53 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
     setIsBusy(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      let patientId = initialEditData?.id;
       
-      // 1. Insert into patients
-      const { data: patient, error: patientError } = await supabase.from("patients").insert({
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        gender: formData.gender,
-        dob: formData.dob || null,
-        marital_status: formData.marital_status,
-        nationality: formData.nationality,
-        national_id: formData.national_id,
-        email: formData.email,
-        phone: formData.phone,
-        alternative_phone: formData.alternative_phone,
-        preferred_language: formData.preferred_language,
-        occupation: formData.occupation,
-        status: formData.status,
-        lead_source: formData.lead_source,
-        created_by: user?.id,
-      }).select().single();
+      if (isEditing && patientId) {
+        const { error: updateError } = await supabase.from("patients").update({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          gender: formData.gender,
+          dob: formData.dob || null,
+          marital_status: formData.marital_status,
+          nationality: formData.nationality,
+          national_id: formData.national_id,
+          email: formData.email,
+          phone: formData.phone,
+          alternative_phone: formData.alternative_phone,
+          preferred_language: formData.preferred_language,
+          occupation: formData.occupation,
+          status: formData.status,
+          lead_source: formData.lead_source,
+        }).eq("id", patientId);
+        
+        if (updateError) throw updateError;
+      } else {
+        const { data: patient, error: patientError } = await supabase.from("patients").insert({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          gender: formData.gender,
+          dob: formData.dob || null,
+          marital_status: formData.marital_status,
+          nationality: formData.nationality,
+          national_id: formData.national_id,
+          email: formData.email,
+          phone: formData.phone,
+          alternative_phone: formData.alternative_phone,
+          preferred_language: formData.preferred_language,
+          occupation: formData.occupation,
+          status: formData.status,
+          lead_source: formData.lead_source,
+          created_by: user?.id,
+        }).select().single();
 
-      if (patientError) throw patientError;
+        if (patientError) throw patientError;
+        patientId = patient.id;
+      }
 
-      // 2. Parallel inserts for related data
       await Promise.all([
-        supabase.from("patient_addresses").insert({
-          patient_id: patient.id,
+        supabase.from("patient_addresses").upsert({
+          patient_id: patientId,
           country: formData.country,
           city: formData.city,
           region: formData.region,
@@ -297,8 +309,8 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
           street_address: formData.street_address,
           google_maps_location: formData.google_maps_location,
         }),
-        supabase.from("patient_medical_history").insert({
-          patient_id: patient.id,
+        supabase.from("patient_medical_history").upsert({
+          patient_id: patientId,
           blood_group: formData.blood_group,
           height_cm: formData.height_cm ? parseFloat(formData.height_cm) : null,
           weight_kg: formData.weight_kg ? parseFloat(formData.weight_kg) : null,
@@ -307,42 +319,42 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
           conditions: formData.medical_history,
           custom_conditions: formData.custom_conditions,
         }),
-        supabase.from("patient_allergies").insert({
-          patient_id: patient.id,
+        supabase.from("patient_allergies").upsert({
+          patient_id: patientId,
           allergies: formData.allergies,
           custom_allergies: formData.custom_allergies,
         }),
-        supabase.from("patient_emergency_contacts").insert({
-          patient_id: patient.id,
+        supabase.from("patient_emergency_contacts").upsert({
+          patient_id: patientId,
           name: formData.emergency_name,
           relationship: formData.emergency_relationship,
           phone: formData.emergency_phone,
           alternative_phone: formData.emergency_alt_phone,
           email: formData.emergency_email,
         }),
-        supabase.from("patient_insurance").insert({
-          patient_id: patient.id,
+        supabase.from("patient_insurance").upsert({
+          patient_id: patientId,
           provider: formData.insurance_provider,
           policy_number: formData.insurance_number,
           expiration_date: formData.insurance_expiration || null,
         }),
-        supabase.from("patient_dental_history").insert({
-          patient_id: patient.id,
+        supabase.from("patient_dental_history").upsert({
+          patient_id: patientId,
           previous_dentist: formData.previous_dentist,
           last_visit: formData.last_visit || null,
           chief_complaint: formData.chief_complaint,
           reason_for_visit: formData.reason_for_visit,
           treatments: formData.dental_treatments,
         }),
-        supabase.from("patient_social_history").insert({
-          patient_id: patient.id,
+        supabase.from("patient_social_history").upsert({
+          patient_id: patientId,
           smoking: formData.smoking,
           alcohol: formData.alcohol,
           drug_use: formData.drug_use,
           exercise: formData.exercise,
         }),
-        supabase.from("patient_consent").insert({
-          patient_id: patient.id,
+        supabase.from("patient_consent").upsert({
+          patient_id: patientId,
           receive_sms: formData.receive_sms,
           receive_email: formData.receive_email,
           marketing_consent: formData.marketing_consent,
@@ -350,25 +362,37 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
           treatment_consent: formData.treatment_consent,
           gdpr_consent: formData.gdpr_consent,
         }),
-        supabase.from("patient_notes").insert({
-          patient_id: patient.id,
+        supabase.from("patient_notes").upsert({
+          patient_id: patientId,
           doctor_notes: formData.doctor_notes,
           internal_notes: formData.internal_notes,
           warnings: formData.warnings,
           special_instructions: formData.special_instructions,
         }),
-        // Medications
-        formData.medications.length > 0 ? supabase.from("patient_medications").insert(
-          formData.medications.map(m => ({ ...m, patient_id: patient.id }))
-        ) : Promise.resolve(),
+        (async () => {
+          if (isEditing) {
+            await supabase.from("patient_medications").delete().eq("patient_id", patientId);
+          }
+          if (formData.medications.length > 0) {
+            await supabase.from("patient_medications").insert(
+              formData.medications.map(m => ({
+                medication: m.medication,
+                dose: m.dose,
+                frequency: m.frequency,
+                duration: m.duration,
+                notes: m.notes,
+                patient_id: patientId
+              }))
+            );
+          }
+        })(),
       ]);
 
-      // 3. Handle File Uploads (sequentially or in batch after patient is created)
       if (formData.pending_files.length > 0) {
         for (const f of formData.pending_files) {
           const fileExt = f.file.name.split('.').pop();
           const fileName = `${Math.random().toString(36).substr(2, 9)}.${fileExt}`;
-          const filePath = `${patient.id}/${fileName}`;
+          const filePath = `${patientId}/${fileName}`;
 
           const { error: uploadError } = await supabase.storage
             .from('patient_documents')
@@ -376,7 +400,7 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
 
           if (!uploadError) {
             await supabase.from("patient_documents").insert({
-              patient_id: patient.id,
+              patient_id: patientId,
               document_name: f.file.name,
               document_type: f.file.type,
               category: f.category,
@@ -386,11 +410,11 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
         }
       }
 
-      toast.success("Patient created successfully");
-      navigate(`/admin/patients/details/${patient.id}`);
+      toast.success(isEditing ? "Patient updated successfully" : "Patient created successfully");
+      navigate(`/admin/patients/details/${patientId}`);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || "Failed to create patient");
+      toast.error(error.message || "Failed to save patient");
     } finally {
       setIsBusy(false);
     }
@@ -465,7 +489,7 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
             className="gap-2 bg-emerald-600 text-white hover:bg-emerald-700"
           >
             {isBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Finalize & Save
+            {isEditing ? "Update & Save" : "Finalize & Save"}
           </Button>
         )}
       </div>
@@ -475,9 +499,13 @@ const PatientWizard = ({ initialData: initialEditData, isEditing = false }: { in
         isBusy={isBusy} 
         onSave={handleSubmit} 
         onDiscard={() => {
-          setFormData(initialData);
-          setHasChanges(false);
-          setStep(1);
+          if (isEditing) {
+            window.location.reload();
+          } else {
+            setFormData(initialData);
+            setHasChanges(false);
+            setStep(1);
+          }
         }} 
       />
     </div>
