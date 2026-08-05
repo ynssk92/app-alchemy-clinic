@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Add an appointment timeline on the patient profile that loads real data from the database.">
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Implement a live medical history/summary section on the patient profile that syncs with the stored EMR data.">
           <Globe className="w-4 h-4" />
           {current}
         </Button>

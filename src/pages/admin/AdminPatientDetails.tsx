@@ -285,10 +285,75 @@ const AdminPatientDetails = () => {
             </TabsList>
 
             <TabsContent value="overview" className="mt-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <InfoTile icon={Cake} label="Age" value={calculateAge(patient.dob)} />
                 <InfoTile icon={Droplet} label="Blood Group" value={patient.patient_medical_history?.[0]?.blood_group} />
                 <InfoTile icon={Weight} label="BMI" value={patient.patient_medical_history?.[0]?.bmi} />
+                <InfoTile 
+                  icon={Activity} 
+                  label="Condition Count" 
+                  value={patient.patient_medical_history?.[0]?.conditions?.length?.toString() || "0"} 
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="p-6 border-none bg-white dark:bg-slate-900 shadow-xl rounded-[24px]">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2 text-primary">
+                      <Stethoscope className="w-5 h-5" />
+                      <h3 className="font-bold">Medical Summary</h3>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">Chief Complaints</Label>
+                      <p className="text-sm font-medium">{patient.patient_medical_history?.[0]?.chief_complaints || "No active complaints"}</p>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-muted-foreground block mb-1">Current Medications</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {patient.patient_medications?.length > 0 ? (
+                          patient.patient_medications.map((m: any, idx: number) => (
+                            <Badge key={idx} variant="outline" className="text-[10px] font-bold bg-blue-50/50 dark:bg-blue-900/10">
+                              {m.medication_name} ({m.dosage})
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">None listed</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                <Card className="p-6 border-none bg-white dark:bg-slate-900 shadow-xl rounded-[24px]">
+                  <div className="flex items-center gap-2 mb-4 text-red-500">
+                    <AlertCircle className="w-5 h-5" />
+                    <h3 className="font-bold">Clinical Alerts</h3>
+                  </div>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-red-600 block mb-1">Active Allergies</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {patient.patient_allergies?.[0]?.allergies?.length > 0 ? (
+                          patient.patient_allergies[0].allergies.map((a: string) => (
+                            <Badge key={a} variant="destructive" className="text-[10px] font-bold">
+                              {a}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">No known allergies</span>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-[10px] uppercase font-bold text-red-600 block mb-1">Warnings</Label>
+                      <p className="text-sm text-red-700 dark:text-red-400 font-medium bg-red-50/50 dark:bg-red-900/10 p-2 rounded-lg border border-red-100 dark:border-red-900/20">
+                        {patient.patient_notes?.[0]?.warnings || "No clinical warnings"}
+                      </p>
+                    </div>
+                  </div>
+                </Card>
               </div>
 
               <Card className="p-8 border-none bg-white dark:bg-slate-900 shadow-xl rounded-[24px]">
