@@ -139,9 +139,9 @@ const AdminAppointmentsPremium = () => {
     // Date filter
     let matchesDate = true;
     if (dateFilter !== "all" && a.appointment_date) {
-      const apptDate = new Date(a.appointment_date);
+      const apptDate = parseISO(a.appointment_date);
       if (dateFilter === "today") matchesDate = isToday(apptDate);
-      else if (dateFilter === "week") matchesDate = isThisWeek(apptDate);
+      else if (dateFilter === "week") matchesDate = isThisWeek(apptDate, { weekStartsOn: 1 });
       else if (dateFilter === "month") matchesDate = isThisMonth(apptDate);
     }
 
