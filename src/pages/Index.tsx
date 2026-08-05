@@ -423,9 +423,6 @@ const Index = () => {
           </div>
         </section>
       )}
-          </div>
-        </section>
-      )}
 
       {/* Blog */}
       {posts.length > 0 && (
