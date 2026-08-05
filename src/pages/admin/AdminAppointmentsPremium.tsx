@@ -43,9 +43,13 @@ const AdminAppointmentsPremium = () => {
       const { data, error } = await supabase
         .from("appointments" as any)
         .select(`
-          id, appointment_date, appointment_time, status, reason_for_visit,
-          patients (first_name, last_name, avatar_url),
-          doctors (first_name, last_name)
+          id, appointment_date, appointment_time, status, reason, 
+          patients (first_name, last_name),
+          doctors (
+            full_name,
+            specialties (name),
+            clinics (name)
+          )
         `)
         .order("appointment_date", { ascending: false });
       if (error) throw error;
