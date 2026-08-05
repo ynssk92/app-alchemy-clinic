@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getPdfTemplate } from "./pdfTemplateService";
@@ -51,7 +51,7 @@ export const generatePatientEMR = async (patient: any) => {
         ["Occupation", patient.occupation || "—", "Nationality", patient.nationality || "—"],
       ];
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: currentY + 5,
         body: personalData,
         theme: 'plain',
@@ -77,7 +77,7 @@ export const generatePatientEMR = async (patient: any) => {
         ["Conditions", medical.conditions?.join(", ") || "None listed", "", ""],
       ];
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: currentY + 5,
         body: medicalData,
         theme: 'plain',
@@ -109,7 +109,7 @@ export const generatePatientEMR = async (patient: any) => {
       
       const medications = patient.patient_medications || [];
       if (medications.length > 0) {
-        doc.autoTable({
+        autoTable(doc, {
           startY: currentY + 5,
           head: [['Medication', 'Dose', 'Frequency', 'Notes']],
           body: medications.map((m: any) => [m.medication, m.dose, m.frequency, m.notes || "—"]),
