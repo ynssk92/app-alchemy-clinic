@@ -6,7 +6,7 @@ import { Bell, Mail, Smartphone, Globe, MessageSquare, Clock } from "lucide-reac
 
 interface NotificationProps {
   preferences: any;
-  onChange: (key: string, value: boolean) => void;
+  onChange: (key: string, value: any) => void;
 }
 
 export const NotificationSettingsCard = ({ preferences, onChange }: NotificationProps) => {
