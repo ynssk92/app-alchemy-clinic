@@ -49,8 +49,12 @@ export const ProtectedRoute = ({
 
   // Wait for role to be loaded if user exists but role is null
   if (user && role === null) {
-    // Redirect to admin dashboard as requested if role is not yet determined
-    return <Navigate to="/admin" replace />;
+    // If the path is /profile, we might want to allow it, but the user explicitly wants to land on admin dashboard.
+    // However, we should only redirect if we're NOT already going to /admin to avoid loops.
+    if (!location.pathname.startsWith("/admin")) {
+      return <Navigate to="/admin" replace />;
+    }
+    return children;
   }
 
   // Authorization checks
