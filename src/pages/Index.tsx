@@ -409,92 +409,82 @@ const Index = () => {
       {/* Gallery Section */}
       <Gallery />
 
-      {/* Doctors Preview Section */}
+      {/* Doctors Carousel Section */}
       {doctors.length > 0 && (
-        <section className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32">
-          {/* subtle blue radial gradients */}
+        <section 
+          className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          {/* subtle blurred circles decoration */}
           <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
-            <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
+            <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-[#2563EB]/5 blur-[150px] opacity-[0.08]" />
+            <div className="absolute bottom-0 left-0 h-[600px] w-[600px] rounded-full bg-[#06B6D4]/5 blur-[150px] opacity-[0.08]" />
           </div>
 
           <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="mb-16 flex flex-col items-center text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/10 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6 reveal">
-                👨‍⚕️ OUR DOCTORS
-              </span>
-              <div className="relative w-full flex flex-col items-center">
-                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px] mb-6 reveal">
+            {/* Header Section */}
+            <div className="mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+              <div className="max-w-2xl reveal">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/10 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6">
+                  👨‍⚕️ OUR DOCTORS
+                </span>
+                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px] mb-6">
                   Meet Our Medical Experts
                 </h2>
-                <p className="max-w-2xl text-lg leading-relaxed text-slate-500 reveal">
-                  Meet experienced specialists dedicated to providing exceptional dental care using the latest technology.
+                <p className="text-lg leading-relaxed text-slate-500">
+                  Meet experienced specialists committed to delivering exceptional dental care with modern technology.
                 </p>
-                
-                {/* Desktop Navigation & View All */}
-                <div className="hidden lg:flex items-center gap-4 absolute right-0 bottom-0">
-                  <div className="flex items-center gap-2 mr-4">
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="rounded-full border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
-                      onClick={() => scroll("left")}
-                    >
-                      <ChevronLeft className="h-5 w-5" />
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      size="icon" 
-                      className="rounded-full border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
-                      onClick={() => scroll("right")}
-                    >
-                      <ChevronRight className="h-5 w-5" />
-                    </Button>
-                  </div>
-                  <Link to="/doctors">
-                    <Button variant="ghost" className="group h-12 rounded-xl px-6 font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all">
-                      View all doctors 
-                      <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
+              </div>
+              
+              <div className="flex flex-col items-center md:items-end gap-3 reveal" style={{ transitionDelay: "100ms" }}>
+                <div className="flex items-center gap-3">
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-12 w-12 rounded-full bg-white border-none shadow-soft hover:bg-[#2563EB] hover:text-white transition-all duration-300"
+                    onClick={() => scroll("left")}
+                    aria-label="Previous"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="icon" 
+                    className="h-12 w-12 rounded-full bg-white border-none shadow-soft hover:bg-[#2563EB] hover:text-white transition-all duration-300"
+                    onClick={() => scroll("right")}
+                    aria-label="Next"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </Button>
                 </div>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                  15+ Specialists Available
+                </span>
               </div>
             </div>
             
+            {/* Carousel Container */}
             <div 
               ref={scrollRef}
-              className="flex gap-8 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory lg:grid lg:grid-cols-3 lg:overflow-visible"
+              className="flex gap-8 overflow-x-auto pb-12 scrollbar-hide snap-x snap-mandatory"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {doctors.map((d, idx) => (
-                <div key={d.id} className="min-w-[300px] flex-shrink-0 snap-center lg:min-w-0">
+                <div 
+                  key={d.id} 
+                  className="min-w-full sm:min-w-[calc(50%-16px)] lg:min-w-[calc(33.333%-22px)] flex-shrink-0 snap-center"
+                >
                   <HomeDoctorCard doctor={d} index={idx} />
                 </div>
               ))}
             </div>
 
-            {/* Mobile/Tablet View All & Navigation */}
-            <div className="mt-12 flex flex-col items-center gap-8 lg:hidden">
-              <div className="flex items-center gap-4">
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="h-12 w-12 rounded-full border-[#E5E7EB] text-[#2563EB]"
-                  onClick={() => scroll("left")}
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="icon" 
-                  className="h-12 w-12 rounded-full border-[#E5E7EB] text-[#2563EB]"
-                  onClick={() => scroll("right")}
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </Button>
-              </div>
+            {/* View All Section - Bottom */}
+            <div className="mt-8 flex justify-center reveal" style={{ transitionDelay: "200ms" }}>
               <Link to="/doctors">
-                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] text-[#2563EB] hover:bg-white hover:border-[#2563EB] transition-all">
-                  View all doctors <ArrowRight className="w-4 h-4 ml-2" />
+                <Button variant="ghost" className="group h-12 rounded-xl px-8 font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all">
+                  View all doctors <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
             </div>
