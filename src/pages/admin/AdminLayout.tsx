@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
-  UserCheck, Search, Moon, Sun, User, BarChart3,
+  UserCheck, Search, Moon, Sun, User, BarChart3, Image as ImageIcon,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
