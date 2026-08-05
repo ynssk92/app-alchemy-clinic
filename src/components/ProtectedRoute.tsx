@@ -49,8 +49,8 @@ export const ProtectedRoute = ({
 
   // Wait for role to be loaded if user exists but role is null
   if (user && role === null) {
-    // If we're on a path that needs a role, but profile is incomplete
-    return <Navigate to="/profile" replace />;
+    // Redirect to admin dashboard as requested if role is not yet determined
+    return <Navigate to="/admin" replace />;
   }
 
   // Authorization checks
