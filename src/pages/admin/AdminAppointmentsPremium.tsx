@@ -305,7 +305,7 @@ const AdminAppointmentsPremium = () => {
 
               <div className="flex flex-col md:items-end gap-1 px-4 border-l border-slate-50">
                 <div className="text-sm font-bold text-slate-700">
-                  {format(new Date(a.appointment_date), "EEEE, d MMM yyyy")}
+                  {format(parseISO(a.appointment_date), "EEEE, d MMM yyyy")}
                 </div>
                 <div className="flex items-center gap-2 text-xs text-slate-500 font-medium">
                   <Clock className="w-3 h-3" /> {a.appointment_time} · 30 min
