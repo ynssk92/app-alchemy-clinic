@@ -42,26 +42,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAssistant, setIsAssistant] = useState(false);
   const [isDoctor, setIsDoctor] = useState(false);
   const [isPatient, setIsPatient] = useState(false);
-  const [profileStatus, setProfileStatus] = useState<"active" | "inactive" | "blocked" | "pending" | null>(null);
+  const [roleText, setRoleText] = useState<string | null>(null);
+  const [profileStatus, setProfileStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const loadRole = async (uid: string) => {
     try {
       const { data: prof, error: profError } = await supabase
         .from("profiles")
-        .select("role, status")
+        .select("*")
         .eq("id", uid)
         .maybeSingle();
 
       if (profError) throw profError;
 
-      const userRole = prof?.role as UserRole;
+      const userRole = (prof as any)?.role as UserRole;
       setRole(userRole);
+      setRoleText((prof as any)?.role || null);
       setIsAdmin(userRole === "admin");
       setIsAssistant(userRole === "assistant");
       setIsDoctor(userRole === "doctor");
       setIsPatient(userRole === "patient");
-      setProfileStatus(prof?.status as any || null);
+      setProfileStatus((prof as any)?.status || null);
     } catch (error) {
       console.error("Error loading profile role:", error);
     }
@@ -99,7 +101,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, role, isAdmin, isAssistant, isDoctor, isPatient, isStaff: isAdmin || isAssistant || isDoctor, roleText, profileStatus, loading, signOut }}>
+    <Ctx.Provider value={{ 
+      user, 
+      session, 
+      role, 
+      isAdmin, 
+      isAssistant, 
+      isDoctor, 
+      isPatient, 
+      isStaff: isAdmin || isAssistant || isDoctor, 
+      roleText, 
+      profileStatus, 
+      loading, 
+      signOut 
+    }}>
       {children}
     </Ctx.Provider>
   );
