@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { getPdfTemplate } from "./pdfTemplateService";
@@ -51,14 +51,14 @@ export const generatePatientEMR = async (patient: any) => {
         ["Occupation", patient.occupation || "—", "Nationality", patient.nationality || "—"],
       ];
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: currentY + 5,
         body: personalData,
         theme: 'plain',
         styles: { fontSize: template.bodyFontSize, cellPadding: 2 },
         columnStyles: { 
-          0: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 },
-          2: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 }
+          0: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 },
+          2: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 }
         }
       });
       currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -77,14 +77,14 @@ export const generatePatientEMR = async (patient: any) => {
         ["Conditions", medical.conditions?.join(", ") || "None listed", "", ""],
       ];
 
-      doc.autoTable({
+      autoTable(doc, {
         startY: currentY + 5,
         body: medicalData,
         theme: 'plain',
         styles: { fontSize: template.bodyFontSize, cellPadding: 2 },
         columnStyles: { 
-          0: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 },
-          2: { fontStyle: 'bold', textColor: [100, 100, 100], width: 30 }
+          0: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 },
+          2: { fontStyle: 'bold', textColor: [100, 100, 100], cellWidth: 30 }
         }
       });
       currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -109,7 +109,7 @@ export const generatePatientEMR = async (patient: any) => {
       
       const medications = patient.patient_medications || [];
       if (medications.length > 0) {
-        doc.autoTable({
+        autoTable(doc, {
           startY: currentY + 5,
           head: [['Medication', 'Dose', 'Frequency', 'Notes']],
           body: medications.map((m: any) => [m.medication, m.dose, m.frequency, m.notes || "—"]),
