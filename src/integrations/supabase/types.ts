@@ -1784,6 +1784,7 @@ export type Database = {
           preferred_communication: string | null
           preferred_language: string | null
           privacy_settings: Json | null
+          role: string | null
           status: Database["public"]["Enums"]["profile_status"]
           status_reason: string | null
           status_updated_at: string | null
@@ -1809,6 +1810,7 @@ export type Database = {
           preferred_communication?: string | null
           preferred_language?: string | null
           privacy_settings?: Json | null
+          role?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           status_reason?: string | null
           status_updated_at?: string | null
@@ -1834,6 +1836,7 @@ export type Database = {
           preferred_communication?: string | null
           preferred_language?: string | null
           privacy_settings?: Json | null
+          role?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           status_reason?: string | null
           status_updated_at?: string | null
