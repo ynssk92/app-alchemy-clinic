@@ -35,7 +35,7 @@
     "close": "Close",
     "add": "Add",
     "view": "View",
-    "language": "add historic log-in and modification on the new section on admin panel"
+    "language": "Load the security issues from the scan results and fix the selected issues."
   },
   "admin": {
     "dashboard": "Dashboard",
