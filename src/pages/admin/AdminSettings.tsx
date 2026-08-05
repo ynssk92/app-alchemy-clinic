@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { Upload, Palette, Save, RotateCcw, FileText, Bell } from "lucide-react";
 import PdfTemplateEditor from "@/components/admin/settings/PdfTemplateEditor";
 import NotificationSettings from "@/components/admin/settings/NotificationSettings";
+import NotificationSimulator from "@/components/admin/settings/NotificationSimulator";
 import { usePermissions } from "@/hooks/usePermissions";
 
 const PRESETS = [
@@ -318,8 +319,9 @@ export default function AdminSettings() {
           <PdfTemplateEditor />
         </TabsContent>
 
-        <TabsContent value="notifications" className="mt-4">
+        <TabsContent value="notifications" className="space-y-4 mt-4">
           <NotificationSettings />
+          <NotificationSimulator />
         </TabsContent>
 
         <TabsContent value="ui" className="space-y-4 mt-4">
