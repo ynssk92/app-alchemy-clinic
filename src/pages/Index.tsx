@@ -13,7 +13,9 @@ import {
   Stethoscope,
   UserCheck,
   Ambulance,
+  UserRound,
 } from "lucide-react";
+import { DoctorCard } from "@/components/DoctorCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
@@ -97,7 +99,7 @@ const Index = () => {
   useEffect(() => {
     supabase
       .from("doctors")
-      .select("id, full_name, avatar_url, specialties(name)")
+      .select("id, full_name, avatar_url, experience_years, specialties(name), rating, clinics(name), is_available")
       .eq("is_available", true)
       .order("full_name")
       .limit(3)
@@ -349,60 +351,44 @@ const Index = () => {
 
       {/* Doctors */}
       {doctors.length > 0 && (
-        <section className="py-20 md:py-28 bg-muted/30 border-y border-border">
-          <div className="container mx-auto px-4">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-14 reveal">
-              <div>
-                <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">
-                  Praticiens
+        <section className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32">
+          {/* subtle blue radial gradients */}
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
+          </div>
+
+          <div className="container mx-auto px-4 max-w-[1400px]">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-[60px] reveal">
+              <div className="max-w-2xl">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6">
+                  <UserRound className="h-3.5 w-3.5" />
+                  👨‍⚕️ OUR DOCTORS
                 </span>
-                <h2 className="text-3xl md:text-4xl font-bold text-foreground">Nos experts</h2>
-                <p className="text-muted-foreground mt-3 max-w-xl">
-                  Des spécialistes passionnés, formés aux techniques les plus avancées pour prendre
-                  soin de votre sourire.
+                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px]">
+                  Meet Our Medical Experts
+                </h2>
+                <p className="mt-6 text-lg leading-relaxed text-slate-500">
+                  Our experienced specialists are committed to delivering personalized, high-quality healthcare with the latest medical technologies.
                 </p>
               </div>
-              <Link to="/equipe" className="shrink-0">
-                <Button variant="outline" className="rounded-full font-semibold">
-                  Voir toute l'équipe <ArrowRight className="w-4 h-4 ml-1" />
+              <Link to="/equipe" className="shrink-0 mb-2">
+                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] hover:bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all">
+                  Voir toute l'équipe <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {doctors.map((d, i) => (
-                <article
-                  key={d.id}
-                  className="reveal reveal-scale group relative overflow-hidden rounded-3xl bg-card border border-border shadow-soft hover:shadow-large hover:-translate-y-1 transition-all duration-300"
-                  style={{ transitionDelay: `${i * 90}ms` }}
-                >
-                  <div className="relative aspect-[4/5] bg-muted overflow-hidden">
-                    {d.avatar_url ? (
-                      <img
-                        src={d.avatar_url}
-                        alt={`Portrait de ${d.full_name}`}
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-primary">
-                        <span className="text-5xl font-bold text-primary-foreground">
-                          {initialsOf(d.full_name)}
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-foreground/85 via-foreground/25 to-transparent" />
-                    <span className="absolute top-4 left-4 rounded-full bg-background/90 backdrop-blur px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-primary">
-                      {d.specialties?.name || "Chirurgien-dentiste"}
-                    </span>
-                    <div className="absolute inset-x-0 bottom-0 p-5">
-                      <h3 className="text-xl font-bold text-background">{d.full_name}</h3>
-                      <p className="text-sm text-background/75">
-                        {d.specialties?.name || "Chirurgien-dentiste"}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="p-5">
-                    <Link to={`/booking?doctor=${d.id}`}>
+            
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {doctors.map((d) => (
+                <div key={d.id} className="reveal reveal-scale">
+                  <DoctorCard doctor={d} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
                       <Button
                         className="w-full rounded-full font-semibold"
                         aria-label={`Prendre rendez-vous avec ${d.full_name}`}
