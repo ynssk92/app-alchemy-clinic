@@ -1,6 +1,6 @@
 import { PageShell } from "@/components/PageShell";
 import { DoctorCard, type DoctorCardData } from "@/components/DoctorCard";
-import { Stethoscope } from "lucide-react";
+import { UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -29,34 +29,32 @@ const Equipe = () => {
       hideHero
     >
 
-      <section className="relative -mx-4 overflow-hidden px-4 py-16 md:py-24 lg:py-32">
-        {/* soft medical background */}
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-hero opacity-40" />
-        <div className="pointer-events-none absolute -left-24 top-10 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute -right-24 bottom-0 -z-10 h-80 w-80 rounded-full bg-accent/10 blur-3xl" />
+      <section className="relative -mx-4 overflow-hidden bg-[#F8FAFC] px-4 py-[100px]">
+        {/* subtle blue radial gradients */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
+        </div>
 
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1400px]">
           {/* header */}
-          <div className="mx-auto mb-14 max-w-2xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
-              <Stethoscope className="h-3.5 w-3.5" />
-              Nos experts médicaux
+          <div className="mx-auto mb-[60px] max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm">
+              <UserRound className="h-3.5 w-3.5" />
+              👨‍⚕️ OUR DOCTORS
             </span>
-            <h1 className="mt-5 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-              Rencontrez nos{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">spécialistes</span>
+            <h1 className="mt-6 text-[44px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[56px]">
+              Meet Our Medical Experts
             </h1>
-
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Une équipe pluridisciplinaire de praticiens diplômés, formés aux dernières technologies
-              dentaires, qui vous accompagne avec précision, écoute et bienveillance.
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-500">
+              Our experienced specialists are committed to delivering personalized, high-quality healthcare with the latest medical technologies.
             </p>
           </div>
 
           {loading ? (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="h-[420px] animate-pulse rounded-3xl border border-border bg-muted/40" />
+                <div key={i} className="h-[580px] animate-pulse rounded-[28px] border border-[#E5E7EB] bg-white shadow-soft" />
               ))}
             </div>
           ) : doctors.length === 0 ? (
@@ -64,7 +62,7 @@ const Equipe = () => {
               Aucun praticien à afficher pour le moment.
             </p>
           ) : (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {doctors.map((d) => (
                 <DoctorCard key={d.id} doctor={d} />
               ))}

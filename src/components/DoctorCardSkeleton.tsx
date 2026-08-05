@@ -1,22 +1,26 @@
 export const DoctorCardSkeleton = () => (
   <div
     aria-hidden="true"
-    className="flex animate-pulse flex-col items-center rounded-3xl border border-border bg-card p-8 text-center shadow-soft"
+    className="flex animate-pulse flex-col overflow-hidden rounded-[28px] border border-[#E5E7EB] bg-white p-8 shadow-soft"
   >
-    <div className="mb-5 h-[140px] w-[140px] rounded-full bg-muted" />
-    <div className="h-6 w-40 rounded-full bg-muted" />
-    <div className="mt-3 h-5 w-24 rounded-full bg-muted/70" />
-    <div className="mt-4 h-4 w-36 rounded-full bg-muted/70" />
-    <div className="mt-4 flex flex-wrap justify-center gap-2">
-      <div className="h-6 w-20 rounded-full bg-muted/70" />
-      <div className="h-6 w-20 rounded-full bg-muted/70" />
-      <div className="h-6 w-20 rounded-full bg-muted/70" />
+    <div className="relative mb-6 flex justify-center">
+      <div className="h-[150px] w-[150px] rounded-full bg-slate-100" />
     </div>
-    <div className="mt-5 h-4 w-full rounded-full bg-muted/70" />
-    <div className="mt-2 h-4 w-4/5 rounded-full bg-muted/70" />
-    <div className="mt-6 flex w-full flex-col gap-2 sm:flex-row">
-      <div className="h-10 flex-1 rounded-xl bg-muted" />
-      <div className="h-10 flex-1 rounded-xl bg-muted/70" />
+    <div className="mx-auto h-8 w-48 rounded-full bg-slate-100" />
+    <div className="mx-auto mt-3 h-6 w-24 rounded-full bg-slate-100/70" />
+    
+    <div className="mt-8 grid grid-cols-2 gap-4">
+      <div className="h-12 rounded-xl bg-slate-50" />
+      <div className="h-12 rounded-xl bg-slate-50" />
+      <div className="h-12 rounded-xl bg-slate-50" />
+      <div className="h-12 rounded-xl bg-slate-50" />
+    </div>
+    
+    <div className="mt-8 h-16 rounded-2xl bg-slate-50" />
+    
+    <div className="mt-8 space-y-3">
+      <div className="h-12 w-full rounded-xl bg-slate-100" />
+      <div className="h-10 w-full rounded-xl bg-slate-50" />
     </div>
   </div>
 );

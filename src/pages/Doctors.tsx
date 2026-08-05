@@ -1,6 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Stethoscope, Loader2 } from "lucide-react";
+import { Search, UserRound, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageShell } from "@/components/PageShell";
@@ -132,26 +132,25 @@ const Doctors = () => {
       heading="Find Your Doctor"
       hideHero
     >
-      <section className="relative -mx-4 overflow-hidden bg-background px-4 py-16 md:py-24 lg:py-32">
-        {/* soft medical background (matched to booking page) */}
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
-        <div className="pointer-events-none absolute -top-24 left-1/4 -z-10 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-80 w-80 rounded-full bg-secondary/10 blur-3xl" />
+      <section className="relative -mx-4 overflow-hidden bg-[#F8FAFC] px-4 py-[100px]">
+        {/* subtle blue radial gradients */}
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
+        </div>
 
-        <div className="mx-auto max-w-[1280px]">
+        <div className="mx-auto max-w-[1400px]">
           {/* header */}
-          <div className="mx-auto mb-14 max-w-2xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
-              <Stethoscope className="h-3.5 w-3.5" />
-              Annuaire des praticiens
+          <div className="mx-auto mb-[60px] max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm">
+              <UserRound className="h-3.5 w-3.5" />
+              👨‍⚕️ OUR DOCTORS
             </span>
-            <h1 className="mt-5 text-4xl font-bold tracking-tight text-foreground md:text-5xl">
-              Trouvez votre{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">praticien</span>
+            <h1 className="mt-6 text-[44px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[56px]">
+              Meet Our Medical Experts
             </h1>
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
-              Parcourez notre réseau de professionnels de santé vérifiés et réservez votre
-              rendez-vous en quelques secondes.
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-500">
+              Our experienced specialists are committed to delivering personalized, high-quality healthcare with the latest medical technologies.
             </p>
 
             <div className="relative mx-auto mt-8 max-w-xl">
@@ -184,7 +183,7 @@ const Doctors = () => {
           </div>
 
           {loading ? (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: PAGE_SIZE }).map((_, i) => (
                 <DoctorCardSkeleton key={i} />
               ))}
@@ -198,7 +197,7 @@ const Doctors = () => {
           ) : (
 
             <>
-              <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {shown.map((doctor) => (
                   <div
                     key={doctor.id}
