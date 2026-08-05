@@ -35,7 +35,7 @@
     "close": "Close",
     "add": "Add",
     "view": "View",
-    "language": "Add an admin dashboard page to view sync runs, audit logs, and recent failures with filters and search."
+    "language": "Add a secure patient health records section where I can upload, view, and share documents with my clinician."
   },
   "admin": {
     "dashboard": "Dashboard",
