@@ -35,7 +35,7 @@
     "close": "Close",
     "add": "Add",
     "view": "View",
-    "language": "Load the security issues from the scan results and fix the selected issues."
+    "language": "fix the issue i want to log in the panel admin page not on the profile page"
   },
   "admin": {
     "dashboard": "Dashboard",
