@@ -71,9 +71,20 @@ const AdminAppointmentKanban = () => {
         .update({ status } as any)
         .eq("id", id);
       if (error) throw error;
+
+      // Also log the audit for status changes
+      await supabase.from("clinic_audit_log" as any).insert({
+        action: "UPDATE",
+        table_name: "appointments",
+        record_id: id,
+        change_data: { status, source: "Kanban Board" }
+      } as any);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointments-kanban"] });
+      // Important: Also invalidate other appointment queries to keep calendar/lists in sync
+      queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-timeline"] });
       toast.success("Appointment status updated");
     },
     onError: (error: any) => {

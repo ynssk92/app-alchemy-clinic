@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -12,16 +13,28 @@ type Row = {
 };
 
 const AdminAppointmentCalendar = () => {
-  const [rows, setRows] = useState<Row[]>([]);
+  const queryClient = useQueryClient();
   const [cursor, setCursor] = useState(() => {
     const d = new Date(); d.setDate(1); return d;
   });
 
-  useEffect(() => {
-    supabase.from("appointments")
-      .select("id, appointment_date, appointment_time, status, doctors(full_name)")
-      .then(({ data }) => setRows((data as any) || []));
-  }, []);
+  const { data: rows = [], isLoading } = useQuery({
+    queryKey: ["appointments", "calendar"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("appointments" as any)
+        .select("id, appointment_date, appointment_time, status, doctors(first_name, last_name)")
+        .order("appointment_date", { ascending: true });
+      
+      if (error) throw error;
+      
+      // Transform full_name if necessary since we changed the query to first_name/last_name
+      return (data || []).map((r: any) => ({
+        ...r,
+        doctors: r.doctors ? { full_name: `${r.doctors.first_name} ${r.doctors.last_name}` } : null
+      }));
+    }
+  });
 
   const { days, monthLabel } = useMemo(() => {
     const year = cursor.getFullYear();
@@ -55,7 +68,7 @@ const AdminAppointmentCalendar = () => {
   return (
     <div>
       <h1 className="text-3xl font-bold mb-1">Calendar</h1>
-      <p className="text-muted-foreground mb-6">Monthly view of all appointments</p>
+      <p className="text-muted-foreground mb-6">Monthly view of all appointments {isLoading && <Loader2 className="inline w-4 h-4 animate-spin ml-2" />}</p>
 
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
