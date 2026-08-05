@@ -21,6 +21,7 @@ type Notification = {
 export default function NotificationInbox() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [filter, setFilter] = useState<"all" | "unread">("all");
   const [loading, setLoading] = useState(true);
 
   const fetchNotifications = async () => {
@@ -113,38 +114,68 @@ export default function NotificationInbox() {
     );
   }
 
+  const filteredNotifications = filter === "unread" 
+    ? notifications.filter(n => !n.is_read) 
+    : notifications;
+
   return (
     <Card className="border-none shadow-sm bg-card/50 backdrop-blur-sm">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            <Bell className="w-5 h-5 text-primary" />
-            <CardTitle>Boîte de réception</CardTitle>
-            {unreadCount > 0 && (
-              <Badge variant="destructive" className="ml-2">
-                {unreadCount}
-              </Badge>
-            )}
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5 text-primary" />
+              <CardTitle>Boîte de réception</CardTitle>
+              {unreadCount > 0 && (
+                <Badge variant="destructive" className="ml-2">
+                  {unreadCount}
+                </Badge>
+              )}
+            </div>
+            <CardDescription>Consultez vos rappels de rendez-vous et messages importants.</CardDescription>
           </div>
-          <CardDescription>Consultez vos rappels de rendez-vous et messages importants.</CardDescription>
+          
+          <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-xl w-fit">
+            <Button 
+              variant={filter === "all" ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => setFilter("all")}
+              className="rounded-lg h-8 text-xs font-semibold"
+            >
+              Tous
+            </Button>
+            <Button 
+              variant={filter === "unread" ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => setFilter("unread")}
+              className="rounded-lg h-8 text-xs font-semibold"
+            >
+              Non lus {unreadCount > 0 && `(${unreadCount})`}
+            </Button>
+          </div>
         </div>
+        
         {unreadCount > 0 && (
-          <Button variant="ghost" size="sm" onClick={markAllAsRead}>
-            Tout marquer comme lu
-          </Button>
+          <div className="flex justify-end mt-2">
+            <Button variant="ghost" size="sm" onClick={markAllAsRead} className="h-8 text-xs text-primary hover:text-primary hover:bg-primary/5">
+              Tout marquer comme lu
+            </Button>
+          </div>
         )}
       </CardHeader>
       <CardContent>
-        {notifications.length === 0 ? (
+        {filteredNotifications.length === 0 ? (
           <div className="py-12 text-center">
             <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
               <Bell className="w-6 h-6 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">Aucune notification pour le moment.</p>
+            <p className="text-muted-foreground">
+              {filter === "unread" ? "Aucune notification non lue." : "Aucune notification pour le moment."}
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
-            {notifications.map((notif) => (
+            {filteredNotifications.map((notif) => (
               <div
                 key={notif.id}
                 className={`group relative p-4 rounded-2xl border transition-all duration-300 ${

@@ -40,6 +40,51 @@ import NotificationInbox from "@/components/profile/NotificationInbox";
 import { PrivacySettingsCard } from "@/components/profile/PrivacySettingsCard";
 import { StickySaveBar } from "@/components/profile/StickySaveBar";
 import logo from "@/assets/logo.png";
+import { Badge } from "@/components/ui/badge";
+
+const UnreadBadge = () => {
+  const { user } = useAuth();
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    
+    const fetchCount = async () => {
+      const { count } = await supabase
+        .from("app_notifications")
+        .select("*", { count: 'exact', head: true })
+        .eq("user_id", user.id)
+        .eq("is_read", false);
+      setCount(count || 0);
+    };
+
+    fetchCount();
+
+    const channel = supabase
+      .channel("header-unread-count")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "app_notifications", filter: `user_id=eq.${user.id}` },
+        () => fetchCount()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  if (count === 0) return null;
+
+  return (
+    <Badge 
+      variant="destructive" 
+      className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 flex items-center justify-center text-[10px] border-2 border-white animate-in zoom-in-50"
+    >
+      {count}
+    </Badge>
+  );
+};
 
 const Profile = () => {
   const { user, signOut, isAdmin, isDoctor, isPatient, isAssistant } = useAuth();
@@ -311,7 +356,11 @@ const Profile = () => {
             </div>
             <img src={logo} alt="Logo" className="h-8" />
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+             <div className="relative p-2 rounded-xl bg-slate-50 border border-slate-100 hidden sm:flex">
+               <MessageSquare className="w-5 h-5 text-slate-400" />
+               <UnreadBadge />
+             </div>
              <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full flex items-center gap-1.5">
                <CheckCircle2 className="w-3.5 h-3.5" />
                Changes Synced
