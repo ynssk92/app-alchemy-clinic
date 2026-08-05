@@ -127,7 +127,7 @@ const Profile = () => {
     });
   };
 
-  const handleNotificationChange = (key: string, value: boolean) => {
+  const handleNotificationChange = (key: string, value: any) => {
     const currentPrefs = profileData.notification_preferences || {};
     handleChange("notification_preferences", { ...currentPrefs, [key]: value });
   };

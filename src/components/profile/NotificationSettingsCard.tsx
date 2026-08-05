@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, Mail, Smartphone, Globe, MessageSquare } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Bell, Mail, Smartphone, Globe, MessageSquare, Clock } from "lucide-react";
 
 interface NotificationProps {
   preferences: any;
@@ -11,6 +12,7 @@ interface NotificationProps {
 export const NotificationSettingsCard = ({ preferences, onChange }: NotificationProps) => {
   const settings = [
     { key: "appointment_reminders", label: "Appointment Reminders", desc: "Receive alerts about upcoming bookings", icon: MessageSquare },
+    { key: "reminder_lead_time_hours", label: "Reminder Lead Time (Hours)", desc: "Hours before appointment to send reminder", icon: Clock, type: 'slider', min: 1, max: 72 },
     { key: "email_notifications", label: "Email Notifications", desc: "Important updates sent to your inbox", icon: Mail },
     { key: "sms_notifications", label: "SMS Notifications", desc: "Fast alerts directly to your phone", icon: Smartphone },
     { key: "marketing_emails", label: "Marketing Emails", desc: "New services and exclusive health tips", icon: Globe },
@@ -38,11 +40,24 @@ export const NotificationSettingsCard = ({ preferences, onChange }: Notification
                 <p className="text-xs text-muted-foreground">{item.desc}</p>
               </div>
             </div>
-            <Switch 
-              id={item.key} 
-              checked={preferences?.[item.key] ?? false} 
-              onCheckedChange={(val) => onChange(item.key, val)}
-            />
+            {item.type === 'slider' ? (
+              <div className="w-32 pt-2">
+                <Slider
+                  value={[preferences?.[item.key] ?? 24]}
+                  min={item.min}
+                  max={item.max}
+                  step={1}
+                  onValueChange={(val) => onChange(item.key, val[0])}
+                />
+                <div className="text-[10px] text-right mt-1 text-muted-foreground">{preferences?.[item.key] ?? 24}h</div>
+              </div>
+            ) : (
+              <Switch 
+                id={item.key} 
+                checked={preferences?.[item.key] ?? false} 
+                onCheckedChange={(val) => onChange(item.key, val)}
+              />
+            )}
           </div>
         ))}
       </div>
