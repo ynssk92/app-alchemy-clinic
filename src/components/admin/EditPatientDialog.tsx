@@ -36,54 +36,91 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
   useEffect(() => {
     if (!open) return;
     (async () => {
-      let intake: any = null;
+      console.log("EditPatientDialog opened with intakeId:", intakeIdProp, "profileId:", profileId);
+      let data: any = null;
+      
+      // Prioritize the new 'patients' table
       if (intakeIdProp) {
-        const { data } = await supabase
-          .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country")
+        const { data: patient, error } = await supabase
+          .from("patients")
+          .select(`
+            *,
+            patient_addresses(*),
+            patient_medical_history(*),
+            patient_notes(*)
+          `)
           .eq("id", intakeIdProp)
           .maybeSingle();
-        intake = data;
-      } else if (profileId) {
-        const { data } = await supabase
-          .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country")
-          .eq("user_id", profileId)
-          .maybeSingle();
-        intake = data;
+        
+        if (error) {
+          console.error("Error fetching from patients table:", error);
+        } else if (patient) {
+          console.log("Found patient in 'patients' table:", patient);
+          data = {
+            id: patient.id,
+            first_name: patient.first_name,
+            last_name: patient.last_name,
+            email: patient.email,
+            phone: patient.phone,
+            dob: patient.dob,
+            gender: patient.gender,
+            blood_group: patient.patient_medical_history?.[0]?.blood_group,
+            address_1: patient.patient_addresses?.[0]?.street_address,
+            city: patient.patient_addresses?.[0]?.city,
+            country: patient.patient_addresses?.[0]?.country,
+            full_name: `${patient.first_name} ${patient.last_name}`,
+            user_id: patient.user_id
+          };
+        }
       }
-      setIntakeId(intake?.id ?? null);
 
+      // Fallback to legacy patient_intake if not found or no ID
+      if (!data) {
+        const query = intakeIdProp 
+          ? supabase.from("patient_intake").select("*").eq("id", intakeIdProp)
+          : profileId 
+            ? supabase.from("patient_intake").select("*").eq("user_id", profileId)
+            : null;
+
+        if (query) {
+          const { data: intake, error } = await query.maybeSingle();
+          if (error) console.error("Error fetching from patient_intake:", error);
+          if (intake) {
+            console.log("Found patient in 'patient_intake' table:", intake);
+            data = intake;
+          }
+        }
+      }
+
+      // Profile name fallback
       let profileName = "";
       let profilePhone = "";
-      if (profileId) {
+      if (profileId || data?.user_id) {
         const { data: p } = await supabase
           .from("profiles")
           .select("full_name, phone")
-          .eq("id", profileId)
+          .eq("id", profileId || data?.user_id)
           .maybeSingle();
         profileName = p?.full_name || "";
         profilePhone = p?.phone || "";
       }
 
-      const composedFullName =
-        profileName ||
-        [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") ||
-        "";
-
-      setForm({
-        first_name: intake?.first_name || "",
-        last_name: intake?.last_name || "",
-        full_name: composedFullName,
-        email: intake?.email || "",
-        phone: profilePhone || intake?.phone || "",
-        dob: intake?.dob || "",
-        gender: intake?.gender || "",
-        blood_group: intake?.blood_group || "",
-        address_1: intake?.address_1 || "",
-        city: intake?.city || "",
-        country: intake?.country || "",
-      });
+      if (data) {
+        setIntakeId(data.id);
+        setForm({
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          full_name: profileName || data.full_name || `${data.first_name} ${data.last_name}`.trim(),
+          email: data.email || "",
+          phone: profilePhone || data.phone || "",
+          dob: data.dob || "",
+          gender: data.gender || "",
+          blood_group: data.blood_group || "",
+          address_1: data.address_1 || data.street_address || "",
+          city: data.city || "",
+          country: data.country || "",
+        });
+      }
     })();
   }, [open, profileId, intakeIdProp]);
 
@@ -91,7 +128,10 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
   const onSubmit = async () => {
     setSaving(true);
+    console.log("Submitting patient update for intakeId:", intakeId, "payload:", form);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
       // Update profile (if patient is registered)
       if (profileId) {
         const { error: pErr } = await supabase
@@ -104,12 +144,40 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         if (pErr) throw pErr;
       }
 
-      // Derive first/last from full name when editing a registered patient
       const parts = (form.full_name || "").trim().split(/\s+/);
       const derivedFirst = form.first_name || parts.shift() || "Patient";
       const derivedLast = form.last_name || parts.join(" ") || "-";
 
-      const intakePayload: any = {
+      // 1. Update 'patients' table (The new EMR source of truth)
+      if (intakeId) {
+        const { error: patientErr } = await supabase.from("patients").update({
+          first_name: derivedFirst,
+          last_name: derivedLast,
+          email: form.email,
+          phone: form.phone,
+          dob: form.dob || null,
+          gender: form.gender,
+        }).eq("id", intakeId);
+        
+        if (patientErr) console.error("Error updating 'patients' table:", patientErr);
+
+        // Update related tables in parallel
+        await Promise.all([
+          supabase.from("patient_addresses").upsert({
+            patient_id: intakeId,
+            street_address: form.address_1,
+            city: form.city,
+            country: form.country,
+          }, { onConflict: 'patient_id' }),
+          supabase.from("patient_medical_history").upsert({
+            patient_id: intakeId,
+            blood_group: form.blood_group,
+          }, { onConflict: 'patient_id' })
+        ]);
+      }
+
+      // 2. Backward compatibility: update legacy patient_intake table
+      const legacyPayload: any = {
         first_name: derivedFirst,
         last_name: derivedLast,
         email: form.email || (profileId ? `${profileId}@placeholder.local` : "unknown@placeholder.local"),
@@ -123,22 +191,22 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       };
 
       if (intakeId) {
-        const { error } = await supabase.from("patient_intake").update(intakePayload).eq("id", intakeId);
-        if (error) throw error;
+        const { error: legacyErr } = await supabase.from("patient_intake").update(legacyPayload).eq("id", intakeId);
+        if (legacyErr) console.warn("Legacy patient_intake update skipped or failed:", legacyErr.message);
       } else if (profileId) {
-        const { data: authUser } = await supabase.auth.getUser();
-        const { error } = await supabase.from("patient_intake").insert({
-          ...intakePayload,
+        const { error: legacyErr } = await supabase.from("patient_intake").insert({
+          ...legacyPayload,
           user_id: profileId,
-          created_by: authUser.user?.id ?? null,
+          created_by: user?.id ?? null,
         });
-        if (error) throw error;
+        if (legacyErr) console.warn("Legacy patient_intake insert failed:", legacyErr.message);
       }
 
-      toast({ title: "Patient updated" });
+      toast({ title: "Patient updated successfully" });
       onOpenChange(false);
       onSaved?.();
     } catch (e: any) {
+      console.error("Critical update error:", e);
       toast({ title: "Update failed", description: e.message, variant: "destructive" });
     } finally {
       setSaving(false);
