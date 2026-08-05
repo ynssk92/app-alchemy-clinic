@@ -2,6 +2,8 @@ import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import logo from "@/assets/logo.png";
 import { Link } from "react-router-dom";
+import { LanguageToggle } from "@/components/LanguageToggle";
+
 
 interface AuthLayoutProps {
   children: ReactNode;
