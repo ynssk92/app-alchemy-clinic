@@ -45,20 +45,20 @@ const AdminPatientDetails = () => {
     queryFn: async () => {
       if (!id) return { appts: 0, paid: 0 };
       
+      // Use any to bypass strict typing if table is newly created and not in client types yet
       const [apptsRes, billingRes] = await Promise.all([
         supabase
-          .from("appointments")
+          .from("appointments" as any)
           .select("id", { count: "exact", head: true })
           .eq("patient_id", id),
         supabase
-          .from("billing_payments")
+          .from("billing_payments" as any)
           .select("amount")
           .eq("patient_id", id)
           .eq("status", "completed")
       ]);
 
       const apptsCount = apptsRes.count || 0;
-      // Use any to bypass TS error if table structure is unknown, but attempt mapping
       const totalPaid = (billingRes.data as any[])?.reduce((sum, pay) => sum + (Number(pay.amount) || 0), 0) || 0;
 
       return {
