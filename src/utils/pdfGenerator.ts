@@ -1,6 +1,15 @@
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { supabase } from "@/integrations/supabase/client";
+
+function hexToRgb(hex: string) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 32, g: 48, b: 128 };
+}
 import { toast } from "sonner";
 
 export const generatePatientEMR = async (patient: any) => {
