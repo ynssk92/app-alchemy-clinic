@@ -97,6 +97,7 @@ const sections: Section[] = [
     title: "Content & Comms",
     items: [
       { to: "/admin/blog", icon: FileText, label: "Blog", module: "Blog" },
+      { to: "/admin/gallery", icon: ImageIcon, label: "Gallery", staff: true },
       { to: "/admin/messages", icon: Inbox, label: "Messages", module: "Messages", staff: true },
     ],
   },
