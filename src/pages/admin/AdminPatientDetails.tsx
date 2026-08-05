@@ -11,8 +11,11 @@ import {
   Cake, Droplet, Mail, Activity, Heart,
   Weight, CalendarDays, Pencil,
   ShieldCheck, ShieldAlert, MapPin, UserCheck, Clock, FileText,
-  CreditCard, ClipboardList, Stethoscope, MessageCircle, ListChecks, History, AlertCircle, Info
+  CreditCard, ClipboardList, Stethoscope, MessageCircle, ListChecks, History, AlertCircle, Info,
+  Share2, Loader2, Download
 } from "lucide-react";
+import { generatePatientEMR } from "@/utils/pdfGenerator";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -34,6 +37,7 @@ const AdminPatientDetails = () => {
   const [patient, setPatient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
+  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -95,6 +99,21 @@ const AdminPatientDetails = () => {
     return `${age} yrs`;
   };
 
+  const handleGenerateEMR = async () => {
+    setGeneratingPdf(true);
+    try {
+      await generatePatientEMR(patient);
+      toast.success("EMR Summary generated and saved to documents");
+      // Refresh patient data to show new document
+      window.location.reload();
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Failed to generate EMR Summary");
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-8 px-4 space-y-8">
       {/* Header / Banner */}
@@ -111,6 +130,15 @@ const AdminPatientDetails = () => {
           </div>
         </div>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80"
+            onClick={handleGenerateEMR}
+            disabled={generatingPdf}
+          >
+            {generatingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
+            Generate EMR PDF
+          </Button>
           <Button variant="outline" className="rounded-xl h-11 px-6 border-border/50 hover:bg-white/80">
             <Pencil className="w-4 h-4 mr-2" /> Edit Record
           </Button>
