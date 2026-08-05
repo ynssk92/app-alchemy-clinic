@@ -51,6 +51,7 @@ const NotFound = () => {
       <Seo 
         title="404 - Page Not Found — La Dune"
         description="The page you are looking for doesn't exist. Return to La Dune Clinic home."
+        path={location.pathname}
       />
       
       {/* Background Elements */}
