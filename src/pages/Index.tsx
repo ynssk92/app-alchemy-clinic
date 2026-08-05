@@ -355,6 +355,23 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Counters (Statistics) */}
+      <section className="py-16 bg-muted/40 border-y border-border">
+        <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          {counters.map((c, i) => (
+            <div key={c.label} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+              <div className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                {c.value}
+              </div>
+              <p className="text-sm text-muted-foreground mt-2">{c.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Gallery Section */}
+      <Gallery />
+
       {/* Doctors */}
       {doctors.length > 0 && (
         <section className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32">
@@ -395,23 +412,6 @@ const Index = () => {
           </div>
         </section>
       )}
-
-      {/* Counters */}
-      <section className="py-16 bg-muted/40 border-y border-border">
-        <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {counters.map((c, i) => (
-            <div key={c.label} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
-              <div className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {c.value}
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">{c.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Gallery Section */}
-      <Gallery />
 
       {/* Blog */}
       {posts.length > 0 && (
