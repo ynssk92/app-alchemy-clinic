@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,6 +14,8 @@ import {
   UserCheck,
   Ambulance,
   UserRound,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { HomeDoctorCard } from "@/components/HomeDoctorCard";
 import { supabase } from "@/integrations/supabase/client";
@@ -101,6 +103,15 @@ const Index = () => {
   useScrollReveal();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo = direction === "left" ? scrollLeft - clientWidth : scrollLeft + clientWidth;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
 
   useEffect(() => {
     supabase
@@ -108,7 +119,6 @@ const Index = () => {
       .select("id, full_name, avatar_url, experience_years, specialties(name), rating, clinics(name), is_available")
       .eq("is_available", true)
       .order("full_name")
-      .limit(3)
       .then(({ data }) => setDoctors((data as any) || []));
 
     supabase
@@ -394,8 +404,26 @@ const Index = () => {
                   Meet experienced specialists dedicated to providing exceptional dental care using the latest technology.
                 </p>
                 
-                {/* Desktop View All Button - Positioned Right */}
-                <div className="hidden lg:block absolute right-0 bottom-0">
+                {/* Desktop Navigation & View All */}
+                <div className="hidden lg:flex items-center gap-4 absolute right-0 bottom-0">
+                  <div className="flex items-center gap-2 mr-4">
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="rounded-full border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
+                      onClick={() => scroll("left")}
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="rounded-full border-[#E5E7EB] hover:border-[#2563EB] hover:text-[#2563EB] transition-all"
+                      onClick={() => scroll("right")}
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </Button>
+                  </div>
                   <Link to="/doctors">
                     <Button variant="ghost" className="group h-12 rounded-xl px-6 font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all">
                       View all doctors 
@@ -406,14 +434,37 @@ const Index = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div 
+              ref={scrollRef}
+              className="flex gap-8 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory lg:grid lg:grid-cols-3 lg:overflow-visible"
+            >
               {doctors.map((d, idx) => (
-                <HomeDoctorCard key={d.id} doctor={d} index={idx} />
+                <div key={d.id} className="min-w-[300px] flex-shrink-0 snap-center lg:min-w-0">
+                  <HomeDoctorCard doctor={d} index={idx} />
+                </div>
               ))}
             </div>
 
-            {/* Mobile/Tablet View All Button - Centered below grid */}
-            <div className="mt-12 flex justify-center lg:hidden">
+            {/* Mobile/Tablet View All & Navigation */}
+            <div className="mt-12 flex flex-col items-center gap-8 lg:hidden">
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-12 w-12 rounded-full border-[#E5E7EB] text-[#2563EB]"
+                  onClick={() => scroll("left")}
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  className="h-12 w-12 rounded-full border-[#E5E7EB] text-[#2563EB]"
+                  onClick={() => scroll("right")}
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              </div>
               <Link to="/doctors">
                 <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] text-[#2563EB] hover:bg-white hover:border-[#2563EB] transition-all">
                   View all doctors <ArrowRight className="w-4 h-4 ml-2" />
