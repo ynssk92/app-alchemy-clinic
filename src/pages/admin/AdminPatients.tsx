@@ -160,8 +160,10 @@ const AdminPatients = () => {
                   <Eye className="w-4 h-4 mr-2" /> View
                 </Link>
               </Button>
-              <Button size="sm" variant="ghost" className="rounded-xl h-10 px-4 hover:bg-primary/5 hover:text-primary">
-                <Pencil className="w-4 h-4 mr-2" /> Edit
+              <Button size="sm" variant="ghost" asChild className="rounded-xl h-10 px-4 hover:bg-primary/5 hover:text-primary">
+                <Link to={`/admin/patients/edit/${p.id}`}>
+                  <Pencil className="w-4 h-4 mr-2" /> Edit
+                </Link>
               </Button>
               <Button size="icon" variant="ghost" onClick={() => remove(p.id)} className="rounded-xl h-10 w-10 hover:bg-destructive/5 hover:text-destructive">
                 <Trash2 className="w-4 h-4" />

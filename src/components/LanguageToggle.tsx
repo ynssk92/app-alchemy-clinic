@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="NOT WORKING FIX THE PROBLEM">
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="WHEN I CLICK ON EDIT RECORD NOTHING SHOWED ME FIX THE PROBLEM">
           <Globe className="w-4 h-4" />
           {current}
         </Button>
