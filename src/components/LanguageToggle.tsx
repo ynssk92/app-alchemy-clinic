@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="when i log in on the auth page i want directly move to panel dashboar">
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Implement appointment booking with a real availability calendar so I can reserve a time slot in seconds.">
           <Globe className="w-4 h-4" />
           {current}
         </Button>
