@@ -101,12 +101,6 @@ const Auth = () => {
       setBusy(false);
     }
   };
-    } catch (error: any) {
-      toast.error(error.message);
-    } finally {
-      setBusy(false);
-    }
-  };
 
   const handleGoogle = async () => {
     setBusy(true);
