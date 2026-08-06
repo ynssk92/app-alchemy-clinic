@@ -14,7 +14,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, ExternalLink, Save, FileText, Gavel } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, ExternalLink, Save, FileText, Gavel, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { PageBlock, SitePage } from "@/hooks/usePageContent";
 import { resolveIcon, resolveImage } from "@/lib/pageContent";
