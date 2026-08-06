@@ -30,7 +30,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
           variant={variant} 
           size="sm" 
           className={`gap-1.5 font-semibold ${className ?? ""}`} 
-          title="create a patient dashboard and linked with data like a admin panel but only show what he important to show on the patient dashboard like a appointement scheduled....."
+          title="Load the security issues from the scan results and fix the selected issues."
         >
           <Globe className="w-4 h-4" />
           {current}
