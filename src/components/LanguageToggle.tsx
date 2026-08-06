@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const current = (i18n.resolvedLanguage || i18n.language || "fr").slice(0, 2).toUpperCase();
 
   const change = (lng: "fr" | "en") => {
@@ -26,7 +26,12 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Add a complete Cookie Policy legal page at /cookie-policy and include it in the footer and admin page editor.">
+        <Button 
+          variant={variant} 
+          size="sm" 
+          className={`gap-1.5 font-semibold ${className ?? ""}`} 
+          title="Change language"
+        >
           <Globe className="w-4 h-4" />
           {current}
         </Button>

@@ -16,13 +16,13 @@ export const ProtectedRoute = ({
   doctorOnly?: boolean;
   patientOnly?: boolean;
 }) => {
-  const { user, role, isAdmin, isAssistant, isDoctor, isPatient, profileStatus, loading } = useAuth();
+  const { user, role, isAdmin, isAssistant, isDoctor, isPatient, profileStatus, loading, getDashboardByRole } = useAuth();
   const location = useLocation();
   const toastShown = useRef(false);
 
   useEffect(() => {
     if (!loading && user && profileStatus && ["inactive", "blocked"].includes(profileStatus) && !toastShown.current) {
-      toast.error(`Your account is ${profileStatus}. Please contact support.`);
+      toast.error(`Your account is ${profileStatus}. Please contact support.`, { id: 'status-error' });
       toastShown.current = true;
     }
   }, [loading, user, profileStatus]);
@@ -48,30 +48,44 @@ export const ProtectedRoute = ({
   }
 
   // Wait for role to be loaded if user exists but role is null
-  if (user && role === null) {
-    // If the path is /profile, we might want to allow it, but the user explicitly wants to land on admin dashboard.
-    // However, we should only redirect if we're NOT already going to /admin to avoid loops.
-    if (!location.pathname.startsWith("/admin")) {
-      return <Navigate to="/admin" replace />;
-    }
-    return children;
+  if (role === null) {
+    return (
+      <div className="flex min-h-screen w-full flex-1 items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm font-medium text-muted-foreground">Loading permissions...</p>
+        </div>
+      </div>
+    );
   }
 
   // Authorization checks
   if (adminOnly && !isAdmin) {
-    return <Navigate to={role === "doctor" ? "/admin" : "/patient-dashboard"} replace />;
+    const dashboard = getDashboardByRole(role);
+    if (location.pathname !== dashboard) {
+      return <Navigate to={dashboard} replace />;
+    }
   }
   
   if (staffOnly && !isAdmin && !isAssistant && !isDoctor) {
-    return <Navigate to="/patient-dashboard" replace />;
+    const dashboard = getDashboardByRole(role);
+    if (location.pathname !== dashboard) {
+      return <Navigate to={dashboard} replace />;
+    }
   }
 
   if (doctorOnly && !isDoctor) {
-    return <Navigate to="/patient-dashboard" replace />;
+    const dashboard = getDashboardByRole(role);
+    if (location.pathname !== dashboard) {
+      return <Navigate to={dashboard} replace />;
+    }
   }
 
   if (patientOnly && !isPatient) {
-    return <Navigate to="/admin" replace />;
+    const dashboard = getDashboardByRole(role);
+    if (location.pathname !== dashboard) {
+      return <Navigate to={dashboard} replace />;
+    }
   }
 
   return children;

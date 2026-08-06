@@ -24,10 +24,12 @@ import {
   Search
 } from "lucide-react";
 import { Seo } from "@/components/Seo";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { user, role, loading: authLoading, getDashboardByRole } = useAuth();
   const [busy, setBusy] = useState(false);
   const [accountType, setAccountType] = useState<"patient" | "doctor">("patient");
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -44,6 +46,12 @@ const Auth = () => {
     dob: "",
   });
 
+  useEffect(() => {
+    if (!authLoading && user && role) {
+      navigate(getDashboardByRole(role), { replace: true });
+    }
+  }, [user, role, authLoading, navigate, getDashboardByRole]);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mode === "signup") {
@@ -59,33 +67,12 @@ const Auth = () => {
 
     try {
       if (mode === "login") {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
         if (error) throw error;
-        
-        // Load profile to check role and status
-        const { data: prof } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", data.user.id)
-          .maybeSingle();
-
-        const status = (prof as any)?.status;
-        const roleStr = (prof as any)?.role;
-
-        if (status === "blocked" || status === "inactive") {
-          await supabase.auth.signOut();
-          throw new Error(`Your account is ${prof.status}. Please contact support.`);
-        }
-
-        toast.success(`Welcome back!`);
-        
-        // Redirect staff/doctors/admins directly to admin dashboard
-        if (roleStr === "admin" || roleStr === "doctor") navigate("/admin");
-        else if (roleStr === "patient") navigate("/patient-dashboard");
-        else navigate("/admin");
+        // Navigation is handled by useEffect and useAuth context listener
       } else {
         const { data, error } = await supabase.auth.signUp({
           email: formData.email,
@@ -106,10 +93,8 @@ const Auth = () => {
         if (data.user && !data.user.email_confirmed_at) {
           toast.success("Account created! Check your email to verify.");
           navigate("/verify-email");
-        } else {
-          toast.success("Account created successfully!");
-          navigate(accountType === "doctor" ? "/admin" : "/patient-dashboard");
         }
+        // If logged in immediately, useEffect handles the redirect
       }
     } catch (error: any) {
       toast.error(error.message);
