@@ -26,7 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="Add bulk actions in my notification inbox to mark all notifications as read or unread.">
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title="when i log in on the auth page i want directly move to panel dashboar">
           <Globe className="w-4 h-4" />
           {current}
         </Button>
