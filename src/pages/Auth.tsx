@@ -24,6 +24,7 @@ import {
   Search
 } from "lucide-react";
 import { Seo } from "@/components/Seo";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
 
 const Auth = () => {
