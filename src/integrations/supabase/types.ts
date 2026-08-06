@@ -953,6 +953,45 @@ export type Database = {
           },
         ]
       }
+      legal_pages: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          is_published: boolean
+          last_updated: string
+          page_type: string
+          slug: string
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          last_updated?: string
+          page_type: string
+          slug: string
+          title: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          last_updated?: string
+          page_type?: string
+          slug?: string
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           app_dm_enabled: boolean | null
