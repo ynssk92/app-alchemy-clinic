@@ -30,7 +30,77 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
           variant={variant} 
           size="sm" 
           className={`gap-1.5 font-semibold ${className ?? ""}`} 
-          title="Load the security issues from the scan results and fix the selected issues."
+          title="Audit every Storage RLS policy for the patient_documents bucket.
+
+Current problem:
+
+Any authenticated user can read, upload, update and delete every patient's documents.
+
+Fix all Storage policies.
+
+Requirements:
+
+Patients:
+
+- Can only view their own documents.
+
+- Can only upload their own documents.
+
+- Can never access another patient's files.
+
+Doctors:
+
+- Can read documents only for patients assigned to them.
+
+- Can upload documents for assigned patients.
+
+- Can update documents they created.
+
+- Cannot access unrelated patients.
+
+Admins:
+
+- Full access.
+
+Verify ownership using:
+
+- auth.uid()
+
+- patient_id
+
+- doctor_id
+
+- role
+
+Do not allow bucket_id checks alone.
+
+Every policy must verify both role and ownership.
+
+Test:
+
+Patient A
+
+❌ cannot read Patient B files
+
+Patient B
+
+❌ cannot delete Patient A files
+
+Doctor A
+
+✔ only assigned patients
+
+Doctor B
+
+❌ cannot access Doctor A patients
+
+Admin
+
+✔ full access
+
+Keep existing database schema.
+
+Do not delete data."
         >
           <Globe className="w-4 h-4" />
           {current}
