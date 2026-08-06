@@ -32,60 +32,50 @@ export const ProtectedRoute = ({
       <div className="flex min-h-screen w-full flex-1 items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium text-muted-foreground">Checking authentication...</p>
+          <p className="text-sm font-medium text-muted-foreground">Initializing authentication...</p>
         </div>
       </div>
     );
   }
 
   if (!user) {
+    console.log("[Auth] ProtectedRoute: No user, redirecting to /auth");
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   // Handle account status
   if (profileStatus === "inactive" || profileStatus === "blocked") {
+    console.log("[Auth] ProtectedRoute: Inactive/blocked, redirecting to /auth");
     return <Navigate to="/auth" replace />;
   }
 
   // Wait for role to be loaded if user exists but role is null
   if (role === null) {
-    return (
-      <div className="flex min-h-screen w-full flex-1 items-center justify-center bg-background">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium text-muted-foreground">Loading permissions...</p>
-        </div>
-      </div>
-    );
+    console.log("[Auth] ProtectedRoute: No role yet, redirecting to /complete-profile");
+    return <Navigate to="/complete-profile" replace />;
   }
 
   // Authorization checks
+  const dashboard = getDashboardByRole(role);
+
   if (adminOnly && !isAdmin) {
-    const dashboard = getDashboardByRole(role);
-    if (location.pathname !== dashboard) {
-      return <Navigate to={dashboard} replace />;
-    }
+    console.log("[Auth] ProtectedRoute: Admin access denied, redirecting to", dashboard);
+    return <Navigate to={dashboard} replace />;
   }
   
   if (staffOnly && !isAdmin && !isAssistant && !isDoctor) {
-    const dashboard = getDashboardByRole(role);
-    if (location.pathname !== dashboard) {
-      return <Navigate to={dashboard} replace />;
-    }
+    console.log("[Auth] ProtectedRoute: Staff access denied, redirecting to", dashboard);
+    return <Navigate to={dashboard} replace />;
   }
 
   if (doctorOnly && !isDoctor) {
-    const dashboard = getDashboardByRole(role);
-    if (location.pathname !== dashboard) {
-      return <Navigate to={dashboard} replace />;
-    }
+    console.log("[Auth] ProtectedRoute: Doctor access denied, redirecting to", dashboard);
+    return <Navigate to={dashboard} replace />;
   }
 
   if (patientOnly && !isPatient) {
-    const dashboard = getDashboardByRole(role);
-    if (location.pathname !== dashboard) {
-      return <Navigate to={dashboard} replace />;
-    }
+    console.log("[Auth] ProtectedRoute: Patient access denied, redirecting to", dashboard);
+    return <Navigate to={dashboard} replace />;
   }
 
   return children;
