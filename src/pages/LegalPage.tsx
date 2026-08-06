@@ -39,7 +39,7 @@ interface LegalPageData {
 
 export const LegalPage = () => {
   const { pathname } = useLocation();
-  const pageType = pathname.includes("privacy") ? "privacy" : "terms";
+  const pageType = pathname.includes("privacy") ? "privacy" : pathname.includes("cookie-policy") ? "cookie-policy" : "terms";
   const [data, setData] = useState<LegalPageData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState(0);
@@ -173,7 +173,7 @@ export const LegalPage = () => {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
             <div className="space-y-4 max-w-2xl">
               <Badge variant="outline" className="bg-white text-primary border-primary/20 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                {pageType === "privacy" ? "Privacy & Security" : "Legal Framework"}
+                {pageType === "privacy" ? "Privacy & Security" : pageType === "cookie-policy" ? "Cookies & Tracking" : "Legal Framework"}
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
                 {data.title}
@@ -417,7 +417,7 @@ const SiteFooter = () => {
               <li><Link to="/privacy" className="text-sm text-slate-500 hover:text-primary transition-colors">Privacy Policy</Link></li>
               <li><Link to="/terms" className="text-sm text-slate-500 hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link to="/contact" className="text-sm text-slate-500 hover:text-primary transition-colors">Contact Support</Link></li>
-              <li><button className="text-sm text-slate-500 hover:text-primary transition-colors">Cookie Policy</button></li>
+              <li><Link to="/cookie-policy" className="text-sm text-slate-500 hover:text-primary transition-colors">Cookie Policy</Link></li>
             </ul>
           </div>
 
