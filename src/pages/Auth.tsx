@@ -48,7 +48,9 @@ const Auth = () => {
 
   useEffect(() => {
     if (!authLoading && user && role) {
-      navigate(getDashboardByRole(role), { replace: true });
+      const destination = getDashboardByRole(role);
+      console.log("[Auth Page] User authenticated, role detected. Redirecting to:", destination);
+      navigate(destination, { replace: true });
     }
   }, [user, role, authLoading, navigate, getDashboardByRole]);
 
