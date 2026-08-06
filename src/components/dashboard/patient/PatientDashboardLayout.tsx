@@ -9,7 +9,8 @@ import {
   Activity,
   Award,
   ShieldCheck,
-  Stethoscope
+  Stethoscope,
+  Users
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
@@ -127,13 +128,12 @@ export const PatientDashboardLayout = ({ children }: { children: React.ReactNode
             </div>
           </header>
           <main className="flex-1 p-4 md:p-6 lg:p-8">
-            {children}
+            <div className="mx-auto max-w-7xl">
+              {children}
+            </div>
           </main>
         </div>
       </div>
     </SidebarProvider>
   );
 };
-
-const Users = ({ className }: { className?: string }) => <UsersIcon className={className} />;
-import { Users as UsersIcon } from "lucide-react";
