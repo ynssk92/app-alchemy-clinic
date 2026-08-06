@@ -82,9 +82,13 @@ const App = () => (
             <Route path="/doctors" element={<Doctors />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/confirmed/:id" element={<BookingConfirmed />} />
-            <Route path="/patient-dashboard" element={<ProtectedRoute patientOnly><PatientDashboard /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute patientOnly><PatientDashboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/doctor/dashboard" element={<ProtectedRoute doctorOnly><AdminLayout /></ProtectedRoute>}>
+              <Route index element={<AdminOverview />} />
+            </Route>
+            <Route path="/complete-profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
@@ -100,7 +104,8 @@ const App = () => (
             <Route path="/privacy" element={<LegalPage />} />
             <Route path="/cookie-policy" element={<LegalPage />} />
             <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<AdminOverview />} />
+              <Route path="dashboard" element={<AdminOverview />} />
+              <Route index element={<Navigate to="/admin/dashboard" replace />} />
               <Route path="doctors" element={<PermissionRoute module="Doctors"><AdminDoctors /></PermissionRoute>} />
               <Route path="doctors/new" element={<PermissionRoute module="Doctors" action="create"><AdminDoctorAdd /></PermissionRoute>} />
               <Route path="doctors/details" element={<PermissionRoute module="Doctors"><AdminDoctorDetails /></PermissionRoute>} />
