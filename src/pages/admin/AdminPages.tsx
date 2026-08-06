@@ -14,7 +14,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, ExternalLink, Save } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, ExternalLink, Save, FileText, Gavel } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { PageBlock, SitePage } from "@/hooks/usePageContent";
 import { resolveIcon, resolveImage } from "@/lib/pageContent";
@@ -23,6 +23,8 @@ const PAGES = [
   { slug: "about", label: "À Propos", path: "/about", kinds: ["mission", "value"] },
   { slug: "soins", label: "Nos Soins", path: "/soins", kinds: ["category"] },
   { slug: "expertise", label: "Expertise", path: "/expertise", kinds: ["feature", "stat"] },
+  { slug: "terms", label: "Terms of Service", path: "/terms", isLegal: true },
+  { slug: "privacy", label: "Privacy Policy", path: "/privacy", isLegal: true },
 ];
 
 const emptyBlock = {
@@ -42,6 +44,9 @@ const AdminPages = () => {
   const [page, setPage] = useState<SitePage | null>(null);
   const [blocks, setBlocks] = useState<PageBlock[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Legal page state
+  const [legalPage, setLegalPage] = useState<any>(null);
   const [savingPage, setSavingPage] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<PageBlock | null>(null);
@@ -51,13 +56,27 @@ const AdminPages = () => {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: p }, { data: b, error }] = await Promise.all([
-      supabase.from("site_pages").select("*").eq("slug", slug).maybeSingle(),
-      supabase.from("page_blocks").select("*").eq("page_slug", slug).order("sort_order", { ascending: true }),
-    ]);
-    if (error) toast({ title: "Loading failed", description: error.message, variant: "destructive" });
-    setPage((p as SitePage) || null);
-    setBlocks((b as PageBlock[]) || []);
+    if (config.isLegal) {
+      const { data, error } = await supabase
+        .from("legal_pages")
+        .select("*")
+        .eq("page_type", slug)
+        .maybeSingle();
+      
+      if (error) toast({ title: "Loading failed", description: error.message, variant: "destructive" });
+      setLegalPage(data);
+      setPage(null);
+      setBlocks([]);
+    } else {
+      const [{ data: p }, { data: b, error }] = await Promise.all([
+        supabase.from("site_pages").select("*").eq("slug", slug).maybeSingle(),
+        supabase.from("page_blocks").select("*").eq("page_slug", slug).order("sort_order", { ascending: true }),
+      ]);
+      if (error) toast({ title: "Loading failed", description: error.message, variant: "destructive" });
+      setPage((p as SitePage) || null);
+      setBlocks((b as PageBlock[]) || []);
+      setLegalPage(null);
+    }
     setLoading(false);
   };
 
@@ -79,7 +98,23 @@ const AdminPages = () => {
     toast({ title: "Page updated" });
   };
 
+  const saveLegalPage = async () => {
+    if (!legalPage) return;
+    setSavingPage(true);
+    const { error } = await supabase.from("legal_pages").update({
+      title: legalPage.title,
+      content: legalPage.content,
+      version: legalPage.version,
+      is_published: legalPage.is_published,
+      last_updated: new Date().toISOString()
+    }).eq("page_type", slug);
+    setSavingPage(false);
+    if (error) { toast({ title: "Save failed", description: error.message, variant: "destructive" }); return; }
+    toast({ title: "Legal page updated" });
+  };
+
   const openNew = () => {
+    if (config.isLegal) return;
     setEditing(null);
     setDraft({ ...emptyBlock, kind: config.kinds[0] });
     setOpen(true);
@@ -177,7 +212,9 @@ const AdminPages = () => {
           <Button variant="outline" asChild>
             <Link to={config.path} target="_blank"><ExternalLink className="h-4 w-4 mr-2" />View page</Link>
           </Button>
-          <Button onClick={openNew}><Plus className="h-4 w-4 mr-2" />New block</Button>
+          <Button onClick={openNew} disabled={config.isLegal}>
+            <Plus className="h-4 w-4 mr-2" />New block
+          </Button>
         </div>
       </div>
 
@@ -191,6 +228,129 @@ const AdminPages = () => {
         <Card className="p-10 text-center text-muted-foreground">Loading…</Card>
       ) : (
         <>
+          {config.isLegal && legalPage && (
+            <div className="grid lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-1 space-y-6">
+                <Card className="p-6 space-y-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                      {slug === "privacy" ? <Shield className="h-5 w-5" /> : <Gavel className="h-5 w-5" />}
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-lg">Legal Settings</h2>
+                      <p className="text-xs text-muted-foreground">Main attributes</p>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="legal-title">Page Title</Label>
+                    <Input id="legal-title" value={legalPage.title} onChange={(e) => setLegalPage({ ...legalPage, title: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="legal-subtitle">Subtitle</Label>
+                    <Input id="legal-subtitle" value={legalPage.content.subtitle} onChange={(e) => setLegalPage({ ...legalPage, content: { ...legalPage.content, subtitle: e.target.value } })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="legal-version">Version</Label>
+                    <Input id="legal-version" value={legalPage.version} onChange={(e) => setLegalPage({ ...legalPage, version: e.target.value })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="legal-time">Reading Time</Label>
+                    <Input id="legal-time" value={legalPage.content.estimated_reading_time} onChange={(e) => setLegalPage({ ...legalPage, content: { ...legalPage.content, estimated_reading_time: e.target.value } })} />
+                  </div>
+                  <div className="flex items-center justify-between pt-2">
+                    <Label htmlFor="legal-pub">Is Published</Label>
+                    <Switch id="legal-pub" checked={legalPage.is_published} onCheckedChange={(v) => setLegalPage({ ...legalPage, is_published: v })} />
+                  </div>
+                  <Button className="w-full mt-4" onClick={saveLegalPage} disabled={savingPage}>
+                    <Save className="h-4 w-4 mr-2" />{savingPage ? "Saving…" : "Save changes"}
+                  </Button>
+                </Card>
+              </div>
+
+              <div className="lg:col-span-2 space-y-6">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-bold text-lg flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-primary" />
+                    Sections
+                  </h2>
+                  <Button size="sm" variant="outline" onClick={() => {
+                    const newSections = [...legalPage.content.sections, { title: "New Section", content: "" }];
+                    setLegalPage({ ...legalPage, content: { ...legalPage.content, sections: newSections } });
+                  }}>
+                    <Plus className="h-4 w-4 mr-1" /> Add Section
+                  </Button>
+                </div>
+                
+                {legalPage.content.sections.map((section: any, idx: number) => (
+                  <Card key={idx} className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <Badge variant="outline" className="h-6 w-6 rounded-full flex items-center justify-center p-0">{idx + 1}</Badge>
+                        <Input 
+                          className="font-bold border-none h-auto p-0 focus-visible:ring-0 text-lg" 
+                          value={section.title} 
+                          onChange={(e) => {
+                            const newSections = [...legalPage.content.sections];
+                            newSections[idx].title = e.target.value;
+                            setLegalPage({ ...legalPage, content: { ...legalPage.content, sections: newSections } });
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          disabled={idx === 0}
+                          onClick={() => {
+                            const newSections = [...legalPage.content.sections];
+                            [newSections[idx-1], newSections[idx]] = [newSections[idx], newSections[idx-1]];
+                            setLegalPage({ ...legalPage, content: { ...legalPage.content, sections: newSections } });
+                          }}
+                        >
+                          <ArrowUp className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          disabled={idx === legalPage.content.sections.length - 1}
+                          onClick={() => {
+                            const newSections = [...legalPage.content.sections];
+                            [newSections[idx], newSections[idx+1]] = [newSections[idx+1], newSections[idx]];
+                            setLegalPage({ ...legalPage, content: { ...legalPage.content, sections: newSections } });
+                          }}
+                        >
+                          <ArrowDown className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          size="icon" 
+                          variant="ghost" 
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          onClick={() => {
+                            const newSections = legalPage.content.sections.filter((_: any, i: number) => i !== idx);
+                            setLegalPage({ ...legalPage, content: { ...legalPage.content, sections: newSections } });
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <Textarea 
+                      rows={6} 
+                      className="resize-none"
+                      value={section.content} 
+                      onChange={(e) => {
+                        const newSections = [...legalPage.content.sections];
+                        newSections[idx].content = e.target.value;
+                        setLegalPage({ ...legalPage, content: { ...legalPage.content, sections: newSections } });
+                      }}
+                    />
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+
           {page && (
             <Card className="p-6 space-y-4">
               <h2 className="font-semibold">Header & SEO</h2>
