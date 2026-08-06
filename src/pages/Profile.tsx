@@ -1,22 +1,16 @@
-import { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft, Save, Upload, User as UserIcon, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { 
-  ArrowLeft, 
-  CheckCircle2, 
-  Mail, 
-  Calendar, 
-  User as UserIcon, 
-  ChevronRight,
-  ShieldCheck,
-  CreditCard,
-  MessageSquare
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
 import {
   AlertDialog,
@@ -28,240 +22,63 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { z } from "zod";
 
-import { ProfileOverviewCard } from "@/components/profile/ProfileOverviewCard";
-import { ProfileQuickActions } from "@/components/profile/ProfileQuickActions";
-import { PersonalInfoCard } from "@/components/profile/PersonalInfoCard";
-import { MedicalInfoCard } from "@/components/profile/MedicalInfoCard";
-import { ProfessionalInfoCard } from "@/components/profile/ProfessionalInfoCard";
-import { SecurityCard } from "@/components/profile/SecurityCard";
-import { NotificationSettingsCard } from "@/components/profile/NotificationSettingsCard";
-import NotificationInbox from "@/components/profile/NotificationInbox";
-import { PrivacySettingsCard } from "@/components/profile/PrivacySettingsCard";
-import { StickySaveBar } from "@/components/profile/StickySaveBar";
-import logo from "@/assets/logo.png";
-import { Badge } from "@/components/ui/badge";
+const schema = z.object({
+  full_name: z.string().trim().min(1, "Name is required").max(100, "Name must be under 100 characters"),
+  phone: z.string().trim().max(30, "Phone must be under 30 characters").optional().or(z.literal("")),
+});
 
-const UnreadBadge = () => {
-  const { user } = useAuth();
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!user) return;
-    
-    const fetchCount = async () => {
-      const { count } = await supabase
-        .from("app_notifications")
-        .select("*", { count: 'exact', head: true })
-        .eq("user_id", user.id)
-        .eq("is_read", false);
-      setCount(count || 0);
-    };
-
-    fetchCount();
-
-    const channel = supabase
-      .channel("header-unread-count")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "app_notifications", filter: `user_id=eq.${user.id}` },
-        () => fetchCount()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
-
-  if (count === 0) return null;
-
-  return (
-    <Badge 
-      variant="destructive" 
-      className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 flex items-center justify-center text-[10px] border-2 border-white animate-in zoom-in-50"
-    >
-      {count}
-    </Badge>
-  );
-};
+const passwordSchema = z
+  .object({
+    newPassword: z.string().min(8, "Password must be at least 8 characters").max(72, "Password too long"),
+    confirmPassword: z.string(),
+  })
+  .refine((d) => d.newPassword === d.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 const Profile = () => {
-  const { user, signOut, isAdmin, isDoctor, isPatient, isAssistant } = useAuth();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
-  
-  const [profileData, setProfileData] = useState<any>({});
-  const [initialData, setInitialData] = useState<any>({});
-  
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [avatarPath, setAvatarPath] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [pendingPassword, setPendingPassword] = useState("");
 
   const loadAvatar = async (path: string | null) => {
     if (!path) return setAvatarUrl(null);
-    try {
-      const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 3600);
-      setAvatarUrl(data?.signedUrl || null);
-    } catch (err) {
-      console.error("Error loading avatar:", err);
-    }
-  };
-
-  const fetchData = async () => {
-    if (!user) return;
-    setLoading(true);
-    
-    try {
-      // Fetch core profile
-      const { data: profile, error: profErr } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .maybeSingle();
-      
-      if (profErr) throw profErr;
-
-      let combinedData: any = { ...profile };
-
-      // Fetch specific role data
-      if (isPatient) {
-        const { data: patient } = await supabase
-          .from("patient_intake")
-          .select("*")
-          .eq("user_id", user.id)
-          .maybeSingle();
-        if (patient) combinedData = { ...combinedData, ...patient };
-      }
-
-      if (isDoctor) {
-        const { data: doctor } = await supabase
-          .from("doctors")
-          .select("*")
-          .eq("id", user.id)
-          .maybeSingle();
-        if (doctor) combinedData = { ...combinedData, ...doctor };
-      }
-
-      setProfileData(combinedData);
-      setInitialData(combinedData);
-      if (combinedData.avatar_url) loadAvatar(combinedData.avatar_url);
-    } catch (err: any) {
-      toast.error("Failed to load profile data");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    const { data } = await supabase.storage.from("avatars").createSignedUrl(path, 3600);
+    setAvatarUrl(data?.signedUrl || null);
   };
 
   useEffect(() => {
-    fetchData();
-  }, [user, isDoctor, isPatient]);
-
-  const handleChange = (field: string, value: any) => {
-    setProfileData((prev: any) => {
-      const newData = { ...prev, [field]: value };
-      setHasChanges(JSON.stringify(newData) !== JSON.stringify(initialData));
-      return newData;
-    });
-  };
-
-  const handleNotificationChange = (key: string, value: any) => {
-    const currentPrefs = profileData.notification_preferences || {};
-    handleChange("notification_preferences", { ...currentPrefs, [key]: value });
-  };
-
-  const handlePrivacyChange = (key: string, value: any) => {
-    const currentSettings = profileData.privacy_settings || {};
-    handleChange("privacy_settings", { ...currentSettings, [key]: value });
-  };
-
-  const handleSave = async () => {
     if (!user) return;
-    setSaving(true);
-    
-    try {
-      // Split data for different tables
-      const profileFields = [
-        'full_name', 'phone', 'gender', 'nationality', 'address', 'city', 
-        'country', 'preferred_language', 'emergency_contact_name', 
-        'emergency_contact_phone', 'preferred_communication', 'dob',
-        'notification_preferences', 'privacy_settings'
-      ];
-      
-      const profileUpdate: any = {};
-      profileFields.forEach(f => {
-        if (profileData[f] !== undefined) profileUpdate[f] = profileData[f];
+    supabase
+      .from("profiles")
+      .select("full_name, phone, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setFullName(data?.full_name || "");
+        setPhone(data?.phone || "");
+        setAvatarPath(data?.avatar_url || null);
+        loadAvatar(data?.avatar_url || null);
+        setLoading(false);
       });
+  }, [user]);
 
-      const { error: profErr } = await supabase
-        .from("profiles")
-        .update(profileUpdate)
-        .eq("id", user.id);
-      
-      if (profErr) throw profErr;
-
-      // Update patient intake if applicable
-      if (isPatient) {
-        const patientFields = [
-          'blood_group', 'insurance_provider', 'insurance_number', 
-          'allergies', 'medical_conditions'
-        ];
-        const patientUpdate: any = {};
-        patientFields.forEach(f => {
-          if (profileData[f] !== undefined) patientUpdate[f] = profileData[f];
-        });
-        
-        // Also sync shared fields
-        patientUpdate.first_name = profileData.first_name || profileData.full_name?.split(' ')[0] || '';
-        patientUpdate.last_name = profileData.last_name || profileData.full_name?.split(' ').slice(1).join(' ') || '';
-        patientUpdate.phone = profileData.phone;
-        patientUpdate.dob = profileData.dob;
-        patientUpdate.city = profileData.city;
-        patientUpdate.country = profileData.country;
-
-        await supabase
-          .from("patient_intake")
-          .update(patientUpdate)
-          .eq("user_id", user.id);
-      }
-
-      // Update doctor if applicable
-      if (isDoctor) {
-        const doctorFields = [
-          'license_number', 'experience_years', 'consultation_duration', 
-          'biography', 'languages'
-        ];
-        const doctorUpdate: any = {};
-        doctorFields.forEach(f => {
-          if (profileData[f] !== undefined) doctorUpdate[f] = profileData[f];
-        });
-        doctorUpdate.full_name = profileData.full_name;
-
-        await supabase
-          .from("doctors")
-          .update(doctorUpdate)
-          .eq("id", user.id);
-      }
-
-      setInitialData(profileData);
-      setHasChanges(false);
-      toast.success("Profile updated successfully!");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to save changes");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleAvatarSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !user) return;
@@ -277,203 +94,220 @@ const Profile = () => {
     setUploading(true);
     const path = `${user.id}/avatar-${Date.now()}.jpg`;
 
-    try {
-      const { error: upErr } = await supabase.storage
-        .from("avatars")
-        .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
-      
-      if (upErr) throw upErr;
-
-      if (profileData.avatar_url) {
-        await supabase.storage.from("avatars").remove([profileData.avatar_url]);
-      }
-
-      const { error: updErr } = await supabase
-        .from("profiles")
-        .update({ avatar_url: path })
-        .eq("id", user.id);
-      
-      if (updErr) throw updErr;
-
-      handleChange("avatar_url", path);
-      await loadAvatar(path);
-      setCropSrc(null);
-      toast.success("Profile photo updated!");
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
+    const { error: upErr } = await supabase.storage
+      .from("avatars")
+      .upload(path, blob, { upsert: true, contentType: "image/jpeg" });
+    if (upErr) {
       setUploading(false);
+      return toast.error(upErr.message);
     }
+
+    if (avatarPath && avatarPath !== path) {
+      await supabase.storage.from("avatars").remove([avatarPath]);
+    }
+
+    const { error: updErr } = await supabase
+      .from("profiles")
+      .update({ avatar_url: path })
+      .eq("id", user.id);
+    setUploading(false);
+    if (updErr) return toast.error(updErr.message);
+
+    setAvatarPath(path);
+    await loadAvatar(path);
+    setCropSrc(null);
+    toast.success("Profile photo updated!");
   };
 
-  const handleUpdatePassword = (password: string) => {
-    setPendingPassword(password);
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    const parsed = schema.safeParse({ full_name: fullName, phone });
+    if (!parsed.success) {
+      return toast.error(parsed.error.issues[0].message);
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from("profiles")
+      .update({ full_name: parsed.data.full_name, phone: parsed.data.phone || null })
+      .eq("id", user.id);
+    setSaving(false);
+    if (error) return toast.error(error.message);
+    toast.success("Profile updated!");
+  };
+
+  const handleChangePassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
     setConfirmOpen(true);
   };
 
-  const confirmPasswordChange = async () => {
-    setSaving(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password: pendingPassword });
-      if (error) throw error;
-      
-      toast.success("Password updated — signing you out.");
+  const confirmChangePassword = async () => {
+    const parsed = passwordSchema.safeParse({ newPassword, confirmPassword });
+    if (!parsed.success) {
       setConfirmOpen(false);
-      setTimeout(async () => {
-        await signOut();
-        navigate("/auth");
-      }, 1500);
-    } catch (err: any) {
-      toast.error(err.message);
-    } finally {
-      setSaving(false);
+      return toast.error(parsed.error.issues[0].message);
     }
+    setChangingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: parsed.data.newPassword });
+    setChangingPassword(false);
+    setConfirmOpen(false);
+    if (error) return toast.error(error.message);
+    setNewPassword("");
+    setConfirmPassword("");
+    toast.success("Password updated — signing you out.");
+    setTimeout(async () => {
+      await signOut();
+      navigate("/auth");
+    }, 800);
   };
 
-  if (loading && !profileData.id) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-[#F8FAFC]">
-        <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  const roleLabel = isAdmin ? "Administrator" : isDoctor ? "Doctor" : isAssistant ? "Receptionist" : "Patient";
+  const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24">
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
-        title={`${profileData.full_name || 'Profile'} — La Dune`}
-        description="Manage your professional or patient profile, medical info and security settings."
+        title="Your Profile — HealthBook"
+        description="Update your display name, photo and contact info on HealthBook."
         path="/profile"
       />
-      
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-border/50">
-        <div className="container max-w-[1280px] mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
-              <ArrowLeft className="w-4 h-4 text-primary group-hover:text-white" />
-            </div>
-            <img src={logo} alt="Logo" className="h-8" />
+      <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="HealthBook Logo" className="h-10" />
           </Link>
-          <div className="flex items-center gap-4">
-             <div className="relative p-2 rounded-xl bg-slate-50 border border-slate-100 hidden sm:flex">
-               <MessageSquare className="w-5 h-5 text-slate-400" />
-               <UnreadBadge />
-             </div>
-             <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full flex items-center gap-1.5">
-               <CheckCircle2 className="w-3.5 h-3.5" />
-               Changes Synced
-             </span>
-          </div>
+          <Button variant="outline" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-4 h-4 mr-2" />Back
+          </Button>
         </div>
       </nav>
 
-      <main className="container max-w-[1280px] mx-auto px-6 py-12">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <Avatar className="w-24 h-24 border-4 border-white shadow-xl">
-                {avatarUrl ? <AvatarImage src={avatarUrl} alt="Profile" /> : null}
-                <AvatarFallback className="bg-primary/10 text-primary text-2xl font-bold">
-                  {(profileData.full_name || "?").slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-emerald-500 border-4 border-white rounded-full" />
-            </div>
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h1 className="text-3xl font-bold tracking-tight">{profileData.full_name || "User Profile"}</h1>
-                <span className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
-                  {roleLabel}
-                </span>
+      <section className="py-12">
+        <div className="container mx-auto px-4 max-w-2xl">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Your Profile</h1>
+          <p className="text-muted-foreground mb-8">Update your photo, display name and contact details.</p>
+
+          <Card className="p-8 border-border bg-card shadow-large">
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
               </div>
-              <div className="flex flex-wrap items-center gap-y-1 gap-x-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Mail className="w-4 h-4" />
-                  {user?.email}
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4" />
-                  Member since {new Date(profileData.created_at).getFullYear()}
-                </span>
+            ) : (
+              <form onSubmit={handleSave} className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <Avatar className="w-24 h-24 border-2 border-border shadow-medium">
+                    {avatarUrl ? (
+                      <AvatarImage src={avatarUrl} alt="Profile photo" />
+                    ) : null}
+                    <AvatarFallback className="bg-primary/10 text-primary text-xl font-semibold">
+                      {initials || <UserIcon className="w-8 h-8" />}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleAvatarChange}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploading ? "Uploading..." : avatarPath ? "Change photo" : "Upload photo"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-2">PNG or JPG, up to 5MB.</p>
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" value={user?.email || ""} disabled />
+                  <p className="text-xs text-muted-foreground mt-1">Email cannot be changed.</p>
+                </div>
+                <div>
+                  <Label htmlFor="full_name">Display Name</Label>
+                  <Input
+                    id="full_name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    maxLength={100}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone (optional)</Label>
+                  <Input
+                    id="phone"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    maxLength={30}
+                  />
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <Button type="submit" disabled={saving}>
+                    <Save className="w-4 h-4 mr-2" />
+                    {saving ? "Saving..." : "Save Changes"}
+                  </Button>
+                  <Button type="button" variant="outline" onClick={signOut}>
+                    Sign Out
+                  </Button>
+                </div>
+              </form>
+            )}
+          </Card>
+
+          <Card className="p-8 border-border bg-card shadow-large mt-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <Lock className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Change Password</h2>
+                <p className="text-sm text-muted-foreground">Update the password used to sign in.</p>
               </div>
             </div>
-          </div>
-        </header>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[35%_65%] gap-8">
-          <aside className="space-y-6">
-            <ProfileOverviewCard 
-              user={user} 
-              profile={profileData} 
-              avatarUrl={avatarUrl} 
-              onUploadClick={() => fileInputRef.current?.click()}
-              uploading={uploading}
-            />
-            <ProfileQuickActions />
-            
-            <input 
-              ref={fileInputRef} 
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
-              onChange={handleAvatarSelect}
-            />
-          </aside>
-
-          <section className="space-y-8">
-            <PersonalInfoCard 
-              formData={profileData} 
-              onChange={handleChange} 
-              userEmail={user?.email}
-            />
-
-            {isPatient && (
-              <MedicalInfoCard 
-                formData={profileData} 
-                onChange={handleChange} 
-              />
-            )}
-
-            {isDoctor && (
-              <ProfessionalInfoCard 
-                formData={profileData} 
-                onChange={handleChange} 
-              />
-            )}
-
-            <SecurityCard 
-              onUpdatePassword={handleUpdatePassword} 
-              loading={saving} 
-            />
-
-            <NotificationInbox />
-
-            <NotificationSettingsCard 
-              preferences={profileData.notification_preferences} 
-              onChange={handleNotificationChange} 
-            />
-
-            <PrivacySettingsCard 
-              settings={profileData.privacy_settings} 
-              onChange={handlePrivacyChange} 
-            />
-          </section>
+            <form onSubmit={handleChangePassword} className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="new_password">New password</Label>
+                <Input
+                  id="new_password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  minLength={8}
+                  maxLength={72}
+                  required
+                  autoComplete="new-password"
+                />
+                <p className="text-xs text-muted-foreground mt-1">At least 8 characters.</p>
+              </div>
+              <div>
+                <Label htmlFor="confirm_password">Confirm new password</Label>
+                <Input
+                  id="confirm_password"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  minLength={8}
+                  maxLength={72}
+                  required
+                  autoComplete="new-password"
+                />
+              </div>
+              <Button type="submit" disabled={changingPassword}>
+                <Lock className="w-4 h-4 mr-2" />
+                {changingPassword ? "Updating..." : "Update Password"}
+              </Button>
+            </form>
+          </Card>
         </div>
-      </main>
-
-      <StickySaveBar 
-        show={hasChanges} 
-        loading={saving} 
-        onSave={handleSave} 
-        onDiscard={() => {
-          setProfileData(initialData);
-          setHasChanges(false);
-          toast.info("Changes discarded");
-        }}
-      />
-
+      </section>
       <AvatarCropDialog
         open={!!cropSrc}
         imageSrc={cropSrc}
@@ -481,22 +315,18 @@ const Profile = () => {
         onCropped={handleCropped}
         busy={uploading}
       />
-
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
-        <AlertDialogContent className="rounded-3xl border-none shadow-2xl">
+      <AlertDialog open={confirmOpen} onOpenChange={(o) => !changingPassword && setConfirmOpen(o)}>
+        <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-xl font-bold">Confirm Password Update</AlertDialogTitle>
-            <AlertDialogDescription className="text-muted-foreground">
-              Changing your password will sign you out of all devices. You will need to log in again with your new credentials.
+            <AlertDialogTitle>Update your password?</AlertDialogTitle>
+            <AlertDialogDescription>
+              After updating, you'll be signed out on this device and will need to sign in again with your new password.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-xl border-border">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmPasswordChange}
-              className="rounded-xl bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-200"
-            >
-              Update & Logout
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={changingPassword}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmChangePassword} disabled={changingPassword}>
+              {changingPassword ? "Updating..." : "Update & sign out"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

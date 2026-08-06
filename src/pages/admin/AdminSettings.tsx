@@ -7,10 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
-import { Upload, Palette, Save, RotateCcw, FileText, Bell } from "lucide-react";
-import PdfTemplateEditor from "@/components/admin/settings/PdfTemplateEditor";
-import NotificationSettings from "@/components/admin/settings/NotificationSettings";
-import NotificationSimulator from "@/components/admin/settings/NotificationSimulator";
+import { Upload, Palette, Save, RotateCcw } from "lucide-react";
 import { usePermissions } from "@/hooks/usePermissions";
 
 const PRESETS = [
@@ -184,8 +181,6 @@ export default function AdminSettings() {
           {isAdmin && <TabsTrigger value="branding">Branding</TabsTrigger>}
           <TabsTrigger value="contact">Contact</TabsTrigger>
           {isAdmin && <TabsTrigger value="theme">Theme</TabsTrigger>}
-          {isAdmin && <TabsTrigger value="pdf">PDF EMR</TabsTrigger>}
-          {isAdmin && <TabsTrigger value="notifications">Notifications</TabsTrigger>}
           {isAdmin && <TabsTrigger value="ui">UI</TabsTrigger>}
         </TabsList>
 
@@ -313,15 +308,6 @@ export default function AdminSettings() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="pdf" className="mt-4">
-          <PdfTemplateEditor />
-        </TabsContent>
-
-        <TabsContent value="notifications" className="space-y-4 mt-4">
-          <NotificationSettings />
-          <NotificationSimulator />
         </TabsContent>
 
         <TabsContent value="ui" className="space-y-4 mt-4">

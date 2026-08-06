@@ -14,7 +14,7 @@ interface Props {
 }
 
 export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const current = (i18n.resolvedLanguage || i18n.language || "fr").slice(0, 2).toUpperCase();
 
   const change = (lng: "fr" | "en") => {
@@ -26,28 +26,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant={variant} 
-          size="sm" 
-          className={`gap-1.5 font-semibold ${className ?? ""}`} 
-          title="Audit every PostgreSQL function.
-
-For every function:
-
-- Add
-
-SET search_path = public
-
-unless another schema is intentionally required.
-
-Keep existing logic.
-
-Do not change function behavior.
-
-Verify every SQL function follows Supabase security recommendations.
-
-Do not modify tables or data."
-        >
+        <Button variant={variant} size="sm" className={`gap-1.5 font-semibold ${className ?? ""}`} title={t("common.language")}>
           <Globe className="w-4 h-4" />
           {current}
         </Button>

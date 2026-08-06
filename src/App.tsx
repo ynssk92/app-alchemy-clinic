@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Doctors from "./pages/Doctors";
 import Booking from "./pages/Booking";
@@ -23,7 +23,6 @@ import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminMessages from "./pages/admin/AdminMessages";
 import Contact from "./pages/Contact";
-import LegalPage from "./pages/LegalPage";
 import { AuthProvider } from "./hooks/useAuth";
 import { AppSettingsProvider } from "./hooks/useAppSettings";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -37,12 +36,11 @@ import AdminAppointmentCalendar from "./pages/admin/AdminAppointmentCalendar";
 import AdminAppointmentKanban from "./pages/admin/AdminAppointmentKanban";
 import AdminAppointmentRequests from "./pages/admin/AdminAppointmentRequests";
 import AdminPatients from "./pages/admin/AdminPatients";
-import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
-import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
-import AdminPatientEdit from "./pages/admin/AdminPatientEdit";
 import { AdminSpecialties, AdminClinics } from "./pages/admin/AdminCatalog";
 import AdminClinicAudit from "./pages/admin/AdminClinicAudit";
 import AdminAssistantVerifier from "./pages/admin/AdminAssistantVerifier";
+import AdminPatientDetails from "./pages/admin/AdminPatientDetails";
+import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
 import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
@@ -56,8 +54,6 @@ import AdminRoles from "./pages/admin/AdminRoles";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApprovals from "./pages/admin/AdminApprovals";
 import PendingApproval from "./pages/PendingApproval";
-import AdminGallery from "./pages/admin/AdminGallery";
-import AdminGalleryAnalytics from "./pages/admin/AdminGalleryAnalytics";
 import { PermissionRoute } from "./components/permissions";
 import BillingDashboard from "./pages/admin/billing/BillingDashboard";
 import Invoices from "./pages/admin/billing/Invoices";
@@ -82,13 +78,9 @@ const App = () => (
             <Route path="/doctors" element={<Doctors />} />
             <Route path="/booking" element={<Booking />} />
             <Route path="/booking/confirmed/:id" element={<BookingConfirmed />} />
-            <Route path="/dashboard" element={<ProtectedRoute patientOnly><PatientDashboard /></ProtectedRoute>} />
+            <Route path="/patient-dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/doctor/dashboard" element={<ProtectedRoute doctorOnly><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<AdminOverview />} />
-            </Route>
-            <Route path="/complete-profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
@@ -100,12 +92,8 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/terms" element={<LegalPage />} />
-            <Route path="/privacy" element={<LegalPage />} />
-            <Route path="/cookie-policy" element={<LegalPage />} />
             <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
-              <Route path="dashboard" element={<AdminOverview />} />
-              <Route index element={<Navigate to="/admin/dashboard" replace />} />
+              <Route index element={<AdminOverview />} />
               <Route path="doctors" element={<PermissionRoute module="Doctors"><AdminDoctors /></PermissionRoute>} />
               <Route path="doctors/new" element={<PermissionRoute module="Doctors" action="create"><AdminDoctorAdd /></PermissionRoute>} />
               <Route path="doctors/details" element={<PermissionRoute module="Doctors"><AdminDoctorDetails /></PermissionRoute>} />
@@ -121,7 +109,6 @@ const App = () => (
               <Route path="patients/details" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
               <Route path="patients/details/:id" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
               <Route path="patients/create" element={<PermissionRoute module="Patients" action="create"><AdminPatientCreate /></PermissionRoute>} />
-              <Route path="patients/edit/:id" element={<PermissionRoute module="Patients" action="edit"><AdminPatientEdit /></PermissionRoute>} />
               <Route path="patients/approvals" element={<PermissionRoute module="Patients" action="edit"><AdminApprovals /></PermissionRoute>} />
               <Route path="specialties" element={<PermissionRoute module="Specialties"><AdminSpecialties /></PermissionRoute>} />
               <Route path="clinics" element={<PermissionRoute module="Clinics"><AdminClinics /></PermissionRoute>} />
@@ -144,8 +131,6 @@ const App = () => (
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
-              <Route path="gallery" element={<ProtectedRoute staffOnly><AdminGallery /></ProtectedRoute>} />
-              <Route path="gallery/analytics" element={<ProtectedRoute adminOnly><AdminGalleryAnalytics /></ProtectedRoute>} />
               <Route path="settings" element={<ProtectedRoute><PermissionRoute module="settings" action="edit"><AdminSettings /></PermissionRoute></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />

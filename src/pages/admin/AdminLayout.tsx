@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import {
   LayoutDashboard, Stethoscope, Calendar, Users, Tag, Building2, LogOut, Home,
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
-  UserCheck, Search, Moon, Sun, User, BarChart3, Image as ImageIcon,
+  UserCheck, Search, Moon, Sun, User, BarChart3,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,7 +38,7 @@ const sections: Section[] = [
   {
     title: "Main",
     items: [
-      { to: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
+      { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
     ],
   },
   {
@@ -97,13 +97,6 @@ const sections: Section[] = [
     title: "Content & Comms",
     items: [
       { to: "/admin/blog", icon: FileText, label: "Blog", module: "Blog" },
-      { 
-        to: "/admin/gallery", icon: ImageIcon, label: "Gallery", staff: true,
-        children: [
-          { to: "/admin/gallery", label: "Management", end: true },
-          { to: "/admin/gallery/analytics", label: "Analytics" },
-        ]
-      },
       { to: "/admin/messages", icon: Inbox, label: "Messages", module: "Messages", staff: true },
     ],
   },
@@ -335,25 +328,16 @@ const AdminShell = () => {
           if (visible.length === 0) return null;
           return (
             <SidebarGroup key={section.title} title={section.title}>
-              {visible.map((l) => {
-                const filteredChildren = l.children?.filter(c => {
-                  if (isAdmin) return true;
-                  // We can add specific child visibility logic here if needed
-                  // For now, if a child route is "/admin/gallery/analytics", only admins see it
-                  if (c.to === "/admin/gallery/analytics") return isAdmin;
-                  return true;
-                });
-                return (
-                  <SidebarItem
-                    key={l.to}
-                    to={l.to}
-                    icon={l.icon}
-                    label={l.label}
-                    end={l.end}
-                    children={filteredChildren}
-                  />
-                );
-              })}
+              {visible.map((l) => (
+                <SidebarItem
+                  key={l.to}
+                  to={l.to}
+                  icon={l.icon}
+                  label={l.label}
+                  end={l.end}
+                  children={l.children}
+                />
+              ))}
             </SidebarGroup>
           );
         })}
@@ -378,11 +362,11 @@ const AdminShell = () => {
             <Input placeholder="Search patients, doctors, appointments…" className="pl-9 bg-muted/50 border-0" />
           </div>
           <div className="flex-1" />
+          <LanguageToggle />
           <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
             {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </Button>
           <AdminNotifications />
-          <LanguageToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" className="gap-2 bg-gradient-primary text-primary-foreground">

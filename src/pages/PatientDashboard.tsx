@@ -2,18 +2,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
-  Calendar, Clock, Award, TrendingUp, Activity, Stethoscope,
+  Calendar, Clock, Award, TrendingUp, LogOut, Activity, Stethoscope,
   HeartPulse, CircleDot, Search, User, Plus, ChevronRight, Flame,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import logo from "@/assets/logo.png";
 import { Seo } from "@/components/Seo";
 import { WidgetCard, EmptyState } from "@/components/dashboard/WidgetCard";
 import { format, isToday, parseISO } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PatientDashboardLayout } from "@/components/dashboard/patient/PatientDashboardLayout";
 
 type Appt = {
   id: string;
@@ -98,14 +98,39 @@ const PatientDashboard = () => {
   ];
 
   return (
-    <PatientDashboardLayout>
+    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-muted/30">
       <Seo
         title="Your Dashboard — HealthBook"
         description="Track your health score, upcoming appointments, and achievements in your HealthBook dashboard."
-        path="/dashboard"
+        path="/patient-dashboard"
       />
 
-      <div className="space-y-6">
+      {/* Sticky top bar */}
+      <nav className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-xl">
+        <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-2.5">
+          <Link to="/" className="flex items-center gap-3">
+            <img src={logo} alt="La Dune Clinique Dentaire" className="h-8" />
+          </Link>
+          <div className="flex items-center gap-1.5">
+            <Button asChild variant="ghost" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
+              <Link to="/doctors">Find Doctors</Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
+              <Link to="/profile">Profile</Link>
+            </Button>
+            {isAdmin && (
+              <Button asChild variant="secondary" size="sm" className="h-9 rounded-xl text-xs font-semibold">
+                <Link to="/admin">Admin Panel</Link>
+              </Button>
+            )}
+            <Button variant="outline" size="sm" className="h-9 rounded-xl text-xs font-semibold" onClick={signOut}>
+              <LogOut className="mr-1.5 h-3.5 w-3.5" />Sign Out
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="container mx-auto space-y-4 px-4 py-5">
         {/* Header */}
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
@@ -318,8 +343,8 @@ const PatientDashboard = () => {
             </WidgetCard>
           </div>
         </div>
-      </div>
-    </PatientDashboardLayout>
+      </main>
+    </div>
   );
 };
 

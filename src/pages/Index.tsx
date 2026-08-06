@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,18 +14,14 @@ import {
   UserCheck,
   Ambulance,
   UserRound,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { HomeDoctorCard } from "@/components/HomeDoctorCard";
+import { DoctorCard } from "@/components/DoctorCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
-import { Gallery } from "@/components/Gallery";
-import { motion, AnimatePresence } from "framer-motion";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import esthetique from "@/assets/soin-esthetique.jpg";
 import implant from "@/assets/soin-implant.jpg";
@@ -104,47 +100,6 @@ const Index = () => {
   useScrollReveal();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [isPaused, setIsPaused] = useState(false);
-
-  const scroll = useCallback((direction: "left" | "right") => {
-    if (scrollRef.current) {
-      const { scrollLeft, clientWidth } = scrollRef.current;
-      // We want to scroll by roughly one card width + gap
-      // On desktop (3 cards): clientWidth / 3
-      // But for simplicity and smoothness, scrolling by clientWidth is often better for "pages"
-      // The user asked for smooth sliding.
-      // Desktop (3 cards): clientWidth / 3
-      // Tablet (2 cards): clientWidth / 2
-      // Mobile (1 card): clientWidth
-      let scrollAmount = clientWidth;
-      if (window.innerWidth >= 1024) scrollAmount = clientWidth / 3;
-      else if (window.innerWidth >= 640) scrollAmount = clientWidth / 2;
-      
-      const scrollTo = direction === "left" ? scrollLeft - scrollAmount : scrollLeft + scrollAmount;
-      
-      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
-    }
-  }, []);
-
-  // Auto-scroll effect
-  useEffect(() => {
-    if (isPaused || doctors.length === 0) return;
-    
-    const interval = setInterval(() => {
-      if (scrollRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        // If we are near the end, wrap around to start
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
-          scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
-        } else {
-          scroll("right");
-        }
-      }
-    }, 6000);
-
-    return () => clearInterval(interval);
-  }, [isPaused, doctors.length, scroll]);
 
   useEffect(() => {
     supabase
@@ -152,6 +107,7 @@ const Index = () => {
       .select("id, full_name, avatar_url, experience_years, specialties(name), rating, clinics(name), is_available")
       .eq("is_available", true)
       .order("full_name")
+      .limit(3)
       .then(({ data }) => setDoctors((data as any) || []));
 
     supabase
@@ -398,7 +354,48 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Counters (Statistics) */}
+      {/* Doctors */}
+      {doctors.length > 0 && (
+        <section className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32">
+          {/* subtle blue radial gradients */}
+          <div className="pointer-events-none absolute inset-0 -z-10">
+            <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
+          </div>
+
+          <div className="container mx-auto px-4 max-w-[1400px]">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-[60px] reveal">
+              <div className="max-w-2xl">
+                <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6">
+                  <UserRound className="h-3.5 w-3.5" />
+                  👨‍⚕️ OUR DOCTORS
+                </span>
+                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px]">
+                  Meet Our Medical Experts
+                </h2>
+                <p className="mt-6 text-lg leading-relaxed text-slate-500">
+                  Our experienced specialists are committed to delivering personalized, high-quality healthcare with the latest medical technologies.
+                </p>
+              </div>
+              <Link to="/equipe" className="shrink-0 mb-2">
+                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] hover:bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all">
+                  Voir toute l'équipe <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {doctors.map((d) => (
+                <div key={d.id} className="reveal reveal-scale">
+                  <DoctorCard doctor={d} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Counters */}
       <section className="py-16 bg-muted/40 border-y border-border">
         <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {counters.map((c, i) => (
@@ -411,92 +408,6 @@ const Index = () => {
           ))}
         </div>
       </section>
-
-      {/* Gallery Section */}
-      <Gallery />
-
-      {/* Doctors Carousel Section */}
-      {doctors.length > 0 && (
-        <section 
-          className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {/* subtle blurred circles decoration */}
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-[#2563EB]/5 blur-[150px] opacity-[0.08]" />
-            <div className="absolute bottom-0 left-0 h-[600px] w-[600px] rounded-full bg-[#06B6D4]/5 blur-[150px] opacity-[0.08]" />
-          </div>
-
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            {/* Header Section */}
-            <div className="mb-16 flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-              <div className="max-w-2xl reveal">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/10 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6">
-                  👨‍⚕️ OUR DOCTORS
-                </span>
-                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px] mb-6">
-                  Meet Our Medical Experts
-                </h2>
-                <p className="text-lg leading-relaxed text-slate-500">
-                  Meet experienced specialists committed to delivering exceptional dental care with modern technology.
-                </p>
-              </div>
-              
-              <div className="flex flex-col items-center md:items-end gap-3 reveal" style={{ transitionDelay: "100ms" }}>
-                <div className="flex items-center gap-3">
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-12 w-12 rounded-full bg-white border-none shadow-soft hover:bg-[#2563EB] hover:text-white transition-all duration-300"
-                    onClick={() => scroll("left")}
-                    aria-label="Previous"
-                  >
-                    <ChevronLeft className="h-6 w-6" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-12 w-12 rounded-full bg-white border-none shadow-soft hover:bg-[#2563EB] hover:text-white transition-all duration-300"
-                    onClick={() => scroll("right")}
-                    aria-label="Next"
-                  >
-                    <ChevronRight className="h-6 w-6" />
-                  </Button>
-                </div>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                  15+ Specialists Available
-                </span>
-              </div>
-            </div>
-            
-            {/* Carousel Container */}
-            <div 
-              ref={scrollRef}
-              className="flex gap-8 overflow-x-auto pb-12 scrollbar-hide snap-x snap-mandatory"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {doctors.map((d, idx) => (
-                <div 
-                  key={d.id} 
-                  className="min-w-full sm:min-w-[calc(50%-16px)] lg:min-w-[calc(33.333%-22px)] flex-shrink-0 snap-center"
-                >
-                  <HomeDoctorCard doctor={d} index={idx} />
-                </div>
-              ))}
-            </div>
-
-            {/* View All Section - Bottom */}
-            <div className="mt-8 flex justify-center reveal" style={{ transitionDelay: "200ms" }}>
-              <Link to="/doctors">
-                <Button variant="ghost" className="group h-12 rounded-xl px-8 font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all">
-                  View all doctors <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Blog */}
       {posts.length > 0 && (
