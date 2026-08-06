@@ -38,7 +38,7 @@ const sections: Section[] = [
   {
     title: "Main",
     items: [
-      { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
+      { to: "/admin/dashboard", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
     ],
   },
   {
