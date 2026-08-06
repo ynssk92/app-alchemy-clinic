@@ -23,6 +23,7 @@ import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminMessages from "./pages/admin/AdminMessages";
 import Contact from "./pages/Contact";
+import LegalPage from "./pages/LegalPage";
 import { AuthProvider } from "./hooks/useAuth";
 import { AppSettingsProvider } from "./hooks/useAppSettings";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -95,6 +96,8 @@ const App = () => (
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/terms" element={<LegalPage />} />
+            <Route path="/privacy" element={<LegalPage />} />
             <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
               <Route path="doctors" element={<PermissionRoute module="Doctors"><AdminDoctors /></PermissionRoute>} />
