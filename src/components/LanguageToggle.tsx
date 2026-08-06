@@ -30,7 +30,7 @@ export const LanguageToggle = ({ variant = "ghost", className }: Props) => {
           variant={variant} 
           size="sm" 
           className={`gap-1.5 font-semibold ${className ?? ""}`} 
-          title="Change language"
+          title="Add an automated test suite to verify that each role redirects exactly once to the correct dashboard after login, with no redirect loops."
         >
           <Globe className="w-4 h-4" />
           {current}
