@@ -1,6 +1,7 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export type UserRole = "patient" | "doctor" | "admin" | "assistant" | null;
 
@@ -17,6 +18,7 @@ type AuthCtx = {
   profileStatus: string | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  getDashboardByRole: (role: UserRole) => string;
 };
 
 const Ctx = createContext<AuthCtx>({
@@ -32,6 +34,7 @@ const Ctx = createContext<AuthCtx>({
   profileStatus: null,
   loading: true,
   signOut: async () => {},
+  getDashboardByRole: () => "/auth",
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -46,6 +49,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profileStatus, setProfileStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const getDashboardByRole = useCallback((r: UserRole) => {
+    switch (r) {
+      case "admin":
+      case "doctor":
+      case "assistant":
+        return "/admin";
+      case "patient":
+        return "/patient-dashboard";
+      default:
+        return "/auth";
+    }
+  }, []);
+
   const loadRole = async (uid: string) => {
     try {
       const { data: prof, error: profError } = await supabase
@@ -57,25 +73,64 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (profError) throw profError;
 
       const userRole = (prof as any)?.role as UserRole;
+      const status = (prof as any)?.status;
+      
       setRole(userRole);
       setRoleText((prof as any)?.role || null);
       setIsAdmin(userRole === "admin");
       setIsAssistant(userRole === "assistant");
       setIsDoctor(userRole === "doctor");
       setIsPatient(userRole === "patient");
-      setProfileStatus((prof as any)?.status || null);
+      setProfileStatus(status || null);
+      
+      return { userRole, status };
     } catch (error) {
       console.error("Error loading profile role:", error);
+      return { userRole: null, status: null };
     }
   };
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_evt, s) => {
+    let mounted = true;
+
+    const initialize = async () => {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      if (!mounted) return;
+
       setSession(s);
       setUser(s?.user ?? null);
+      
       if (s?.user) {
-        setTimeout(() => loadRole(s.user.id), 0);
-      } else {
+        await loadRole(s.user.id);
+      }
+      
+      setLoading(false);
+    };
+
+    initialize();
+
+    const { data: sub } = supabase.auth.onAuthStateChange(async (evt, s) => {
+      if (!mounted) return;
+
+      setSession(s);
+      setUser(s?.user ?? null);
+
+      if (evt === "SIGNED_IN" && s?.user) {
+        setLoading(true);
+        const { userRole, status } = await loadRole(s.user.id);
+        
+        if (status === "blocked" || status === "inactive") {
+          toast.error(`Your account is ${status}. Please contact support.`);
+          await supabase.auth.signOut();
+        } else if (userRole) {
+          const dash = getDashboardByRole(userRole);
+          const roleName = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+          toast.success(`Welcome back! Redirecting to your ${roleName} Dashboard.`, {
+            id: 'auth-success' // Prevent duplicate toasts
+          });
+        }
+        setLoading(false);
+      } else if (evt === "SIGNED_OUT") {
         setRole(null);
         setRoleText(null);
         setIsAdmin(false);
@@ -83,18 +138,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsDoctor(false);
         setIsPatient(false);
         setProfileStatus(null);
+        setLoading(false);
       }
     });
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) loadRole(s.user.id);
-      setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
-  }, []);
+    return () => {
+      mounted = false;
+      sub.subscription.unsubscribe();
+    };
+  }, [getDashboardByRole]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
@@ -113,7 +165,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       roleText, 
       profileStatus, 
       loading, 
-      signOut 
+      signOut,
+      getDashboardByRole
     }}>
       {children}
     </Ctx.Provider>
