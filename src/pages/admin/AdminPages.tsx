@@ -25,6 +25,7 @@ const PAGES = [
   { slug: "expertise", label: "Expertise", path: "/expertise", kinds: ["feature", "stat"] },
   { slug: "terms", label: "Terms of Service", path: "/terms", isLegal: true },
   { slug: "privacy", label: "Privacy Policy", path: "/privacy", isLegal: true },
+  { slug: "cookie-policy", label: "Cookie Policy", path: "/cookie-policy", isLegal: true },
 ];
 
 const emptyBlock = {

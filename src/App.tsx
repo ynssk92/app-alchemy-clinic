@@ -98,6 +98,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/terms" element={<LegalPage />} />
             <Route path="/privacy" element={<LegalPage />} />
+            <Route path="/cookie-policy" element={<LegalPage />} />
             <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
               <Route path="doctors" element={<PermissionRoute module="Doctors"><AdminDoctors /></PermissionRoute>} />
