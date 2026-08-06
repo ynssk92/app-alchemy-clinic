@@ -52,11 +52,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const getDashboardByRole = useCallback((r: UserRole) => {
     switch (r) {
       case "admin":
+        return "/admin/dashboard";
       case "doctor":
+        return "/doctor/dashboard";
       case "assistant":
         return "/admin";
       case "patient":
-        return "/patient-dashboard";
+        return "/dashboard";
       default:
         return "/auth";
     }
@@ -64,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loadRole = async (uid: string) => {
     try {
+      console.log("[Auth] Fetching profile for user:", uid);
       const { data: prof, error: profError } = await supabase
         .from("profiles")
         .select("*")
@@ -72,8 +75,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (profError) throw profError;
 
+      if (!prof) {
+        console.warn("[Auth] No profile found for user:", uid);
+        setRole(null);
+        setProfileStatus(null);
+        return { userRole: null, status: null };
+      }
+
       const userRole = (prof as any)?.role as UserRole;
       const status = (prof as any)?.status;
+      
+      console.log("[Auth] Profile loaded. Role detected:", userRole);
       
       setRole(userRole);
       setRoleText((prof as any)?.role || null);
@@ -85,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       
       return { userRole, status };
     } catch (error) {
-      console.error("Error loading profile role:", error);
+      console.error("[Auth] Error loading profile role:", error);
       return { userRole: null, status: null };
     }
   };
@@ -94,29 +106,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let mounted = true;
 
     const initialize = async () => {
+      console.log("[Auth] Initializing...");
       const { data: { session: s } } = await supabase.auth.getSession();
+      
       if (!mounted) return;
 
-      setSession(s);
-      setUser(s?.user ?? null);
-      
-      if (s?.user) {
+      if (s) {
+        console.log("[Auth] Session found");
+        setSession(s);
+        setUser(s.user);
+        console.log("[Auth] User loaded");
         await loadRole(s.user.id);
+      } else {
+        console.log("[Auth] No session found");
       }
       
       setLoading(false);
+      console.log("[Auth] Initialized");
     };
 
     initialize();
 
     const { data: sub } = supabase.auth.onAuthStateChange(async (evt, s) => {
+      console.log("[Auth] State change:", evt);
       if (!mounted) return;
-
-      setSession(s);
-      setUser(s?.user ?? null);
 
       if (evt === "SIGNED_IN" && s?.user) {
         setLoading(true);
+        setSession(s);
+        setUser(s.user);
+        console.log("[Auth] Signed in. Fetching profile...");
+        
         const { userRole, status } = await loadRole(s.user.id);
         
         if (status === "blocked" || status === "inactive") {
@@ -125,12 +145,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else if (userRole) {
           const dash = getDashboardByRole(userRole);
           const roleName = userRole.charAt(0).toUpperCase() + userRole.slice(1);
+          console.log("[Auth] Redirecting to:", dash);
           toast.success(`Welcome back! Redirecting to your ${roleName} Dashboard.`, {
-            id: 'auth-success' // Prevent duplicate toasts
+            id: 'auth-success'
           });
         }
         setLoading(false);
       } else if (evt === "SIGNED_OUT") {
+        console.log("[Auth] Signed out. Clearing state...");
+        setSession(null);
+        setUser(null);
         setRole(null);
         setRoleText(null);
         setIsAdmin(false);
@@ -139,6 +163,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsPatient(false);
         setProfileStatus(null);
         setLoading(false);
+        
+        // Clear local storage for extra safety as requested
+        localStorage.clear();
+      } else {
+        setSession(s);
+        setUser(s?.user ?? null);
       }
     });
 
@@ -149,6 +179,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [getDashboardByRole]);
 
   const signOut = async () => {
+    console.log("[Auth] Sign out requested");
     await supabase.auth.signOut();
   };
 
