@@ -23,6 +23,7 @@ import { usePageContent } from "@/hooks/usePageContent";
 import { resolveIcon, resolveImage } from "@/lib/pageContent";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
@@ -454,11 +455,7 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="py-12 bg-card border-t border-border">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} La Dune Clinique Dentaire. Tous droits réservés.
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };
