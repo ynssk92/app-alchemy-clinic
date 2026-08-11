@@ -1,76 +1,132 @@
 import { PageShell } from "@/components/PageShell";
 import { ExpertiseCard } from "@/components/ExpertiseCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Zap } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { usePageContent } from "@/hooks/usePageContent";
 import { resolveIcon } from "@/lib/pageContent";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Expertise = () => {
   const { page, blocks, loading } = usePageContent("expertise");
   const features = blocks.filter((b) => b.kind === "feature");
-  const stats = blocks.filter((b) => b.kind === "stat");
+  
+  // Logic to identify a featured item (e.g., first one or marked by sort_order/slug)
+  const featuredItem = features.length > 0 ? features[0] : null;
+  const regularItems = features.length > 1 ? features.slice(1) : [];
 
   return (
     <PageShell
       title={page?.seo_title || "Expertise — La Dune Clinique Dentaire"}
       description={page?.seo_description || "Technologies de pointe et savoir-faire clinique au service de votre sourire."}
       path="/expertise"
-      heading={page?.heading || "Une expertise à la pointe"}
+      heading={page?.heading || "Expertise Médicale Avancée"}
       hideHero
     >
-      <section className="relative -mx-4 -mt-8 overflow-hidden px-4 md:-mt-10">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
-        <div className="pointer-events-none absolute -top-16 left-0 -z-10 h-48 w-48 rounded-full bg-primary/10 blur-2xl sm:-top-20 sm:left-1/4 sm:h-64 sm:w-64 sm:blur-3xl lg:-top-24 lg:h-72 lg:w-72" />
-        <div className="pointer-events-none absolute bottom-0 right-0 -z-10 h-52 w-52 rounded-full bg-secondary/10 blur-2xl sm:h-72 sm:w-72 sm:blur-3xl lg:h-80 lg:w-80" />
-
-        <div className="relative mx-auto max-w-[1280px] py-10 sm:py-14 lg:py-20">
-          <div className="flex flex-col gap-8 sm:gap-10 lg:flex-row lg:items-end lg:justify-between lg:gap-12">
-            <div className="max-w-2xl">
-              {page?.eyebrow && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary sm:px-4 sm:text-xs">
-                  <Zap className="h-3.5 w-3.5 shrink-0" /> {page.eyebrow}
+      <div className="min-h-screen bg-[#f8fafc]">
+        <section className="relative overflow-hidden px-4 pb-20 pt-16 sm:pb-32 sm:pt-24 lg:pt-32">
+          {/* Subtle background decoration */}
+          <div className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />
+          
+          <div className="mx-auto max-w-[1280px]">
+            {/* Redesigned Section Header */}
+            <div className="relative mb-16 text-center sm:mb-24">
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 inline-flex items-center gap-2"
+              >
+                <div className="h-px w-8 bg-primary/30" />
+                <span className="text-[11px] font-bold uppercase tracking-[0.3em] text-primary">
+                  {page?.eyebrow || "NOS EXPERTISES"}
                 </span>
-              )}
-              <h1 className="mt-4 text-[1.9rem] font-bold leading-[1.12] tracking-tight text-foreground xs:text-4xl sm:mt-6 sm:text-5xl lg:text-[3.25rem]">
-                {page?.heading || "Équipements médicaux de pointe"}
-              </h1>
-              {page?.subheading && (
-                <p className="mt-3 max-w-prose text-base leading-relaxed text-muted-foreground sm:mt-5 sm:text-lg">{page.subheading}</p>
+                <div className="h-px w-8 bg-primary/30" />
+              </motion.div>
+              
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="mx-auto max-w-3xl text-[2.5rem] font-bold leading-[1.1] tracking-tight text-[#1a2b4b] sm:text-[3.5rem] lg:text-[4rem]"
+              >
+                {page?.heading || "Soins de pointe. Expertise prouvée."}
+              </motion.h1>
+              
+              <motion.p 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground/90 sm:text-xl"
+              >
+                {page?.subheading || "Découvrez l'expertise, la technologie et les traitements qui nous permettent de prodiguer des soins précis, confortables et personnalisés."}
+              </motion.p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-4">
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <Skeleton 
+                    key={i} 
+                    className={i === 0 ? "h-[320px] lg:col-span-2 rounded-[24px]" : "h-[320px] rounded-[20px]"} 
+                  />
+                ))
+              ) : (
+                <>
+                  {/* Featured Item */}
+                  {featuredItem && (
+                    <ExpertiseCard
+                      icon={resolveIcon(featuredItem.icon)}
+                      title={featuredItem.title || ""}
+                      text={featuredItem.body || ""}
+                      features={featuredItem.items}
+                      featured
+                    />
+                  )}
+
+                  {/* Regular Items */}
+                  {regularItems.map((f) => (
+                    <ExpertiseCard
+                      key={f.id}
+                      icon={resolveIcon(f.icon)}
+                      title={f.title || ""}
+                      text={f.body || ""}
+                    />
+                  ))}
+                </>
               )}
             </div>
 
-            <ul className="flex flex-col gap-3 lg:min-w-[240px]">
-              {stats.map((s) => {
-                const Icon = resolveIcon(s.icon);
-                return (
-                  <li
-                    key={s.id}
-                    className="flex items-center gap-3 rounded-2xl border border-border bg-card/80 px-4 py-3 text-sm font-medium text-foreground shadow-soft backdrop-blur"
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-primary" />
-                    {s.title}
-                  </li>
-                );
-              })}
-            </ul>
+            {/* CTA Section */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-24 text-center sm:mt-32"
+            >
+              <div className="inline-flex flex-col items-center gap-6 rounded-[32px] border border-border bg-card p-8 shadow-soft sm:px-16 sm:py-12">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/5 text-primary">
+                  <Sparkles className="h-6 w-6" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold tracking-tight text-[#1a2b4b] sm:text-3xl">Besoin de soins personnalisés ?</h2>
+                  <p className="mt-2 text-muted-foreground">Discutez avec notre équipe pour trouver le traitement qui vous convient.</p>
+                </div>
+                <div className="flex flex-col items-center gap-4 sm:flex-row">
+                  <Link to="/booking">
+                    <Button size="lg" className="h-14 px-8 text-base shadow-soft hover:shadow-medium">
+                      Prendre rendez-vous <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Link to="/equipe" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
+                    Rencontrez nos médecins
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
           </div>
-
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:mt-12 sm:gap-8 md:grid-cols-2 lg:mt-14 xl:grid-cols-4">
-
-            {loading
-              ? [...Array(4)].map((_, i) => <Skeleton key={i} className="h-[300px] w-full rounded-3xl" />)
-              : features.map((f) => (
-                  <ExpertiseCard
-                    key={f.id}
-                    icon={resolveIcon(f.icon)}
-                    title={f.title || ""}
-                    text={f.body || ""}
-                    features={f.items}
-                  />
-                ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </PageShell>
   );
 };
