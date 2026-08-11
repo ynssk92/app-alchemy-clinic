@@ -9,6 +9,7 @@ import Booking from "./pages/Booking";
 import BookingConfirmed from "./pages/BookingConfirmed";
 import PatientDashboard from "./pages/PatientDashboard";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Profile from "./pages/Profile";
