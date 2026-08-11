@@ -87,6 +87,20 @@ const AdminBlog = () => {
     setUploading(false);
   };
 
+  const openMedia = async () => {
+    setMediaOpen(true);
+    setLoadingMedia(true);
+    const { data } = await supabase.storage.from("branding").list();
+    if (data) {
+      const items = data.map((f) => ({
+        name: f.name,
+        url: supabase.storage.from("branding").getPublicUrl(f.name).data.publicUrl,
+      }));
+      setMediaFiles(items);
+    }
+    setLoadingMedia(false);
+  };
+
   const save = async () => {
     if (!draft.title || !draft.content) {
       toast({ title: "Champs requis", description: "Titre et contenu obligatoires", variant: "destructive" });
