@@ -454,11 +454,7 @@ const Index = () => {
         </div>
       </section>
 
-      <footer className="py-12 bg-card border-t border-border">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} La Dune Clinique Dentaire. Tous droits réservés.
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 };
