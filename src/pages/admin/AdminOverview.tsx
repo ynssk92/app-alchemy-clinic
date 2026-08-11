@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   Stethoscope, Calendar, Users, Building2, TrendingUp,
   Plus, CalendarCheck, Clock, Activity, MessageSquare, Zap,
-  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal,
+  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer,
@@ -172,7 +172,9 @@ const AdminOverview = () => {
     { label: "Create Invoice", to: "/admin/billing/invoices", icon: FileText, tint: "stat-green" },
     { label: "Doctors", to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet" },
     { label: "Messages", to: "/admin/messages", icon: MessageSquare, tint: "stat-amber" },
-    { label: "Clinics", to: "/admin/catalog", icon: Building2, tint: "stat-red" },
+    { label: "Website CMS", to: "/admin/pages", icon: FileStack, tint: "stat-blue" },
+    { label: "New Patient", to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
+
   ];
 
   const activity = useMemo(() => {

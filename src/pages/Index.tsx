@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,18 +14,18 @@ import {
   UserCheck,
   Ambulance,
   UserRound,
+  HelpCircle,
 } from "lucide-react";
 import { DoctorCard } from "@/components/DoctorCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
+import { usePageContent } from "@/hooks/usePageContent";
+import { resolveIcon, resolveImage } from "@/lib/pageContent";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
-import esthetique from "@/assets/soin-esthetique.jpg";
-import implant from "@/assets/soin-implant.jpg";
-import ortho from "@/assets/soin-ortho.jpg";
 import diagnostic from "@/assets/soin-diagnostic.jpg";
 import visage from "@/assets/soin-visage.jpg";
 
@@ -61,45 +61,19 @@ const initialsOf = (name: string) =>
     .join("")
     .toUpperCase();
 
-const steps = [
-  { icon: CalendarCheck, title: "Prenez rendez-vous", desc: "Choisissez la date et l'horaire qui vous conviennent, en ligne et en quelques secondes." },
-  { icon: UserCheck, title: "Choisissez votre praticien", desc: "Sélectionnez le spécialiste adapté à votre besoin parmi notre équipe." },
-  { icon: Stethoscope, title: "Confirmez la consultation", desc: "Recevez votre confirmation et vos rappels automatiques avant la séance." },
-];
+// Steps, departments and counters will be loaded from DB via usePageContent("home")
 
-const departments = [
-  {
-    title: "Esthétique du Sourire",
-    image: esthetique,
-    lead: "Blanchiment, facettes & prothèses",
-    items: ["Blanchiment dentaire", "Facettes céramique", "Couronnes & bridges"],
-  },
-  {
-    title: "Implantologie",
-    image: implant,
-    lead: "Implants unitaires & complets",
-    items: ["Implants unitaires", "All-on-4 / All-on-6", "Greffe osseuse"],
-  },
-  {
-    title: "Orthodontie",
-    image: ortho,
-    lead: "Alignement invisible & classique",
-    items: ["Gouttières transparentes", "Bagues céramique", "Suivi personnalisé"],
-  },
-];
-
-const counters = [
-  { value: "12k+", label: "Patients satisfaits" },
-  { value: "9", label: "Spécialités" },
-  { value: "15+", label: "Praticiens" },
-  { value: "20", label: "Années d'expérience" },
-];
 
 const Index = () => {
   const { settings } = useAppSettings();
   useScrollReveal();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
+  const { page, blocks, loading: contentLoading } = usePageContent("home");
+
+  const steps = useMemo(() => blocks.filter(b => b.kind === "step"), [blocks]);
+  const departments = useMemo(() => blocks.filter(b => b.kind === "department"), [blocks]);
+  const counters = useMemo(() => blocks.filter(b => b.kind === "stat"), [blocks]);
 
   useEffect(() => {
     supabase
@@ -119,11 +93,13 @@ const Index = () => {
       .then(({ data }) => setPosts((data as Post[]) || []));
   }, []);
 
+
   return (
     <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
-        title="La Dune Clinique Dentaire — Rendez-vous en quelques secondes"
-        description="Clinique dentaire moderne : esthétique du sourire, implantologie, orthodontie. Prenez rendez-vous en ligne avec nos praticiens en quelques secondes."
+        title={page?.seo_title || "La Dune Clinique Dentaire — Rendez-vous en quelques secondes"}
+        description={page?.seo_description || "Clinique dentaire moderne : esthétique du sourire, implantologie, orthodontie. Prenez rendez-vous en ligne avec nos praticiens en quelques secondes."}
+
         path="/"
       />
 
@@ -166,16 +142,16 @@ const Index = () => {
         <div className="container mx-auto px-4 py-20 sm:py-24 md:py-32 relative">
           <div className="max-w-2xl mx-auto text-center sm:mx-0 sm:text-left">
             <span className="reveal inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-5 sm:mb-4">
-              La Dune Clinique Dentaire
+              {page?.eyebrow || "La Dune Clinique Dentaire"}
             </span>
             <h1 className="reveal text-5xl md:text-7xl font-bold text-foreground mb-5 sm:mb-6 leading-[1.05] text-balance" style={{ transitionDelay: "80ms" }}>
-              Rencontrez nos{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">meilleurs praticiens</span>
+              {page?.heading || "Rencontrez nos meilleurs praticiens"}
             </h1>
+
             <p className="reveal text-lg md:text-xl text-muted-foreground mb-10 sm:mb-8 max-w-xl mx-auto sm:mx-0" style={{ transitionDelay: "160ms" }}>
-              Une équipe experte, un plateau technique moderne et un parcours de soins pensé
-              pour votre confort — réservez votre consultation en quelques secondes.
+              {page?.subheading || "Une équipe experte, un plateau technique moderne et un parcours de soins pensé pour votre confort — réservez votre consultation en quelques secondes."}
             </p>
+
             <HeroCta className="reveal" style={{ transitionDelay: "240ms" }} />
 
           </div>
@@ -206,11 +182,10 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 leading-tight">
               Un lieu où l'excellence médicale rencontre le confort du patient.
             </h2>
-            <p className="text-muted-foreground mb-8">
-              De la première consultation au suivi post-traitement, nous combinons technologies
-              de pointe et approche humaine pour offrir des soins dentaires précis, indolores
-              et durables à toute la famille.
-            </p>
+            <div className="text-muted-foreground mb-8 whitespace-pre-line">
+              {page?.intro || "De la première consultation au suivi post-traitement, nous combinons technologies de pointe et approche humaine pour offrir des soins dentaires précis, indolores et durables à toute la famille."}
+            </div>
+
             <ul className="grid sm:grid-cols-2 gap-3 mb-8">
               {["Urgences dentaires", "Diagnostic 3D", "Sédation douce", "Devis transparent"].map((f) => (
                 <li key={f} className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -242,20 +217,24 @@ const Index = () => {
               </Link>
             </div>
             <div className="lg:col-span-2 grid sm:grid-cols-3 gap-6">
-              {steps.map((s, i) => (
-                <Card
-                  key={s.title}
-                  className="reveal reveal-scale p-6 bg-card border-border hover:shadow-medium hover:-translate-y-1 transition-all"
-                  style={{ transitionDelay: `${i * 90}ms` }}
-                >
-                  <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-4">
-                    <s.icon className="w-6 h-6 text-primary-foreground" />
-                  </div>
-                  <span className="text-xs font-bold text-muted-foreground">0{i + 1}</span>
-                  <h3 className="text-lg font-bold text-card-foreground mb-2">{s.title}</h3>
-                  <p className="text-sm text-muted-foreground">{s.desc}</p>
-                </Card>
-              ))}
+              {steps.map((s, i) => {
+                const Icon = resolveIcon(s.icon);
+                return (
+                  <Card
+                    key={s.id}
+                    className="reveal reveal-scale p-6 bg-card border-border hover:shadow-medium hover:-translate-y-1 transition-all"
+                    style={{ transitionDelay: `${i * 90}ms` }}
+                  >
+                    <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-4">
+                      <Icon className="w-6 h-6 text-primary-foreground" />
+                    </div>
+                    <span className="text-xs font-bold text-muted-foreground">0{i + 1}</span>
+                    <h3 className="text-lg font-bold text-card-foreground mb-2">{s.title}</h3>
+                    <p className="text-sm text-muted-foreground">{s.body}</p>
+                  </Card>
+                );
+              })}
+
             </div>
           </div>
         </div>
@@ -273,23 +252,23 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {departments.map((d, i) => (
               <Card
-                key={d.title}
+                key={d.id}
                 className="reveal reveal-scale overflow-hidden border-border bg-card hover:shadow-large transition-all group"
                 style={{ transitionDelay: `${i * 90}ms` }}
               >
                 <div className="overflow-hidden">
                   <img
-                    src={d.image}
-                    alt={d.title}
+                    src={resolveImage(d.image_url)}
+                    alt={d.title || ""}
                     loading="lazy"
                     className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-card-foreground mb-1">{d.title}</h3>
-                  <p className="text-sm text-primary font-semibold mb-4">{d.lead}</p>
+                  <p className="text-sm text-primary font-semibold mb-4">{d.subtitle}</p>
                   <ul className="space-y-2 mb-6">
-                    {d.items.map((it) => (
+                    {d.items?.map((it) => (
                       <li key={it} className="flex items-center gap-2 text-sm text-muted-foreground">
                         <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
                         {it}
@@ -304,6 +283,7 @@ const Index = () => {
                 </div>
               </Card>
             ))}
+
           </div>
         </div>
       </section>
@@ -399,13 +379,14 @@ const Index = () => {
       <section className="py-16 bg-muted/40 border-y border-border">
         <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {counters.map((c, i) => (
-            <div key={c.label} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
+            <div key={c.id} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
               <div className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {c.value}
+                {c.title}
               </div>
-              <p className="text-sm text-muted-foreground mt-2">{c.label}</p>
+              <p className="text-sm text-muted-foreground mt-2">{c.subtitle}</p>
             </div>
           ))}
+
         </div>
       </section>
 
