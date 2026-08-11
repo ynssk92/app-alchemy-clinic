@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, Save, Upload, User as UserIcon, Lock } from "lucide-react";
+import { ArrowLeft, Save, Upload, User as UserIcon, Lock, CheckCircle2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -260,6 +260,72 @@ const Profile = () => {
                 </div>
               </form>
             )}
+          </Card>
+
+          <Card className="p-8 border-border bg-card shadow-large mt-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                <UserIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Linked Accounts</h2>
+                <p className="text-sm text-muted-foreground">Manage your connected social login providers.</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {[
+                { id: "google", name: "Google", icon: (
+                  <svg className="w-5 h-5" viewBox="0 0 48 48">
+                    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.5 29.6 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+                    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 7 29.6 5 24 5 16.3 5 9.6 9.3 6.3 14.7z"/>
+                    <path fill="#4CAF50" d="M24 43c5.4 0 10.3-2 14-5.3l-6.5-5.3C29.4 34 26.8 35 24 35c-5.3 0-9.7-3.1-11.3-8l-6.6 5.1C9.4 38.7 16.1 43 24 43z"/>
+                    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.4-2.4 4.4-4.5 5.7l6.5 5.3C41 35 43.5 30 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+                  </svg>
+                )},
+                { id: "apple", name: "Apple", icon: (
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 384 512">
+                    <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                  </svg>
+                )},
+                { id: "facebook", name: "Facebook", icon: (
+                  <svg className="w-5 h-5 fill-[#1877F2]" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                )},
+                { id: "twitter", name: "X (Twitter)", icon: (
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                )},
+              ].map((provider) => {
+                const isLinked = user?.app_metadata?.providers?.includes(provider.id);
+                return (
+                  <div key={provider.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50/50">
+                    <div className="flex items-center gap-3">
+                      {provider.icon}
+                      <span className="font-medium">{provider.name}</span>
+                    </div>
+                    <Button 
+                      variant={isLinked ? "ghost" : "outline"} 
+                      size="sm"
+                      className={isLinked ? "text-green-600 hover:text-green-700" : ""}
+                      onClick={() => !isLinked && (provider.id === 'google' || provider.id === 'apple' ? 
+                        supabase.auth.signInWithOAuth({ provider: provider.id as 'google' | 'apple', options: { redirectTo: `${window.location.origin}/auth/callback` } }) :
+                        supabase.auth.signInWithOAuth({ provider: provider.id as 'facebook' | 'twitter', options: { redirectTo: `${window.location.origin}/auth/callback` } })
+                      )}
+                    >
+                      {isLinked ? (
+                        <div className="flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Linked</span>
+                        </div>
+                      ) : "Connect"}
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
           </Card>
 
           <Card className="p-8 border-border bg-card shadow-large mt-6">
