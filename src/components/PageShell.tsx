@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { SiteHeader } from "./SiteHeader";
+import { SiteFooter } from "./SiteFooter";
 import { Seo } from "./Seo";
 
 interface PageShellProps {
