@@ -26,47 +26,40 @@ const Soins = () => {
       hideHero
       heading={page?.heading || "Nos Soins"}
     >
-      <section className="relative overflow-hidden bg-[#F8FAFC] py-20 sm:py-24 lg:py-[140px]">
-        {/* Luxury Background Decorations */}
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-blue-50/50 via-white to-white" />
-        <div className="pointer-events-none absolute -left-32 top-10 -z-10 h-[500px] w-[500px] rounded-full bg-blue-100/30 blur-[120px]" />
-        <div className="pointer-events-none absolute -right-32 bottom-0 -z-10 h-[500px] w-[500px] rounded-full bg-blue-50/40 blur-[120px]" />
+      <section className="relative -mx-4 overflow-hidden px-4 py-20 sm:py-24 lg:py-[140px]">
+        {/* Decorative background */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-muted/60 via-background to-background" />
+        <div className="pointer-events-none absolute -left-32 top-10 -z-10 h-[420px] w-[420px] rounded-full bg-primary/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-32 bottom-0 -z-10 h-[420px] w-[420px] rounded-full bg-accent/10 blur-3xl" />
 
-        <div className="mx-auto w-full max-w-[1280px] px-6">
-          {/* Header Section */}
-          <header className="mx-auto max-w-4xl text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-5 py-2 text-xs font-bold uppercase tracking-[0.15em] text-[#2563EB] shadow-soft transition-transform hover:scale-105">
-              <span className="text-sm">🦷</span> Premium Dental Services
+        <div className="mx-auto w-full max-w-[1280px]">
+          {/* Header */}
+          <header className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden />
+              Soins dentaires premium
             </span>
-            <h1 className="mt-8 text-[34px] font-bold leading-[1.08] tracking-tight text-[#1E293B] sm:text-[48px] lg:text-[54px]">
-              Complete{" "}
-              <span className="bg-gradient-to-r from-[#2563EB] to-[#3B82F6] bg-clip-text text-transparent">
-                Dental Care
-              </span>
-              ,
-              <br className="hidden sm:block" /> Designed Around You
+            <h1 className="mt-6 text-[34px] font-extrabold leading-[1.08] tracking-tight text-foreground sm:text-[44px] lg:text-[54px]">
+              Des{" "}
+              <span className="bg-gradient-primary bg-clip-text text-transparent">soins dentaires</span>
+              <br className="hidden sm:block" /> complets, pensés pour vous
             </h1>
-            <p className="mx-auto mt-6 max-w-2xl text-[17px] leading-relaxed text-[#64748B]">
+            <p className="mx-auto mt-5 max-w-2xl text-[17px] leading-relaxed text-muted-foreground">
               {page?.subheading ||
-                "Experience a new standard of dental excellence. We combine cutting-edge technology with personalized care to create healthy, beautiful smiles in a luxury environment."}
+                "Une prise en charge sur mesure, des technologies de pointe et une équipe dédiée à votre confort — du diagnostic au sourire final."}
             </p>
           </header>
 
           {loading ? (
-            <div className="mt-16 space-y-8">
-              <div className="flex justify-center gap-3">
-                {[1, 2, 3, 4].map((i) => (
-                  <Skeleton key={i} className="h-12 w-32 rounded-full" />
-                ))}
-              </div>
-              <Skeleton className="h-[600px] w-full rounded-[32px] shadow-large" />
+            <div className="mt-12 space-y-6">
+              <Skeleton className="mx-auto h-11 w-full max-w-xl rounded-full" />
+              <Skeleton className="h-[520px] w-full rounded-[32px]" />
             </div>
           ) : !current ? (
-            <p className="mt-16 text-center text-[#64748B] font-medium italic">Aucun soin publié pour le moment.</p>
+            <p className="mt-12 text-center text-muted-foreground">Aucun soin publié pour le moment.</p>
           ) : (
-            <div className="mt-16 sm:mt-20">
-              {/* Category Navigation */}
-              <div className="mb-12 sm:mb-16">
+            <>
+              <div className="mt-10 sm:mt-12">
                 <ServiceTabs
                   items={categories.map((c) => ({ id: c.id, label: c.title || "Soin" }))}
                   activeId={current.id}
@@ -74,8 +67,7 @@ const Soins = () => {
                 />
               </div>
 
-              {/* Service Display */}
-              <div key={current.id} className="animate-in fade-in slide-in-from-bottom-8 duration-700">
+              <div key={current.id} className="mt-10 animate-fade-in sm:mt-12">
                 <ServiceCard
                   name={current.subtitle || current.title || "Soin dentaire"}
                   description={current.body}
@@ -83,7 +75,7 @@ const Soins = () => {
                   imageSrc={resolveImage(current.image_url) || undefined}
                 />
               </div>
-            </div>
+            </>
           )}
         </div>
       </section>

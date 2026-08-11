@@ -1,25 +1,21 @@
 import { Award, ShieldCheck, Smile } from "lucide-react";
 
 const BADGES = [
-  { icon: Award, label: "Certified Specialists" },
-  { icon: ShieldCheck, label: "Modern Equipment" },
-  { icon: Smile, label: "Same-Day Consultation" },
+  { icon: Award, label: "Spécialistes certifiés" },
+  { icon: ShieldCheck, label: "Équipement moderne" },
+  { icon: Smile, label: "Consultation le jour même" },
 ];
 
 export const TrustBadges = () => (
-  <div className="flex flex-wrap items-center gap-3">
+  <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
     {BADGES.map(({ icon: Icon, label }) => (
-      <div
+      <span
         key={label}
-        className="group flex items-center gap-2 transition-colors hover:text-[#2563EB]"
+        className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors duration-[250ms] hover:border-primary/40 hover:text-foreground sm:gap-2 sm:px-3.5 sm:py-2 sm:text-xs"
       >
-        <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-50 text-[#2563EB] group-hover:bg-[#2563EB] group-hover:text-white transition-all duration-300">
-          <Icon className="h-3 w-3" aria-hidden />
-        </div>
-        <span className="text-[12px] font-bold text-slate-500 group-hover:text-slate-700 transition-colors">
-          {label}
-        </span>
-      </div>
+        <Icon className="h-3.5 w-3.5 flex-shrink-0 text-primary sm:h-4 sm:w-4" aria-hidden />
+        {label}
+      </span>
     ))}
   </div>
 );

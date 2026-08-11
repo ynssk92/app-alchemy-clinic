@@ -1,14 +1,4 @@
-import { 
-  Activity, 
-  Gem, 
-  Microscope, 
-  Smile, 
-  Sparkles, 
-  Stethoscope,
-  Component,
-  Zap,
-  Star
-} from "lucide-react";
+import { Activity, Gem, Microscope, Smile, Sparkles, Stethoscope } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface ServiceTabItem {
@@ -22,17 +12,17 @@ interface ServiceTabsProps {
   onChange: (id: string) => void;
 }
 
-const EMOJIS = ["✨", "🦷", "😁", "🔬", "💎", "🌟"];
+const ICONS = [Sparkles, Stethoscope, Smile, Microscope, Gem, Activity];
 
 export const ServiceTabs = ({ items, activeId, onChange }: ServiceTabsProps) => (
   <div
     role="tablist"
     aria-label="Catégories de soins"
-    className="flex flex-wrap items-center justify-center gap-3 sm:gap-4"
+    className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3"
   >
     {items.map((item, i) => {
       const active = item.id === activeId;
-      const emoji = EMOJIS[i % EMOJIS.length];
+      const Icon = ICONS[i % ICONS.length];
       return (
         <button
           key={item.id}
@@ -41,15 +31,18 @@ export const ServiceTabs = ({ items, activeId, onChange }: ServiceTabsProps) => 
           aria-selected={active}
           onClick={() => onChange(item.id)}
           className={cn(
-            "group inline-flex items-center gap-2.5 rounded-full border px-5 py-3 text-sm font-semibold shadow-soft",
-            "transition-all duration-[250ms] ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-500/20",
-            "sm:px-6 sm:py-3.5 sm:text-[15px]",
+            "group inline-flex items-center gap-2 rounded-full border px-4 py-2.5 text-sm font-semibold",
+            "transition-all duration-[250ms] ease-out focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20",
+            "sm:px-5 sm:text-[15px]",
             active
-              ? "border-transparent bg-gradient-to-r from-[#2563EB] to-[#3B82F6] text-white shadow-[0_12px_24px_-8px_rgba(37,99,235,0.4)]"
-              : "border-slate-200 bg-white text-slate-600 hover:-translate-y-1 hover:border-blue-300 hover:text-blue-600 hover:shadow-medium"
+              ? "border-transparent bg-gradient-primary text-primary-foreground shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.65)]"
+              : "border-border bg-card text-foreground/80 hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground hover:shadow-soft"
           )}
         >
-          <span className="text-base sm:text-lg">{emoji}</span>
+          <Icon
+            className={cn("h-4 w-4", active ? "text-primary-foreground" : "text-primary")}
+            aria-hidden
+          />
           <span className="whitespace-nowrap">{item.label}</span>
         </button>
       );
