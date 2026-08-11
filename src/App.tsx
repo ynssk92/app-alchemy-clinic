@@ -51,6 +51,7 @@ import {
 import AdminFaq from "./pages/admin/AdminFaq";
 import AdminPages from "./pages/admin/AdminPages";
 import AdminRoles from "./pages/admin/AdminRoles";
+import AdminMediaLibrary from "./pages/admin/AdminMediaLibrary";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApprovals from "./pages/admin/AdminApprovals";
 import PendingApproval from "./pages/PendingApproval";
