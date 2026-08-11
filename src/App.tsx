@@ -9,6 +9,7 @@ import Booking from "./pages/Booking";
 import BookingConfirmed from "./pages/BookingConfirmed";
 import PatientDashboard from "./pages/PatientDashboard";
 import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
 import Profile from "./pages/Profile";
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/patient-dashboard" element={<ProtectedRoute><PatientDashboard /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/pending-approval" element={<PendingApproval />} />
