@@ -7,7 +7,7 @@ interface PageShellProps {
   description: string;
   path: string;
   eyebrow?: string;
-  heading: string;
+  heading?: string;
   subheading?: string;
   hideHero?: boolean;
   children: ReactNode;
