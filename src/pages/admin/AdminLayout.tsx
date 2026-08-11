@@ -40,6 +40,7 @@ const sections: Section[] = [
     items: [
       { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
       { to: "/admin/pages", icon: FileStack, label: "Website CMS (Pages)", adminOnly: true },
+      { to: "/admin/media", icon: FolderOpen, label: "Media Library", adminOnly: true },
 
     ],
   },

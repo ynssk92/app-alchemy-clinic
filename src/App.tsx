@@ -128,6 +128,7 @@ const App = () => (
               <Route path="delete-requests" element={<ProtectedRoute adminOnly><AdminDeleteRequests /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>} />
               <Route path="pages" element={<ProtectedRoute adminOnly><AdminPages /></ProtectedRoute>} />
+              <Route path="media" element={<ProtectedRoute adminOnly><AdminMediaLibrary /></ProtectedRoute>} />
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
