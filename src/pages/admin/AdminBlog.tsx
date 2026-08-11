@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, ExternalLink, Upload } from "lucide-react";
+import { Pencil, Trash2, Plus, ExternalLink, Upload, FolderOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface Post {
@@ -40,6 +40,9 @@ const AdminBlog = () => {
   const [draft, setDraft] = useState(emptyDraft);
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<{ name: string; url: string }[]>([]);
+  const [loadingMedia, setLoadingMedia] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -210,6 +213,9 @@ const AdminBlog = () => {
               <Label>Image de couverture</Label>
               <div className="flex items-center gap-2">
                 <Input value={draft.cover_image_url} onChange={(e) => setDraft({ ...draft, cover_image_url: e.target.value })} placeholder="URL ou upload" />
+                <Button type="button" variant="outline" onClick={openMedia} title="Media Library">
+                  <FolderOpen className="w-4 h-4" />
+                </Button>
                 <label>
                   <input type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && handleUpload(e.target.files[0])} />
                   <Button type="button" variant="outline" asChild disabled={uploading}>
@@ -232,6 +238,35 @@ const AdminBlog = () => {
             <Button variant="outline" onClick={() => setOpen(false)}>Annuler</Button>
             <Button onClick={save} disabled={saving}>{saving ? "..." : "Enregistrer"}</Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={mediaOpen} onOpenChange={setMediaOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Médiathèque</DialogTitle>
+          </DialogHeader>
+          {loadingMedia ? (
+            <div className="p-10 text-center">Chargement...</div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {mediaFiles.map((f) => (
+                <button
+                  key={f.name}
+                  className="group relative border rounded-md overflow-hidden hover:border-primary transition-colors text-left"
+                  onClick={() => {
+                    setDraft((d) => ({ ...d, cover_image_url: f.url }));
+                    setMediaOpen(false);
+                  }}
+                >
+                  <img src={f.url} alt={f.name} className="w-full h-24 object-cover" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-xs font-medium px-2 py-1 bg-primary rounded">Sélectionner</span>
+                  </div>
+                  <div className="p-1 text-[10px] truncate">{f.name}</div>
+                </button>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
