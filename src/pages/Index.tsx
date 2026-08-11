@@ -23,6 +23,7 @@ import { usePageContent } from "@/hooks/usePageContent";
 import { resolveIcon, resolveImage } from "@/lib/pageContent";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
