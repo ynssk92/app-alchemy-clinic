@@ -1,54 +1,97 @@
-import { ArrowRight, Check, type LucideIcon } from "lucide-react";
+import { ArrowRight, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export interface ExpertiseCardProps {
   icon: LucideIcon;
   title: string;
   text: string;
-  features: string[];
+  features?: string[];
   className?: string;
   style?: React.CSSProperties;
+  featured?: boolean;
 }
 
-export const ExpertiseCard = ({ icon: Icon, title, text, features, className, style }: ExpertiseCardProps) => {
+export const ExpertiseCard = ({ 
+  icon: Icon, 
+  title, 
+  text, 
+  features, 
+  className, 
+  style,
+  featured = false 
+}: ExpertiseCardProps) => {
+  if (featured) {
+    return (
+      <motion.article
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className={cn(
+          "group relative overflow-hidden rounded-[24px] border border-border bg-card p-8 md:p-10 lg:col-span-2 shadow-soft transition-all duration-300 hover:shadow-medium hover:border-primary/20",
+          className
+        )}
+      >
+        <div className="flex flex-col gap-8 md:flex-row md:items-center lg:gap-12">
+          <div className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-primary/5 text-primary md:h-24 md:w-24">
+            <Icon className="h-10 w-10 md:h-12 md:w-12" strokeWidth={1.5} />
+            <div className="absolute inset-0 rounded-2xl bg-primary/10 opacity-0 transition-opacity group-hover:opacity-100" />
+          </div>
+          
+          <div className="flex-1">
+            <span className="mb-2 inline-block text-[10px] font-bold uppercase tracking-[0.2em] text-primary/60">
+              Expertise Vedette
+            </span>
+            <h3 className="text-2xl font-bold tracking-tight text-[#1a2b4b] md:text-3xl">{title}</h3>
+            <p className="mt-4 max-w-xl text-lg leading-relaxed text-muted-foreground">{text}</p>
+            
+            {features && features.length > 0 && (
+              <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
+                {features.slice(0, 4).map((f) => (
+                  <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground/80">
+                    <div className="h-1 w-1 rounded-full bg-primary" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            )}
+            
+            <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-primary transition-colors group-hover:text-primary/80">
+              Découvrir cette expertise
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </div>
+          </div>
+        </div>
+      </motion.article>
+    );
+  }
+
   return (
-    <article
-      style={style}
+    <motion.article
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
       className={cn(
-        "group relative flex min-h-[300px] flex-col rounded-3xl border border-border bg-card p-8",
-        "shadow-soft transition-all duration-[250ms] ease-out",
-        "hover:-translate-y-2 hover:scale-[1.03] hover:border-primary/60 hover:shadow-large",
-        className,
+        "group flex flex-col rounded-[20px] border border-border bg-card p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-primary/20 hover:shadow-medium",
+        className
       )}
     >
-      {/* gradient glow behind icon */}
-      <div className="pointer-events-none absolute left-6 top-4 h-24 w-24 rounded-full bg-gradient-primary opacity-0 blur-2xl transition-opacity duration-[250ms] group-hover:opacity-40" />
-
-      <div className="relative mb-6 flex h-[72px] w-[72px] items-center justify-center rounded-full bg-gradient-primary shadow-medium transition-transform duration-[250ms] group-hover:rotate-6 group-hover:scale-105">
-        <Icon className="h-[34px] w-[34px] text-primary-foreground" strokeWidth={1.75} />
+      <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/5 text-primary transition-colors group-hover:bg-primary/10">
+        <Icon className="h-7 w-7" strokeWidth={1.5} />
       </div>
 
-      <h3 className="text-[22px] font-bold leading-snug text-foreground">{title}</h3>
-      <p className="mt-2 line-clamp-2 text-base text-muted-foreground">{text}</p>
+      <h3 className="text-xl font-bold tracking-tight text-[#1a2b4b]">{title}</h3>
+      <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground/90">{text}</p>
 
-      <ul className="mt-5 space-y-2">
-        {features.map((f) => (
-          <li key={f} className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <Check className="h-3 w-3 text-primary" strokeWidth={3} />
-            </span>
-            {f}
-          </li>
-        ))}
-      </ul>
-
-      <div className="mt-auto pt-6">
-        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+      <div className="mt-auto pt-8">
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary/90 transition-all group-hover:gap-2 group-hover:text-primary">
           En savoir plus
-          <ArrowRight className="h-4 w-4 transition-transform duration-[250ms] group-hover:translate-x-1" />
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
         </span>
       </div>
-    </article>
+    </motion.article>
   );
 };
 
