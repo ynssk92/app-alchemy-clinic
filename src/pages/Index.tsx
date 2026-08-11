@@ -26,7 +26,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
-
+import diagnostic from "@/assets/soin-diagnostic.jpg";
+import visage from "@/assets/soin-visage.jpg";
 
 interface Doctor {
   id: string;
@@ -148,9 +149,9 @@ const Index = () => {
               <span className="bg-gradient-primary bg-clip-text text-transparent">meilleurs praticiens</span>
             </h1>
             <p className="reveal text-lg md:text-xl text-muted-foreground mb-10 sm:mb-8 max-w-xl mx-auto sm:mx-0" style={{ transitionDelay: "160ms" }}>
-              Une équipe experte, un plateau technique moderne et un parcours de soins pensé
-              pour votre confort — réservez votre consultation en quelques secondes.
+              {page?.subheading || "Une équipe experte, un plateau technique moderne et un parcours de soins pensé pour votre confort — réservez votre consultation en quelques secondes."}
             </p>
+
             <HeroCta className="reveal" style={{ transitionDelay: "240ms" }} />
 
           </div>
