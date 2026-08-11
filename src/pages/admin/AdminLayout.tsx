@@ -39,6 +39,8 @@ const sections: Section[] = [
     title: "Main",
     items: [
       { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
+      { to: "/admin/pages", icon: FileStack, label: "Website CMS (Pages)", adminOnly: true },
+
     ],
   },
   {
@@ -329,14 +331,17 @@ const AdminShell = () => {
           return (
             <SidebarGroup key={section.title} title={section.title}>
               {visible.map((l) => (
-                <SidebarItem
-                  key={l.to}
-                  to={l.to}
-                  icon={l.icon}
-                  label={l.label}
-                  end={l.end}
-                  children={l.children}
-                />
+                {l.to === "/admin/pages" ? null : (
+                  <SidebarItem
+                    key={l.to}
+                    to={l.to}
+                    icon={l.icon}
+                    label={l.label}
+                    end={l.end}
+                    children={l.children}
+                  />
+                )}
+
               ))}
             </SidebarGroup>
           );
