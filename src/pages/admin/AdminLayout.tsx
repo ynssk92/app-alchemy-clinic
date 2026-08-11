@@ -330,8 +330,8 @@ const AdminShell = () => {
           if (visible.length === 0) return null;
           return (
             <SidebarGroup key={section.title} title={section.title}>
-              {visible.map((l) => (
-                {l.to === "/admin/pages" ? null : (
+              {visible.map((l) => 
+                l.to === "/admin/pages" ? null : (
                   <SidebarItem
                     key={l.to}
                     to={l.to}
@@ -340,9 +340,9 @@ const AdminShell = () => {
                     end={l.end}
                     children={l.children}
                   />
-                )}
+                )
+              )}
 
-              ))}
             </SidebarGroup>
           );
         })}
