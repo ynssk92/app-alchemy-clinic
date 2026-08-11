@@ -14,7 +14,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
-import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, ExternalLink, Save } from "lucide-react";
+import { Pencil, Trash2, Plus, ArrowUp, ArrowDown, ExternalLink, Save, FolderOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { PageBlock, SitePage } from "@/hooks/usePageContent";
 import { resolveIcon, resolveImage } from "@/lib/pageContent";
@@ -49,6 +49,9 @@ const AdminPages = () => {
   const [draft, setDraft] = useState(emptyBlock);
   const [saving, setSaving] = useState(false);
   const [toDelete, setToDelete] = useState<PageBlock | null>(null);
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<{ name: string; url: string }[]>([]);
+  const [loadingMedia, setLoadingMedia] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -163,6 +166,20 @@ const AdminPages = () => {
     const { data } = supabase.storage.from("branding").getPublicUrl(path);
     setDraft((d) => ({ ...d, image_url: data.publicUrl }));
     toast({ title: "Image uploaded" });
+  };
+
+  const openMedia = async () => {
+    setMediaOpen(true);
+    setLoadingMedia(true);
+    const { data } = await supabase.storage.from("branding").list();
+    if (data) {
+      const items = data.map((f) => ({
+        name: f.name,
+        url: supabase.storage.from("branding").getPublicUrl(f.name).data.publicUrl,
+      }));
+      setMediaFiles(items);
+    }
+    setLoadingMedia(false);
   };
 
   return (
@@ -316,8 +333,16 @@ const AdminPages = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="b-img">Image</Label>
-              <Input id="b-img" placeholder="https://…" value={draft.image_url} onChange={(e) => setDraft({ ...draft, image_url: e.target.value })} />
-              <Input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0])} />
+              <div className="flex gap-2">
+                <Input id="b-img" className="flex-1" placeholder="https://…" value={draft.image_url} onChange={(e) => setDraft({ ...draft, image_url: e.target.value })} />
+                <Button type="button" variant="outline" onClick={openMedia} title="Open Media Library">
+                  <FolderOpen className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="mt-1">
+                <Label htmlFor="b-upload" className="text-xs text-muted-foreground block mb-1">Or upload new:</Label>
+                <Input id="b-upload" type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && uploadImage(e.target.files[0])} />
+              </div>
             </div>
             <div className="flex items-center gap-3">
               <Switch id="b-pub" checked={draft.published} onCheckedChange={(v) => setDraft({ ...draft, published: v })} />
@@ -343,6 +368,35 @@ const AdminPages = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <Dialog open={mediaOpen} onOpenChange={setMediaOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Select from Media Library</DialogTitle>
+          </DialogHeader>
+          {loadingMedia ? (
+            <div className="p-10 text-center">Loading media...</div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {mediaFiles.map((f) => (
+                <button
+                  key={f.name}
+                  className="group relative border rounded-md overflow-hidden hover:border-primary transition-colors"
+                  onClick={() => {
+                    setDraft((d) => ({ ...d, image_url: f.url }));
+                    setMediaOpen(false);
+                  }}
+                >
+                  <img src={f.url} alt={f.name} className="w-full h-24 object-cover" />
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <span className="text-white text-xs font-medium px-2 py-1 bg-primary rounded">Select</span>
+                  </div>
+                  <div className="p-1 text-[10px] truncate">{f.name}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

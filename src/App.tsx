@@ -51,6 +51,7 @@ import {
 import AdminFaq from "./pages/admin/AdminFaq";
 import AdminPages from "./pages/admin/AdminPages";
 import AdminRoles from "./pages/admin/AdminRoles";
+import AdminMediaLibrary from "./pages/admin/AdminMediaLibrary";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApprovals from "./pages/admin/AdminApprovals";
 import PendingApproval from "./pages/PendingApproval";
@@ -128,6 +129,7 @@ const App = () => (
               <Route path="delete-requests" element={<ProtectedRoute adminOnly><AdminDeleteRequests /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>} />
               <Route path="pages" element={<ProtectedRoute adminOnly><AdminPages /></ProtectedRoute>} />
+              <Route path="media" element={<ProtectedRoute adminOnly><AdminMediaLibrary /></ProtectedRoute>} />
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />

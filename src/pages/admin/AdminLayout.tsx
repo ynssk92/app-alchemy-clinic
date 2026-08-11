@@ -7,6 +7,7 @@ import {
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
+  FolderOpen,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ const sections: Section[] = [
     items: [
       { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
       { to: "/admin/pages", icon: FileStack, label: "Website CMS (Pages)", adminOnly: true },
+      { to: "/admin/media", icon: FolderOpen, label: "Media Library", adminOnly: true },
 
     ],
   },
