@@ -1,17 +1,17 @@
 const STATS = [
-  { value: "98%", label: "Satisfaction patients" },
-  { value: "2500+", label: "Traitements réussis" },
-  { value: "15+", label: "Années d'expérience" },
+  { value: "98%", label: "Patient Satisfaction" },
+  { value: "2500+", label: "Successful Treatments" },
+  { value: "15+", label: "Years Experience" },
 ];
 
 export const ServiceStats = () => (
-  <div className="grid grid-cols-3 gap-2 rounded-2xl border border-border/70 bg-muted/40 p-3 xs:gap-3 sm:gap-5 sm:rounded-[24px] sm:p-6">
+  <div className="grid grid-cols-3 gap-4 rounded-3xl border border-slate-100 bg-slate-50/50 p-6 sm:p-8">
     {STATS.map((stat) => (
-      <div key={stat.label} className="min-w-0 text-center">
-        <div className="bg-gradient-primary bg-clip-text text-xl font-extrabold leading-none tracking-tight text-transparent xs:text-2xl sm:text-3xl">
+      <div key={stat.label} className="text-center group">
+        <div className="bg-gradient-to-r from-[#2563EB] to-[#3B82F6] bg-clip-text text-2xl font-black tracking-tight text-transparent transition-transform duration-300 group-hover:scale-110 sm:text-3xl">
           {stat.value}
         </div>
-        <p className="mt-1.5 text-[10px] font-medium leading-tight text-muted-foreground xs:text-[11px] sm:text-xs">
+        <p className="mt-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 sm:text-xs">
           {stat.label}
         </p>
       </div>

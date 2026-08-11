@@ -7,14 +7,16 @@ interface ServiceFeaturesProps {
 export const ServiceFeatures = ({ items }: ServiceFeaturesProps) => {
   if (!items.length) return null;
   return (
-    <ul className="grid gap-2.5 sm:grid-cols-2 sm:gap-3">
+    <ul className="grid gap-3 sm:grid-cols-2">
       {items.map((item) => (
         <li
           key={item}
-          className="flex min-w-0 items-start gap-2.5 rounded-xl border border-border/70 bg-muted/40 px-3 py-2.5 transition-all duration-[250ms] hover:-translate-y-0.5 hover:border-primary/35 hover:bg-card hover:shadow-soft sm:gap-3 sm:rounded-2xl sm:px-4 sm:py-3"
+          className="group flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50/50 px-4 py-3.5 transition-all duration-300 hover:border-blue-200 hover:bg-white hover:shadow-soft"
         >
-          <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary sm:h-5 sm:w-5" aria-hidden />
-          <span className="break-words text-sm font-semibold leading-snug text-foreground sm:text-[15px]">{item}</span>
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#2563EB]/10 text-[#2563EB] transition-colors group-hover:bg-[#2563EB] group-hover:text-white">
+            <CheckCircle2 className="h-4 w-4" aria-hidden />
+          </div>
+          <span className="text-[15px] font-semibold text-slate-700 transition-colors group-hover:text-[#1E293B]">{item}</span>
         </li>
       ))}
     </ul>
