@@ -142,12 +142,12 @@ const Index = () => {
         <div className="container mx-auto px-4 py-20 sm:py-24 md:py-32 relative">
           <div className="max-w-2xl mx-auto text-center sm:mx-0 sm:text-left">
             <span className="reveal inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-5 sm:mb-4">
-              La Dune Clinique Dentaire
+              {page?.eyebrow || "La Dune Clinique Dentaire"}
             </span>
             <h1 className="reveal text-5xl md:text-7xl font-bold text-foreground mb-5 sm:mb-6 leading-[1.05] text-balance" style={{ transitionDelay: "80ms" }}>
-              Rencontrez nos{" "}
-              <span className="bg-gradient-primary bg-clip-text text-transparent">meilleurs praticiens</span>
+              {page?.heading || "Rencontrez nos meilleurs praticiens"}
             </h1>
+
             <p className="reveal text-lg md:text-xl text-muted-foreground mb-10 sm:mb-8 max-w-xl mx-auto sm:mx-0" style={{ transitionDelay: "160ms" }}>
               {page?.subheading || "Une équipe experte, un plateau technique moderne et un parcours de soins pensé pour votre confort — réservez votre consultation en quelques secondes."}
             </p>
