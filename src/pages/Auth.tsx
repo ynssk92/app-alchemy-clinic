@@ -332,12 +332,13 @@ const Auth = () => {
                             <span className="font-semibold text-xs sm:text-sm">X / Twitter</span>
                           </Button>
                         </div>
-
+                        <div className="relative my-8">
                           <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100" /></div>
                           <div className="relative flex justify-center text-xs uppercase">
                             <span className="bg-white px-4 text-slate-400 font-medium tracking-wider">OR EMAIL</span>
                           </div>
                         </div>
+
 
                         <form onSubmit={handleLogin} className="space-y-5">
                           <div className="space-y-2">
