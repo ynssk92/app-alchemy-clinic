@@ -4,13 +4,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Save, Upload, User as UserIcon, Lock, CheckCircle2, Copy, ShieldCheck, Mail, Calendar, Clock } from "lucide-react";
+import { ArrowLeft, Save, Upload, User as UserIcon, Lock, CheckCircle2, Copy, ShieldCheck, Mail, Calendar, Clock, LayoutGrid } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Seo } from "@/components/Seo";
+import { useAppSettings } from "@/hooks/useAppSettings";
 import { AvatarCropDialog } from "@/components/AvatarCropDialog";
 import {
   AlertDialog,
@@ -42,7 +43,8 @@ const passwordSchema = z
   });
 
 const Profile = () => {
-  const { user, signOut, isAdmin } = useAuth();
+  const { user, signOut, isAdmin, isAssistant } = useAuth();
+  const { settings } = useAppSettings();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -141,17 +143,39 @@ const Profile = () => {
   const initials = (fullName || user?.email || "?").slice(0, 2).toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#F7F9FC] p-6 md:p-10">
+    <div className="min-h-screen bg-[#F7F9FC]">
       <Seo title="Profile & Settings" description="Manage your account." path="/profile" />
       
-      <div className="max-w-6xl mx-auto">
+      {/* Premium Header */}
+      <header className="sticky top-0 z-50 w-full h-[64px] md:h-[72px] bg-white border-b border-slate-100 flex items-center justify-center px-4 md:px-6">
+        <div className="w-full max-w-[1200px] flex items-center justify-between">
+          <Link to={isAdmin || isAssistant ? "/admin" : "/"} className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
+            <img src={settings.logo_url || "/logo.png"} alt="La Dune Clinique Dentaire" className="w-[120px] md:w-[150px] h-auto object-contain" />
+          </Link>
+          
+          <div className="flex items-center gap-4">
+            {(isAdmin || isAssistant) && (
+              <Button 
+                onClick={() => navigate("/admin")}
+                className="bg-primary hover:bg-primary/90 text-white rounded-lg h-10 px-4 flex items-center gap-2 transition-all shadow-sm"
+              >
+                <LayoutGrid className="w-4 h-4" />
+                <span className="hidden md:inline font-semibold">Admin Panel</span>
+              </Button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <div className="max-w-[1200px] mx-auto p-6 md:p-10">
         <div className="mb-8">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="text-slate-500 hover:text-slate-900 mb-2 -ml-3">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Back
+          <Button variant="ghost" onClick={() => navigate(-1)} className="text-slate-500 hover:text-slate-900 mb-6 -ml-3 flex items-center gap-2 group">
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" /> Back
           </Button>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Profile & Settings</h1>
-          <p className="text-slate-500">Manage your personal information, account security and preferences.</p>
+          <p className="text-slate-500 mt-1">Manage your personal information, account security and preferences.</p>
         </div>
+
 
         <Card className="p-6 md:p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white mb-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
