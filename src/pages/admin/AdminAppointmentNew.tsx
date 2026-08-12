@@ -44,6 +44,19 @@ const AdminAppointmentNew = () => {
       .then(({ data }) => setServices(data || []));
   }, []);
 
+  const handleServiceSelect = (service: any) => {
+    if (service === "custom") {
+      setForm({ ...form, service_id: "", reason: "" });
+    } else {
+      setForm({
+        ...form,
+        service_id: service.id,
+        reason: service.name,
+      });
+    }
+    setServiceSearchOpen(false);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.patient_id || !form.doctor_id || !form.appointment_date || !form.appointment_time) {
@@ -51,13 +64,21 @@ const AdminAppointmentNew = () => {
     }
     setSaving(true);
     const { error } = await supabase.from("appointments").insert({
-      ...form, status: "upcoming",
+      patient_id: form.patient_id,
+      doctor_id: form.doctor_id,
+      appointment_date: form.appointment_date,
+      appointment_time: form.appointment_time,
+      reason: form.reason,
+      service_id: form.service_id || null,
+      status: "upcoming",
     });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Appointment created successfully");
     navigate("/admin/appointments");
   };
+
+  const selectedService = services.find(s => s.id === form.service_id);
 
   return (
     <div className="min-h-screen bg-[#F7F9FC] -m-6 p-6 md:p-10 flex justify-center">
