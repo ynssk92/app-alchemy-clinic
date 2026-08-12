@@ -109,7 +109,7 @@ export const SiteHeader = () => {
             <SheetTrigger asChild>
               <button
                 type="button"
-                aria-label={open ? "Close menu" : "Open menu"}
+                aria-label={open ? t("nav.closeMenu", { defaultValue: "Close menu" }) : t("nav.openMenu", { defaultValue: "Open menu" })}
                 aria-expanded={open}
                 aria-controls="mobile-nav-sheet"
                 className="lg:hidden inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background/60 text-foreground active:scale-95 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
