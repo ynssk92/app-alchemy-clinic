@@ -533,15 +533,40 @@ const AdminPatientDetails = () => {
 
               {/* Registration status */}
               <Card className="p-6 border-border">
-                <h3 className="font-bold mb-5 flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-primary" /> Registration Status
+                <h3 className="font-bold mb-5 flex items-center gap-2 text-primary">
+                  <UserCheck className="w-4 h-4" /> Registration Status
                 </h3>
                 <div className="grid md:grid-cols-3 gap-5">
-                  <InfoTile
-                    icon={registered ? ShieldCheck : ShieldAlert}
-                    label="Account status"
-                    value={registered ? "Registered" : "Not registered (admin-added)"}
-                  />
+                  <div className="space-y-1.5">
+                    <Label className="text-muted-foreground flex items-center gap-2">
+                      <ShieldCheck className="w-3.5 h-3.5" /> Account status
+                    </Label>
+                    {!isEditing ? (
+                      <div className="font-semibold flex items-center gap-2">
+                        {registered ? (
+                          <span className="text-emerald-600 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> Registered</span>
+                        ) : (
+                          <span className="text-amber-600 flex items-center gap-1.5"><ShieldAlert className="w-4 h-4" /> Not registered</span>
+                        )}
+                      </div>
+                    ) : (
+                      <Select
+                        value={form.status}
+                        onValueChange={(v: any) => setForm(f => ({ ...f, status: v }))}
+                        disabled={saving}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="approved">Approved</SelectItem>
+                          <SelectItem value="rejected">Rejected</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+
                   <InfoTile
                     icon={Mail}
                     label="Linked email"
