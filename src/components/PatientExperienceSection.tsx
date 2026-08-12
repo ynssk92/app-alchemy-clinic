@@ -3,9 +3,11 @@ import type { PageBlock } from "@/hooks/usePageContent";
 
 interface PatientExperienceSectionProps {
   blocks?: PageBlock[];
+  displayStyle?: 'grid' | 'carousel';
+  limit?: number;
 }
 
-export const PatientExperienceSection = ({ blocks }: PatientExperienceSectionProps) => {
+export const PatientExperienceSection = ({ blocks, displayStyle = 'grid', limit = 3 }: PatientExperienceSectionProps) => {
   const defaultItems = [
     {
       title: "Calm Environment",
@@ -21,10 +23,10 @@ export const PatientExperienceSection = ({ blocks }: PatientExperienceSectionPro
     }
   ];
 
-  const items = blocks ? blocks.map(b => ({
+  const items = (blocks ? blocks.map(b => ({
     title: b.title || "",
     desc: b.body || ""
-  })) : defaultItems;
+  })) : defaultItems).slice(0, limit);
 
   return (
     <section className="py-24 md:py-32 bg-white">
@@ -36,7 +38,7 @@ export const PatientExperienceSection = ({ blocks }: PatientExperienceSectionPro
           </h2>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className={displayStyle === 'carousel' ? "flex overflow-x-auto gap-8 pb-8 no-scrollbar scroll-smooth" : "grid md:grid-cols-2 lg:grid-cols-3 gap-8"}>
           {items.map((item, i) => (
             <motion.div 
               key={i}
@@ -44,7 +46,7 @@ export const PatientExperienceSection = ({ blocks }: PatientExperienceSectionPro
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="p-10 rounded-[32px] border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-primary/10 transition-all duration-300"
+              className={`${displayStyle === 'carousel' ? "min-w-[300px] md:min-w-[400px]" : ""} p-10 rounded-[32px] border border-slate-100 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-primary/10 transition-all duration-300`}
             >
               <h3 className="text-xl font-bold text-slate-900 mb-4">{item.title}</h3>
               <p className="text-slate-500 leading-relaxed">{item.desc}</p>
