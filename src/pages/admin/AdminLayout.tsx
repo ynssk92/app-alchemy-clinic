@@ -7,7 +7,7 @@ import {
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
-  FolderOpen,
+  FolderOpen, Globe, Layers, MessageSquare, Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";

@@ -154,7 +154,7 @@ const AdminLandingPage = () => {
                   <Label htmlFor="hero-badge">Badge Text</Label>
                   <Input 
                     id="hero-badge" 
-                    value={hero.badge || ""} 
+                    value={(hero as any).badge || ""} 
                     onChange={(e) => handleHeroChange("badge", e.target.value)}
                   />
                 </div>
@@ -163,7 +163,7 @@ const AdminLandingPage = () => {
                   <Label htmlFor="hero-heading">Main Heading</Label>
                   <Input 
                     id="hero-heading" 
-                    value={hero.heading || ""} 
+                    value={(hero as any).heading || ""} 
                     onChange={(e) => handleHeroChange("heading", e.target.value)}
                   />
                 </div>
@@ -172,7 +172,7 @@ const AdminLandingPage = () => {
                   <Label htmlFor="hero-highlight">Highlight Text</Label>
                   <Input 
                     id="hero-highlight" 
-                    value={hero.highlight || ""} 
+                    value={(hero as any).highlight || ""} 
                     onChange={(e) => handleHeroChange("highlight", e.target.value)}
                   />
                 </div>
@@ -182,7 +182,7 @@ const AdminLandingPage = () => {
                   <Textarea 
                     id="hero-desc" 
                     rows={3}
-                    value={hero.description || ""} 
+                    value={(hero as any).description || ""} 
                     onChange={(e) => handleHeroChange("description", e.target.value)}
                   />
                 </div>
@@ -202,7 +202,7 @@ const AdminLandingPage = () => {
                     <Input 
                       id="hero-video" 
                       placeholder="https://..."
-                      value={hero.videoUrl || ""} 
+                      value={(hero as any).videoUrl || ""} 
                       onChange={(e) => handleHeroChange("videoUrl", e.target.value)}
                     />
                     <Button variant="outline" size="icon">
@@ -217,11 +217,11 @@ const AdminLandingPage = () => {
                 <div className="space-y-2 pt-2">
                   <div className="flex items-center justify-between">
                     <Label>Overlay Opacity</Label>
-                    <span className="text-xs font-mono">{hero.overlayOpacity || 40}%</span>
+                    <span className="text-xs font-mono">{(hero as any).overlayOpacity || 40}%</span>
                   </div>
                   <Slider 
-                    value={[hero.overlayOpacity || 40]} 
-                    max={90} 
+                    value={[(hero as any).overlayOpacity || 40]} 
+                    max={90}
                     step={1} 
                     onValueChange={([val]) => handleHeroChange("overlayOpacity", val)}
                   />
@@ -233,14 +233,14 @@ const AdminLandingPage = () => {
                     <div className="space-y-2">
                       <Label className="text-xs">Primary Label</Label>
                       <Input 
-                        value={hero.primaryCTA || ""} 
+                        value={(hero as any).primaryCTA || ""} 
                         onChange={(e) => handleHeroChange("primaryCTA", e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs">Primary URL</Label>
                       <Input 
-                        value={hero.primaryURL || ""} 
+                        value={(hero as any).primaryURL || ""} 
                         onChange={(e) => handleHeroChange("primaryURL", e.target.value)}
                       />
                     </div>
@@ -259,7 +259,7 @@ const AdminLandingPage = () => {
                   <Label htmlFor="float-title">Card Title</Label>
                   <Input 
                     id="float-title" 
-                    value={hero.floatingTitle || ""} 
+                    value={(hero as any).floatingTitle || ""} 
                     onChange={(e) => handleHeroChange("floatingTitle", e.target.value)}
                   />
                 </div>
@@ -267,7 +267,7 @@ const AdminLandingPage = () => {
                   <Label htmlFor="float-sub">Card Subtitle</Label>
                   <Input 
                     id="float-sub" 
-                    value={hero.floatingSubtitle || ""} 
+                    value={(hero as any).floatingSubtitle || ""} 
                     onChange={(e) => handleHeroChange("floatingSubtitle", e.target.value)}
                   />
                 </div>
