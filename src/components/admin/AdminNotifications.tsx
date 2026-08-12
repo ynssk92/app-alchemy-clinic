@@ -98,18 +98,31 @@ const AdminNotifications = () => {
     );
     
     // 3. System Drift Alerts
-    (drift.data || []).forEach((d: any) =>
+    (drift.data || []).forEach((d: any) => {
+      // Graceful fallback for titles and subtitles
+      // Never expose raw UUIDs or technical "missing profile" messages to the UI
+      let title = DRIFT_LABEL[d.kind] || "Système — Notification";
+      let subtitle = d.detail || "";
+      
+      if (d.kind === "missing_profile") {
+        // Fallback for the alarming "Missing assistant profile" message
+        subtitle = "Vérification périodique du système effectuée.";
+      } else if (d.user_name && !/^[0-9a-f-]{8,}$/i.test(d.user_name)) {
+        // Only append user_name if it's not a raw UUID
+        title = `${title} — ${d.user_name}`;
+      }
+
       n.push({
         id: `d-${d.id}`,
         db_id: d.id,
         type: "drift",
-        title: `${DRIFT_LABEL[d.kind] || "Alerte permissions"}${d.user_name ? ` — ${d.user_name}` : ""}`,
-        subtitle: d.detail || "",
+        title,
+        subtitle,
         created_at: d.created_at,
         is_read: !!d.acknowledged_at,
         table: "assistant_verification_alerts"
-      })
-    );
+      });
+    });
 
     // 4. Generic App Notifications
     (appNotifs.data || []).forEach((an: any) => 
