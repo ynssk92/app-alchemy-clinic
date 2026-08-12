@@ -33,12 +33,20 @@ const AdminMessages = () => {
   useEffect(() => { load(); }, []);
 
   const toggleRead = async (m: Message) => {
+    const newRead = !m.read;
+    // Optimistic UI update
+    setRows((r) => r.map((x) => (x.id === m.id ? { ...x, read: newRead } : x)));
+    
     const { error } = await supabase
       .from("contact_messages")
-      .update({ read: !m.read })
+      .update({ read: newRead })
       .eq("id", m.id);
-    if (error) return toast.error(error.message);
-    setRows((r) => r.map((x) => (x.id === m.id ? { ...x, read: !m.read } : x)));
+      
+    if (error) {
+      toast.error(error.message);
+      // Rollback
+      setRows((r) => r.map((x) => (x.id === m.id ? { ...x, read: m.read } : x)));
+    }
   };
 
   const remove = async (id: string) => {
