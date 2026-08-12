@@ -13,7 +13,6 @@ export const HeroSection = () => {
     <section className="relative isolate w-full min-h-[700px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
       {/* Full-screen video background */}
       <video
-        ref={videoRef}
         autoPlay
         muted
         loop
