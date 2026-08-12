@@ -1,26 +1,21 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   ArrowRight,
-  Calendar,
-  CalendarCheck,
   CheckCircle2,
-  Clock,
   Mail,
   Phone,
-  Stethoscope,
-  UserCheck,
   Ambulance,
-  UserRound,
-  HelpCircle,
+  Clock,
+  Stethoscope,
 } from "lucide-react";
 import { DoctorCard } from "@/components/DoctorCard";
+import { BlogCard } from "@/components/blog/BlogCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { usePageContent } from "@/hooks/usePageContent";
-import { resolveIcon, resolveImage } from "@/lib/pageContent";
+import { resolveImage } from "@/lib/pageContent";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -29,6 +24,8 @@ import { useScrollReveal } from "@/hooks/useScrollReveal";
 import heroVideo from "@/assets/hero-bg.mp4.asset.json";
 import diagnostic from "@/assets/soin-diagnostic.jpg";
 import visage from "@/assets/soin-visage.jpg";
+import { ServiceTabs } from "@/components/services/ServiceTabs";
+import { ServiceCard } from "@/components/services/ServiceCard";
 
 interface Doctor {
   id: string;
@@ -52,19 +49,6 @@ interface Post {
   created_at: string;
 }
 
-const initialsOf = (name: string) =>
-  name
-    .replace(/^Dr\.?\s+/i, "")
-    .split(/\s+/)
-    .map((s) => s[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-
-// Steps, departments and counters will be loaded from DB via usePageContent("home")
-
-
 const Index = () => {
   const { settings } = useAppSettings();
   useScrollReveal();
@@ -72,9 +56,13 @@ const Index = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const { page, blocks, loading: contentLoading } = usePageContent("home");
 
-  const steps = useMemo(() => blocks.filter(b => b.kind === "step"), [blocks]);
   const departments = useMemo(() => blocks.filter(b => b.kind === "department"), [blocks]);
   const counters = useMemo(() => blocks.filter(b => b.kind === "stat"), [blocks]);
+  const [activeDept, setActiveDept] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activeDept && departments.length) setActiveDept(departments[0].id);
+  }, [departments, activeDept]);
 
   useEffect(() => {
     supabase
@@ -94,273 +82,178 @@ const Index = () => {
       .then(({ data }) => setPosts((data as Post[]) || []));
   }, []);
 
+  const currentDept = departments.find((d) => d.id === activeDept) || departments[0];
 
   return (
     <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title={page?.seo_title || "La Dune Clinique Dentaire — Rendez-vous en quelques secondes"}
         description={page?.seo_description || "Clinique dentaire moderne : esthétique du sourire, implantologie, orthodontie. Prenez rendez-vous en ligne avec nos praticiens en quelques secondes."}
-
         path="/"
       />
 
-      {/* Top info bar */}
-      <div className="hidden lg:block border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-3 flex items-center justify-end gap-10">
-          {[
-            { icon: Mail, label: "Email", value: settings.contact_email },
-            { icon: Phone, label: "Téléphone", value: settings.contact_phone },
-            { icon: Clock, label: "Horaires", value: `Lun - Sam : ${settings.hours_weekdays}` },
-
-          ].map((it) => (
-            <div key={it.label} className="flex items-center gap-3">
-              <span className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <it.icon className="w-4 h-4 text-primary" />
-              </span>
-              <span className="leading-tight">
-                <span className="block text-xs font-bold uppercase tracking-wide text-foreground">{it.label}</span>
-                <span className="block text-sm text-muted-foreground">{it.value}</span>
-              </span>
-            </div>
+      <div className="hidden lg:block sticky top-0 z-[60] bg-slate-900 text-white/80 py-2">
+        <div className="container mx-auto px-4 flex items-center justify-end gap-6 text-xs font-bold tracking-widest uppercase">
+           {[
+            { icon: Mail, label: settings.contact_email, href: `mailto:${settings.contact_email}` },
+            { icon: Phone, label: settings.contact_phone, href: `tel:${settings.contact_phone?.replace(/\s/g, "")}` },
+          ].map((it, i) => (
+            <a key={i} href={it.href} className="flex items-center gap-2 hover:text-white transition-colors">
+              <it.icon className="w-3.5 h-3.5 text-primary" />
+              <span>{it.label}</span>
+            </a>
           ))}
         </div>
       </div>
 
       <SiteHeader />
 
-      {/* Hero */}
-      <section id="home" className="relative overflow-hidden scroll-mt-20">
+      {/* Hero Section */}
+      <section id="home" className="relative h-[90vh] min-h-[700px] overflow-hidden scroll-mt-20">
         <video
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           src={heroVideo.url}
           autoPlay
           muted
           loop
           playsInline
         />
-        <div className="absolute inset-0 bg-background/80" />
-        <div className="absolute inset-0 bg-gradient-hero" />
-        <div className="container mx-auto px-4 py-20 sm:py-24 md:py-32 relative">
-          <div className="max-w-2xl mx-auto text-center sm:mx-0 sm:text-left">
-            <span className="reveal inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-5 sm:mb-4">
-              {page?.eyebrow || "La Dune Clinique Dentaire"}
-            </span>
-            <h1 className="reveal text-5xl md:text-7xl font-bold text-foreground mb-5 sm:mb-6 leading-[1.05] text-balance" style={{ transitionDelay: "80ms" }}>
-              {page?.heading || "Rencontrez nos meilleurs praticiens"}
+        <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-slate-900/20" />
+        
+        <div className="container relative mx-auto flex h-full items-center px-4">
+          <div className="max-w-3xl">
+            <div className="reveal mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md">
+              <span className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white">
+                {page?.eyebrow || "Expertise Dentaire Premium"}
+              </span>
+            </div>
+            
+            <h1 className="reveal text-5xl font-extrabold tracking-tight text-white sm:text-7xl lg:text-8xl leading-[0.95] mb-8">
+              {page?.heading || "Votre sourire,\nnotre signature."}
             </h1>
-
-            <p className="reveal text-lg md:text-xl text-muted-foreground mb-10 sm:mb-8 max-w-xl mx-auto sm:mx-0" style={{ transitionDelay: "160ms" }}>
-              {page?.subheading || "Une équipe experte, un plateau technique moderne et un parcours de soins pensé pour votre confort — réservez votre consultation en quelques secondes."}
+            
+            <p className="reveal mb-10 max-w-xl text-lg text-slate-200 sm:text-xl leading-relaxed" style={{ transitionDelay: "100ms" }}>
+              {page?.subheading || "Une technologie de pointe alliée à une approche humaine pour des soins d'exception."}
             </p>
-
-            <HeroCta className="reveal" style={{ transitionDelay: "240ms" }} />
-
+            
+            <HeroCta className="reveal" style={{ transitionDelay: "200ms" }} />
           </div>
         </div>
       </section>
 
-      {/* About */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-14 items-center">
-          <div className="reveal reveal-left relative">
-            <img
-              src={diagnostic}
-              alt="Salle de soins de La Dune Clinique Dentaire"
-              loading="lazy"
-              className="w-4/5 rounded-2xl shadow-large object-cover aspect-[4/3]"
-            />
-            <img
-              src={visage}
-              alt="Praticienne de la clinique en consultation"
-              loading="lazy"
-              className="absolute bottom-[-2.5rem] right-0 w-1/2 rounded-2xl border-8 border-background shadow-large object-cover aspect-square"
-            />
-          </div>
-          <div className="reveal reveal-right">
-            <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4">
-              À propos
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6 leading-tight">
-              Un lieu où l'excellence médicale rencontre le confort du patient.
-            </h2>
-            <div className="text-muted-foreground mb-8 whitespace-pre-line">
-              {page?.intro || "De la première consultation au suivi post-traitement, nous combinons technologies de pointe et approche humaine pour offrir des soins dentaires précis, indolores et durables à toute la famille."}
+      {/* Intro Section */}
+      <section className="relative py-24 md:py-32 overflow-hidden bg-white">
+        <div className="container mx-auto px-4">
+          <div className="grid items-center gap-16 lg:grid-cols-2">
+            <div className="reveal reveal-left relative">
+              <div className="relative z-10 aspect-[4/5] overflow-hidden rounded-[40px] shadow-large">
+                <img src={diagnostic} alt="Clinic" className="h-full w-full object-cover" />
+              </div>
+              <div className="absolute -bottom-10 -right-10 z-20 aspect-square w-2/3 overflow-hidden rounded-[40px] border-[12px] border-white shadow-large hidden sm:block">
+                <img src={visage} alt="Treatment" className="h-full w-full object-cover" />
+              </div>
+              {/* Decorative elements */}
+              <div className="absolute -left-10 -top-10 -z-10 h-40 w-40 rounded-full bg-primary/5 blur-3xl" />
             </div>
 
-            <ul className="grid sm:grid-cols-2 gap-3 mb-8">
-              {["Urgences dentaires", "Diagnostic 3D", "Sédation douce", "Devis transparent"].map((f) => (
-                <li key={f} className="flex items-center gap-2 text-sm font-medium text-foreground">
-                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link to="/about">
-              <Button variant="outline">En savoir plus</Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Process */}
-      <section className="py-20 bg-muted/40 border-y border-border">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-3 gap-10">
-            <div className="reveal">
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 leading-tight">
-                Comment obtenir une consultation chez nous ?
+            <div className="reveal reveal-right">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary/60">L'excellence au quotidien</span>
+              <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl leading-[1.1]">
+                Une approche holistique de la santé dentaire.
               </h2>
-              <p className="text-muted-foreground mb-6">
-                Trois étapes simples, aucune attente au téléphone, une confirmation immédiate.
-              </p>
-              <Link to="/booking">
-                <Button>Commencer</Button>
-              </Link>
-            </div>
-            <div className="lg:col-span-2 grid sm:grid-cols-3 gap-6">
-              {steps.map((s, i) => {
-                const Icon = resolveIcon(s.icon);
-                return (
-                  <Card
-                    key={s.id}
-                    className="reveal reveal-scale p-6 bg-card border-border hover:shadow-medium hover:-translate-y-1 transition-all"
-                    style={{ transitionDelay: `${i * 90}ms` }}
-                  >
-                    <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center mb-4">
-                      <Icon className="w-6 h-6 text-primary-foreground" />
+              <div className="mt-8 text-lg leading-relaxed text-slate-500">
+                {page?.intro || "Nous croyons que chaque sourire est unique. Notre clinique combine les dernières innovations technologiques avec un confort absolu pour transformer votre expérience dentaire."}
+              </div>
+              
+              <div className="mt-10 grid grid-cols-2 gap-6">
+                {[
+                  "Technologies 3D",
+                  "Confort Patient",
+                  "Soins Indolores",
+                  "Suivi Personnalisé"
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-3">
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <CheckCircle2 className="h-4 w-4" />
                     </div>
-                    <span className="text-xs font-bold text-muted-foreground">0{i + 1}</span>
-                    <h3 className="text-lg font-bold text-card-foreground mb-2">{s.title}</h3>
-                    <p className="text-sm text-muted-foreground">{s.body}</p>
-                  </Card>
-                );
-              })}
+                    <span className="text-sm font-bold text-slate-700">{item}</span>
+                  </div>
+                ))}
+              </div>
 
+              <div className="mt-12 flex items-center gap-6">
+                <Link to="/about">
+                  <Button variant="outline" className="h-12 rounded-xl px-8 font-bold hover:bg-slate-50">
+                    Découvrir notre histoire
+                  </Button>
+                </Link>
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-3">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="h-10 w-10 rounded-full border-2 border-white bg-slate-100" />
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-slate-500">+2k patients satisfaits</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Departments */}
-      <section className="py-20 md:py-28">
+      {/* Services/Expertise Section */}
+      <section className="bg-slate-50 py-24 md:py-32">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-14 reveal">
-            <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">
-              Services
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">Nos départements</h2>
+          <div className="mb-16 text-center max-w-3xl mx-auto">
+            <span className="text-xs font-bold uppercase tracking-widest text-primary">Spécialités</span>
+            <h2 className="mt-4 text-[40px] font-bold leading-tight tracking-tight text-slate-900 md:text-[52px]">
+              Nos pôles d'expertise
+            </h2>
+            <p className="mt-6 text-lg text-slate-500">
+              Des soins spécialisés prodigués par des experts passionnés, utilisant les équipements les plus performants du marché.
+            </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {departments.map((d, i) => (
-              <Card
-                key={d.id}
-                className="reveal reveal-scale overflow-hidden border-border bg-card hover:shadow-large transition-all group"
-                style={{ transitionDelay: `${i * 90}ms` }}
-              >
-                <div className="overflow-hidden">
-                  <img
-                    src={resolveImage(d.image_url)}
-                    alt={d.title || ""}
-                    loading="lazy"
-                    className="w-full aspect-[4/3] object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-card-foreground mb-1">{d.title}</h3>
-                  <p className="text-sm text-primary font-semibold mb-4">{d.subtitle}</p>
-                  <ul className="space-y-2 mb-6">
-                    {d.items?.map((it) => (
-                      <li key={it} className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                        {it}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link to="/booking">
-                    <Button variant="outline" size="sm" className="w-full">
-                      Prendre rendez-vous
-                    </Button>
-                  </Link>
-                </div>
-              </Card>
-            ))}
 
-          </div>
+          {departments.length > 0 && (
+            <div className="reveal">
+              <ServiceTabs
+                items={departments.map((d) => ({ id: d.id, label: d.title || "Soin" }))}
+                activeId={activeDept || departments[0].id}
+                onChange={setActiveDept}
+              />
+              <div key={activeDept} className="mt-12 animate-fade-in">
+                <ServiceCard
+                  name={currentDept?.title || ""}
+                  description={currentDept?.body}
+                  features={currentDept?.items || []}
+                  imageSrc={resolveImage(currentDept?.image_url) || undefined}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Emergency + hours */}
-      <section className="py-16 bg-gradient-primary">
-        <div className="container mx-auto px-4 grid md:grid-cols-3 gap-6">
-          <Card className="reveal p-8 bg-card border-none shadow-large">
-            <Ambulance className="w-8 h-8 text-primary mb-4" />
-            <h3 className="text-lg font-bold text-card-foreground mb-2">Urgence dentaire</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Douleur aiguë, dent cassée ou traumatisme ? Nous vous recevons en priorité.
-            </p>
-            <a
-              href={`tel:${(settings.emergency_phone || settings.contact_phone).replace(/\s/g, "")}`}
-              className="text-sm font-bold text-primary inline-flex items-center gap-1"
-            >
-              {settings.emergency_phone || settings.contact_phone} <ArrowRight className="w-4 h-4" />
-            </a>
-          </Card>
-          <Card className="reveal p-8 bg-card border-none shadow-large" style={{ transitionDelay: "90ms" }}>
-            <Clock className="w-8 h-8 text-primary mb-4" />
-            <h3 className="text-lg font-bold text-card-foreground mb-4">Horaires d'ouverture</h3>
-            <ul className="space-y-2 text-sm">
-              {[
-                ["Lun - Ven", settings.hours_weekdays],
-                ["Samedi", settings.hours_saturday],
-                ["Dimanche", settings.hours_sunday],
-              ].map(([d, h]) => (
-
-                <li key={d} className="flex justify-between border-b border-border pb-2 last:border-0">
-                  <span className="text-muted-foreground">{d}</span>
-                  <span className="font-semibold text-card-foreground">{h}</span>
-                </li>
-              ))}
-            </ul>
-          </Card>
-          <Card className="reveal p-8 bg-card border-none shadow-large" style={{ transitionDelay: "180ms" }}>
-            <Stethoscope className="w-8 h-8 text-primary mb-4" />
-            <h3 className="text-lg font-bold text-card-foreground mb-2">Bilan complet</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              Radiographie panoramique, dépistage et plan de traitement détaillé en une séance.
-            </p>
-            <Link to="/soins" className="text-sm font-bold text-primary inline-flex items-center gap-1">
-              Voir les soins <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Card>
-        </div>
-      </section>
-
-      {/* Doctors */}
+      {/* Medical Team Section */}
       {doctors.length > 0 && (
-        <section className="relative overflow-hidden bg-[#F8FAFC] py-24 md:py-32">
-          {/* subtle blue radial gradients */}
-          <div className="pointer-events-none absolute inset-0 -z-10">
-            <div className="absolute left-1/4 top-0 h-[500px] w-[500px] rounded-full bg-[#2563EB]/5 blur-[120px]" />
-            <div className="absolute bottom-0 right-1/4 h-[500px] w-[500px] rounded-full bg-[#06B6D4]/5 blur-[120px]" />
-          </div>
-
+        <section className="bg-white py-24 md:py-32">
           <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-[60px] reveal">
+            <div className="mb-16 flex flex-col items-end justify-between gap-8 md:flex-row">
               <div className="max-w-2xl">
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#2563EB]/20 bg-white px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.1em] text-[#2563EB] shadow-sm mb-6">
-                  <UserRound className="h-3.5 w-3.5" />
-                  👨‍⚕️ OUR DOCTORS
-                </span>
-                <h2 className="text-[40px] font-bold leading-[1.1] tracking-tight text-[#111827] md:text-[52px]">
-                  Meet Our Medical Experts
+                <span className="text-xs font-bold uppercase tracking-widest text-primary">Praticiens</span>
+                <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
+                  Rencontrez nos experts
                 </h2>
-                <p className="mt-6 text-lg leading-relaxed text-slate-500">
-                  Our experienced specialists are committed to delivering personalized, high-quality healthcare with the latest medical technologies.
+                <p className="mt-6 text-lg text-slate-500">
+                  Une équipe pluridisciplinaire dédiée à votre santé bucco-dentaire, alliant expérience et formation continue.
                 </p>
               </div>
-              <Link to="/equipe" className="shrink-0 mb-2">
-                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-[#E5E7EB] hover:bg-white hover:border-[#2563EB] hover:text-[#2563EB] transition-all">
-                  Voir toute l'équipe <ArrowRight className="w-4 h-4 ml-2" />
+              <Link to="/equipe" className="shrink-0">
+                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold group">
+                  Voir toute l'équipe
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
             </div>
@@ -376,81 +269,123 @@ const Index = () => {
         </section>
       )}
 
-      {/* Counters */}
-      <section className="py-16 bg-muted/40 border-y border-border">
-        <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {counters.map((c, i) => (
-            <div key={c.id} className="reveal" style={{ transitionDelay: `${i * 80}ms` }}>
-              <div className="text-4xl md:text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-                {c.title}
+      {/* Counters/Stats Section */}
+      <section className="bg-primary py-20">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+            {counters.map((c, i) => (
+              <div key={c.id} className="reveal text-center" style={{ transitionDelay: `${i * 100}ms` }}>
+                <div className="text-4xl font-extrabold text-white md:text-5xl lg:text-6xl">
+                  {c.title}
+                </div>
+                <div className="mt-2 text-sm font-bold uppercase tracking-widest text-white/60">
+                  {c.subtitle}
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground mt-2">{c.subtitle}</p>
-            </div>
-          ))}
-
+            ))}
+            {counters.length === 0 && [
+              { label: "Patients", value: "15k+" },
+              { label: "Spécialistes", value: "12" },
+              { label: "Années", value: "25+" },
+              { label: "Sourires", value: "100%" }
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className="text-4xl font-extrabold text-white md:text-5xl">{stat.value}</div>
+                <div className="mt-2 text-sm font-bold uppercase tracking-widest text-white/60">{stat.label}</div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Blog */}
-      {posts.length > 0 && (
-        <section className="py-20 md:py-28">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-14 reveal">
-              <span className="inline-block text-xs font-bold tracking-[0.2em] uppercase text-primary mb-3">
-                Actualités
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold text-foreground">Derniers articles</h2>
+      {/* Emergency/Trust Section */}
+      <section className="py-24 md:py-32 bg-slate-50">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="reveal flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-soft border border-slate-100">
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-500">
+                <Ambulance className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Urgences 24/7</h3>
+              <p className="mt-4 text-slate-500">Un service dédié pour vos urgences dentaires, même sans rendez-vous préalable.</p>
+              <a href={`tel:${settings.contact_phone}`} className="mt-6 text-sm font-extrabold text-primary hover:underline">
+                APPELER MAINTENANT
+              </a>
             </div>
-            <div className="grid md:grid-cols-3 gap-8">
+            
+            <div className="reveal flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-soft border border-slate-100" style={{ transitionDelay: "100ms" }}>
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-blue-500">
+                <Clock className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Horaires Flexibles</h3>
+              <p className="mt-4 text-slate-500">Ouvert du lundi au samedi, de 8h à 20h, pour s'adapter à votre emploi du temps.</p>
+              <Link to="/contact" className="mt-6 text-sm font-extrabold text-primary hover:underline">
+                VOIR LE PLAN
+              </Link>
+            </div>
+
+            <div className="reveal flex flex-col items-center text-center p-8 bg-white rounded-3xl shadow-soft border border-slate-100" style={{ transitionDelay: "200ms" }}>
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-500">
+                <Stethoscope className="h-8 w-8" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Bilan Complet</h3>
+              <p className="mt-4 text-slate-500">Diagnostic global incluant radiographie panoramique et plan de soins détaillé.</p>
+              <Link to="/booking" className="mt-6 text-sm font-extrabold text-primary hover:underline">
+                PRENDRE RDV
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Section */}
+      {posts.length > 0 && (
+        <section className="bg-white py-24 md:py-32">
+          <div className="container mx-auto px-4">
+            <div className="mb-16 text-center">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary">Blog</span>
+              <h2 className="mt-4 text-4xl font-bold text-slate-900">Derniers articles</h2>
+            </div>
+            <div className="grid gap-8 md:grid-cols-3">
               {posts.map((p, i) => (
-                <Card
-                  key={p.id}
-                  className="reveal reveal-scale overflow-hidden border-border bg-card hover:shadow-large transition-all"
-                  style={{ transitionDelay: `${i * 90}ms` }}
-                >
-                  {p.cover_image_url && (
-                    <img src={p.cover_image_url} alt={p.title} loading="lazy" className="w-full aspect-[16/10] object-cover" />
-                  )}
-                  <div className="p-6">
-                    <span className="text-xs font-semibold text-muted-foreground">
-                      {new Date(p.published_at || p.created_at).toLocaleDateString("fr-FR", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </span>
-                    <h3 className="text-lg font-bold text-card-foreground mt-2 mb-2 line-clamp-2">{p.title}</h3>
-                    {p.excerpt && <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{p.excerpt}</p>}
-                    <Link to={`/blog/${p.slug}`} className="text-sm font-bold text-primary inline-flex items-center gap-1">
-                      Lire l'article <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </Card>
+                <BlogCard key={p.id} post={p} index={i} />
               ))}
+            </div>
+            <div className="mt-16 text-center">
+              <Link to="/blog">
+                <Button variant="ghost" className="font-bold text-slate-600 hover:text-primary transition-colors">
+                  Lire tous les articles <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
       )}
 
-      {/* CTA */}
-      <section id="contact" className="py-20 bg-gradient-primary relative overflow-hidden scroll-mt-20">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-primary-foreground rounded-full blur-3xl" />
-          <div className="absolute bottom-10 right-10 w-40 h-40 bg-primary-foreground rounded-full blur-3xl" />
+      {/* Global CTA Section */}
+      <section className="relative overflow-hidden py-24 md:py-32 bg-slate-900">
+        <div className="absolute inset-0 z-0 opacity-20">
+          <div className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-primary blur-[120px]" />
+          <div className="absolute -right-20 -bottom-20 h-96 w-96 rounded-full bg-blue-400 blur-[120px]" />
         </div>
-        <div className="container mx-auto px-4 text-center relative">
-          <h2 className="reveal text-3xl md:text-4xl font-bold text-primary-foreground mb-4">
-            Prêt à retrouver un sourire éclatant ?
+        
+        <div className="container relative z-10 mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold tracking-tight text-white md:text-6xl leading-[1.1]">
+            Prêt à retrouver<br />votre plus beau sourire ?
           </h2>
-          <p className="reveal text-lg text-primary-foreground/90 mb-8 max-w-2xl mx-auto" style={{ transitionDelay: "100ms" }}>
-            Réservez votre consultation en ligne — confirmation immédiate et rappels automatiques.
+          <p className="mt-8 mx-auto max-w-2xl text-lg text-slate-400">
+            Rejoignez des milliers de patients qui ont déjà fait confiance à notre expertise pour leurs soins dentaires.
           </p>
-          <div className="reveal" style={{ transitionDelay: "180ms" }}>
+          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link to="/booking">
-              <Button size="lg" variant="secondary" className="text-base px-8">
-                Prendre rendez-vous
+              <Button size="lg" className="h-14 rounded-2xl px-10 text-lg font-bold shadow-large bg-primary hover:bg-primary/90">
+                Prendre rendez-vous en ligne
               </Button>
             </Link>
+            <a href={`tel:${settings.contact_phone}`} className="flex items-center gap-3 text-white font-bold text-lg hover:text-primary transition-colors">
+              <Phone className="h-5 w-5" />
+              {settings.contact_phone}
+            </a>
           </div>
         </div>
       </section>
