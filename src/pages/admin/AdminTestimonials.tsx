@@ -124,9 +124,14 @@ export const AdminTestimonials = () => {
     if (!toDelete) return;
     const { error } = await (supabase as any).from("testimonials").delete().eq("id", toDelete.id);
     if (error) {
-      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+      console.error("Error deleting testimonial:", error);
+      toast({ 
+        title: "Erreur de suppression", 
+        description: "Impossible de supprimer le témoignage. Veuillez réessayer.", 
+        variant: "destructive" 
+      });
     } else {
-      toast({ title: "Testimonial deleted" });
+      toast({ title: "Témoignage supprimé" });
       load();
     }
     setToDelete(null);
