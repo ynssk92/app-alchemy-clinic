@@ -56,11 +56,11 @@ export const SiteHeader = () => {
 
   return (
     <nav className={cn(
-      "sticky top-0 z-50 transition-all duration-300 border-b",
+      "sticky top-0 z-50 transition-all duration-300 border-b bg-white",
       scrolled 
-        ? "bg-background/95 backdrop-blur-md py-2 border-border shadow-soft" 
-        : "bg-background py-4 border-slate-100"
-    )}>
+        ? "py-2 border-slate-200 shadow-sm backdrop-blur-md bg-white/90" 
+        : "py-4 border-slate-100 shadow-none"
+    )} style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}>
       <div className="container mx-auto px-4 flex items-center justify-between gap-2">
         <Link to="/" className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
           <img src={logoUrl} alt="La Dune Clinique Dentaire" className={cn("transition-all duration-300", scrolled ? "h-8" : "h-9 md:h-11")} />
@@ -75,13 +75,16 @@ export const SiteHeader = () => {
                 to={item.to}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative text-[13px] font-bold uppercase tracking-wider transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left",
+                  "relative text-[13px] font-bold uppercase tracking-wider transition-all duration-300",
                   active
-                    ? "text-primary after:scale-x-100 after:origin-left"
-                    : "text-slate-600 after:scale-x-0 after:origin-right",
+                    ? "text-primary"
+                    : "text-slate-600 hover:text-primary",
                 )}
               >
                 {item.label}
+                {active && (
+                  <span className="absolute -bottom-1 left-0 h-0.5 w-full bg-primary" />
+                )}
               </NavLink>
             );
           })}
@@ -94,11 +97,11 @@ export const SiteHeader = () => {
           <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="hidden sm:block shrink-0">
             <Button
               className={cn(
-                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 px-5 text-[13px] font-bold uppercase tracking-wide",
-                bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-medium",
+                "shadow-sm hover:shadow-md transition-all duration-300 h-10 px-6 text-[13px] font-bold uppercase tracking-wide rounded-full bg-primary text-white",
+                bookingActive && "ring-2 ring-primary/20 ring-offset-2 shadow-md",
               )}
             >
-              Rendez-vous
+              Book an Appointment
             </Button>
           </Link>
 
