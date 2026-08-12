@@ -49,7 +49,12 @@ export const AdminTestimonials = () => {
       .order("sort_order", { ascending: true });
     
     if (error) {
-      toast({ title: "Load failed", description: error.message, variant: "destructive" });
+      console.error("Error loading testimonials:", error);
+      toast({ 
+        title: "Chargement impossible", 
+        description: "Impossible de charger les témoignages. Veuillez réessayer plus tard.", 
+        variant: "destructive" 
+      });
     } else {
       setTestimonials((data as any[]) || []);
     }
@@ -83,9 +88,14 @@ export const AdminTestimonials = () => {
     }
     
     if (error) {
-      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+      console.error("Error saving testimonial:", error);
+      toast({ 
+        title: "Erreur d'enregistrement", 
+        description: "Impossible d'enregistrer le témoignage. Veuillez réessayer.", 
+        variant: "destructive" 
+      });
     } else {
-      toast({ title: "Testimonial saved" });
+      toast({ title: "Témoignage enregistré avec succès" });
       setOpen(false);
       load();
     }
@@ -114,9 +124,14 @@ export const AdminTestimonials = () => {
     if (!toDelete) return;
     const { error } = await (supabase as any).from("testimonials").delete().eq("id", toDelete.id);
     if (error) {
-      toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+      console.error("Error deleting testimonial:", error);
+      toast({ 
+        title: "Erreur de suppression", 
+        description: "Impossible de supprimer le témoignage. Veuillez réessayer.", 
+        variant: "destructive" 
+      });
     } else {
-      toast({ title: "Testimonial deleted" });
+      toast({ title: "Témoignage supprimé" });
       load();
     }
     setToDelete(null);
@@ -139,9 +154,9 @@ export const AdminTestimonials = () => {
       </div>
 
       {loading ? (
-        <Card className="p-10 text-center">Loading testimonials...</Card>
+        <Card className="p-10 text-center">Chargement des témoignages...</Card>
       ) : testimonials.length === 0 ? (
-        <Card className="p-10 text-center text-muted-foreground border-dashed">No testimonials found.</Card>
+        <Card className="p-10 text-center text-muted-foreground border-dashed">Aucun témoignage trouvé.</Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {testimonials.map((t, i) => (
@@ -193,25 +208,25 @@ export const AdminTestimonials = () => {
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="t-name">Patient Name</Label>
-                <Input id="t-name" value={draft.name} onChange={e => setDraft({...draft, name: e.target.value})} placeholder="e.g. Jean Dupont" />
+                <Label htmlFor="t-name">Nom du patient</Label>
+                <Input id="t-name" value={draft.name} onChange={e => setDraft({...draft, name: e.target.value})} placeholder="ex. Jean Dupont" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="t-role">Role / Subtitle</Label>
-                <Input id="t-role" value={draft.role} onChange={e => setDraft({...draft, role: e.target.value})} placeholder="e.g. Patient" />
+                <Label htmlFor="t-role">Rôle / Sous-titre</Label>
+                <Input id="t-role" value={draft.role} onChange={e => setDraft({...draft, role: e.target.value})} placeholder="ex. Patient" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="t-content">Testimonial Content</Label>
-              <Textarea id="t-content" value={draft.content} onChange={e => setDraft({...draft, content: e.target.value})} placeholder="What the patient said..." rows={4} />
+              <Label htmlFor="t-content">Contenu du témoignage</Label>
+              <Textarea id="t-content" value={draft.content} onChange={e => setDraft({...draft, content: e.target.value})} placeholder="Ce que le patient a dit..." rows={4} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="t-avatar">Avatar URL</Label>
+                <Label htmlFor="t-avatar">URL de l'avatar</Label>
                 <Input id="t-avatar" value={draft.avatar_url} onChange={e => setDraft({...draft, avatar_url: e.target.value})} placeholder="https://..." />
               </div>
               <div className="space-y-2">
-                <Label>Rating</Label>
+                <Label>Note</Label>
                 <div className="flex items-center h-10 gap-2">
                   {[1, 2, 3, 4, 5].map(r => (
                     <button key={r} type="button" onClick={() => setDraft({...draft, rating: r})} className="focus:outline-none">
@@ -224,13 +239,13 @@ export const AdminTestimonials = () => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Switch id="t-status" checked={draft.status === 'published'} onCheckedChange={v => setDraft({...draft, status: v ? 'published' : 'draft'})} />
-                <Label htmlFor="t-status">Published</Label>
+                <Label htmlFor="t-status">Publié</Label>
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={save}>Save Testimonial</Button>
+            <Button variant="outline" type="button" onClick={() => setOpen(false)}>Annuler</Button>
+            <Button onClick={save}>Enregistrer le témoignage</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -238,12 +253,12 @@ export const AdminTestimonials = () => {
       <AlertDialog open={!!toDelete} onOpenChange={o => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete testimonial?</AlertDialogTitle>
-            <AlertDialogDescription>This will permanently remove this review from the website.</AlertDialogDescription>
+            <AlertDialogTitle>Supprimer le témoignage ?</AlertDialogTitle>
+            <AlertDialogDescription>Ceci supprimera définitivement cet avis du site web.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
