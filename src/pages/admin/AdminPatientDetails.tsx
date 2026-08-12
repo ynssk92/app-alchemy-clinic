@@ -498,19 +498,35 @@ const AdminPatientDetails = () => {
                   </div>
                   <div className="flex flex-col items-end gap-3">
                     <div className="flex gap-2">
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9" onClick={() => setEditOpen(true)} title="Edit patient"><Pencil className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
+                      {!isEditing ? (
+                        <>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9" onClick={() => setIsEditing(true)} title="Edit patient"><Pencil className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button onClick={handleSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-9 px-4 rounded-full">
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Save
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsEditing(false)} disabled={saving} className="rounded-full h-9 px-4 gap-2">
+                            <X className="w-4 h-4" /> Cancel
+                          </Button>
+                        </>
+                      )}
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" className="gap-2" onClick={() => setEditOpen(true)}>
-                        <Pencil className="w-4 h-4" />Edit
-                      </Button>
-                      <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
-                        <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
-                      </Button>
-                    </div>
+                    {!isEditing && (
+                      <div className="flex gap-2">
+                        <Button variant="outline" className="gap-2" onClick={() => setIsEditing(true)}>
+                          <Pencil className="w-4 h-4" />Edit
+                        </Button>
+                        <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
+                          <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
