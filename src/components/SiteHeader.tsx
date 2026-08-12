@@ -230,9 +230,9 @@ export const SiteHeader = () => {
                 </ul>
               </nav>
 
-              <div className="border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3 bg-card">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <div className="border-t border-border p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] space-y-4 bg-background shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     {t("nav.language", { defaultValue: "Language" })}
                   </span>
                   <LanguageToggle />
@@ -240,21 +240,14 @@ export const SiteHeader = () => {
                 <Link
                   to="/booking"
                   onClick={() => setOpen(false)}
-                  aria-current={bookingActive ? "page" : undefined}
                   className="block"
                 >
                   <Button
-                    className={cn(
-                      "w-full h-12 text-base shadow-soft",
-                      bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background",
-                    )}
+                    className="w-full h-12 text-base font-bold shadow-medium hover:shadow-lg transition-all active:scale-95"
                   >
                     Rendez-vous
                   </Button>
                 </Link>
-
-
-
               </div>
             </SheetContent>
           </Sheet>
