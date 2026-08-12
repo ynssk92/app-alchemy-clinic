@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Save, Upload, User as UserIcon, Lock, CheckCircle2, Copy, ShieldCheck, Mail, Calendar } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
