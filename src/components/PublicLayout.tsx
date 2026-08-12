@@ -9,7 +9,7 @@ interface PublicLayoutProps {
 
 export const PublicLayout = ({ children }: PublicLayoutProps) => {
   return (
-    <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden">
       <TopHeader />
       <SiteHeader />
       <main className="flex-1">
