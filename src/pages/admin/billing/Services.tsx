@@ -30,17 +30,29 @@ export default function Services() {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: s, error: sErr }, { data: c, error: cErr }] = await Promise.all([
-      supabase.from("services").select(`*`).order("name"),
-      supabase.from("service_categories").select("*").order("name"),
-    ]);
-    
-    if (sErr) console.error("Error loading services:", sErr);
-    if (cErr) console.error("Error loading categories:", cErr);
+    try {
+      const [{ data: s, error: sErr }, { data: c, error: cErr }] = await Promise.all([
+        supabase.from("services").select(`*`).order("name"),
+        supabase.from("service_categories").select("*").order("name"),
+      ]);
+      
+      if (sErr) throw sErr;
+      if (cErr) throw cErr;
 
-    setRows(s || []);
-    setCats(c || []);
-    setLoading(false);
+      // Handle the join manually to avoid schema cache issues with complex select strings
+      const enrichedServices = s?.map(service => ({
+        ...service,
+        category: c?.find(cat => cat.id === service.category_id) || null
+      })) || [];
+
+      setRows(enrichedServices);
+      setCats(c || []);
+    } catch (error: any) {
+      console.error("Error loading services data:", error);
+      toast.error("Erreur lors du chargement des services");
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { load(); }, []);
 
