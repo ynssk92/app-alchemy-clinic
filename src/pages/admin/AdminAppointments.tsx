@@ -152,38 +152,92 @@ const AdminAppointments = () => {
       </div>
 
       {/* Toolbar */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          <div className="relative group flex-1 md:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-            <Input 
-              placeholder="Search by doctor or reason..." 
-              className="pl-9 bg-white border-slate-200 rounded-full h-10 text-sm focus-visible:ring-primary/20"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="relative group flex-1 md:w-[280px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <Input 
+                placeholder="Search by doctor or reason..." 
+                className="pl-9 bg-white border-slate-200 rounded-full h-10 text-sm focus-visible:ring-primary/20"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[140px] rounded-full h-10 bg-white border-slate-200 text-slate-600">
+                <Filter className="w-4 h-4 mr-2 text-slate-400" />
+                <SelectValue placeholder="Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="upcoming">Upcoming</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px] rounded-full h-10 bg-white border-slate-200 text-slate-600">
-              <Filter className="w-4 h-4 mr-2 text-slate-400" />
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="upcoming">Upcoming</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
-            </SelectContent>
-          </Select>
+
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <Button 
+              variant="outline"
+              onClick={exportToCSV}
+              className="flex-1 md:flex-none border-slate-200 text-slate-600 hover:bg-slate-50 rounded-full px-4 h-10 gap-2"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Export CSV</span>
+            </Button>
+            
+            <Button 
+              onClick={() => navigate("/admin/appointments/new")}
+              className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white rounded-full px-6 h-10 gap-2 shadow-md shadow-primary/10"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Appointment</span>
+            </Button>
+          </div>
         </div>
 
-        <Button 
-          onClick={() => navigate("/admin/appointments/new")}
-          className="w-full md:w-auto bg-primary hover:bg-primary/90 text-white rounded-full px-6 h-10 gap-2 shadow-md shadow-primary/10"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Appointment</span>
-        </Button>
+        {/* Active Filters */}
+        {(searchQuery || statusFilter !== "all") && (
+          <div className="flex flex-wrap items-center gap-2 px-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mr-1">Active Filters:</span>
+            
+            {searchQuery && (
+              <Badge variant="secondary" className="bg-white border-slate-200 text-slate-600 py-1 pl-3 pr-1.5 rounded-full flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
+                <span className="text-xs font-medium">Search: {searchQuery}</span>
+                <button 
+                  onClick={() => setSearchQuery("")}
+                  className="w-4 h-4 rounded-full hover:bg-slate-200 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            
+            {statusFilter !== "all" && (
+              <Badge variant="secondary" className="bg-white border-slate-200 text-slate-600 py-1 pl-3 pr-1.5 rounded-full flex items-center gap-1.5 hover:bg-slate-50 transition-colors">
+                <span className="text-xs font-medium uppercase tracking-tight">Status: {statusFilter}</span>
+                <button 
+                  onClick={() => setStatusFilter("all")}
+                  className="w-4 h-4 rounded-full hover:bg-slate-200 flex items-center justify-center transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            
+            <button 
+              onClick={() => {
+                setSearchQuery("");
+                setStatusFilter("all");
+              }}
+              className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors ml-1"
+            >
+              Reset All
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Appointment List */}
