@@ -170,6 +170,45 @@ const AdminNotifications = () => {
     }
   };
 
+  const markAllAsRead = async () => {
+    const unreadItems = items.filter(n => !n.is_read);
+    if (unreadItems.length === 0) return;
+
+    // Optimistic UI update
+    setItems(prev => prev.map(item => ({ ...item, is_read: true })));
+
+    try {
+      // Split items by table for batch updates
+      const messages = unreadItems.filter(n => n.table === "contact_messages").map(n => n.db_id);
+      const alerts = unreadItems.filter(n => n.table === "assistant_verification_alerts").map(n => n.db_id);
+      const appNotifs = unreadItems.filter(n => n.table === "notifications").map(n => n.db_id);
+
+      const updates = [];
+      if (messages.length > 0) {
+        updates.push(supabase.from("contact_messages").update({ read: true }).in("id", messages));
+      }
+      if (alerts.length > 0) {
+        updates.push(supabase.from("assistant_verification_alerts").update({ acknowledged_at: new Date().toISOString() }).in("id", alerts));
+      }
+      if (appNotifs.length > 0) {
+        updates.push(supabase.from("notifications").update({ read: true }).in("id", appNotifs));
+      }
+
+      const results = await Promise.all(updates);
+      const hasError = results.some(r => r.error);
+
+      if (hasError) {
+        toast.error("Certaines notifications n'ont pas pu être marquées comme lues");
+        load(); // Refresh from server to get correct state
+      } else {
+        toast.success("Toutes les notifications ont été marquées comme lues");
+      }
+    } catch (err) {
+      toast.error("Erreur lors du marquage en masse");
+      load();
+    }
+  };
+
   const handleItemClick = async (n: Notif) => {
     await markAsRead(n);
     
@@ -199,11 +238,26 @@ const AdminNotifications = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-80 bg-popover/95 backdrop-blur-md border-border shadow-2xl rounded-2xl p-0 overflow-hidden">
         <DropdownMenuLabel className="px-4 py-3 bg-muted/30 border-b border-border flex items-center justify-between">
-          <span className="font-bold text-sm tracking-tight">Notifications</span>
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-sm tracking-tight">Notifications</span>
+            {unreadCount > 0 && (
+              <Badge variant="secondary" className="rounded-full px-2 py-0 text-[10px] bg-primary/10 text-primary border-none">
+                {unreadCount}
+              </Badge>
+            )}
+          </div>
           {unreadCount > 0 && (
-            <Badge variant="secondary" className="rounded-full px-2 py-0 text-[10px] bg-primary/10 text-primary border-none">
-              {unreadCount} non lue{unreadCount > 1 ? "s" : ""}
-            </Badge>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={(e) => {
+                e.stopPropagation();
+                markAllAsRead();
+              }}
+              className="h-7 px-2 text-[10px] font-semibold text-primary hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+            >
+              Tout marquer comme lu
+            </Button>
           )}
         </DropdownMenuLabel>
         
