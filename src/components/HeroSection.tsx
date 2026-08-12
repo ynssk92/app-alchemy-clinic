@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
-const HERO_VIDEO_URL =
-  "https://app-clinic.lovable.app/__l5e/assets-v1/b0071650-2082-45fc-b971-064a43fda304/hero-bg.mp4";
+import heroVideoAsset from "@/assets/hero-bg-new.mp4.asset.json";
+
+const HERO_VIDEO_URL = heroVideoAsset.url;
 
 export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
