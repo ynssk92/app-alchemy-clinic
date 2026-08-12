@@ -6,15 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
-  ShieldCheck, ShieldAlert, MapPin, UserCheck,
+  ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
+import { useToast } from "@/hooks/use-toast";
 
 type ListRow = {
   key: string;
@@ -101,13 +103,29 @@ const fmtDate = (d?: string | null) =>
 const AdminPatientDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [list, setList] = useState<ListRow[]>([]);
   const [patient, setPatient] = useState<PatientView | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [apptSearch, setApptSearch] = useState("");
-  const [editOpen, setEditOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    full_name: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "",
+    blood_group: "",
+    address_1: "",
+    city: "",
+    country: "",
+    status: "approved" as "pending" | "approved" | "rejected",
+  });
   const [reloadTick, setReloadTick] = useState(0);
   const [notFound, setNotFound] = useState(false);
 
@@ -258,6 +276,21 @@ const AdminPatientDetails = () => {
       };
       setPatient(view);
 
+      setForm({
+        first_name: intakeRow?.first_name || "",
+        last_name: intakeRow?.last_name || "",
+        full_name: view.full_name,
+        email: view.email || "",
+        phone: view.phone || "",
+        dob: view.dob || "",
+        gender: view.gender || "",
+        blood_group: view.blood_group || "",
+        address_1: view.address_1 || "",
+        city: view.city || "",
+        country: view.country || "",
+        status: (profileRow?.status as any) || "approved",
+      });
+
       // Avatar signed URL
       if (avatarPath) {
         const { data: signed } = await supabase.storage
@@ -302,6 +335,69 @@ const AdminPatientDetails = () => {
       (a.doctors?.full_name || "").toLowerCase().includes(s) ||
       (a.reason || "").toLowerCase().includes(s);
   });
+
+  const handleSave = async () => {
+    if (!patient) return;
+    setSaving(true);
+    try {
+      // 1. Update Profile (if registered)
+      if (patient.profileId) {
+        const { error: pErr } = await supabase
+          .from("profiles")
+          .update({
+            full_name: form.full_name.trim() || null,
+            phone: form.phone.trim() || null,
+            status: form.status,
+          })
+          .eq("id", patient.profileId);
+        if (pErr) throw pErr;
+      }
+
+      // 2. Update/Insert Intake
+      // Derive first/last from full name if we don't have them separately (mostly for registered profiles)
+      let derivedFirst = form.first_name;
+      let derivedLast = form.last_name;
+      if (!derivedFirst || !derivedLast) {
+        const parts = (form.full_name || "").trim().split(/\s+/);
+        derivedFirst = derivedFirst || parts.shift() || "Patient";
+        derivedLast = derivedLast || parts.join(" ") || "-";
+      }
+
+      const intakePayload: any = {
+        first_name: derivedFirst,
+        last_name: derivedLast,
+        email: form.email || (patient.profileId ? `${patient.profileId}@placeholder.local` : "unknown@placeholder.local"),
+        phone: form.phone || null,
+        dob: form.dob || null,
+        gender: form.gender || null,
+        blood_group: form.blood_group || null,
+        address_1: form.address_1 || null,
+        city: form.city || null,
+        country: form.country || null,
+      };
+
+      if (patient.intakeId) {
+        const { error } = await supabase.from("patient_intake").update(intakePayload).eq("id", patient.intakeId);
+        if (error) throw error;
+      } else if (patient.profileId) {
+        const { data: authUser } = await supabase.auth.getUser();
+        const { error } = await supabase.from("patient_intake").insert({
+          ...intakePayload,
+          user_id: patient.profileId,
+          created_by: authUser.user?.id ?? null,
+        });
+        if (error) throw error;
+      }
+
+      toast({ title: "Patient information updated successfully." });
+      setIsEditing(false);
+      setReloadTick((t) => t + 1);
+    } catch (e: any) {
+      toast({ title: "Unable to update patient information.", description: e.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -402,34 +498,75 @@ const AdminPatientDetails = () => {
                   </div>
                   <div className="flex flex-col items-end gap-3">
                     <div className="flex gap-2">
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9" onClick={() => setEditOpen(true)} title="Edit patient"><Pencil className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
-                      <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
+                      {!isEditing ? (
+                        <>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9" onClick={() => setIsEditing(true)} title="Edit patient"><Pencil className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Phone className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><MessageSquare className="w-4 h-4" /></Button>
+                          <Button size="icon" variant="outline" className="rounded-full h-9 w-9"><Video className="w-4 h-4" /></Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button onClick={handleSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-9 px-4 rounded-full">
+                            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                            Save
+                          </Button>
+                          <Button variant="outline" onClick={() => setIsEditing(false)} disabled={saving} className="rounded-full h-9 px-4 gap-2">
+                            <X className="w-4 h-4" /> Cancel
+                          </Button>
+                        </>
+                      )}
                     </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" className="gap-2" onClick={() => setEditOpen(true)}>
-                        <Pencil className="w-4 h-4" />Edit
-                      </Button>
-                      <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
-                        <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
-                      </Button>
-                    </div>
+                    {!isEditing && (
+                      <div className="flex gap-2">
+                        <Button variant="outline" className="gap-2" onClick={() => setIsEditing(true)}>
+                          <Pencil className="w-4 h-4" />Edit
+                        </Button>
+                        <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
+                          <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
 
               {/* Registration status */}
               <Card className="p-6 border-border">
-                <h3 className="font-bold mb-5 flex items-center gap-2">
-                  <UserCheck className="w-4 h-4 text-primary" /> Registration Status
+                <h3 className="font-bold mb-5 flex items-center gap-2 text-primary">
+                  <UserCheck className="w-4 h-4" /> Registration Status
                 </h3>
                 <div className="grid md:grid-cols-3 gap-5">
-                  <InfoTile
-                    icon={registered ? ShieldCheck : ShieldAlert}
-                    label="Account status"
-                    value={registered ? "Registered" : "Not registered (admin-added)"}
-                  />
+                  <div className="space-y-1.5">
+                    <Label className="text-muted-foreground flex items-center gap-2">
+                      <ShieldCheck className="w-3.5 h-3.5" /> Account status
+                    </Label>
+                    {!isEditing ? (
+                      <div className="font-semibold flex items-center gap-2">
+                        {registered ? (
+                          <span className="text-emerald-600 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> Registered</span>
+                        ) : (
+                          <span className="text-amber-600 flex items-center gap-1.5"><ShieldAlert className="w-4 h-4" /> Not registered</span>
+                        )}
+                      </div>
+                    ) : (
+                      <Select
+                        value={form.status}
+                        onValueChange={(v: any) => setForm(f => ({ ...f, status: v }))}
+                        disabled={saving}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending">Pending</SelectItem>
+                          <SelectItem value="approved">Approved</SelectItem>
+                          <SelectItem value="rejected">Rejected</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </div>
+
                   <InfoTile
                     icon={Mail}
                     label="Linked email"
@@ -469,16 +606,122 @@ const AdminPatientDetails = () => {
               {/* About + Vital Signs */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Card className="p-6 border-border">
-                  <h3 className="font-bold mb-5 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-primary" /> About
+                  <h3 className="font-bold mb-5 flex items-center gap-2 text-primary">
+                    <BookOpen className="w-4 h-4" /> About
                   </h3>
-                  <div className="grid grid-cols-2 gap-5">
-                    <InfoTile icon={Cake} label="DOB" value={fmtDate(patient.dob)} />
-                    <InfoTile icon={Droplet} label="Blood Group" value={patient.blood_group || "—"} />
-                    <InfoTile icon={VenetianMask} label="Gender" value={patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : "—"} />
-                    <InfoTile icon={Mail} label="Email" value={patient.email || "—"} />
-                    <InfoTile icon={MapPin} label="Address" value={patient.address_1 || "—"} />
-                    <InfoTile icon={MapPin} label="City" value={patient.city || "—"} />
+                  <div className="grid grid-cols-2 gap-x-5 gap-y-4">
+                    {!isEditing ? (
+                      <>
+                        <InfoTile icon={Cake} label="DOB" value={fmtDate(patient.dob)} />
+                        <InfoTile icon={Droplet} label="Blood Group" value={patient.blood_group || "—"} />
+                        <InfoTile icon={VenetianMask} label="Gender" value={patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : "—"} />
+                        <InfoTile icon={Mail} label="Email" value={patient.email || "—"} />
+                        <InfoTile icon={MapPin} label="Address" value={patient.address_1 || "—"} />
+                        <InfoTile icon={MapPin} label="City" value={patient.city || "—"} />
+                      </>
+                    ) : (
+                      <>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Full Name</Label>
+                          <Input
+                            className="h-9"
+                            value={form.full_name}
+                            onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Email</Label>
+                          <Input
+                            className="h-9"
+                            type="email"
+                            value={form.email}
+                            onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
+                            disabled={saving || registered}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Phone</Label>
+                          <Input
+                            className="h-9"
+                            value={form.phone}
+                            onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Date of Birth</Label>
+                          <Input
+                            className="h-9"
+                            type="date"
+                            value={form.dob}
+                            onChange={(e) => setForm(f => ({ ...f, dob: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Gender</Label>
+                          <Select
+                            value={form.gender}
+                            onValueChange={(v) => setForm(f => ({ ...f, gender: v }))}
+                            disabled={saving}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Blood Group</Label>
+                          <Select
+                            value={form.blood_group}
+                            onValueChange={(v) => setForm(f => ({ ...f, blood_group: v }))}
+                            disabled={saving}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(g => (
+                                <SelectItem key={g} value={g}>{g}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="col-span-2 space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Address</Label>
+                          <Input
+                            className="h-9"
+                            value={form.address_1}
+                            onChange={(e) => setForm(f => ({ ...f, address_1: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">City</Label>
+                          <Input
+                            className="h-9"
+                            value={form.city}
+                            onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Country</Label>
+                          <Input
+                            className="h-9"
+                            value={form.country}
+                            onChange={(e) => setForm(f => ({ ...f, country: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </Card>
 
@@ -602,15 +845,6 @@ const AdminPatientDetails = () => {
         </div>
       </div>
 
-      {patient && (
-        <EditPatientDialog
-          open={editOpen}
-          onOpenChange={setEditOpen}
-          profileId={patient.profileId}
-          intakeId={patient.intakeId}
-          onSaved={() => setReloadTick((t) => t + 1)}
-        />
-      )}
     </div>
   );
 };
