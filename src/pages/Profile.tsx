@@ -209,23 +209,101 @@ const Profile = () => {
 
           <div className="space-y-8">
             <Card className="p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Account overview</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-slate-900">Account overview</h3>
+                <ShieldCheck className="w-5 h-5 text-primary" />
+              </div>
               <div className="space-y-4 text-sm">
-                <div className="flex justify-between border-b pb-3"><span className="text-slate-500">Status</span><span className="font-medium text-emerald-600">Active</span></div>
-                <div className="flex justify-between border-b pb-3"><span className="text-slate-500">Role</span><span className="font-medium">{isAdmin ? "Admin" : "Patient"}</span></div>
-                <div className="flex justify-between border-b pb-3"><span className="text-slate-500">User ID</span><span className="font-mono text-slate-900">{user?.id.slice(0, 8)}...</span></div>
+                <div className="flex justify-between border-b border-slate-50 pb-3">
+                  <span className="text-slate-500">Status</span>
+                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-100 font-bold uppercase tracking-wider text-[10px]">Active</Badge>
+                </div>
+                <div className="flex justify-between border-b border-slate-50 pb-3">
+                  <span className="text-slate-500">Role</span>
+                  <span className="font-bold text-slate-900 uppercase tracking-tighter text-[11px]">{isAdmin ? "Admin" : "Patient"}</span>
+                </div>
+                <div className="flex justify-between border-b border-slate-50 pb-3">
+                  <span className="text-slate-500">User ID</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-[11px] text-slate-900">{user?.id.slice(0, 8)}...</span>
+                    <button onClick={() => { navigator.clipboard.writeText(user?.id || ""); toast.success("ID Copied"); }} className="p-1 hover:bg-slate-100 rounded transition-colors">
+                      <Copy className="w-3 h-3 text-slate-400" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </Card>
 
             <Card className="p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white">
               <h3 className="text-lg font-bold text-slate-900 mb-4">Profile completeness</h3>
               <Progress value={completion} className="h-2 mb-2" />
-              <p className="text-sm text-slate-500">{completion}% complete</p>
+              <p className="text-sm text-slate-500 font-medium">{completion}% complete</p>
+              <p className="text-[11px] text-slate-400 mt-1 italic">Complete your profile to keep your account information up to date.</p>
             </Card>
 
             <Card className="p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white">
-                <h3 className="text-lg font-bold text-slate-900 mb-1">Account actions</h3>
-                <Button onClick={signOut} variant="ghost" className="w-full justify-start text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl mt-4">Sign out</Button>
+              <h3 className="text-lg font-bold text-slate-900 mb-1">Connected accounts</h3>
+              <p className="text-[12px] text-slate-500 mb-6">Manage the services connected to your account.</p>
+              <div className="space-y-3">
+                {[
+                  { id: "google", name: "Google", icon: (
+                    <svg className="w-4 h-4" viewBox="0 0 48 48">
+                      <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.5 29.6 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+                      <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 7 29.6 5 24 5 16.3 5 9.6 9.3 6.3 14.7z"/>
+                      <path fill="#4CAF50" d="M24 43c5.4 0 10.3-2 14-5.3l-6.5-5.3C29.4 34 26.8 35 24 35c-5.3 0-9.7-3.1-11.3-8l-6.6 5.1C9.4 38.7 16.1 43 24 43z"/>
+                      <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.4-2.4 4.4-4.5 5.7l6.5 5.3C41 35 43.5 30 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+                    </svg>
+                  )},
+                  { id: "apple", name: "Apple", icon: (
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 384 512">
+                      <path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141.2 4 184.8 4 273.5q0 39.3 14.4 81.2c12.8 36.7 59 126.7 107.2 125.2 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-82.5 102.6-119.3-65.2-30.7-61.7-90-61.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/>
+                    </svg>
+                  )},
+                ].map((provider) => {
+                  const isLinked = user?.app_metadata?.providers?.includes(provider.id);
+                  return (
+                    <div key={provider.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/50">
+                      <div className="flex items-center gap-2.5">
+                        {provider.icon}
+                        <span className="text-xs font-semibold text-slate-700">{provider.name}</span>
+                      </div>
+                      {isLinked ? (
+                        <div className="flex items-center gap-1 text-emerald-600 text-[10px] font-bold">
+                          <CheckCircle2 className="w-3 h-3" />
+                          <span>Linked</span>
+                        </div>
+                      ) : (
+                        <button 
+                          className="text-[10px] font-bold text-primary hover:underline"
+                          onClick={() => supabase.auth.signInWithOAuth({ provider: provider.id as 'google' | 'apple', options: { redirectTo: `${window.location.origin}/auth/callback` } })}
+                        >
+                          Connect
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+
+            <Card className="p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white">
+              <h3 className="text-lg font-bold text-slate-900 mb-1">Account activity</h3>
+              <p className="text-[12px] text-slate-500 mb-6">Security and session overview.</p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600"><CheckCircle2 className="w-3.5 h-3.5" /></div>
+                  <div><p className="text-[12px] font-bold text-slate-900">Email verified</p><p className="text-[10px] text-slate-500">{user?.email_confirmed_at ? new Date(user.email_confirmed_at).toLocaleDateString() : "Verified"}</p></div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="p-1.5 rounded-lg bg-slate-100 text-slate-600"><Clock className="w-3.5 h-3.5" /></div>
+                  <div><p className="text-[12px] font-bold text-slate-900">Last sign-in</p><p className="text-[10px] text-slate-500">{user?.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : "Just now"}</p></div>
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white">
+              <h3 className="text-lg font-bold text-slate-900 mb-1">Account actions</h3>
+              <Button onClick={signOut} variant="ghost" className="w-full justify-start text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl mt-4 h-11 text-sm font-semibold">Sign out</Button>
             </Card>
           </div>
         </div>
