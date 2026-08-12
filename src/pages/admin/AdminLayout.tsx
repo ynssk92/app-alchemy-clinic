@@ -85,14 +85,14 @@ const sections: Section[] = [
     title: "Billing",
     items: [
       {
-        to: "/admin/billing", icon: Receipt, label: "Billing", module: "Billing",
+        to: "/admin/billing", icon: Receipt, label: "Billing & Services", module: "Billing",
         children: [
           { to: "/admin/billing", label: "Dashboard", end: true },
+          { to: "/admin/billing/services", label: "Services Catalog" },
+          { to: "/admin/billing/categories", label: "Service Categories" },
           { to: "/admin/billing/invoices", label: "Invoices" },
           { to: "/admin/billing/invoices/new", label: "New Invoice" },
           { to: "/admin/billing/payments", label: "Payments" },
-          { to: "/admin/billing/services", label: "Services" },
-          { to: "/admin/billing/categories", label: "Categories" },
         ],
       },
     ],
