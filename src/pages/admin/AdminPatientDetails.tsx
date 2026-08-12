@@ -276,6 +276,21 @@ const AdminPatientDetails = () => {
       };
       setPatient(view);
 
+      setForm({
+        first_name: intakeRow?.first_name || "",
+        last_name: intakeRow?.last_name || "",
+        full_name: view.full_name,
+        email: view.email || "",
+        phone: view.phone || "",
+        dob: view.dob || "",
+        gender: view.gender || "",
+        blood_group: view.blood_group || "",
+        address_1: view.address_1 || "",
+        city: view.city || "",
+        country: view.country || "",
+        status: (profileRow?.status as any) || "approved",
+      });
+
       // Avatar signed URL
       if (avatarPath) {
         const { data: signed } = await supabase.storage
