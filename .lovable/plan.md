@@ -1,12 +1,13 @@
 # Dental Clinic Services Management Module Plan
 
-I will implement a professional Services Management module, reusing the existing `services` and `service_categories` tables. The module will include a clean list view, search/filter capabilities, and a detailed creation/editing interface, all restricted to admin users and scoped to the clinic.
+I will implement a professional Services Management module. I found that an existing `src/pages/admin/billing/Services.tsx` already exists, so I will redesign and enhance it to meet the new requirements while preserving existing functionality. I will reuse the existing `services` and `service_categories` tables.
 
 ## User Review Required
 
 > [!IMPORTANT]
+> - I will enhance the existing `src/pages/admin/billing/Services.tsx` to match the requested premium design and functionality.
 > - I will use the existing `services` and `service_categories` tables found in the database.
-> - Currency will be set to MAD (Moroccan Dirham) as requested, unless a global currency setting is found.
+> - Currency will be set to MAD (Moroccan Dirham) as requested.
 > - Default dental categories will be seeded into `service_categories` if it is empty.
 
 ## Proposed Changes
@@ -15,26 +16,27 @@ I will implement a professional Services Management module, reusing the existing
 - Ensure RLS policies on `services` and `service_categories` allow admins to manage their clinic's records.
 - Grant necessary permissions (`SELECT`, `INSERT`, `UPDATE`, `DELETE`) to the `authenticated` role (scoped by RLS).
 
-### Services Management Page
-- Create `src/pages/admin/AdminServices.tsx`:
+### Services Management Page Enhancement
+- Redesign `src/pages/admin/billing/Services.tsx`:
+    - Premium medical SaaS UI with excellent spacing and rounded cards.
     - Responsive table/card layout for listing services.
     - Search by name, code, or category.
     - Filters for Category and Status (Active/Inactive).
-    - Sorting by Name, Price, and Duration.
-    - Summary metrics (Total, Active).
+    - Sorting by Name, Price, Category, and Duration.
+    - Export functionality if needed.
 
 ### Service Editor
-- Create `src/components/admin/ServiceDialog.tsx`:
+- Create/Enhance a Service Dialog component:
     - Form to Create/Edit services.
-    - Fields: Name, Category (dropdown from `service_categories`), Code, Description, Duration (minutes), Price (MAD), and Status.
+    - Fields: Name, Category (dropdown from `service_categories`), Code, Description, Duration (minutes), Price (MAD), Tax, and Status.
     - Validation for required fields.
 
 ### Integration
-- Add "Services" to the Admin sidebar navigation.
-- Ensure only active services appear in appointment/billing selectors (if those modules are updated).
+- Verify "Services" is correctly linked in the Admin sidebar.
+- Ensure only active services appear in appointment/billing selectors.
+- Implement "Soft Delete" (Deactivate) for services used in historical records.
 
 ## Technical Details
 - **Tables used**: `public.services`, `public.service_categories`.
-- **State Management**: React State for filters/sorting, TanStack Query (or existing patterns) for data fetching.
-- **UI Components**: Shadcn UI (Table, Dialog, Form, Input, Select, Badge) with Framer Motion for smooth transitions.
+- **UI Components**: Shadcn UI (Table, Dialog, Form, Input, Select, Badge) with Framer Motion.
 - **Security**: RLS enforces `clinic_id` isolation.
