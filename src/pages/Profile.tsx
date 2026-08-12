@@ -147,17 +147,21 @@ const Profile = () => {
       <Seo title="Profile & Settings" description="Manage your account." path="/profile" />
       
       {/* Premium Header */}
-      <header className="sticky top-0 z-50 w-full h-[64px] md:h-[72px] bg-white border-b border-slate-100 flex items-center justify-center px-4 md:px-6">
+      <header className="sticky top-0 z-50 w-full h-[64px] md:h-[72px] bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-center px-4 md:px-6">
         <div className="w-full max-w-[1200px] flex items-center justify-between">
           <Link to={isAdmin || isAssistant ? "/admin" : "/"} className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
-            <img src={logoUrl} alt="La Dune Clinique Dentaire" className="w-[120px] md:w-[150px] h-auto object-contain" />
+            <img 
+              src={logoUrl} 
+              alt="La Dune Clinique Dentaire" 
+              className="w-[100px] md:w-[150px] h-auto object-contain dark:brightness-0 dark:invert" 
+            />
           </Link>
           
           <div className="flex items-center gap-4">
             {(isAdmin || isAssistant) && (
               <Button 
                 onClick={() => navigate("/admin")}
-                className="bg-primary hover:bg-primary/90 text-white rounded-lg h-10 px-4 flex items-center gap-2 transition-all shadow-sm"
+                className="bg-primary hover:bg-primary/90 text-white rounded-lg h-9 md:h-10 px-3 md:px-4 flex items-center gap-2 transition-all shadow-sm"
               >
                 <LayoutGrid className="w-4 h-4" />
                 <span className="hidden md:inline font-semibold">Admin Panel</span>
@@ -166,6 +170,7 @@ const Profile = () => {
           </div>
         </div>
       </header>
+
 
       <div className="max-w-[1200px] mx-auto p-6 md:p-10">
         <div className="mb-8">
