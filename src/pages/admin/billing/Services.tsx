@@ -31,7 +31,10 @@ export default function Services() {
   const load = async () => {
     setLoading(true);
     const [{ data: s, error: sErr }, { data: c, error: cErr }] = await Promise.all([
-      supabase.from("services").select(`*, category:service_categories!services_category_id_fkey(name, color)`).order("name"),
+      supabase.from("services").select(`
+        id, name, code, description, duration, price, cost, tax_rate, active, category_id, clinic_id,
+        category:service_categories(name, color)
+      `).order("name"),
       supabase.from("service_categories").select("*").order("name"),
     ]);
     
