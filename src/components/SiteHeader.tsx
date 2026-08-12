@@ -75,10 +75,10 @@ export const SiteHeader = () => {
                 to={item.to}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative text-sm font-bold transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-gradient-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left",
+                  "relative text-[13px] font-bold uppercase tracking-wider transition-colors duration-300 after:content-[''] after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:bg-primary after:transition-transform after:duration-300 hover:text-primary hover:after:scale-x-100 hover:after:origin-left",
                   active
                     ? "text-primary after:scale-x-100 after:origin-left"
-                    : "text-foreground after:scale-x-0 after:origin-right",
+                    : "text-slate-600 after:scale-x-0 after:origin-right",
                 )}
               >
                 {item.label}
@@ -91,10 +91,10 @@ export const SiteHeader = () => {
           <div className="hidden lg:flex items-center gap-2">
             <LanguageToggle />
           </div>
-          <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="shrink-0">
+          <Link to="/booking" aria-current={bookingActive ? "page" : undefined} className="hidden sm:block shrink-0">
             <Button
               className={cn(
-                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-11 px-3 text-sm md:h-10 md:px-4",
+                "shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-0.5 h-10 px-5 text-[13px] font-bold uppercase tracking-wide",
                 bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background shadow-medium",
               )}
             >
