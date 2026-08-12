@@ -11,8 +11,9 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
-      <div className="absolute inset-0 z-0">
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
+      {/* Container to force correct stacking context */}
+      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
         {/* Full-screen video background */}
         <video
           key={HERO_VIDEO_URL}
@@ -28,13 +29,13 @@ export const HeroSection = () => {
         </video>
 
         {/* Fallback background if video fails to load */}
-        <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800 ${!videoError ? "opacity-0" : "opacity-100"}`} />
+        <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800 transition-opacity duration-700 ${!videoError ? "opacity-0" : "opacity-100"}`} />
 
         {/* Subtle Premium Overlay */}
-        <div className="absolute inset-0 bg-[rgba(5,20,55,0.30)]" />
+        <div className="absolute inset-0 bg-[rgba(5,20,55,0.35)]" />
         
         {/* Gradient overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(5,20,55,0.4)] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(5,20,55,0.6)] via-[rgba(5,20,55,0.2)] to-transparent" />
       </div>
 
       <div className="container mx-auto px-4 relative z-10 py-24 md:py-32">
