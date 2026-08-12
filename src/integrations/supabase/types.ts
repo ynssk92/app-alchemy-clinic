@@ -2166,6 +2166,48 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          active: boolean | null
+          avatar_url: string | null
+          content: string
+          created_at: string | null
+          id: string
+          name: string
+          rating: number | null
+          role: string | null
+          sort_order: number | null
+          status: Database["public"]["Enums"]["content_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          avatar_url?: string | null
+          content: string
+          created_at?: string | null
+          id?: string
+          name: string
+          rating?: number | null
+          role?: string | null
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          avatar_url?: string | null
+          content?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          rating?: number | null
+          role?: string | null
+          sort_order?: number | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       user_role_assignments: {
         Row: {
           created_at: string
