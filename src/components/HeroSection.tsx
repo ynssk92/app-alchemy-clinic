@@ -85,7 +85,7 @@ export const HeroSection = () => {
                   Book an Appointment
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-8 text-base border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50">
+              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-8 text-base bg-transparent border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50">
                 <Link to="/soins">
                   Discover Our Care
                 </Link>
