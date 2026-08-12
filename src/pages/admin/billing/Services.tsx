@@ -67,7 +67,7 @@ export default function Services() {
 
   const save = async () => {
     if (!editing.name) return toast.error("Name required");
-    const { id, clinic_id, category, ...updateData } = editing;
+    const { id: _, clinic_id: __, category, ...updateData } = editing;
     const payload = { ...updateData, category_id: editing.category_id || null };
     
     const { error } = editing.id
