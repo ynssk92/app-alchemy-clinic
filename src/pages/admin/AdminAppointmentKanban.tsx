@@ -17,7 +17,8 @@ import {
   XCircle,
   MoreVertical,
   ChevronRight,
-  User
+  User,
+  Receipt
 } from "lucide-react";
 
 type Row = {
@@ -27,7 +28,7 @@ type Row = {
   status: string; 
   reason: string | null;
   doctors: { full_name: string } | null;
-  services: { name: string; duration: number; category: { name: string } | null } | null;
+  services: { name: string; duration: number; price: number; category: { name: string } | null } | null;
 };
 
 const COLUMNS = [
@@ -69,7 +70,7 @@ const AdminAppointmentKanban = () => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, status, reason, doctors(full_name), services(name, duration, category:service_categories(name))")
+      .select("id, appointment_date, appointment_time, status, reason, doctors(full_name), services(name, duration, price, category:service_categories(name))")
       .order("appointment_date", { ascending: true });
     
     if (error) {
@@ -238,6 +239,16 @@ const AdminAppointmentKanban = () => {
                         )}
                       </div>
                     </div>
+
+                    {r.services && (
+                      <div className="mb-4 p-2.5 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Receipt className="w-3.5 h-3.5 text-slate-400" />
+                          <span className="text-[11px] font-semibold text-slate-500">Billing Preview</span>
+                        </div>
+                        <span className="text-[12px] font-bold text-primary">{r.services.price.toFixed(2)} MAD</span>
+                      </div>
+                    )}
 
                     {/* Quick Actions (Visually redesigned) */}
                     <div className="pt-3 border-t border-slate-100 flex items-center justify-between">

@@ -17,7 +17,9 @@ import {
   MoreVertical,
   AlertCircle,
   Download,
-  X
+  X,
+  Receipt,
+  Info
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -32,7 +34,7 @@ type Row = {
   reason: string | null; 
   patient_id: string;
   doctors: { full_name: string } | null;
-  services: { name: string; duration: number; category: { name: string } | null } | null;
+  services: { name: string; duration: number; price: number; category: { name: string } | null } | null;
 };
 
 const AdminAppointments = () => {
@@ -45,7 +47,7 @@ const AdminAppointments = () => {
   const load = async () => {
     setIsLoading(true);
     const { data } = await supabase.from("appointments")
-      .select("id, appointment_date, appointment_time, status, reason, patient_id, doctors(full_name), services(name, duration, category:service_categories(name))")
+      .select("id, appointment_date, appointment_time, status, reason, patient_id, doctors(full_name), services(name, duration, price, category:service_categories(name))")
       .order("appointment_date", { ascending: false });
     setRows((data as any) || []);
     setIsLoading(false);
@@ -285,8 +287,17 @@ const AdminAppointments = () => {
                 </div>
               </div>
 
-              {/* Actions */}
+              {/* Billing Preview & Actions */}
               <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
+                {r.services && (
+                  <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200/60 mr-2">
+                    <Receipt className="w-3.5 h-3.5 text-slate-400" />
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-none">Estimate</span>
+                      <span className="text-xs font-bold text-primary">{r.services.price.toFixed(2)} MAD</span>
+                    </div>
+                  </div>
+                )}
                 <Badge variant="outline" className={cn("text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 border rounded-md", getStatusStyle(r.status))}>
                   {r.status}
                 </Badge>
