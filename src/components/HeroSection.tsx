@@ -11,34 +11,28 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
-      {/* Full-screen video background */}
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
       <video
+        key={HERO_VIDEO_URL}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         onError={() => setVideoError(true)}
-        className={`absolute inset-0 h-full w-full object-cover -z-30 ${videoError ? "hidden" : ""}`}
+        className={`absolute inset-0 h-full w-full object-cover z-0 ${videoError ? "hidden" : ""}`}
       >
         <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>
 
-      {/* Fallback background if video fails to load */}
-      <div className="absolute inset-0 -z-[25] bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800" />
+      {/* Overlays */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
+        <div className={`absolute inset-0 bg-[#0a1f44] transition-opacity duration-700 ${!videoError ? "opacity-0" : "opacity-100"}`} />
+        <div className="absolute inset-0 bg-[#051437]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#051437]/70 via-transparent to-transparent" />
+      </div>
 
-      {/* Subtle Premium Overlay */}
-      <div 
-        className="absolute inset-0 -z-20 bg-[rgba(5,20,55,0.30)]" 
-      />
-      
-      {/* Gradient overlay for text readability - keeping it subtle but effective */}
-      <div 
-        className="absolute inset-0 -z-10 bg-gradient-to-r from-[rgba(5,20,55,0.4)] via-transparent to-transparent" 
-      />
-
-      <div className="container mx-auto px-4 relative z-10 py-24 md:py-32">
+      <div className="container mx-auto px-4 relative z-20 py-24 md:py-32">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="flex flex-col gap-8">
             <motion.div
