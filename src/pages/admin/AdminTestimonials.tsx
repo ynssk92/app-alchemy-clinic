@@ -88,9 +88,14 @@ export const AdminTestimonials = () => {
     }
     
     if (error) {
-      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+      console.error("Error saving testimonial:", error);
+      toast({ 
+        title: "Erreur d'enregistrement", 
+        description: "Impossible d'enregistrer le témoignage. Veuillez réessayer.", 
+        variant: "destructive" 
+      });
     } else {
-      toast({ title: "Testimonial saved" });
+      toast({ title: "Témoignage enregistré avec succès" });
       setOpen(false);
       load();
     }
