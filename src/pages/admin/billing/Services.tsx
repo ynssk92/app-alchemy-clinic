@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-type Svc = { id?: string; name: string; code: string; description: string; duration: number; price: number; cost: number; tax_rate: number; active: boolean; category_id: string | null; clinic_id?: string | null };
+type Svc = { id?: string; name: string; code: string; description: string; duration: number; price: number; cost: number; tax_rate: number; active: boolean; category_id: string | null; clinic_id?: string | null; category?: { name: string; color: string } | null };
 
 const empty: Svc = { name: "", code: "", description: "", duration: 30, price: 0, cost: 0, tax_rate: 0, active: true, category_id: null };
 
@@ -30,13 +30,29 @@ export default function Services() {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: s }, { data: c }] = await Promise.all([
-      supabase.from("services").select("*, category:service_categories(name, color)").order("name"),
-      supabase.from("service_categories").select("*").order("name"),
-    ]);
-    setRows(s || []);
-    setCats(c || []);
-    setLoading(false);
+    try {
+      const [{ data: s, error: sErr }, { data: c, error: cErr }] = await Promise.all([
+        supabase.from("services").select(`*`).order("name"),
+        supabase.from("service_categories").select("*").order("name"),
+      ]);
+      
+      if (sErr) throw sErr;
+      if (cErr) throw cErr;
+
+      // Handle the join manually to avoid schema cache issues with complex select strings
+      const enrichedServices = s?.map(service => ({
+        ...service,
+        category: c?.find(cat => cat.id === service.category_id) || null
+      })) || [];
+
+      setRows(enrichedServices);
+      setCats(c || []);
+    } catch (error: any) {
+      console.error("Error loading services data:", error);
+      toast.error("Erreur lors du chargement des services");
+    } finally {
+      setLoading(false);
+    }
   };
   useEffect(() => { load(); }, []);
 
@@ -51,10 +67,17 @@ export default function Services() {
 
   const save = async () => {
     if (!editing.name) return toast.error("Name required");
+    const { id: _, clinic_id: __, category, ...updateData } = editing;
+    const payload = { ...updateData, category_id: editing.category_id || null };
+    
     const { error } = editing.id
-      ? await supabase.from("services").update({ ...editing, category_id: editing.category_id || null }).eq("id", editing.id)
-      : await supabase.from("services").insert({ ...editing, category_id: editing.category_id || null });
-    if (error) return toast.error(error.message);
+      ? await supabase.from("services").update(payload).eq("id", editing.id)
+      : await supabase.from("services").insert(payload);
+    
+    if (error) {
+      console.error("Service save error:", error);
+      return toast.error(error.message);
+    }
     toast.success("Service saved successfully");
     setOpen(false); setEditing(empty); load();
   };
