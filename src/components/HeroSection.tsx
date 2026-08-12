@@ -11,7 +11,7 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate bg-slate-900">
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
       <video
         key={HERO_VIDEO_URL}
         autoPlay
@@ -27,9 +27,9 @@ export const HeroSection = () => {
 
       {/* Overlays */}
       <div className="absolute inset-0 z-10 pointer-events-none">
-        <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800 transition-opacity duration-700 ${!videoError ? "opacity-0" : "opacity-100"}`} />
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
+        <div className={`absolute inset-0 bg-[#0a1f44] transition-opacity duration-700 ${!videoError ? "opacity-0" : "opacity-100"}`} />
+        <div className="absolute inset-0 bg-[#051437]/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#051437]/70 via-transparent to-transparent" />
       </div>
 
       <div className="container mx-auto px-4 relative z-20 py-24 md:py-32">
