@@ -30,10 +30,14 @@ export default function Services() {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: s }, { data: c }] = await Promise.all([
+    const [{ data: s, error: sErr }, { data: c, error: cErr }] = await Promise.all([
       supabase.from("services").select("*, category:service_categories(name, color)").order("name"),
       supabase.from("service_categories").select("*").order("name"),
     ]);
+    
+    if (sErr) console.error("Error loading services:", sErr);
+    if (cErr) console.error("Error loading categories:", cErr);
+
     setRows(s || []);
     setCats(c || []);
     setLoading(false);
