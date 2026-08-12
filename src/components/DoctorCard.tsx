@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
   UserRound, 
-  Stethoscope, 
   CalendarDays, 
   Languages, 
   Star, 
   Clock, 
   ShieldCheck, 
   MapPin,
-  ChevronRight
+  ChevronRight,
+  Award
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DoctorProfileDialog } from "@/components/DoctorProfileDialog";
@@ -38,12 +38,6 @@ const initialsOf = (name: string) =>
     .join("")
     .toUpperCase();
 
-const LANGUAGES = [
-  { flag: "🇫🇷", label: "Français" },
-  { flag: "🇺🇸", label: "English" },
-  { flag: "🇲🇦", label: "العربية" },
-];
-
 export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
   const specialty = doctor.specialties?.name || "Praticien";
   const [profileOpen, setProfileOpen] = useState(false);
@@ -55,135 +49,133 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      transition={{ duration: 0.25, ease: "easeOut" }}
-      className="group relative flex h-full flex-col overflow-hidden rounded-[28px] border border-[#E5E7EB] bg-white p-6 shadow-large transition-all duration-300 sm:p-8"
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="group relative flex h-full flex-col overflow-hidden rounded-[24px] border border-slate-100 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-md hover:border-primary/10"
     >
-      {/* Top Section with Avatar */}
-      <div className="relative mb-6 flex justify-center">
-        <div className="relative h-[150px] w-[150px]">
-          {/* Blue gradient ring */}
-          <div className="absolute inset-[-4px] rounded-full bg-gradient-to-tr from-[#2563EB] via-[#3B82F6] to-[#06B6D4] opacity-20 group-hover:opacity-40 transition-opacity duration-300" />
+      {/* Availability Status Indicator */}
+      <div className="absolute top-6 right-6 z-10">
+        <div className={cn(
+          "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase bg-white/80 backdrop-blur-sm border",
+          doctor.is_available !== false 
+            ? "text-emerald-600 border-emerald-100" 
+            : "text-slate-400 border-slate-100"
+        )}>
+          <div className={cn(
+            "h-1.5 w-1.5 rounded-full",
+            doctor.is_available !== false ? "bg-emerald-500 animate-pulse" : "bg-slate-300"
+          )} />
+          {doctor.is_available !== false ? "Available" : "Unavailable"}
+        </div>
+      </div>
+
+      {/* Doctor Photo Section */}
+      <div className="relative mb-6 flex justify-center pt-2">
+        <div className="relative h-32 w-32">
+          {/* Subtle blue-gray ring around the image */}
+          <div className="absolute inset-[-6px] rounded-full border border-slate-100 ring-4 ring-slate-50/50" />
           
-          <div className="relative h-full w-full overflow-hidden rounded-full border-4 border-white shadow-medium">
+          <div className="relative h-full w-full overflow-hidden rounded-full bg-slate-50 border-2 border-white shadow-sm">
             {doctor.avatar_url ? (
               <img
                 src={doctor.avatar_url}
                 alt={doctor.full_name}
                 loading="lazy"
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
             ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#2563EB] to-[#3B82F6] text-3xl font-bold text-white">
+              <div className="flex h-full w-full items-center justify-center bg-slate-100 text-2xl font-bold text-slate-400">
                 {initialsOf(doctor.full_name)}
               </div>
             )}
           </div>
-
-          {/* Online badge */}
-          {doctor.is_available !== false && (
-            <div className="absolute bottom-2 right-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white bg-[#22C55E] shadow-sm">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-white" />
-            </div>
-          )}
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col text-center">
-        <div className="mb-2 flex items-center justify-center gap-1.5">
-          <h3 className="text-[28px] font-bold tracking-tight text-[#111827]">
+      {/* Doctor Name & Specialty */}
+      <div className="flex flex-col items-center text-center mb-6">
+        <div className="flex items-center justify-center gap-1.5 mb-1.5">
+          <h3 className="text-xl font-bold text-[#1a2b4b] leading-tight group-hover:text-primary transition-colors">
             {doctor.full_name}
           </h3>
-          <ShieldCheck className="h-5 w-5 text-[#2563EB]" />
+          <ShieldCheck className="h-4 w-4 text-primary" />
         </div>
+        
+        <span className="inline-flex px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-semibold tracking-medium">
+          {specialty}
+        </span>
+      </div>
 
-        <div className="mb-4 flex justify-center">
-          <span className="rounded-full bg-gradient-to-r from-[#2563EB]/10 to-[#3B82F6]/10 px-4 py-1 text-sm font-semibold text-[#2563EB]">
-            {specialty}
-          </span>
-        </div>
-
-        {/* Info Grid */}
-        <div className="mb-6 grid grid-cols-2 gap-4 text-left">
-          <div className="flex items-start gap-2.5">
-            <div className="mt-0.5 rounded-lg bg-slate-50 p-1.5">
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Rating</p>
-              <p className="text-sm font-semibold text-slate-700">{rating} (120+)</p>
-            </div>
+      {/* Information Area - Compact Icons & Typography */}
+      <div className="grid grid-cols-2 gap-y-4 gap-x-2 mb-8 border-t border-slate-50 pt-6">
+        <div className="flex items-center gap-2.5">
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
           </div>
-          <div className="flex items-start gap-2.5">
-            <div className="mt-0.5 rounded-lg bg-slate-50 p-1.5">
-              <Clock className="h-4 w-4 text-[#2563EB]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Expérience</p>
-              <p className="text-sm font-semibold text-slate-700">{doctor.experience_years || 5}+ ans</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <div className="mt-0.5 rounded-lg bg-slate-50 p-1.5">
-              <Languages className="h-4 w-4 text-[#2563EB]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Langues</p>
-              <p className="text-sm font-semibold text-slate-700">FR, EN, AR</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-2.5">
-            <div className="mt-0.5 rounded-lg bg-slate-50 p-1.5">
-              <MapPin className="h-4 w-4 text-[#2563EB]" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Clinique</p>
-              <p className="text-sm font-semibold text-slate-700 truncate max-w-[80px]">{clinicName}</p>
-            </div>
+          <div className="min-w-0">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Rating</p>
+            <p className="text-xs font-semibold text-slate-700">{rating}</p>
           </div>
         </div>
 
-        {/* Availability */}
-        <div className="mb-8 rounded-2xl bg-[#F8FAFC] p-4 text-left">
-          <div className="mb-1 flex items-center justify-between">
-            <span className="text-xs font-semibold text-slate-500">Prochaine disponibilité</span>
-            <span className="flex items-center gap-1 text-[10px] font-bold uppercase text-[#22C55E]">
-              <div className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-              Aujourd'hui
-            </span>
+        <div className="flex items-center gap-2.5">
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+            <Award className="h-3.5 w-3.5 text-primary" />
           </div>
-          <p className="text-sm font-bold text-[#111827]">Demain à 09:30</p>
+          <div className="min-w-0">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Experience</p>
+            <p className="text-xs font-semibold text-slate-700">{doctor.experience_years || 5}+ Years</p>
+          </div>
         </div>
 
-        {/* Actions */}
-        <div className="mt-auto space-y-3">
-          <Button 
-            asChild 
-            className="w-full h-12 rounded-xl bg-[#2563EB] text-base font-bold text-white shadow-lg transition-all hover:bg-[#1d4ed8] active:scale-[0.98]"
-          >
-            <Link to={`/booking?doctor=${doctor.id}`} className="flex items-center justify-center gap-2">
-              <CalendarDays className="h-5 w-5" />
-              Prendre RDV
-            </Link>
-          </Button>
-          <Button
-            variant="ghost"
-            className="w-full h-12 rounded-xl text-[#2563EB] font-bold hover:bg-[#2563EB]/5"
-            onClick={() => setProfileOpen(true)}
-          >
-            Voir le profil
-            <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Button>
+        <div className="flex items-center gap-2.5">
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+            <Languages className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Languages</p>
+            <p className="text-xs font-semibold text-slate-700">FR, EN, AR</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center">
+            <MapPin className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Clinic</p>
+            <p className="text-xs font-semibold text-slate-700 truncate">{clinicName}</p>
+          </div>
         </div>
       </div>
 
-      {/* Optional Tag: Available Today */}
-      <div className="absolute left-4 top-4">
-        <span className="flex items-center gap-1.5 rounded-full bg-white/90 backdrop-blur-sm px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#22C55E] shadow-sm border border-[#22C55E]/20">
-          <div className="h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-          Disponible
-        </span>
+      {/* Next Availability Highlight */}
+      <div className="mb-6 rounded-2xl bg-slate-50/50 border border-slate-100/50 p-4">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Next availability</span>
+          <span className="text-[10px] font-bold text-emerald-600">Available Today</span>
+        </div>
+        <p className="text-sm font-bold text-[#1a2b4b]">Tomorrow at 09:30</p>
+      </div>
+
+      {/* Primary Actions */}
+      <div className="mt-auto flex flex-col gap-3">
+        <Button 
+          asChild 
+          className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-sm transition-all active:scale-[0.98]"
+        >
+          <Link to={`/booking?doctor=${doctor.id}`} className="flex items-center justify-center gap-2">
+            <CalendarDays className="h-4 w-4" />
+            Make an appointment
+          </Link>
+        </Button>
+        
+        <button
+          onClick={() => setProfileOpen(true)}
+          className="w-full py-2 text-sm font-bold text-primary flex items-center justify-center gap-1 hover:gap-2 transition-all"
+        >
+          View profile
+          <ChevronRight className="h-4 w-4" />
+        </button>
       </div>
 
       <DoctorProfileDialog doctor={doctor} open={profileOpen} onOpenChange={setProfileOpen} />
