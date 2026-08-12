@@ -228,28 +228,30 @@ const Index = () => {
       {/* Medical Team Section */}
       {doctors.length > 0 && (
         <section className="bg-white py-24 md:py-32">
-          <div className="container mx-auto px-4 max-w-[1400px]">
-            <div className="mb-16 flex flex-col items-end justify-between gap-8 md:flex-row">
-              <div className="max-w-2xl">
-                <span className="text-xs font-bold uppercase tracking-widest text-primary">Praticiens</span>
-                <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl">
-                  Rencontrez nos experts
+          <div className="container mx-auto px-4 max-w-[1200px]">
+            <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <div className="max-w-xl">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1a2b4b]">Praticiens</span>
+                <h2 className="mt-4 text-[40px] font-bold leading-tight tracking-tight text-[#1a2b4b] md:text-[52px]">
+                  Meet our experts
                 </h2>
-                <p className="mt-6 text-lg text-slate-500">
-                  Une équipe pluridisciplinaire dédiée à votre santé bucco-dentaire, alliant expérience et formation continue.
+                <p className="mt-6 text-lg leading-relaxed text-slate-500">
+                  A multidisciplinary team dedicated to your oral health, combining experience and continuous training.
                 </p>
               </div>
-              <Link to="/equipe" className="shrink-0">
-                <Button variant="outline" className="h-12 rounded-xl px-8 font-bold group">
-                  Voir toute l'équipe
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-              </Link>
+              <div>
+                <Link to="/equipe" className="shrink-0">
+                  <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-slate-200 text-[#1a2b4b] hover:bg-slate-50 group">
+                    See all the team
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </Link>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
               {doctors.map((d) => (
-                <div key={d.id} className="reveal reveal-scale">
+                <div key={d.id} className="reveal-scale">
                   <DoctorCard doctor={d} />
                 </div>
               ))}
