@@ -317,6 +317,8 @@ const AdminShell = () => {
   const initials = (adminName || "A").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
   const toggleTheme = () => setDark((d) => !d);
 
+  const location = useLocation();
+
   return (
     <div className="min-h-screen flex bg-muted/30">
       <Sidebar
@@ -341,7 +343,7 @@ const AdminShell = () => {
           return (
             <SidebarGroup key={section.title} title={section.title}>
               {visible.map((l) => 
-                l.to === "/admin/pages" ? null : (
+                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" ? null : (
                   <SidebarItem
                     key={l.to}
                     to={l.to}
@@ -352,10 +354,44 @@ const AdminShell = () => {
                   />
                 )
               )}
-
             </SidebarGroup>
           );
         })}
+
+        {isAdmin && (
+          <SidebarGroup title="Website & Content">
+            <SidebarItem
+              icon={Globe}
+              label="Landing Page"
+              to="/admin/landing-page"
+              active={location.pathname === "/admin/landing-page"}
+            />
+            <SidebarItem
+              icon={FileText}
+              label="CMS Pages"
+              to="/admin/pages"
+              active={location.pathname === "/admin/pages"}
+            />
+            <SidebarItem
+              icon={Layers}
+              label="Blog"
+              to="/admin/blog"
+              active={location.pathname === "/admin/blog"}
+            />
+            <SidebarItem
+              icon={MessageSquare}
+              label="Testimonials"
+              to="/admin/testimonials"
+              active={location.pathname === "/admin/testimonials"}
+            />
+            <SidebarItem
+              icon={ImageIcon}
+              label="Media Library"
+              to="/admin/media"
+              active={location.pathname === "/admin/media"}
+            />
+          </SidebarGroup>
+        )}
       </Sidebar>
 
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
