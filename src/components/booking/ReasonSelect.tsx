@@ -130,7 +130,7 @@ export const ReasonSelect = ({ value, onChange, invalid }: ReasonSelectProps) =>
               </CommandGroup>
             ))}
           </CommandList>
-Command>
+        </Command>
       </PopoverContent>
     </Popover>
   );
