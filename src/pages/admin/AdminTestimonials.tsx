@@ -42,8 +42,8 @@ export const AdminTestimonials = () => {
 
   const load = async () => {
     setLoading(true);
-    // @ts-ignore - dynamic table access
-    const { data, error } = await supabase
+    // Use any to bypass strict type checking for dynamic table access if it's missing from generated types
+    const { data, error } = await (supabase as any)
       .from("testimonials")
       .select("*")
       .order("sort_order", { ascending: true });
@@ -76,12 +76,10 @@ export const AdminTestimonials = () => {
 
     let error;
     if (editing) {
-      // @ts-ignore
-      ({ error } = await supabase.from("testimonials").update(payload).eq("id", editing.id));
+      ({ error } = await (supabase as any).from("testimonials").update(payload).eq("id", editing.id));
     } else {
       const sort_order = testimonials.length ? Math.max(...testimonials.map(t => t.sort_order || 0)) + 1 : 1;
-      // @ts-ignore
-      ({ error } = await supabase.from("testimonials").insert({ ...payload, sort_order }));
+      ({ error } = await (supabase as any).from("testimonials").insert({ ...payload, sort_order }));
     }
     
     if (error) {
@@ -98,10 +96,8 @@ export const AdminTestimonials = () => {
     const next = testimonials[index + dir];
     if (!next) return;
     
-    // @ts-ignore
-    const { error: err1 } = await supabase.from("testimonials").update({ sort_order: next.sort_order }).eq("id", curr.id);
-    // @ts-ignore
-    const { error: err2 } = await supabase.from("testimonials").update({ sort_order: curr.sort_order }).eq("id", next.id);
+    const { error: err1 } = await (supabase as any).from("testimonials").update({ sort_order: next.sort_order }).eq("id", curr.id);
+    const { error: err2 } = await (supabase as any).from("testimonials").update({ sort_order: curr.sort_order }).eq("id", next.id);
     
     if (err1 || err2) toast({ title: "Move failed", variant: "destructive" });
     load();
@@ -109,16 +105,14 @@ export const AdminTestimonials = () => {
 
   const toggleStatus = async (t: Testimonial) => {
     const newStatus = t.status === 'published' ? 'draft' : 'published';
-    // @ts-ignore
-    const { error } = await supabase.from("testimonials").update({ status: newStatus }).eq("id", t.id);
+    const { error } = await (supabase as any).from("testimonials").update({ status: newStatus }).eq("id", t.id);
     if (error) toast({ title: "Toggle failed", variant: "destructive" });
     load();
   };
 
   const confirmDelete = async () => {
     if (!toDelete) return;
-    // @ts-ignore
-    const { error } = await supabase.from("testimonials").delete().eq("id", toDelete.id);
+    const { error } = await (supabase as any).from("testimonials").delete().eq("id", toDelete.id);
     if (error) {
       toast({ title: "Delete failed", description: error.message, variant: "destructive" });
     } else {
