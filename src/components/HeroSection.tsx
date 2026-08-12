@@ -11,14 +11,15 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
       {/* Full-screen video background */}
       <video
+        key={HERO_VIDEO_URL}
         autoPlay
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="auto"
         onError={() => setVideoError(true)}
         className={`absolute inset-0 h-full w-full object-cover -z-30 ${videoError ? "hidden" : ""}`}
       >
