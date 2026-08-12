@@ -1,25 +1,18 @@
 import { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   ArrowRight,
-  CalendarCheck,
   CheckCircle2,
-  Clock,
   Mail,
   Phone,
-  Stethoscope,
-  Ambulance,
-  UserRound,
-  Sparkles,
 } from "lucide-react";
 import { DoctorCard } from "@/components/DoctorCard";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { supabase } from "@/integrations/supabase/client";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { usePageContent } from "@/hooks/usePageContent";
-import { resolveIcon, resolveImage } from "@/lib/pageContent";
+import { resolveImage } from "@/lib/pageContent";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -30,7 +23,6 @@ import diagnostic from "@/assets/soin-diagnostic.jpg";
 import visage from "@/assets/soin-visage.jpg";
 import { ServiceTabs } from "@/components/services/ServiceTabs";
 import { ServiceCard } from "@/components/services/ServiceCard";
-import { motion } from "framer-motion";
 
 interface Doctor {
   id: string;
