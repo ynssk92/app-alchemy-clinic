@@ -61,13 +61,15 @@ Deno.serve(async (req) => {
     }
 
     // Drift 2: missing profile row
+    // Note: We keep the detection logic to alert admins of potential inconsistencies
+    // via a generic system notification, handled gracefully by the UI.
     for (const id of assistantIds) {
       if (!profiles?.some((p) => p.id === id)) {
         alerts.push({
           user_id: id,
-          user_name: id.slice(0, 8),
+          user_name: null, // UI will handle null user_name as a general system notification
           kind: "missing_profile",
-          detail: "Assistant has no matching profile row.",
+          detail: "System consistency check — assistant profile verification.",
         });
       }
     }
