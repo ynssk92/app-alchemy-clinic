@@ -208,25 +208,25 @@ export const AdminTestimonials = () => {
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="t-name">Patient Name</Label>
-                <Input id="t-name" value={draft.name} onChange={e => setDraft({...draft, name: e.target.value})} placeholder="e.g. Jean Dupont" />
+                <Label htmlFor="t-name">Nom du patient</Label>
+                <Input id="t-name" value={draft.name} onChange={e => setDraft({...draft, name: e.target.value})} placeholder="ex. Jean Dupont" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="t-role">Role / Subtitle</Label>
-                <Input id="t-role" value={draft.role} onChange={e => setDraft({...draft, role: e.target.value})} placeholder="e.g. Patient" />
+                <Label htmlFor="t-role">Rôle / Sous-titre</Label>
+                <Input id="t-role" value={draft.role} onChange={e => setDraft({...draft, role: e.target.value})} placeholder="ex. Patient" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="t-content">Testimonial Content</Label>
-              <Textarea id="t-content" value={draft.content} onChange={e => setDraft({...draft, content: e.target.value})} placeholder="What the patient said..." rows={4} />
+              <Label htmlFor="t-content">Contenu du témoignage</Label>
+              <Textarea id="t-content" value={draft.content} onChange={e => setDraft({...draft, content: e.target.value})} placeholder="Ce que le patient a dit..." rows={4} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="t-avatar">Avatar URL</Label>
+                <Label htmlFor="t-avatar">URL de l'avatar</Label>
                 <Input id="t-avatar" value={draft.avatar_url} onChange={e => setDraft({...draft, avatar_url: e.target.value})} placeholder="https://..." />
               </div>
               <div className="space-y-2">
-                <Label>Rating</Label>
+                <Label>Note</Label>
                 <div className="flex items-center h-10 gap-2">
                   {[1, 2, 3, 4, 5].map(r => (
                     <button key={r} type="button" onClick={() => setDraft({...draft, rating: r})} className="focus:outline-none">
