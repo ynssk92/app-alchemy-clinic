@@ -59,7 +59,7 @@ export const SiteHeader = () => {
       "sticky top-0 z-50 transition-all duration-300 border-b",
       scrolled 
         ? "bg-background/95 backdrop-blur-md py-2 border-border shadow-soft" 
-        : "bg-transparent py-4 border-transparent"
+        : "bg-background py-4 border-slate-100"
     )}>
       <div className="container mx-auto px-4 flex items-center justify-between gap-2">
         <Link to="/" className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
