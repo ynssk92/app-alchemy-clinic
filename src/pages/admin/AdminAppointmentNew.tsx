@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -16,24 +16,32 @@ import {
   FileText, 
   Plus,
   ChevronLeft,
-  Info
+  Info,
+  Search,
+  Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 const AdminAppointmentNew = () => {
   const navigate = useNavigate();
   const [doctors, setDoctors] = useState<{ id: string; full_name: string }[]>([]);
   const [patients, setPatients] = useState<{ id: string; full_name: string | null }[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [form, setForm] = useState({
-    patient_id: "", doctor_id: "", appointment_date: "", appointment_time: "", reason: "",
+    patient_id: "", doctor_id: "", appointment_date: "", appointment_time: "", reason: "", service_id: ""
   });
   const [saving, setSaving] = useState(false);
+  const [serviceSearchOpen, setServiceSearchOpen] = useState(false);
 
   useEffect(() => {
     supabase.from("doctors").select("id, full_name").order("full_name")
       .then(({ data }) => setDoctors(data || []));
     supabase.from("profiles").select("id, full_name").order("full_name")
       .then(({ data }) => setPatients(data || []));
+    supabase.from("services").select("*, category:service_categories(name)").eq("active", true).order("name")
+      .then(({ data }) => setServices(data || []));
   }, []);
 
   const submit = async (e: React.FormEvent) => {
