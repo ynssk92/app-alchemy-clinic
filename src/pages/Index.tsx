@@ -18,6 +18,7 @@ import { usePageContent } from "@/hooks/usePageContent";
 import { resolveImage } from "@/lib/pageContent";
 import { Seo } from "@/components/Seo";
 import { SiteHeader } from "@/components/SiteHeader";
+import { TopHeader } from "@/components/TopHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { HeroCta } from "@/components/HeroCta";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -92,19 +93,7 @@ const Index = () => {
         path="/"
       />
 
-      <div className="hidden lg:block sticky top-0 z-[60] bg-slate-900 text-white/80 py-2">
-        <div className="container mx-auto px-4 flex items-center justify-end gap-6 text-xs font-bold tracking-widest uppercase">
-           {[
-            { icon: Mail, label: settings.contact_email, href: `mailto:${settings.contact_email}` },
-            { icon: Phone, label: settings.contact_phone, href: `tel:${settings.contact_phone?.replace(/\s/g, "")}` },
-          ].map((it, i) => (
-            <a key={i} href={it.href} className="flex items-center gap-2 hover:text-white transition-colors">
-              <it.icon className="w-3.5 h-3.5 text-primary" />
-              <span>{it.label}</span>
-            </a>
-          ))}
-        </div>
-      </div>
+      <TopHeader />
 
       <SiteHeader />
 
