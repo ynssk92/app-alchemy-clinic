@@ -714,15 +714,6 @@ const AdminPatientDetails = () => {
         </div>
       </div>
 
-      {patient && (
-        <EditPatientDialog
-          open={editOpen}
-          onOpenChange={setEditOpen}
-          profileId={patient.profileId}
-          intakeId={patient.intakeId}
-          onSaved={() => setReloadTick((t) => t + 1)}
-        />
-      )}
     </div>
   );
 };
