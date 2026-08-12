@@ -1,48 +1,80 @@
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CalendarDays, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
+const HERO_VIDEO_URL =
+  "https://app-clinic.lovable.app/__l5e/assets-v1/b0071650-2082-45fc-b971-064a43fda304/hero-bg.mp4";
+
 export const HeroSection = () => {
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   return (
-    <section className="relative w-full pt-20 pb-32 overflow-hidden bg-white">
-      {/* Subtle background decoration */}
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-slate-50 rounded-bl-[100px] -z-10" />
-      
-      <div className="container mx-auto px-4">
+    <section className="relative isolate w-full min-h-[700px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
+      {/* Full-screen video background */}
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        onError={() => setVideoError(true)}
+        onStalled={() => setVideoError(true)}
+        className={`absolute inset-0 h-full w-full object-cover bg-transparent ${videoError ? "hidden" : ""}`}
+        style={{ zIndex: -30 }}
+      >
+        <source src={HERO_VIDEO_URL} type="video/mp4" />
+      </video>
+
+      {/* Fallback background if video fails to load */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800" style={{ zIndex: -25 }} />
+
+      {/* Premium dark navy overlay — strong on the left for text, lighter on the right to reveal video */}
+      <div
+        className="absolute inset-0 bg-gradient-to-r from-[rgba(5,20,55,0.75)] via-[rgba(5,20,55,0.45)] to-[rgba(5,20,55,0.22)]"
+        style={{ zIndex: -20 }}
+      />
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-[rgba(5,20,55,0.35)] via-transparent to-[rgba(5,20,55,0.20)]"
+        style={{ zIndex: -20 }}
+      />
+
+      <div className="container mx-auto px-4 relative z-10 py-24 md:py-32">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="flex flex-col gap-8">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 w-fit"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 w-fit backdrop-blur-sm"
             >
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/90">
                 La Dune Clinique Dentaire
               </span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-5xl md:text-7xl font-bold tracking-tight text-slate-900 leading-[0.95]"
+              className="text-5xl md:text-7xl font-bold tracking-tight text-white leading-[0.95] drop-shadow-md"
             >
               Exceptional dental care.<br />
-              <span className="text-primary">A confident smile.</span>
+              <span className="text-white">A confident smile.</span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-lg"
+              className="text-lg md:text-xl text-white/85 leading-relaxed max-w-lg drop-shadow-sm"
             >
               Advanced dental expertise, modern technology and personalized care, all in one place.
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
@@ -53,7 +85,7 @@ export const HeroSection = () => {
                   Book an Appointment
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-8 text-base border-slate-200 hover:bg-slate-50">
+              <Button asChild size="lg" variant="outline" className="h-14 rounded-full px-8 text-base border-white/30 text-white hover:bg-white/10 hover:text-white hover:border-white/50">
                 <Link to="/soins">
                   Discover Our Care
                 </Link>
@@ -61,21 +93,14 @@ export const HeroSection = () => {
             </motion.div>
           </div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
-            className="relative"
+            className="relative hidden lg:flex items-center justify-center min-h-[400px]"
           >
-            <div className="aspect-[4/5] rounded-[40px] overflow-hidden shadow-2xl">
-              <img 
-                src="https://images.unsplash.com/photo-1629904853716-f0bc54fd6306?q=80&w=2000&auto=format&fit=crop" 
-                alt="Dental Clinic" 
-                className="w-full h-full object-cover"
-              />
-            </div>
             {/* Floating stats card */}
-            <div className="absolute -left-8 bottom-12 bg-white p-6 rounded-3xl shadow-xl border border-slate-100 hidden sm:block">
+            <div className="absolute left-0 bottom-12 bg-white p-6 rounded-3xl shadow-xl border border-slate-100">
               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Clinic Expertise</p>
               <p className="text-2xl font-bold text-slate-900">Modern Technology</p>
             </div>
