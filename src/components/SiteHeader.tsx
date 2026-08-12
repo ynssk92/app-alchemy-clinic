@@ -120,19 +120,15 @@ export const SiteHeader = () => {
 
             <SheetContent
               id="mobile-nav-sheet"
-              side="bottom"
+              side="left"
               aria-label="Main navigation"
               onOpenAutoFocus={(e) => {
-                // Radix traps focus; keep initial focus on the close button
-                // instead of the first nav link so users don't accidentally
-                // trigger navigation when opening the drawer.
                 e.preventDefault();
                 const el = document.getElementById("mobile-nav-close");
                 el?.focus();
               }}
               className={cn(
-                "p-0 rounded-t-2xl border-t border-border bg-background h-[85dvh] flex flex-col",
-                // Smoother, spring-like slide + fade for the drawer itself
+                "p-0 border-r border-border bg-background w-[300px] sm:w-[350px] flex flex-col",
                 "data-[state=open]:duration-400 data-[state=closed]:duration-250",
                 "data-[state=open]:ease-[cubic-bezier(0.22,1,0.36,1)]",
                 "data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)]",
