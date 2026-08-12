@@ -42,6 +42,7 @@ const AdminNotifications = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
+    // Fetch all notification sources in parallel
     const [msgs, appts, drift, appNotifs] = await Promise.all([
       supabase
         .from("contact_messages")
@@ -68,6 +69,7 @@ const AdminNotifications = () => {
 
     const n: Notif[] = [];
     
+    // 1. Contact Messages
     (msgs.data || []).forEach((m: any) =>
       n.push({
         id: `m-${m.id}`,
@@ -81,6 +83,7 @@ const AdminNotifications = () => {
       })
     );
     
+    // 2. Appointments: Status 'pending' is considered unread
     (appts.data || []).forEach((a: any) =>
       n.push({
         id: `a-${a.id}`,
@@ -89,11 +92,12 @@ const AdminNotifications = () => {
         title: `RDV — ${a.doctors?.full_name || "Docteur"}`,
         subtitle: `${a.appointment_date} à ${a.appointment_time}`,
         created_at: a.created_at,
-        is_read: a.status !== "upcoming", // Following existing logic where upcoming are considered unread
+        is_read: a.status !== "pending", 
         table: "appointments"
       })
     );
     
+    // 3. System Drift Alerts
     (drift.data || []).forEach((d: any) =>
       n.push({
         id: `d-${d.id}`,
@@ -107,6 +111,7 @@ const AdminNotifications = () => {
       })
     );
 
+    // 4. Generic App Notifications
     (appNotifs.data || []).forEach((an: any) => 
       n.push({
         id: `an-${an.id}`,
@@ -142,7 +147,7 @@ const AdminNotifications = () => {
   const markAsRead = async (n: Notif) => {
     if (n.is_read) return;
 
-    // Optimistic UI
+    // Optimistic UI update
     setItems(prev => prev.map(item => item.id === n.id ? { ...item, is_read: true } : item));
 
     let error;
@@ -154,15 +159,13 @@ const AdminNotifications = () => {
       } else if (n.table === "notifications") {
         ({ error } = await supabase.from("notifications").update({ read: true }).eq("id", n.db_id));
       }
-      // Note: Appointments don't have a simple 'read' boolean, they use status. 
-      // We don't change status just by clicking a notification as per instructions "DO NOT change appointment logic".
     } catch (err) {
       error = err;
     }
 
     if (error) {
       toast.error("Erreur lors du marquage comme lu");
-      // Rollback
+      // Rollback on failure
       setItems(prev => prev.map(item => item.id === n.id ? { ...item, is_read: false } : item));
     }
   };
@@ -174,7 +177,7 @@ const AdminNotifications = () => {
       message: "/admin/messages",
       drift: "/admin/verify-assistants",
       appointment: "/admin/appointments",
-      app: "/admin/appointments" // Default path for app notifications usually related to appts
+      app: "/admin/appointments"
     };
     
     navigate(paths[n.type]);
