@@ -11,7 +11,7 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate bg-slate-900">
       <video
         key={HERO_VIDEO_URL}
         autoPlay
@@ -20,20 +20,19 @@ export const HeroSection = () => {
         playsInline
         preload="auto"
         onError={() => setVideoError(true)}
-        style={{ position: "absolute", inset: 0, height: "100%", width: "100%", objectFit: "cover", zIndex: -10 }}
-        className={videoError ? "hidden" : ""}
+        className={`absolute inset-0 h-full w-full object-cover z-0 ${videoError ? "hidden" : ""}`}
       >
         <source src={HERO_VIDEO_URL} type="video/mp4" />
       </video>
 
-      {/* Fallback & Overlays */}
-      <div className="absolute inset-0 pointer-events-none" style={{ zIndex: -5 }}>
+      {/* Overlays */}
+      <div className="absolute inset-0 z-10 pointer-events-none">
         <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800 transition-opacity duration-700 ${!videoError ? "opacity-0" : "opacity-100"}`} />
-        <div className="absolute inset-0 bg-black/30" />
+        <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-transparent" />
       </div>
 
-      <div className="container mx-auto px-4 relative z-10 py-24 md:py-32">
+      <div className="container mx-auto px-4 relative z-20 py-24 md:py-32">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="flex flex-col gap-8">
             <motion.div
