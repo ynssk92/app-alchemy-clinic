@@ -9,6 +9,13 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { 
   Save, 
@@ -37,6 +44,8 @@ interface HeroConfig {
   overlayOpacity: number;
   videoUrl?: string;
   imageUrl?: string;
+  testimonialStyle: 'grid' | 'carousel';
+  testimonialLimit: number;
 }
 
 const AdminLandingPage = () => {
@@ -76,6 +85,17 @@ const AdminLandingPage = () => {
       ...page,
       hero_config: {
         ...currentHero,
+        [field]: value,
+      },
+    });
+  };
+
+  const handleGlobalConfigChange = (field: string, value: any) => {
+    if (!page) return;
+    setPage({
+      ...page,
+      hero_config: {
+        ...(page.hero_config || {}),
         [field]: value,
       },
     });
@@ -144,6 +164,7 @@ const AdminLandingPage = () => {
         <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
           <TabsTrigger value="hero">Hero Section</TabsTrigger>
           <TabsTrigger value="sections">Sections</TabsTrigger>
+          <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
           <TabsTrigger value="seo">SEO & Metadata</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -296,6 +317,61 @@ const AdminLandingPage = () => {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="testimonials" className="mt-6 space-y-6">
+          <Card className="p-6 space-y-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <Settings className="h-5 w-5 text-primary" />
+              Testimonials Display Settings
+            </h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="testimonial-style">Display Style</Label>
+                <Select 
+                  value={(hero as any).testimonialStyle || "grid"} 
+                  onValueChange={(val) => handleGlobalConfigChange("testimonialStyle", val)}
+                >
+                  <SelectTrigger id="testimonial-style">
+                    <SelectValue placeholder="Select style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="grid">Grid (Modern List)</SelectItem>
+                    <SelectItem value="carousel">Carousel (Premium Slider)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Choose how patient reviews are presented on the homepage.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="testimonial-limit">Display Limit</Label>
+                  <span className="text-xs font-mono">{(hero as any).testimonialLimit || 3} items</span>
+                </div>
+                <Slider 
+                  id="testimonial-limit"
+                  value={[(hero as any).testimonialLimit || 3]} 
+                  min={1}
+                  max={12}
+                  step={1} 
+                  onValueChange={([val]) => handleGlobalConfigChange("testimonialLimit", val)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Maximum number of testimonials to show in this section.
+                </p>
+              </div>
+            </div>
+            <div className="pt-4 border-t">
+              <Button asChild variant="outline" size="sm">
+                <Link to="/admin/testimonials">
+                  Manage Testimonial Content
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
           </Card>
         </TabsContent>
 
