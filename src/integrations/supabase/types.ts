@@ -710,8 +710,10 @@ export type Database = {
           created_at: string
           id: string
           published: boolean
+          published_at: string | null
           question: string
           sort_order: number
+          status: Database["public"]["Enums"]["content_status"] | null
           updated_at: string
         }
         Insert: {
@@ -719,8 +721,10 @@ export type Database = {
           created_at?: string
           id?: string
           published?: boolean
+          published_at?: string | null
           question: string
           sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"] | null
           updated_at?: string
         }
         Update: {
@@ -728,8 +732,10 @@ export type Database = {
           created_at?: string
           id?: string
           published?: boolean
+          published_at?: string | null
           question?: string
           sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"] | null
           updated_at?: string
         }
         Relationships: []
@@ -777,6 +783,8 @@ export type Database = {
           display_order: number | null
           id: string
           image_url: string
+          published_at: string | null
+          status: Database["public"]["Enums"]["content_status"] | null
           title: string
           updated_at: string | null
         }
@@ -787,6 +795,8 @@ export type Database = {
           display_order?: number | null
           id?: string
           image_url: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
           title: string
           updated_at?: string | null
         }
@@ -797,6 +807,8 @@ export type Database = {
           display_order?: number | null
           id?: string
           image_url?: string
+          published_at?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
           title?: string
           updated_at?: string | null
         }
@@ -1090,7 +1102,9 @@ export type Database = {
           kind: string
           page_slug: string
           published: boolean
+          published_at: string | null
           sort_order: number
+          status: Database["public"]["Enums"]["content_status"] | null
           subtitle: string | null
           title: string | null
           updated_at: string
@@ -1105,7 +1119,9 @@ export type Database = {
           kind?: string
           page_slug: string
           published?: boolean
+          published_at?: string | null
           sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"] | null
           subtitle?: string | null
           title?: string | null
           updated_at?: string
@@ -1120,7 +1136,9 @@ export type Database = {
           kind?: string
           page_slug?: string
           published?: boolean
+          published_at?: string | null
           sort_order?: number
+          status?: Database["public"]["Enums"]["content_status"] | null
           subtitle?: string | null
           title?: string | null
           updated_at?: string
@@ -2086,7 +2104,9 @@ export type Database = {
         Row: {
           created_at: string
           eyebrow: string | null
+          footer_config: Json | null
           heading: string
+          hero_config: Json | null
           intro: string | null
           name: string
           seo_description: string
@@ -2098,7 +2118,9 @@ export type Database = {
         Insert: {
           created_at?: string
           eyebrow?: string | null
+          footer_config?: Json | null
           heading: string
+          hero_config?: Json | null
           intro?: string | null
           name: string
           seo_description: string
@@ -2110,7 +2132,9 @@ export type Database = {
         Update: {
           created_at?: string
           eyebrow?: string | null
+          footer_config?: Json | null
           heading?: string
+          hero_config?: Json | null
           intro?: string | null
           name?: string
           seo_description?: string
@@ -2267,6 +2291,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "doctor" | "patient" | "assistant"
+      content_status: "draft" | "published"
       invoice_status:
         | "draft"
         | "pending"
@@ -2403,6 +2428,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "doctor", "patient", "assistant"],
+      content_status: ["draft", "published"],
       invoice_status: [
         "draft",
         "pending",

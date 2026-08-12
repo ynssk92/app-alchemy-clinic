@@ -67,6 +67,7 @@ import CreateInvoice from "./pages/admin/billing/CreateInvoice";
 import Payments from "./pages/admin/billing/Payments";
 import Services from "./pages/admin/billing/Services";
 import Categories from "./pages/admin/billing/Categories";
+import AdminLandingPage from "./pages/admin/AdminLandingPage";
 
 const queryClient = new QueryClient();
 
@@ -136,6 +137,7 @@ const App = () => (
               <Route path="users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />
               <Route path="delete-requests" element={<ProtectedRoute adminOnly><AdminDeleteRequests /></ProtectedRoute>} />
               <Route path="reports" element={<ProtectedRoute adminOnly><AdminReports /></ProtectedRoute>} />
+              <Route path="landing-page" element={<ProtectedRoute adminOnly><AdminLandingPage /></ProtectedRoute>} />
               <Route path="pages" element={<ProtectedRoute adminOnly><AdminPages /></ProtectedRoute>} />
               <Route path="media" element={<ProtectedRoute adminOnly><AdminMediaLibrary /></ProtectedRoute>} />
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />

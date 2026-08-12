@@ -10,6 +10,8 @@ export interface SitePage {
   heading: string;
   subheading: string | null;
   intro: string | null;
+  hero_config?: any;
+  footer_config?: any;
 }
 
 export interface PageBlock {
@@ -24,9 +26,11 @@ export interface PageBlock {
   items: string[];
   sort_order: number;
   published: boolean;
+  status?: "draft" | "published";
+  published_at?: string;
 }
 
-export const usePageContent = (slug: string) => {
+export const usePageContent = (slug: string, preview = false) => {
   const [page, setPage] = useState<SitePage | null>(null);
   const [blocks, setBlocks] = useState<PageBlock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -35,22 +39,29 @@ export const usePageContent = (slug: string) => {
     let active = true;
     (async () => {
       setLoading(true);
+      
+      let blocksQuery = supabase
+        .from("page_blocks")
+        .select("*")
+        .eq("page_slug", slug)
+        .order("sort_order", { ascending: true });
+
+      if (!preview) {
+        blocksQuery = blocksQuery.eq("published", true).eq("status", "published");
+      }
+
       const [{ data: p }, { data: b }] = await Promise.all([
         supabase.from("site_pages").select("*").eq("slug", slug).maybeSingle(),
-        supabase
-          .from("page_blocks")
-          .select("*")
-          .eq("page_slug", slug)
-          .eq("published", true)
-          .order("sort_order", { ascending: true }),
+        blocksQuery,
       ]);
+
       if (!active) return;
       setPage((p as SitePage) || null);
       setBlocks((b as PageBlock[]) || []);
       setLoading(false);
     })();
     return () => { active = false; };
-  }, [slug]);
+  }, [slug, preview]);
 
   return { page, blocks, loading };
 };

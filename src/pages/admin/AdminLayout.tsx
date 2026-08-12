@@ -7,7 +7,7 @@ import {
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
-  FolderOpen,
+  FolderOpen, Globe, Layers, MessageSquare, Image as ImageIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,6 +139,14 @@ const sections: Section[] = [
 const SidebarHeader = () => {
   const { collapsed } = useSidebar();
   const { logoUrl } = useAppSettings();
+  const contentMenuItems = [
+    { icon: Globe, label: "Landing Page", path: "/admin/landing-page" },
+    { icon: FileText, label: "CMS Pages", path: "/admin/pages" },
+    { icon: Layers, label: "Blog", path: "/admin/blog" },
+    { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },
+    { icon: ImageIcon, label: "Media Library", path: "/admin/media" },
+  ];
+
   return (
     <div
       className={cn(
@@ -309,6 +317,8 @@ const AdminShell = () => {
   const initials = (adminName || "A").split(" ").map(s => s[0]).slice(0, 2).join("").toUpperCase();
   const toggleTheme = () => setDark((d) => !d);
 
+  
+
   return (
     <div className="min-h-screen flex bg-muted/30">
       <Sidebar
@@ -333,7 +343,7 @@ const AdminShell = () => {
           return (
             <SidebarGroup key={section.title} title={section.title}>
               {visible.map((l) => 
-                l.to === "/admin/pages" ? null : (
+                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" ? null : (
                   <SidebarItem
                     key={l.to}
                     to={l.to}
@@ -344,10 +354,39 @@ const AdminShell = () => {
                   />
                 )
               )}
-
             </SidebarGroup>
           );
         })}
+
+        {isAdmin && (
+          <SidebarGroup title="Website & Content">
+            <SidebarItem
+              icon={Globe}
+              label="Landing Page"
+              to="/admin/landing-page"
+            />
+            <SidebarItem
+              icon={FileText}
+              label="CMS Pages"
+              to="/admin/pages"
+            />
+            <SidebarItem
+              icon={Layers}
+              label="Blog"
+              to="/admin/blog"
+            />
+            <SidebarItem
+              icon={MessageSquare}
+              label="Testimonials"
+              to="/admin/testimonials"
+            />
+            <SidebarItem
+              icon={ImageIcon}
+              label="Media Library"
+              to="/admin/media"
+            />
+          </SidebarGroup>
+        )}
       </Sidebar>
 
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">

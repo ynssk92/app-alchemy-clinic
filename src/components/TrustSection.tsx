@@ -1,8 +1,14 @@
 import { CheckCircle2, ShieldCheck, Award, Heart } from "lucide-react";
 import { motion } from "framer-motion";
+import { resolveIcon } from "@/lib/pageContent";
+import type { PageBlock } from "@/hooks/usePageContent";
 
-export const TrustSection = () => {
-  const items = [
+interface TrustSectionProps {
+  blocks?: PageBlock[];
+}
+
+export const TrustSection = ({ blocks }: TrustSectionProps) => {
+  const defaultItems = [
     {
       icon: <ShieldCheck className="w-6 h-6 text-primary" />,
       title: "Safe & Professional",
@@ -19,6 +25,15 @@ export const TrustSection = () => {
       desc: "Customized treatment plans tailored to your specific needs."
     }
   ];
+
+  const items = blocks ? blocks.map(b => {
+    const Icon = resolveIcon(b.icon);
+    return {
+      icon: <Icon className="w-6 h-6 text-primary" />,
+      title: b.title || "",
+      desc: b.body || ""
+    };
+  }) : defaultItems;
 
   return (
     <section className="py-20 bg-white border-b border-slate-50">

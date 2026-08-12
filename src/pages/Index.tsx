@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DoctorCard } from "@/components/DoctorCard";
@@ -42,10 +42,18 @@ interface Post {
 }
 
 const Index = () => {
+  const [searchParams] = useSearchParams();
+  const isPreview = searchParams.get("preview") === "true";
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
-  const { blocks } = usePageContent("home");
+  const { page, blocks } = usePageContent("home", isPreview);
+  
   const departments = blocks.filter(b => b.kind === "department");
+  const trustBlocks = blocks.filter(b => b.kind === "trust");
+  const expertiseBlocks = blocks.filter(b => b.kind === "expertise");
+  const whyUsBlocks = blocks.filter(b => b.kind === "why-us");
+  const experienceBlocks = blocks.filter(b => b.kind === "experience");
+  
   const [activeDept, setActiveDept] = useState<string | null>(null);
 
   useEffect(() => {
@@ -75,13 +83,18 @@ const Index = () => {
   return (
     <PublicLayout>
       <Seo
-        title="La Dune Clinique Dentaire — Exceptional Dental Care"
-        description="Premium modern dental clinic in Agadir. Advanced technology, experienced specialists, and personalized care."
+        title={page?.seo_title || "La Dune Clinique Dentaire — Exceptional Dental Care"}
+        description={page?.seo_description || "Premium modern dental clinic in Agadir. Advanced technology, experienced specialists, and personalized care."}
         path="/"
       />
 
       <HeroSection />
-      <TrustSection />
+      
+      {trustBlocks.length > 0 ? (
+        <TrustSection blocks={trustBlocks} />
+      ) : (
+        <TrustSection />
+      )}
 
       {/* Services Section */}
       <section className="bg-slate-50 py-24 md:py-32">
@@ -117,7 +130,11 @@ const Index = () => {
         </div>
       </section>
 
-      <ExpertiseSection />
+      {expertiseBlocks.length > 0 ? (
+        <ExpertiseSection blocks={expertiseBlocks} />
+      ) : (
+        <ExpertiseSection />
+      )}
 
       {/* Team Section */}
       {doctors.length > 0 && (
@@ -150,8 +167,17 @@ const Index = () => {
         </section>
       )}
 
-      <WhyLaDuneSection />
-      <PatientExperienceSection />
+      {whyUsBlocks.length > 0 ? (
+        <WhyLaDuneSection blocks={whyUsBlocks} />
+      ) : (
+        <WhyLaDuneSection />
+      )}
+      
+      {experienceBlocks.length > 0 ? (
+        <PatientExperienceSection blocks={experienceBlocks} />
+      ) : (
+        <PatientExperienceSection />
+      )}
 
       {/* Blog Section */}
       {posts.length > 0 && (
@@ -179,7 +205,11 @@ const Index = () => {
         </section>
       )}
 
-      <FinalCTA />
+      {blocks.find(b => b.kind === "final-cta") ? (
+        <FinalCTA block={blocks.find(b => b.kind === "final-cta")} />
+      ) : (
+        <FinalCTA />
+      )}
     </PublicLayout>
   );
 };
