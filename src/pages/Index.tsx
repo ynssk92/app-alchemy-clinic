@@ -174,9 +174,16 @@ const Index = () => {
       )}
       
       {experienceBlocks.length > 0 ? (
-        <PatientExperienceSection blocks={experienceBlocks} />
+        <PatientExperienceSection 
+          blocks={experienceBlocks} 
+          displayStyle={page?.hero_config?.testimonialStyle}
+          limit={page?.hero_config?.testimonialLimit}
+        />
       ) : (
-        <PatientExperienceSection />
+        <PatientExperienceSection 
+          displayStyle={page?.hero_config?.testimonialStyle}
+          limit={page?.hero_config?.testimonialLimit}
+        />
       )}
 
       {/* Blog Section */}
