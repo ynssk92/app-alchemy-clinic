@@ -7,7 +7,7 @@ import {
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
-  FolderOpen, Globe, Layers, MessageSquare, Image as ImageIcon,
+  FolderOpen, Globe, Layers, MessageSquare, Image as ImageIcon, LayoutGrid,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -145,6 +145,7 @@ const SidebarHeader = () => {
     { icon: Layers, label: "Blog", path: "/admin/blog" },
     { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },
     { icon: ImageIcon, label: "Media Library", path: "/admin/media" },
+    { icon: LayoutGrid, label: "Gallery", path: "/admin/gallery" },
   ];
 
   return (
@@ -343,7 +344,7 @@ const AdminShell = () => {
           return (
             <SidebarGroup key={section.title} title={section.title}>
               {visible.map((l) => 
-                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" ? null : (
+                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" || l.to === "/admin/gallery" ? null : (
                   <SidebarItem
                     key={l.to}
                     to={l.to}
@@ -384,6 +385,11 @@ const AdminShell = () => {
               icon={ImageIcon}
               label="Media Library"
               to="/admin/media"
+            />
+            <SidebarItem
+              icon={LayoutGrid}
+              label="Gallery"
+              to="/admin/gallery"
             />
           </SidebarGroup>
         )}

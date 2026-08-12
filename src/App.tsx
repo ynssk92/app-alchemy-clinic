@@ -50,12 +50,14 @@ import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
 import {
   AdminDeleteRequests, AdminReports,
-  AdminLocation, AdminTestimonials,
+  AdminLocation,
 } from "./pages/admin/AdminStubs";
+import { AdminTestimonials } from "./pages/admin/AdminTestimonials";
 import AdminFaq from "./pages/admin/AdminFaq";
 import AdminPages from "./pages/admin/AdminPages";
 import AdminRoles from "./pages/admin/AdminRoles";
 import AdminMediaLibrary from "./pages/admin/AdminMediaLibrary";
+import { AdminGallery } from "./pages/admin/AdminGallery";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminApprovals from "./pages/admin/AdminApprovals";
 import PendingApproval from "./pages/PendingApproval";
@@ -140,6 +142,7 @@ const App = () => (
               <Route path="landing-page" element={<ProtectedRoute adminOnly><AdminLandingPage /></ProtectedRoute>} />
               <Route path="pages" element={<ProtectedRoute adminOnly><AdminPages /></ProtectedRoute>} />
               <Route path="media" element={<ProtectedRoute adminOnly><AdminMediaLibrary /></ProtectedRoute>} />
+              <Route path="gallery" element={<ProtectedRoute adminOnly><AdminGallery /></ProtectedRoute>} />
               <Route path="location" element={<ProtectedRoute adminOnly><AdminLocation /></ProtectedRoute>} />
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
