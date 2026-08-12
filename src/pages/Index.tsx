@@ -86,7 +86,7 @@ const Index = () => {
   const currentDept = departments.find((d) => d.id === activeDept) || departments[0];
 
   return (
-    <div className="relative flex min-h-screen w-full flex-1 flex-col bg-background">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title={page?.seo_title || "La Dune Clinique Dentaire — Rendez-vous en quelques secondes"}
         description={page?.seo_description || "Clinique dentaire moderne : esthétique du sourire, implantologie, orthodontie. Prenez rendez-vous en ligne avec nos praticiens en quelques secondes."}
@@ -227,7 +227,7 @@ const Index = () => {
 
       {/* Medical Team Section */}
       {doctors.length > 0 && (
-        <section className="bg-white py-24 md:py-32 overflow-hidden">
+        <section className="bg-white py-24 md:py-32">
           <div className="container mx-auto px-4 max-w-[1200px]">
             <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-8">
               <div className="max-w-xl">
@@ -239,7 +239,7 @@ const Index = () => {
                   A multidisciplinary team dedicated to your oral health, combining experience and continuous training.
                 </p>
               </div>
-              <div className="reveal">
+              <div>
                 <Link to="/equipe" className="shrink-0">
                   <Button variant="outline" className="h-12 rounded-xl px-8 font-bold border-slate-200 text-[#1a2b4b] hover:bg-slate-50 group">
                     See all the team
@@ -251,7 +251,7 @@ const Index = () => {
             
             <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
               {doctors.map((d) => (
-                <div key={d.id} className="reveal reveal-scale">
+                <div key={d.id} className="reveal-scale">
                   <DoctorCard doctor={d} />
                 </div>
               ))}
