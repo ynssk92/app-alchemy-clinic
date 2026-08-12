@@ -154,9 +154,9 @@ export const AdminTestimonials = () => {
       </div>
 
       {loading ? (
-        <Card className="p-10 text-center">Loading testimonials...</Card>
+        <Card className="p-10 text-center">Chargement des témoignages...</Card>
       ) : testimonials.length === 0 ? (
-        <Card className="p-10 text-center text-muted-foreground border-dashed">No testimonials found.</Card>
+        <Card className="p-10 text-center text-muted-foreground border-dashed">Aucun témoignage trouvé.</Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {testimonials.map((t, i) => (
