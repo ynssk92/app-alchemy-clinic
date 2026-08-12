@@ -11,33 +11,31 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
-      {/* Full-screen video background */}
-      <video
-        key={HERO_VIDEO_URL}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        onError={() => setVideoError(true)}
-        className={`absolute inset-0 h-full w-full object-cover -z-30 ${videoError ? "hidden" : ""}`}
-      >
-        <source src={HERO_VIDEO_URL} type="video/mp4" />
-      </video>
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
+      <div className="absolute inset-0 z-0">
+        {/* Full-screen video background */}
+        <video
+          key={HERO_VIDEO_URL}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onError={() => setVideoError(true)}
+          className={`absolute inset-0 h-full w-full object-cover ${videoError ? "hidden" : ""}`}
+        >
+          <source src={HERO_VIDEO_URL} type="video/mp4" />
+        </video>
 
-      {/* Fallback background if video fails to load */}
-      <div className="absolute inset-0 -z-[25] bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800" />
+        {/* Fallback background if video fails to load */}
+        <div className={`absolute inset-0 bg-gradient-to-br from-slate-900 via-[#0a1f44] to-slate-800 ${!videoError ? "opacity-0" : "opacity-100"}`} />
 
-      {/* Subtle Premium Overlay */}
-      <div 
-        className="absolute inset-0 -z-20 bg-[rgba(5,20,55,0.30)]" 
-      />
-      
-      {/* Gradient overlay for text readability - keeping it subtle but effective */}
-      <div 
-        className="absolute inset-0 -z-10 bg-gradient-to-r from-[rgba(5,20,55,0.4)] via-transparent to-transparent" 
-      />
+        {/* Subtle Premium Overlay */}
+        <div className="absolute inset-0 bg-[rgba(5,20,55,0.30)]" />
+        
+        {/* Gradient overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(5,20,55,0.4)] via-transparent to-transparent" />
+      </div>
 
       <div className="container mx-auto px-4 relative z-10 py-24 md:py-32">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
