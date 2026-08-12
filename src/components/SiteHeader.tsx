@@ -17,13 +17,20 @@ import LanguageToggle from "@/components/LanguageToggle";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { cn } from "@/lib/utils";
 
-
-
 export const SiteHeader = () => {
   const { t } = useTranslation();
   const { logoUrl } = useAppSettings();
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navItems = [
     { label: t("nav.about"), to: "/about" },
@@ -47,12 +54,16 @@ export const SiteHeader = () => {
     setOpen(false);
   }, [pathname]);
 
-
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-lg bg-background/80 border-b border-border">
-      <div className="container mx-auto px-4 py-3 md:py-4 flex items-center justify-between gap-2">
+    <nav className={cn(
+      "sticky top-0 z-50 transition-all duration-300 border-b",
+      scrolled 
+        ? "bg-background/95 backdrop-blur-md py-2 border-border shadow-soft" 
+        : "bg-transparent py-4 border-transparent"
+    )}>
+      <div className="container mx-auto px-4 flex items-center justify-between gap-2">
         <Link to="/" className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
-          <img src={logoUrl} alt="La Dune Clinique Dentaire" className="h-8 md:h-10" />
+          <img src={logoUrl} alt="La Dune Clinique Dentaire" className={cn("transition-all duration-300", scrolled ? "h-8" : "h-9 md:h-11")} />
         </Link>
 
         <div className="hidden lg:flex items-center gap-6 xl:gap-8">
