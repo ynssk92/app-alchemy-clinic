@@ -51,10 +51,17 @@ export default function Services() {
 
   const save = async () => {
     if (!editing.name) return toast.error("Name required");
+    const { id, clinic_id, category, ...updateData } = editing;
+    const payload = { ...updateData, category_id: editing.category_id || null };
+    
     const { error } = editing.id
-      ? await supabase.from("services").update({ ...editing, category_id: editing.category_id || null }).eq("id", editing.id)
-      : await supabase.from("services").insert({ ...editing, category_id: editing.category_id || null });
-    if (error) return toast.error(error.message);
+      ? await supabase.from("services").update(payload).eq("id", editing.id)
+      : await supabase.from("services").insert(payload);
+    
+    if (error) {
+      console.error("Service save error:", error);
+      return toast.error(error.message);
+    }
     toast.success("Service saved successfully");
     setOpen(false); setEditing(empty); load();
   };
