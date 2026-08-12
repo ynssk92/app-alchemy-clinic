@@ -77,7 +77,7 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
         <div className="mt-6 w-full">
           <Button 
             asChild 
-            className="w-full h-10 rounded-full bg-[#00A3AD] hover:bg-[#008C94] text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all active:scale-[0.98]"
+            className="w-full h-10 rounded-full bg-primary hover:bg-primary/90 text-white text-xs font-bold uppercase tracking-wider shadow-md transition-all active:scale-[0.98]"
           >
             <Link to={`/booking?doctor=${doctor.id}`}>
               Get Appointment
@@ -90,12 +90,12 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
       <div className="flex flex-col items-center text-center">
         <h3 
           onClick={() => setProfileOpen(true)}
-          className="cursor-pointer text-2xl font-bold text-[#1a2b4b] leading-tight hover:text-[#00A3AD] transition-colors mb-2"
+          className="cursor-pointer text-2xl font-bold text-[#1a2b4b] leading-tight hover:text-primary transition-colors mb-2"
         >
           {doctor.full_name}
         </h3>
         
-        <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#00A3AD] mb-3">
+        <p className="text-xs font-bold uppercase tracking-[0.15em] text-primary mb-3">
           {specialty}
         </p>
 
