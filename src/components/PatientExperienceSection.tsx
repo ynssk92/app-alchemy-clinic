@@ -1,6 +1,31 @@
 import { motion } from "framer-motion";
+import type { PageBlock } from "@/hooks/usePageContent";
 
-export const PatientExperienceSection = () => {
+interface PatientExperienceSectionProps {
+  blocks?: PageBlock[];
+}
+
+export const PatientExperienceSection = ({ blocks }: PatientExperienceSectionProps) => {
+  const defaultItems = [
+    {
+      title: "Calm Environment",
+      desc: "We've created a clinic space that feels like a sanctuary, reducing dental anxiety and promoting relaxation."
+    },
+    {
+      title: "Transparent Care",
+      desc: "Clear explanations, detailed treatment plans, and upfront pricing. You're always in control of your dental health."
+    },
+    {
+      title: "Modern Comfort",
+      desc: "From ergonomic treatment chairs to entertainment options during procedures, your comfort is our priority."
+    }
+  ];
+
+  const items = blocks ? blocks.map(b => ({
+    title: b.title || "",
+    desc: b.body || ""
+  })) : defaultItems;
+
   return (
     <section className="py-24 md:py-32 bg-white">
       <div className="container mx-auto px-4">
@@ -12,20 +37,7 @@ export const PatientExperienceSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[
-            {
-              title: "Calm Environment",
-              desc: "We've created a clinic space that feels like a sanctuary, reducing dental anxiety and promoting relaxation."
-            },
-            {
-              title: "Transparent Care",
-              desc: "Clear explanations, detailed treatment plans, and upfront pricing. You're always in control of your dental health."
-            },
-            {
-              title: "Modern Comfort",
-              desc: "From ergonomic treatment chairs to entertainment options during procedures, your comfort is our priority."
-            }
-          ].map((item, i) => (
+          {items.map((item, i) => (
             <motion.div 
               key={i}
               initial={{ opacity: 0, y: 20 }}
