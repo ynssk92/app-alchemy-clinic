@@ -27,10 +27,10 @@ type Notif = {
 };
 
 const DRIFT_LABEL: Record<string, string> = {
-  assistant_also_admin: "Escalade admin détectée",
-  missing_profile: "Profil assistant manquant",
-  appointments_unreachable: "Rendez-vous inaccessibles",
-  messages_unreachable: "Messages inaccessibles",
+  assistant_also_admin: "Sécurité — Escalade détectée",
+  missing_profile: "Système — Notification",
+  appointments_unreachable: "Système — Service indisponible",
+  messages_unreachable: "Système — Service indisponible",
 };
 
 const AdminNotifications = () => {
