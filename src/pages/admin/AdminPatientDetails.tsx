@@ -6,15 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
-  ShieldCheck, ShieldAlert, MapPin, UserCheck,
+  ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
-import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
+import { useToast } from "@/hooks/use-toast";
 
 type ListRow = {
   key: string;
