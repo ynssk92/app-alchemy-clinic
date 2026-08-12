@@ -69,6 +69,35 @@ const AdminAppointments = () => {
     load();
   };
 
+  const exportToCSV = () => {
+    if (filteredRows.length === 0) {
+      return toast.error("No data to export");
+    }
+
+    const headers = ["Date", "Time", "Doctor", "Status", "Reason"];
+    const csvContent = [
+      headers.join(","),
+      ...filteredRows.map(r => [
+        r.appointment_date,
+        r.appointment_time,
+        `"${r.doctors?.full_name || "Doctor"}"`,
+        r.status,
+        `"${r.reason || ""}"`
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `appointments-export-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("CSV exported successfully");
+  };
+
   const filteredRows = rows.filter(r => {
     const matchesSearch = (r.doctors?.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           r.reason?.toLowerCase().includes(searchQuery.toLowerCase()));
