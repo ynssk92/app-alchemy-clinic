@@ -40,7 +40,8 @@ const schema = z.object({
   phone: z.string().trim().min(6, "Téléphone invalide").max(40),
   dob: z.string().optional().or(z.literal("")),
   gender: z.enum(["male", "female", "other"]).optional(),
-  reason_id: z.string().uuid("Merci de choisir un motif"),
+  service_id: z.string().uuid("Merci de choisir un motif").optional().or(z.literal("")),
+  reason_id: z.string().uuid("Merci de choisir un motif").optional().or(z.literal("")),
   custom_reason: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
