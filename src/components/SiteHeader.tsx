@@ -209,18 +209,18 @@ export const SiteHeader = () => {
                           onClick={() => setOpen(false)}
                           aria-current={active ? "page" : undefined}
                           className={cn(
-                            "relative flex items-center justify-between rounded-xl px-4 min-h-14 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            "relative flex items-center justify-between rounded-xl px-4 min-h-[52px] text-base font-bold transition-all active:scale-[0.98]",
                             active
-                              ? "bg-primary/10 text-primary before:absolute before:left-0 before:top-3 before:bottom-3 before:w-1 before:rounded-full before:bg-primary"
-                              : "text-foreground hover:bg-muted",
+                              ? "bg-primary/5 text-primary"
+                              : "text-foreground hover:bg-muted/50",
                           )}
                         >
                           <span>{item.label}</span>
                           <span
                             aria-hidden="true"
                             className={cn(
-                              "h-2 w-2 rounded-full bg-current",
-                              active ? "opacity-100" : "opacity-40",
+                              "h-1.5 w-1.5 rounded-full bg-current transition-opacity duration-300",
+                              active ? "opacity-100" : "opacity-0",
                             )}
                           />
                         </NavLink>
