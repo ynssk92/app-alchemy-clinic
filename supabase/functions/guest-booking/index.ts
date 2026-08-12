@@ -13,6 +13,7 @@ const BodySchema = z.object({
   appointment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   appointment_time: z.string().trim().min(3).max(20),
   reason: z.string().trim().min(3).max(1000),
+  service_id: z.string().uuid().optional().nullable(),
   reason_id: z.string().uuid().optional().nullable(),
   custom_reason: z.string().trim().max(1000).optional().nullable(),
   redirect_to: z.string().trim().url().max(300).optional(),
@@ -87,6 +88,7 @@ Deno.serve(async (req) => {
       _date: b.appointment_date,
       _time: b.appointment_time,
       _reason: b.reason,
+      _service_id: b.service_id ?? null,
       _reason_id: b.reason_id ?? null,
       _custom_reason: b.custom_reason ?? null,
     });

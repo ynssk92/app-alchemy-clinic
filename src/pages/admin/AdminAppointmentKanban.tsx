@@ -27,6 +27,7 @@ type Row = {
   status: string; 
   reason: string | null;
   doctors: { full_name: string } | null;
+  services: { name: string; duration: number; category: { name: string } | null } | null;
 };
 
 const COLUMNS = [
@@ -68,7 +69,7 @@ const AdminAppointmentKanban = () => {
     setIsLoading(true);
     const { data, error } = await supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, status, reason, doctors(full_name)")
+      .select("id, appointment_date, appointment_time, status, reason, doctors(full_name), services(name, duration, category:service_categories(name))")
       .order("appointment_date", { ascending: true });
     
     if (error) {
@@ -110,7 +111,8 @@ const AdminAppointmentKanban = () => {
 
   const filteredRows = rows.filter(r => 
     r.doctors?.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.reason?.toLowerCase().includes(searchQuery.toLowerCase())
+    r.reason?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.services?.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -219,11 +221,22 @@ const AdminAppointmentKanban = () => {
                         </div>
                       </div>
                       
-                      {r.reason && (
-                        <p className="text-slate-600 text-[13px] leading-relaxed line-clamp-2">
-                          {r.reason}
+                      <div className="space-y-1">
+                        <p className="text-sm font-bold text-slate-800 leading-tight">
+                          {r.services?.name || "Custom Consultation"}
                         </p>
-                      )}
+                        {r.services && (
+                          <div className="flex gap-1.5">
+                            <Badge variant="outline" className="text-[9px] h-3.5 px-1 bg-slate-50 border-slate-200 text-slate-500">{r.services.category?.name}</Badge>
+                            <Badge variant="outline" className="text-[9px] h-3.5 px-1 bg-slate-50 border-slate-200 text-slate-500">{r.services.duration} min</Badge>
+                          </div>
+                        )}
+                        {r.reason && r.reason !== r.services?.name && (
+                          <p className="text-slate-500 text-[12px] leading-relaxed line-clamp-1 italic mt-1">
+                            "{r.reason}"
+                          </p>
+                        )}
+                      </div>
                     </div>
 
                     {/* Quick Actions (Visually redesigned) */}

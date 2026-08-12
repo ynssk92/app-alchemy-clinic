@@ -258,6 +258,7 @@ export type Database = {
           reason: string | null
           reason_id: string | null
           reference: string | null
+          service_id: string | null
           source: string
           status: string
           updated_at: string
@@ -273,6 +274,7 @@ export type Database = {
           reason?: string | null
           reason_id?: string | null
           reference?: string | null
+          service_id?: string | null
           source?: string
           status?: string
           updated_at?: string
@@ -288,6 +290,7 @@ export type Database = {
           reason?: string | null
           reason_id?: string | null
           reference?: string | null
+          service_id?: string | null
           source?: string
           status?: string
           updated_at?: string
@@ -305,6 +308,13 @@ export type Database = {
             columns: ["reason_id"]
             isOneToOne: false
             referencedRelation: "consultation_reasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
@@ -2188,6 +2198,25 @@ export type Database = {
     }
     Functions: {
       create_guest_booking:
+        | {
+            Args: {
+              _custom_reason?: string
+              _date?: string
+              _dob?: string
+              _doctor_id?: string
+              _email: string
+              _first_name: string
+              _gender?: string
+              _last_name: string
+              _phone: string
+              _reason?: string
+              _reason_id?: string
+              _service_id?: string
+              _time?: string
+              _user_id: string
+            }
+            Returns: Json
+          }
         | {
             Args: {
               _date: string

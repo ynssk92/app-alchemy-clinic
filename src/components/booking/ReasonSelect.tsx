@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, ChevronsUpDown, Search, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { supabase } from "@/integrations/supabase/client";
-import { resolveIcon } from "@/lib/pageContent";
 import { cn } from "@/lib/utils";
 
 export interface ConsultationReason {
@@ -20,6 +19,8 @@ export interface ConsultationReason {
   label: string;
   icon: string | null;
   is_other: boolean;
+  duration?: number;
+  price?: number;
 }
 
 interface ReasonSelectProps {
@@ -34,11 +35,32 @@ export const ReasonSelect = ({ value, onChange, invalid }: ReasonSelectProps) =>
 
   useEffect(() => {
     supabase
-      .from("consultation_reasons")
-      .select("id, category, label, icon, is_other")
+      .from("services")
+      .select("id, name, duration, price, category:service_categories(name)")
       .eq("active", true)
-      .order("sort_order", { ascending: true })
-      .then(({ data }) => setReasons((data as ConsultationReason[]) ?? []));
+      .order("name", { ascending: true })
+      .then(({ data }) => {
+        const mapped: ConsultationReason[] = (data || []).map((s: any) => ({
+          id: s.id,
+          label: s.name,
+          category: s.category?.name || "General",
+          icon: "Stethoscope",
+          is_other: false,
+          duration: s.duration,
+          price: s.price
+        }));
+        
+        // Add "Other" option
+        mapped.push({
+          id: "other",
+          label: "Other / Custom Consultation",
+          category: "Custom",
+          icon: "Search",
+          is_other: true
+        });
+        
+        setReasons(mapped);
+      });
   }, []);
 
   const groups = useMemo(() => {
@@ -48,8 +70,7 @@ export const ReasonSelect = ({ value, onChange, invalid }: ReasonSelectProps) =>
   }, [reasons]);
 
   const selected = reasons.find((r) => r.id === value);
-  const SelectedIcon = selected ? resolveIcon(selected.icon) : Search;
-
+  
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -64,9 +85,9 @@ export const ReasonSelect = ({ value, onChange, invalid }: ReasonSelectProps) =>
           )}
         >
           <span className="flex min-w-0 items-center gap-2.5">
-            <SelectedIcon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Stethoscope className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
             <span className={cn("truncate", !selected && "text-muted-foreground")}>
-              {selected ? selected.label : "Rechercher un motif…"}
+              {selected ? selected.label : "Rechercher un service…"}
             </span>
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" aria-hidden="true" />
@@ -77,13 +98,12 @@ export const ReasonSelect = ({ value, onChange, invalid }: ReasonSelectProps) =>
         className="w-[--radix-popover-trigger-width] min-w-[min(92vw,320px)] rounded-2xl p-0"
       >
         <Command>
-          <CommandInput placeholder="Rechercher un motif…" />
+          <CommandInput placeholder="Rechercher un service…" />
           <CommandList className="max-h-[min(60vh,320px)]">
-            <CommandEmpty>Aucun motif trouvé.</CommandEmpty>
+            <CommandEmpty>Aucun service trouvé.</CommandEmpty>
             {groups.map(([category, items]) => (
               <CommandGroup key={category} heading={category}>
                 {items.map((r) => {
-                  const Icon = resolveIcon(r.icon);
                   return (
                     <CommandItem
                       key={r.id}
@@ -92,10 +112,17 @@ export const ReasonSelect = ({ value, onChange, invalid }: ReasonSelectProps) =>
                         onChange(r.id === value ? undefined : r);
                         setOpen(false);
                       }}
-                      className="gap-2.5 rounded-xl py-2.5"
+                      className="gap-2.5 rounded-xl py-2.5 cursor-pointer"
                     >
-                      <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
-                      <span className="flex-1 truncate">{r.label}</span>
+                      <Stethoscope className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                      <div className="flex flex-col flex-1 min-w-0">
+                        <span className="truncate">{r.label}</span>
+                        {!r.is_other && (
+                          <span className="text-[10px] text-muted-foreground">
+                            {r.duration} min • {r.price} MAD
+                          </span>
+                        )}
+                      </div>
                       {r.id === value && <Check className="h-4 w-4 text-primary" aria-hidden="true" />}
                     </CommandItem>
                   );

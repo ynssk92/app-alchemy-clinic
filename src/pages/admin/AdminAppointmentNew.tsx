@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -16,25 +17,46 @@ import {
   FileText, 
   Plus,
   ChevronLeft,
-  Info
+  Info,
+  Search,
+  Check
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 
 const AdminAppointmentNew = () => {
   const navigate = useNavigate();
   const [doctors, setDoctors] = useState<{ id: string; full_name: string }[]>([]);
   const [patients, setPatients] = useState<{ id: string; full_name: string | null }[]>([]);
+  const [services, setServices] = useState<any[]>([]);
   const [form, setForm] = useState({
-    patient_id: "", doctor_id: "", appointment_date: "", appointment_time: "", reason: "",
+    patient_id: "", doctor_id: "", appointment_date: "", appointment_time: "", reason: "", service_id: ""
   });
   const [saving, setSaving] = useState(false);
+  const [serviceSearchOpen, setServiceSearchOpen] = useState(false);
 
   useEffect(() => {
     supabase.from("doctors").select("id, full_name").order("full_name")
       .then(({ data }) => setDoctors(data || []));
     supabase.from("profiles").select("id, full_name").order("full_name")
       .then(({ data }) => setPatients(data || []));
+    supabase.from("services").select("*, category:service_categories(name)").eq("active", true).order("name")
+      .then(({ data }) => setServices(data || []));
   }, []);
+
+  const handleServiceSelect = (service: any) => {
+    if (service === "custom") {
+      setForm({ ...form, service_id: "", reason: "" });
+    } else {
+      setForm({
+        ...form,
+        service_id: service.id,
+        reason: service.name,
+      });
+    }
+    setServiceSearchOpen(false);
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,13 +65,21 @@ const AdminAppointmentNew = () => {
     }
     setSaving(true);
     const { error } = await supabase.from("appointments").insert({
-      ...form, status: "upcoming",
+      patient_id: form.patient_id,
+      doctor_id: form.doctor_id,
+      appointment_date: form.appointment_date,
+      appointment_time: form.appointment_time,
+      reason: form.reason,
+      service_id: form.service_id || null,
+      status: "upcoming",
     });
     setSaving(false);
     if (error) return toast.error(error.message);
     toast.success("Appointment created successfully");
     navigate("/admin/appointments");
   };
+
+  const selectedService = services.find(s => s.id === form.service_id);
 
   return (
     <div className="min-h-screen bg-[#F7F9FC] -m-6 p-6 md:p-10 flex justify-center">
@@ -160,22 +190,108 @@ const AdminAppointmentNew = () => {
               </div>
             </div>
 
-            {/* Section 3: Reason */}
+            {/* Section 3: Service & Reason */}
             <div className="p-6 md:p-8 space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="w-4 h-4 text-primary" />
-                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">Reason for Visit</h3>
+                <h3 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">Service & Reason</h3>
               </div>
               
-              <div className="space-y-2">
-                <Label className="text-slate-700 font-medium">Additional Notes</Label>
-                <Textarea 
-                  value={form.reason} 
-                  onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                  placeholder="Describe the consultation, cleaning, follow-up, or any specific patient concerns..." 
-                  className="min-h-[120px] rounded-xl bg-slate-50 border-slate-200 focus:ring-primary/20 resize-none p-4 text-[15px]"
-                />
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-slate-700 font-medium">Service <span className="text-rose-500">*</span></Label>
+                  <Popover open={serviceSearchOpen} onOpenChange={setServiceSearchOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        className="w-full h-11 justify-between rounded-xl bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100/50"
+                      >
+                        {selectedService ? selectedService.name : "Select a dental service"}
+                        <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[400px] p-0 rounded-xl shadow-xl border-slate-200" align="start">
+                      <Command>
+                        <CommandInput placeholder="Search services..." />
+                        <CommandList>
+                          <CommandEmpty>No service found.</CommandEmpty>
+                          <CommandGroup heading="Clinic Services">
+                            {services.map((s) => (
+                              <CommandItem
+                                key={s.id}
+                                value={s.name}
+                                onSelect={() => handleServiceSelect(s)}
+                                className="py-3 px-4 flex items-center justify-between cursor-pointer"
+                              >
+                                <div>
+                                  <p className="font-medium text-slate-900">{s.name}</p>
+                                  <p className="text-xs text-slate-500">{s.category?.name} • {s.duration} min • {s.price} MAD</p>
+                                </div>
+                                {form.service_id === s.id && <Check className="h-4 w-4 text-primary" />}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                          <CommandGroup heading="Custom Option">
+                            <CommandItem
+                              value="Other / Custom Consultation"
+                              onSelect={() => handleServiceSelect("custom")}
+                              className="py-3 px-4 flex items-center justify-between cursor-pointer"
+                            >
+                              <div>
+                                <p className="font-medium text-slate-900">Other / Custom Consultation</p>
+                                <p className="text-xs text-slate-500">Specify reason manually</p>
+                              </div>
+                              {!form.service_id && form.reason && <Check className="h-4 w-4 text-primary" />}
+                            </CommandItem>
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                {(!form.service_id || form.service_id === "") && (
+                  <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                    <Label className="text-slate-700 font-medium">Consultation Reason <span className="text-rose-500">*</span></Label>
+                    <Input 
+                      value={form.reason} 
+                      onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                      placeholder="e.g., General dental checkup" 
+                      className="h-11 rounded-xl bg-slate-50 border-slate-200 focus:ring-primary/20"
+                    />
+                  </div>
+                )}
               </div>
+
+              {selectedService && (
+                <div className="bg-primary/5 rounded-xl p-4 border border-primary/10 flex gap-4 animate-in fade-in zoom-in-95">
+                  <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
+                    <Info className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-slate-900 text-sm">{selectedService.name}</h4>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{selectedService.description || "Pre-defined dental service for patients."}</p>
+                    <div className="flex gap-3 mt-2">
+                      <Badge variant="outline" className="text-[10px] bg-white">{selectedService.category?.name}</Badge>
+                      <Badge variant="outline" className="text-[10px] bg-white">{selectedService.duration} Minutes</Badge>
+                      <Badge variant="outline" className="text-[10px] bg-white font-bold text-primary">{selectedService.price} MAD</Badge>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(!form.service_id || form.service_id === "") && form.reason && (
+                <div className="space-y-2">
+                  <Label className="text-slate-700 font-medium">Additional Details</Label>
+                  <Textarea 
+                    value={form.reason} 
+                    onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                    placeholder="Describe the consultation, cleaning, follow-up, or any specific patient concerns..." 
+                    className="min-h-[100px] rounded-xl bg-slate-50 border-slate-200 focus:ring-primary/20 resize-none p-4 text-[15px]"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}
