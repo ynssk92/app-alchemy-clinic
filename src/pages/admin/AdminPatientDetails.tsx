@@ -103,13 +103,29 @@ const fmtDate = (d?: string | null) =>
 const AdminPatientDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [list, setList] = useState<ListRow[]>([]);
   const [patient, setPatient] = useState<PatientView | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [apptSearch, setApptSearch] = useState("");
-  const [editOpen, setEditOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    full_name: "",
+    email: "",
+    phone: "",
+    dob: "",
+    gender: "",
+    blood_group: "",
+    address_1: "",
+    city: "",
+    country: "",
+    status: "approved" as "pending" | "approved" | "rejected",
+  });
   const [reloadTick, setReloadTick] = useState(0);
   const [notFound, setNotFound] = useState(false);
 
