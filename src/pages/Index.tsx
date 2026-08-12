@@ -205,7 +205,11 @@ const Index = () => {
         </section>
       )}
 
-      <FinalCTA />
+      {blocks.find(b => b.kind === "final-cta") ? (
+        <FinalCTA block={blocks.find(b => b.kind === "final-cta")} />
+      ) : (
+        <FinalCTA />
+      )}
     </PublicLayout>
   );
 };

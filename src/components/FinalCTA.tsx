@@ -1,8 +1,13 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import type { PageBlock } from "@/hooks/usePageContent";
 
-export const FinalCTA = () => {
+interface FinalCTAProps {
+  block?: PageBlock;
+}
+
+export const FinalCTA = ({ block }: FinalCTAProps) => {
   return (
     <section className="py-24 md:py-32 bg-primary relative overflow-hidden">
       {/* Decorative patterns */}
@@ -19,20 +24,20 @@ export const FinalCTA = () => {
           className="max-w-3xl mx-auto"
         >
           <h2 className="text-[40px] md:text-[64px] font-bold tracking-tight text-white leading-[1.1]">
-            Your smile deserves exceptional care.
+            {block?.title || "Your smile deserves exceptional care."}
           </h2>
           <p className="mt-8 text-xl text-white/80 leading-relaxed">
-            Take the next step toward a healthier, more confident smile with our team of dental specialists.
+            {block?.body || "Take the next step toward a healthier, more confident smile with our team of dental specialists."}
           </p>
           <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6">
             <Button asChild size="lg" className="h-14 rounded-full px-10 text-lg bg-white text-primary hover:bg-slate-50 shadow-xl shadow-black/20">
               <Link to="/booking">
-                Book an Appointment
+                {block?.items?.[0] || "Book an Appointment"}
               </Link>
             </Button>
             <Button asChild variant="ghost" className="h-14 rounded-full px-10 text-lg text-white hover:bg-white/10">
               <Link to="/contact">
-                Contact the Clinic
+                {block?.items?.[1] || "Contact the Clinic"}
               </Link>
             </Button>
           </div>
