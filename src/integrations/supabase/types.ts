@@ -258,6 +258,7 @@ export type Database = {
           reason: string | null
           reason_id: string | null
           reference: string | null
+          service_id: string | null
           source: string
           status: string
           updated_at: string
@@ -273,6 +274,7 @@ export type Database = {
           reason?: string | null
           reason_id?: string | null
           reference?: string | null
+          service_id?: string | null
           source?: string
           status?: string
           updated_at?: string
@@ -288,6 +290,7 @@ export type Database = {
           reason?: string | null
           reason_id?: string | null
           reference?: string | null
+          service_id?: string | null
           source?: string
           status?: string
           updated_at?: string
@@ -305,6 +308,13 @@ export type Database = {
             columns: ["reason_id"]
             isOneToOne: false
             referencedRelation: "consultation_reasons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
             referencedColumns: ["id"]
           },
         ]
