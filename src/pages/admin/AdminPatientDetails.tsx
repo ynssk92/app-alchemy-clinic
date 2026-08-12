@@ -606,16 +606,122 @@ const AdminPatientDetails = () => {
               {/* About + Vital Signs */}
               <div className="grid md:grid-cols-2 gap-6">
                 <Card className="p-6 border-border">
-                  <h3 className="font-bold mb-5 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-primary" /> About
+                  <h3 className="font-bold mb-5 flex items-center gap-2 text-primary">
+                    <BookOpen className="w-4 h-4" /> About
                   </h3>
-                  <div className="grid grid-cols-2 gap-5">
-                    <InfoTile icon={Cake} label="DOB" value={fmtDate(patient.dob)} />
-                    <InfoTile icon={Droplet} label="Blood Group" value={patient.blood_group || "—"} />
-                    <InfoTile icon={VenetianMask} label="Gender" value={patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : "—"} />
-                    <InfoTile icon={Mail} label="Email" value={patient.email || "—"} />
-                    <InfoTile icon={MapPin} label="Address" value={patient.address_1 || "—"} />
-                    <InfoTile icon={MapPin} label="City" value={patient.city || "—"} />
+                  <div className="grid grid-cols-2 gap-x-5 gap-y-4">
+                    {!isEditing ? (
+                      <>
+                        <InfoTile icon={Cake} label="DOB" value={fmtDate(patient.dob)} />
+                        <InfoTile icon={Droplet} label="Blood Group" value={patient.blood_group || "—"} />
+                        <InfoTile icon={VenetianMask} label="Gender" value={patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : "—"} />
+                        <InfoTile icon={Mail} label="Email" value={patient.email || "—"} />
+                        <InfoTile icon={MapPin} label="Address" value={patient.address_1 || "—"} />
+                        <InfoTile icon={MapPin} label="City" value={patient.city || "—"} />
+                      </>
+                    ) : (
+                      <>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Full Name</Label>
+                          <Input
+                            className="h-9"
+                            value={form.full_name}
+                            onChange={(e) => setForm(f => ({ ...f, full_name: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Email</Label>
+                          <Input
+                            className="h-9"
+                            type="email"
+                            value={form.email}
+                            onChange={(e) => setForm(f => ({ ...f, email: e.target.value }))}
+                            disabled={saving || registered}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Phone</Label>
+                          <Input
+                            className="h-9"
+                            value={form.phone}
+                            onChange={(e) => setForm(f => ({ ...f, phone: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Date of Birth</Label>
+                          <Input
+                            className="h-9"
+                            type="date"
+                            value={form.dob}
+                            onChange={(e) => setForm(f => ({ ...f, dob: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Gender</Label>
+                          <Select
+                            value={form.gender}
+                            onValueChange={(v) => setForm(f => ({ ...f, gender: v }))}
+                            disabled={saving}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="male">Male</SelectItem>
+                              <SelectItem value="female">Female</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Blood Group</Label>
+                          <Select
+                            value={form.blood_group}
+                            onValueChange={(v) => setForm(f => ({ ...f, blood_group: v }))}
+                            disabled={saving}
+                          >
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Select" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(g => (
+                                <SelectItem key={g} value={g}>{g}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="col-span-2 space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Address</Label>
+                          <Input
+                            className="h-9"
+                            value={form.address_1}
+                            onChange={(e) => setForm(f => ({ ...f, address_1: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">City</Label>
+                          <Input
+                            className="h-9"
+                            value={form.city}
+                            onChange={(e) => setForm(f => ({ ...f, city: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Country</Label>
+                          <Input
+                            className="h-9"
+                            value={form.country}
+                            onChange={(e) => setForm(f => ({ ...f, country: e.target.value }))}
+                            disabled={saving}
+                          />
+                        </div>
+                      </>
+                    )}
                   </div>
                 </Card>
 
