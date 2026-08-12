@@ -11,7 +11,7 @@ export const HeroSection = () => {
   const [videoError, setVideoError] = useState(false);
 
   return (
-    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden">
+    <section className="relative w-full min-h-[650px] md:min-h-[750px] lg:min-h-[800px] flex items-center overflow-hidden isolate">
       <div className="absolute inset-0 z-0">
         {/* Full-screen video background */}
         <video
