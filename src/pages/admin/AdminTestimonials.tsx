@@ -49,7 +49,12 @@ export const AdminTestimonials = () => {
       .order("sort_order", { ascending: true });
     
     if (error) {
-      toast({ title: "Load failed", description: error.message, variant: "destructive" });
+      console.error("Error loading testimonials:", error);
+      toast({ 
+        title: "Chargement impossible", 
+        description: "Impossible de charger les témoignages. Veuillez réessayer plus tard.", 
+        variant: "destructive" 
+      });
     } else {
       setTestimonials((data as any[]) || []);
     }
