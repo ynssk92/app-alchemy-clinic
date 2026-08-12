@@ -135,13 +135,9 @@ export const SiteHeader = () => {
                 "motion-reduce:transition-none motion-reduce:animate-none",
               )}
             >
-              <SheetHeader className="px-5 pt-5 pb-2 flex-row items-center justify-between space-y-0">
-                <span
-                  aria-hidden="true"
-                  className="absolute left-1/2 top-2 -translate-x-1/2 h-1.5 w-12 rounded-full bg-muted"
-                />
+              <SheetHeader className="px-5 pt-6 pb-4 flex-row items-center justify-between space-y-0">
                 <SheetTitle className="text-left flex items-center gap-2">
-                  <img src={logoUrl} alt="" className="h-8" />
+                  <img src={logoUrl} alt="" className="h-9" />
                   <VisuallyHidden>Menu</VisuallyHidden>
                 </SheetTitle>
                 <SheetDescription className="sr-only">
