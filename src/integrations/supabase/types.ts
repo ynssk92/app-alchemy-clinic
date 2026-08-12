@@ -2200,6 +2200,25 @@ export type Database = {
       create_guest_booking:
         | {
             Args: {
+              _custom_reason?: string
+              _date?: string
+              _dob?: string
+              _doctor_id?: string
+              _email: string
+              _first_name: string
+              _gender?: string
+              _last_name: string
+              _phone: string
+              _reason?: string
+              _reason_id?: string
+              _service_id?: string
+              _time?: string
+              _user_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
               _date: string
               _dob: string
               _doctor_id: string
