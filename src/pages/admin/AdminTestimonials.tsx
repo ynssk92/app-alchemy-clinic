@@ -239,13 +239,13 @@ export const AdminTestimonials = () => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Switch id="t-status" checked={draft.status === 'published'} onCheckedChange={v => setDraft({...draft, status: v ? 'published' : 'draft'})} />
-                <Label htmlFor="t-status">Published</Label>
+                <Label htmlFor="t-status">Publié</Label>
               </div>
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" type="button" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button onClick={save}>Save Testimonial</Button>
+            <Button variant="outline" type="button" onClick={() => setOpen(false)}>Annuler</Button>
+            <Button onClick={save}>Enregistrer le témoignage</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
