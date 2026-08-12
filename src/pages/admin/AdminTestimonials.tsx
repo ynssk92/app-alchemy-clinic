@@ -253,12 +253,12 @@ export const AdminTestimonials = () => {
       <AlertDialog open={!!toDelete} onOpenChange={o => !o && setToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete testimonial?</AlertDialogTitle>
-            <AlertDialogDescription>This will permanently remove this review from the website.</AlertDialogDescription>
+            <AlertDialogTitle>Supprimer le témoignage ?</AlertDialogTitle>
+            <AlertDialogDescription>Ceci supprimera définitivement cet avis du site web.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Delete</AlertDialogAction>
+            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground">Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
