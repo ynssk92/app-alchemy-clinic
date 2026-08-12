@@ -336,6 +336,69 @@ const AdminPatientDetails = () => {
       (a.reason || "").toLowerCase().includes(s);
   });
 
+  const handleSave = async () => {
+    if (!patient) return;
+    setSaving(true);
+    try {
+      // 1. Update Profile (if registered)
+      if (patient.profileId) {
+        const { error: pErr } = await supabase
+          .from("profiles")
+          .update({
+            full_name: form.full_name.trim() || null,
+            phone: form.phone.trim() || null,
+            status: form.status,
+          })
+          .eq("id", patient.profileId);
+        if (pErr) throw pErr;
+      }
+
+      // 2. Update/Insert Intake
+      // Derive first/last from full name if we don't have them separately (mostly for registered profiles)
+      let derivedFirst = form.first_name;
+      let derivedLast = form.last_name;
+      if (!derivedFirst || !derivedLast) {
+        const parts = (form.full_name || "").trim().split(/\s+/);
+        derivedFirst = derivedFirst || parts.shift() || "Patient";
+        derivedLast = derivedLast || parts.join(" ") || "-";
+      }
+
+      const intakePayload: any = {
+        first_name: derivedFirst,
+        last_name: derivedLast,
+        email: form.email || (patient.profileId ? `${patient.profileId}@placeholder.local` : "unknown@placeholder.local"),
+        phone: form.phone || null,
+        dob: form.dob || null,
+        gender: form.gender || null,
+        blood_group: form.blood_group || null,
+        address_1: form.address_1 || null,
+        city: form.city || null,
+        country: form.country || null,
+      };
+
+      if (patient.intakeId) {
+        const { error } = await supabase.from("patient_intake").update(intakePayload).eq("id", patient.intakeId);
+        if (error) throw error;
+      } else if (patient.profileId) {
+        const { data: authUser } = await supabase.auth.getUser();
+        const { error } = await supabase.from("patient_intake").insert({
+          ...intakePayload,
+          user_id: patient.profileId,
+          created_by: authUser.user?.id ?? null,
+        });
+        if (error) throw error;
+      }
+
+      toast({ title: "Patient information updated successfully." });
+      setIsEditing(false);
+      setReloadTick((t) => t + 1);
+    } catch (e: any) {
+      toast({ title: "Unable to update patient information.", description: e.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
