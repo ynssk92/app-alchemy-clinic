@@ -120,32 +120,24 @@ export const SiteHeader = () => {
 
             <SheetContent
               id="mobile-nav-sheet"
-              side="bottom"
+              side="left"
               aria-label="Main navigation"
               onOpenAutoFocus={(e) => {
-                // Radix traps focus; keep initial focus on the close button
-                // instead of the first nav link so users don't accidentally
-                // trigger navigation when opening the drawer.
                 e.preventDefault();
                 const el = document.getElementById("mobile-nav-close");
                 el?.focus();
               }}
               className={cn(
-                "p-0 rounded-t-2xl border-t border-border bg-background h-[85dvh] flex flex-col",
-                // Smoother, spring-like slide + fade for the drawer itself
+                "p-0 border-r border-border bg-background w-[300px] sm:w-[350px] flex flex-col",
                 "data-[state=open]:duration-400 data-[state=closed]:duration-250",
                 "data-[state=open]:ease-[cubic-bezier(0.22,1,0.36,1)]",
                 "data-[state=closed]:ease-[cubic-bezier(0.4,0,1,1)]",
                 "motion-reduce:transition-none motion-reduce:animate-none",
               )}
             >
-              <SheetHeader className="px-5 pt-5 pb-2 flex-row items-center justify-between space-y-0">
-                <span
-                  aria-hidden="true"
-                  className="absolute left-1/2 top-2 -translate-x-1/2 h-1.5 w-12 rounded-full bg-muted"
-                />
+              <SheetHeader className="px-5 pt-6 pb-4 flex-row items-center justify-between space-y-0">
                 <SheetTitle className="text-left flex items-center gap-2">
-                  <img src={logoUrl} alt="" className="h-8" />
+                  <img src={logoUrl} alt="" className="h-9" />
                   <VisuallyHidden>Menu</VisuallyHidden>
                 </SheetTitle>
                 <SheetDescription className="sr-only">
@@ -167,35 +159,37 @@ export const SiteHeader = () => {
                 aria-label="Mobile"
                 className="flex-1 overflow-y-auto px-4 pb-4"
               >
-                <div className="grid grid-cols-2 gap-3 pb-4">
-                  <Link
-                    to="/booking"
-                    onClick={() => setOpen(false)}
-                    aria-current={bookingActive ? "page" : undefined}
-                    className={cn(
-                      "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      bookingActive
-                        ? "border-primary/40 bg-primary/10 text-primary"
-                        : "bg-card text-foreground hover:bg-muted",
-                    )}
-                  >
-                    <CalendarPlus className="h-5 w-5" aria-hidden="true" />
-                    Rendez-vous
-                  </Link>
-                  <Link
-                    to="/doctors"
-                    onClick={() => setOpen(false)}
-                    aria-current={matches("/doctors") ? "page" : undefined}
-                    className={cn(
-                      "flex min-h-16 flex-col items-center justify-center gap-1 rounded-xl border border-border px-3 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      matches("/doctors")
-                        ? "border-primary/40 bg-primary/10 text-primary"
-                        : "bg-card text-foreground hover:bg-muted",
-                    )}
-                  >
-                    <Stethoscope className="h-5 w-5" aria-hidden="true" />
-                    {t("nav.doctors", { defaultValue: "Médecins" })}
-                  </Link>
+                <div className="flex flex-col gap-4 pb-6">
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link
+                      to="/booking"
+                      onClick={() => setOpen(false)}
+                      aria-current={bookingActive ? "page" : undefined}
+                      className={cn(
+                        "flex min-h-[70px] flex-col items-center justify-center gap-1.5 rounded-xl border border-border px-3 text-[13px] font-bold transition-all active:scale-95",
+                        bookingActive
+                          ? "border-primary/40 bg-primary/10 text-primary shadow-sm"
+                          : "bg-card text-foreground hover:bg-muted/50",
+                      )}
+                    >
+                      <CalendarPlus className="h-5 w-5" aria-hidden="true" />
+                      Rendez-vous
+                    </Link>
+                    <Link
+                      to="/doctors"
+                      onClick={() => setOpen(false)}
+                      aria-current={matches("/doctors") ? "page" : undefined}
+                      className={cn(
+                        "flex min-h-[70px] flex-col items-center justify-center gap-1.5 rounded-xl border border-border px-3 text-[13px] font-bold transition-all active:scale-95",
+                        matches("/doctors")
+                          ? "border-primary/40 bg-primary/10 text-primary shadow-sm"
+                          : "bg-card text-foreground hover:bg-muted/50",
+                      )}
+                    >
+                      <Stethoscope className="h-5 w-5" aria-hidden="true" />
+                      {t("nav.doctors", { defaultValue: "Médecins" })}
+                    </Link>
+                  </div>
                 </div>
                 <ul className="flex flex-col gap-1">
 
@@ -215,18 +209,18 @@ export const SiteHeader = () => {
                           onClick={() => setOpen(false)}
                           aria-current={active ? "page" : undefined}
                           className={cn(
-                            "relative flex items-center justify-between rounded-xl px-4 min-h-14 text-base font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            "relative flex items-center justify-between rounded-xl px-4 min-h-[52px] text-base font-bold transition-all active:scale-[0.98]",
                             active
-                              ? "bg-primary/10 text-primary before:absolute before:left-0 before:top-3 before:bottom-3 before:w-1 before:rounded-full before:bg-primary"
-                              : "text-foreground hover:bg-muted",
+                              ? "bg-primary/5 text-primary"
+                              : "text-foreground hover:bg-muted/50",
                           )}
                         >
                           <span>{item.label}</span>
                           <span
                             aria-hidden="true"
                             className={cn(
-                              "h-2 w-2 rounded-full bg-current",
-                              active ? "opacity-100" : "opacity-40",
+                              "h-1.5 w-1.5 rounded-full bg-current transition-opacity duration-300",
+                              active ? "opacity-100" : "opacity-0",
                             )}
                           />
                         </NavLink>
@@ -236,9 +230,9 @@ export const SiteHeader = () => {
                 </ul>
               </nav>
 
-              <div className="border-t border-border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] space-y-3 bg-card">
-                <div className="flex items-center justify-between gap-3">
-                  <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+              <div className="border-t border-border p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] space-y-4 bg-background shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+                <div className="flex items-center justify-between px-1">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                     {t("nav.language", { defaultValue: "Language" })}
                   </span>
                   <LanguageToggle />
@@ -246,21 +240,14 @@ export const SiteHeader = () => {
                 <Link
                   to="/booking"
                   onClick={() => setOpen(false)}
-                  aria-current={bookingActive ? "page" : undefined}
                   className="block"
                 >
                   <Button
-                    className={cn(
-                      "w-full h-12 text-base shadow-soft",
-                      bookingActive && "ring-2 ring-primary/40 ring-offset-2 ring-offset-background",
-                    )}
+                    className="w-full h-12 text-base font-bold shadow-medium hover:shadow-lg transition-all active:scale-95"
                   >
                     Rendez-vous
                   </Button>
                 </Link>
-
-
-
               </div>
             </SheetContent>
           </Sheet>
