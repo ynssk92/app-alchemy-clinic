@@ -32,6 +32,7 @@ type Row = {
   reason: string | null; 
   patient_id: string;
   doctors: { full_name: string } | null;
+  services: { name: string; duration: number; category: { name: string } | null } | null;
 };
 
 const AdminAppointments = () => {
@@ -44,7 +45,7 @@ const AdminAppointments = () => {
   const load = async () => {
     setIsLoading(true);
     const { data } = await supabase.from("appointments")
-      .select("id, appointment_date, appointment_time, status, reason, patient_id, doctors(full_name)")
+      .select("id, appointment_date, appointment_time, status, reason, patient_id, doctors(full_name), services(name, duration, category:service_categories(name))")
       .order("appointment_date", { ascending: false });
     setRows((data as any) || []);
     setIsLoading(false);
@@ -100,7 +101,8 @@ const AdminAppointments = () => {
 
   const filteredRows = rows.filter(r => {
     const matchesSearch = (r.doctors?.full_name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          r.reason?.toLowerCase().includes(searchQuery.toLowerCase()));
+                          r.reason?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          r.services?.name.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesStatus = statusFilter === "all" || r.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -266,9 +268,20 @@ const AdminAppointments = () => {
                   <Clock className="w-4 h-4 text-slate-400 shrink-0" />
                   <span className="text-sm font-medium">{r.appointment_time.slice(0, 5)}</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-500 flex-1 min-w-0">
-                  <FileText className="w-4 h-4 text-slate-300 shrink-0" />
-                  <p className="text-sm truncate pr-4">{r.reason || "No consultation reason provided"}</p>
+                <div className="flex flex-col gap-1 flex-1 min-w-0">
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <FileText className="w-4 h-4 text-slate-300 shrink-0" />
+                    <p className="text-sm font-bold text-slate-700 truncate">{r.services?.name || "Custom Consultation"}</p>
+                  </div>
+                  {r.services && (
+                    <div className="flex gap-2 pl-6">
+                      <Badge variant="outline" className="text-[9px] h-4 px-1.5 bg-slate-50 border-slate-200 text-slate-500 font-medium">{r.services.category?.name}</Badge>
+                      <Badge variant="outline" className="text-[9px] h-4 px-1.5 bg-slate-50 border-slate-200 text-slate-500 font-medium">{r.services.duration} min</Badge>
+                    </div>
+                  )}
+                  {r.reason && r.reason !== r.services?.name && (
+                    <p className="text-xs text-slate-400 pl-6 truncate">{r.reason}</p>
+                  )}
                 </div>
               </div>
 

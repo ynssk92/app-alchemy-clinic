@@ -61,7 +61,7 @@ const Booking = () => {
 
   const methods = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", reason_id: undefined, custom_reason: "" },
+    defaultValues: { first_name: "", last_name: "", email: "", phone: "", dob: "", service_id: "", reason_id: undefined, custom_reason: "" },
     mode: "onBlur",
   });
 
@@ -113,7 +113,7 @@ const Booking = () => {
   const detailsFilled = Boolean(values.first_name && values.last_name && values.email && values.phone);
   const completed = [detailsFilled ? 1 : 0, doctorId ? 2 : 0, date && selectedTime ? 3 : 0].filter(Boolean) as number[];
   const currentStep = !detailsFilled ? 1 : !doctorId ? 2 : !(date && selectedTime) ? 3 : 4;
-  const ready = Boolean(detailsFilled && doctorId && date && selectedTime);
+  const ready = Boolean(detailsFilled && doctorId && date && selectedTime && (values.service_id || values.reason_id));
 
   const handleSaveForLater = () => {
     localStorage.setItem(
@@ -148,7 +148,7 @@ const Booking = () => {
         appointment_date: localDate,
         appointment_time: selectedTime,
         reason: reasonText,
-        reason_id: v.reason_id,
+        service_id: reason?.id !== "other" ? reason?.id : null,
         custom_reason: reason?.is_other ? (v.custom_reason ?? "").trim() : null,
         redirect_to: `${window.location.origin}/reset-password`,
       },
@@ -248,19 +248,24 @@ const Booking = () => {
                 <DoctorCard doctor={selectedDoctor} nextAvailable={selectedDoctor ? "Aujourd'hui" : undefined} />
 
                 <div className="rounded-3xl border border-border bg-card p-6 shadow-soft sm:p-8">
-                  <Label htmlFor="reason" className="text-sm font-semibold">Motif de la consultation *</Label>
+                  <Label htmlFor="reason" className="text-sm font-semibold">Service ou motif de consultation *</Label>
                   <ReasonSelect
                     value={reason?.id}
-                    invalid={Boolean(methods.formState.errors.reason_id)}
+                    invalid={Boolean(methods.formState.errors.service_id || methods.formState.errors.reason_id)}
                     onChange={(r) => {
                       setReason(r);
-                      methods.setValue("reason_id", r?.id ?? "", { shouldValidate: true });
+                      if (r?.id === "other") {
+                        methods.setValue("service_id", "");
+                        methods.setValue("reason_id", "");
+                      } else {
+                        methods.setValue("service_id", r?.id ?? "", { shouldValidate: true });
+                      }
                       if (!r?.is_other) methods.setValue("custom_reason", "");
                     }}
                   />
-                  {methods.formState.errors.reason_id ? (
+                  {(methods.formState.errors.service_id || methods.formState.errors.reason_id) ? (
                     <p className="mt-1.5 text-xs font-medium text-destructive">
-                      {methods.formState.errors.reason_id.message}
+                      {(methods.formState.errors.service_id?.message || methods.formState.errors.reason_id?.message)}
                     </p>
                   ) : null}
 
