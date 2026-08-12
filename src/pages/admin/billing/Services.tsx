@@ -14,7 +14,7 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-type Svc = { id?: string; name: string; code: string; description: string; duration: number; price: number; cost: number; tax_rate: number; active: boolean; category_id: string | null; clinic_id?: string | null };
+type Svc = { id?: string; name: string; code: string; description: string; duration: number; price: number; cost: number; tax_rate: number; active: boolean; category_id: string | null; clinic_id?: string | null; category?: { name: string; color: string } | null };
 
 const empty: Svc = { name: "", code: "", description: "", duration: 30, price: 0, cost: 0, tax_rate: 0, active: true, category_id: null };
 
