@@ -122,10 +122,16 @@ const AdminLandingPage = () => {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
-            <Link to="/?preview=true" target="_blank">
+            <a href="/?preview=true" target="_blank">
               <Eye className="h-4 w-4 mr-2" />
               Preview Site
-            </Link>
+            </a>
+          </Button>
+          <Button variant="outline" asChild>
+            <a href="/" target="_blank">
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Live Site
+            </a>
           </Button>
           <Button onClick={saveContent} disabled={saving}>
             <Save className="h-4 w-4 mr-2" />
