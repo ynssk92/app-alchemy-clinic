@@ -86,7 +86,7 @@ const Index = () => {
   const currentDept = departments.find((d) => d.id === activeDept) || departments[0];
 
   return (
-    <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col bg-background">
       <Seo
         title={page?.seo_title || "La Dune Clinique Dentaire — Rendez-vous en quelques secondes"}
         description={page?.seo_description || "Clinique dentaire moderne : esthétique du sourire, implantologie, orthodontie. Prenez rendez-vous en ligne avec nos praticiens en quelques secondes."}
