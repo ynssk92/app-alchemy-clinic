@@ -44,7 +44,7 @@ const passwordSchema = z
 
 const Profile = () => {
   const { user, signOut, isAdmin, isAssistant } = useAuth();
-  const { settings } = useAppSettings();
+  const { logoUrl } = useAppSettings();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -150,7 +150,7 @@ const Profile = () => {
       <header className="sticky top-0 z-50 w-full h-[64px] md:h-[72px] bg-white border-b border-slate-100 flex items-center justify-center px-4 md:px-6">
         <div className="w-full max-w-[1200px] flex items-center justify-between">
           <Link to={isAdmin || isAssistant ? "/admin" : "/"} className="flex items-center gap-3 shrink-0 transition-transform duration-300 hover:scale-105">
-            <img src={settings.logo_url || "/logo.png"} alt="La Dune Clinique Dentaire" className="w-[120px] md:w-[150px] h-auto object-contain" />
+            <img src={logoUrl} alt="La Dune Clinique Dentaire" className="w-[120px] md:w-[150px] h-auto object-contain" />
           </Link>
           
           <div className="flex items-center gap-4">
