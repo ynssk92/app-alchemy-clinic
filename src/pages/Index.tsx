@@ -161,7 +161,7 @@ const Index = () => {
             <div className="reveal reveal-right">
               <span className="text-xs font-bold uppercase tracking-widest text-primary/60">L'excellence au quotidien</span>
               <h2 className="mt-4 text-4xl font-bold tracking-tight text-slate-900 md:text-5xl leading-[1.1]">
-                {page?.intro_heading || "Une approche holistique de la santé dentaire."}
+                Une approche holistique de la santé dentaire.
               </h2>
               <div className="mt-8 text-lg leading-relaxed text-slate-500">
                 {page?.intro || "Nous croyons que chaque sourire est unique. Notre clinique combine les dernières innovations technologiques avec un confort absolu pour transformer votre expérience dentaire."}
