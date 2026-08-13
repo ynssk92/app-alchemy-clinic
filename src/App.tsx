@@ -23,6 +23,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import AdminBlog from "./pages/admin/AdminBlog";
 import AdminMessages from "./pages/admin/AdminMessages";
+import AdminLanguages from "./pages/admin/AdminLanguages";
 import Contact from "./pages/Contact";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -148,6 +149,7 @@ const App = () => (
               <Route path="testimonials" element={<ProtectedRoute adminOnly><AdminTestimonials /></ProtectedRoute>} />
               <Route path="faq" element={<ProtectedRoute adminOnly><AdminFaq /></ProtectedRoute>} />
               <Route path="translation-monitor" element={<ProtectedRoute adminOnly><AdminTranslationMonitor /></ProtectedRoute>} />
+              <Route path="languages" element={<ProtectedRoute adminOnly><AdminLanguages /></ProtectedRoute>} />
               <Route path="settings" element={<ProtectedRoute><PermissionRoute module="settings" action="edit"><AdminSettings /></PermissionRoute></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
