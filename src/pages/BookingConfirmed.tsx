@@ -389,6 +389,7 @@ const BookingConfirmed = () => {
 
                   {appt ? (
                     <div className="mt-5 space-y-4">
+                      <Row icon={UserRound} label="Patient" value={appt.profiles?.full_name || guest?.email || "Patient non renseigné"} />
                       <Row icon={UserRound} label="Praticien" value={appt.doctors?.full_name ?? "—"} hint={appt.doctors?.specialties?.name ?? undefined} />
                       <Row icon={CalendarDays} label="Date" value={dateLabel} />
                       <Row icon={Clock} label="Heure" value={appt.appointment_time} />
