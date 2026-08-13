@@ -208,6 +208,18 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "bold").setFontSize(12);
       doc.text(reference, M, 195);
 
+      // QR Code in the header
+      try {
+        const qrDataUrl = await QRCode.toDataURL(reference, { margin: 1, width: 60 });
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(W - M - 70, 30, 70, 70, 10, 10, "F");
+        doc.addImage(qrDataUrl, "PNG", W - M - 65, 35, 60, 60);
+        doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(255, 255, 255);
+        doc.text("SCANNER", W - M - 60, 110);
+      } catch (qrErr) {
+        console.error("QR Code generation failed:", qrErr);
+      }
+
       y = headerH + 40;
       doc.setTextColor(textDark[0], textDark[1], textDark[2]);
       doc.setFont("helvetica", "bold").setFontSize(22);
