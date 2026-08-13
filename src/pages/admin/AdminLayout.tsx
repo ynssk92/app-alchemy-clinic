@@ -207,6 +207,7 @@ const SidebarFooterContent = ({
   const navigate = useNavigate();
   const { signOut } = useAuth();
   const { collapsed } = useSidebar();
+  const { t } = useTranslation();
 
   // Collapsed rail: Settings, Profile avatar (tooltip = name), Logout
   if (collapsed) {
