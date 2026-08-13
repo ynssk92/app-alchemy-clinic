@@ -14,7 +14,44 @@
     "billing": "الفواتير",
     "services": "الخدمات",
     "messages": "الرسائل",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "main": "الرئيسية",
+    "clinic": "العيادة",
+    "billingServices": "الفواتير والخدمات",
+    "contentComms": "المحتوى والتواصل",
+    "administration": "الإدارة",
+    "content": "المحتوى",
+    "system": "النظام",
+    "websiteCms": "إدارة الموقع",
+    "mediaLibrary": "مكتبة الوسائط",
+    "doctorDetails": "تفاصيل الطبيب",
+    "addDoctor": "إضافة طبيب",
+    "doctorSchedule": "جدول الطبيب",
+    "patientDetails": "تفاصيل المريض",
+    "createPatient": "إنشاء مريض",
+    "approvals": "الموافقات",
+    "newAppointment": "موعد جديد",
+    "calendar": "التقويم",
+    "kanbanView": "عرض كانبان",
+    "requests": "الطلبات",
+    "specialties": "التخصصات",
+    "clinics": "العيادات",
+    "clinicAudit": "تدقيق العيادة",
+    "servicesCatalog": "كتالوج الخدمات",
+    "serviceCategories": "فئات الخدمات",
+    "invoices": "الفواتير",
+    "newInvoice": "فاتورة جديدة",
+    "payments": "المدفوعات",
+    "users": "المستخدمين",
+    "rolesPermissions": "الأدوار والأذونات",
+    "deleteRequests": "طلبات الحذف",
+    "reports": "التقارير",
+    "pages": "الصفحات",
+    "location": "الموقع",
+    "testimonials": "التوصيات",
+    "aiTranslation": "الذكاء الاصطناعي والترجمة",
+    "verifyAssistants": "التحقق من المساعدين",
+    "searchPlaceholder": "البحث عن المرضى والأطباء والمواعيد..."
   },
   "common": {
     "language": "اللغة",
@@ -26,6 +63,49 @@
     "add": "إضافة",
     "search": "بحث",
     "view": "عرض",
-    "actions": "إجراءات"
+    "actions": "إجراءات",
+    "quickActions": "إجراءات سريعة",
+    "viewSite": "عرض الموقع",
+    "signOut": "تسجيل الخروج",
+    "profile": "الملف الشخصي",
+    "bookAppointment": "احجز موعداً"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "صباح الخير",
+      "afternoon": "مساء الخير",
+      "evening": "مساء الخير"
+    },
+    "stats": {
+      "activePractitioners": "الممارسين النشطين",
+      "registeredProfiles": "الملفات المسجلة",
+      "allTimeBookings": "إجمالي الحجوزات",
+      "upcoming": "القادمة",
+      "scheduledAhead": "المجدولة مسبقاً"
+    },
+    "status": {
+      "clinicOpen": "العيادة مفتوحة"
+    },
+    "charts": {
+      "appointmentStats": {
+        "title": "إحصائيات المواعيد",
+        "desc": "التوزيع خلال الـ 12 شهراً الماضية"
+      },
+      "activityGrowth": {
+        "title": "نمو النشاط",
+        "desc": "إجمالي الحجوزات لكل شهر"
+      }
+    },
+    "schedule": {
+      "title": "جدول اليوم",
+      "desc": "الزيارات القادمة على الجدول الزمني"
+    },
+    "activity": {
+      "title": "النشاط الأخير",
+      "desc": "أحدث الأحداث في العيادة"
+    },
+    "actions": {
+      "desc": "انتقل مباشرة إلى العمل"
+    }
   }
 }
