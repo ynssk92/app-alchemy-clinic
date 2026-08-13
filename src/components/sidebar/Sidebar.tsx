@@ -13,7 +13,7 @@ type SidebarProps = {
   children: ReactNode;
 };
 
-const RAIL_BG = "#0F172A";
+const RAIL_BG = "#F5F7FB"; // Modern SaaS light background
 
 const SidebarShell = ({ header, footer, children }: SidebarProps) => {
   const { collapsed } = useSidebar();
@@ -29,8 +29,8 @@ const SidebarShell = ({ header, footer, children }: SidebarProps) => {
         "hidden md:flex flex-col shrink-0 overflow-hidden",
         "transition-[width,background-color] duration-300 ease-in-out will-change-[width]",
         collapsed
-          ? "border-r border-slate-800/80 text-slate-400"
-          : "bg-card border-r border-border",
+          ? "border-r border-[#E2E8F0] text-[#334155]"
+          : "bg-[#F5F7FB] border-r border-[#E2E8F0]",
       )}
     >
       <div className="shrink-0">{header}</div>

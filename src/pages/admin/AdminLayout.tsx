@@ -155,8 +155,8 @@ const SidebarHeader = () => {
       className={cn(
         "flex items-center border-b py-3 gap-2",
         collapsed
-          ? "flex-col px-2 border-slate-800/80"
-          : "px-3 border-border",
+          ? "flex-col px-2 border-[#E2E8F0]"
+          : "px-3 border-[#E2E8F0]",
       )}
     >
       {collapsed ? (
@@ -220,7 +220,7 @@ const SidebarFooterContent = ({
               type="button"
               onClick={() => navigate("/admin/settings")}
               aria-label="Settings"
-              className="group relative flex items-center justify-center w-12 h-12 rounded-[14px] text-slate-400 hover:bg-slate-700 hover:text-white transition-[transform,background-color,color] duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
+              className="group relative flex items-center justify-center w-12 h-12 rounded-[14px] text-[#334155] hover:bg-[#EEF2FF] hover:text-[#243B8F] transition-[transform,background-color,color] duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
             >
               <Settings className="h-5 w-5" strokeWidth={2} />
             </button>
@@ -232,7 +232,7 @@ const SidebarFooterContent = ({
             aria-label={`Profile — ${adminName}`}
             className="group flex items-center justify-center w-12 h-12 rounded-full transition-transform duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70"
           >
-            <Avatar className="w-10 h-10 ring-2 ring-slate-700 group-hover:ring-primary transition-colors">
+            <Avatar className="w-10 h-10 ring-2 ring-[#E2E8F0] group-hover:ring-primary transition-colors">
               {avatarUrl && <AvatarImage src={avatarUrl} alt={adminName} />}
               <AvatarFallback className="bg-primary/20 text-primary text-xs font-semibold">
                 {initials}
@@ -245,7 +245,7 @@ const SidebarFooterContent = ({
             type="button"
             onClick={async () => { await signOut(); navigate("/"); }}
             aria-label="Sign out"
-            className="group flex items-center justify-center w-12 h-12 rounded-[14px] text-slate-400 hover:bg-destructive/20 hover:text-destructive transition-[transform,background-color,color] duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/70"
+            className="group flex items-center justify-center w-12 h-12 rounded-[14px] text-[#334155] hover:bg-destructive/10 hover:text-destructive transition-[transform,background-color,color] duration-200 ease-out motion-safe:hover:scale-105 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive/70"
           >
             <LogOut className="h-5 w-5" strokeWidth={2} />
           </button>

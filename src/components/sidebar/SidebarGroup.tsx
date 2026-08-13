@@ -33,7 +33,7 @@ export const SidebarGroup = ({
         {children}
       </div>
       {collapsed && (
-        <div className="mx-auto mt-3 h-px w-8 bg-slate-800/80" aria-hidden="true" />
+        <div className="mx-auto mt-3 h-px w-8 bg-[#E5E7EB]" aria-hidden="true" />
       )}
     </div>
   );
