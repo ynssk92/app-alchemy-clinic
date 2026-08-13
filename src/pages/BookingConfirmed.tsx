@@ -374,8 +374,12 @@ const BookingConfirmed = () => {
                       disabled={!appt || downloading}
                       onClick={handleDownloadPdf}
                     >
-                      {downloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-                      Télécharger le PDF
+                      {downloading ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Download className="mr-2 h-4 w-4" />
+                      )}
+                      Télécharger la confirmation (PDF)
                     </Button>
                   </div>
                   <Button asChild variant="ghost" className="mt-3 h-11 w-full rounded-xl">
