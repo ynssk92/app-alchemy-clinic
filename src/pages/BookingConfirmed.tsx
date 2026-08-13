@@ -149,101 +149,139 @@ const BookingConfirmed = () => {
       const { jsPDF } = await import("jspdf");
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const W = doc.internal.pageSize.getWidth();
-      const M = 48;
-      let y = 64;
+      const H = doc.internal.pageSize.getHeight();
+      const M = 48; // Margin
+      let y = 0;
 
-      const logo = await loadLogo();
-      const headerH = 130;
-      doc.setFillColor(32, 48, 128);
+      // COLORS & STYLES
+      const brandBlue = [32, 48, 128]; // #203080
+      const textDark = [20, 20, 20];
+      const textGray = [110, 116, 135];
+      const lightGray = [220, 224, 235];
+
+      // --- HEADER SECTION ---
+      const headerH = 140;
+      doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
       doc.rect(0, 0, W, headerH, "F");
 
-      let textX = M;
+      // Logo Box
+      const logo = await loadLogo();
+      let logoWidth = 0;
       if (logo) {
-        const boxH = 64;
-        const logoH = 48;
-        const logoW = Math.min(160, (logo.w / logo.h) * logoH);
-        const boxW = logoW + 28;
+        const boxH = 70;
+        const logoH = 50;
+        logoWidth = Math.min(180, (logo.w / logo.h) * logoH);
+        const boxW = logoWidth + 28;
+        
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(M, 33, boxW, boxH, 12, 12, "F");
-        doc.addImage(logo.data, M + 14, 33 + (boxH - logoH) / 2, logoW, logoH, undefined, "FAST");
-        textX = M + boxW + 20;
+        doc.roundedRect(M, 35, boxW, boxH, 12, 12, "F");
+        doc.addImage(logo.data, M + 14, 35 + (boxH - logoH) / 2, logoWidth, logoH, undefined, "FAST");
       }
 
+      // Clinic Name & Patient Info
       doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold").setFontSize(19);
-      doc.text(settings.site_name || "La Dune", textX, 62);
-      doc.setFont("helvetica", "normal").setFontSize(12);
-      doc.text("Confirmation de rendez-vous", textX, 84);
-      doc.setFontSize(10);
-      doc.text(`Reference : ${appt.reference ?? "#" + appt.id.slice(0, 8).toUpperCase()}`, W - M, 62, { align: "right" });
+      doc.setFont("helvetica", "bold").setFontSize(18);
+      doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 120);
 
+      const patientName = appt.profiles?.full_name || "—";
+      doc.setFontSize(11).setFont("helvetica", "normal");
+      doc.text("PATIENT", M, 85);
+      doc.setFont("helvetica", "bold").setFontSize(14);
+      doc.text(patientName, M, 100);
+
+      // Top Right: Reference
+      const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
+      doc.setFont("helvetica", "normal").setFontSize(11);
+      doc.text("RÉFÉRENCE", W - M, 85, { align: "right" });
+      doc.setFont("helvetica", "bold").setFontSize(16);
+      doc.text(reference, W - M, 105, { align: "right" });
+
+      // --- MAIN CONTENT ---
       y = headerH + 40;
-      doc.setTextColor(20, 20, 20);
-      doc.setFont("helvetica", "bold").setFontSize(13);
-      doc.text("Details du rendez-vous", M, y);
-      y += 10;
-      doc.setDrawColor(220, 224, 235);
-      doc.line(M, y, W - M, y);
-      y += 24;
+      
+      // Title
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.setFont("helvetica", "bold").setFontSize(22);
+      doc.text("Confirmation de rendez-vous", M, y);
+      y += 40;
 
-      const rows: [string, string][] = [
-        ["Praticien", appt.doctors?.full_name ?? "-"],
-        ["Specialite", appt.doctors?.specialties?.name ?? "-"],
-        ["Date", dateLabel],
-        ["Heure", appt.appointment_time],
-        ["Lieu", appt.doctors?.clinics?.name ?? settings.site_name],
-        ["Adresse", address || "-"],
-        ["Motif", appt.reason || "-"],
-        ["Statut", appt.status],
+      // APPOINTMENT DETAILS CARD (Grid-like layout)
+      const details = [
+        { label: "PRATICIEN", value: appt.doctors?.full_name || "—" },
+        { label: "SPÉCIALITÉ", value: appt.doctors?.specialties?.name || "—" },
+        { label: "DATE", value: dateLabel },
+        { label: "HEURE", value: appt.appointment_time },
+        { label: "LIEU", value: appt.doctors?.clinics?.name || settings.site_name },
+        { label: "ADRESSE", value: address || "—" },
+        { label: "MOTIF", value: appt.reason || "—" },
+        { label: "STATUT", value: appt.status.toUpperCase() },
       ];
-      rows.forEach(([label, value]) => {
-        doc.setFont("helvetica", "bold").setFontSize(10).setTextColor(110, 116, 135);
-        doc.text(label.toUpperCase(), M, y);
-        doc.setFont("helvetica", "normal").setFontSize(12).setTextColor(20, 20, 20);
-        const lines = doc.splitTextToSize(String(value), W - M - 190);
-        doc.text(lines, M + 150, y);
-        y += 20 + (lines.length - 1) * 14;
+
+      // Draw 2 columns
+      const colWidth = (W - (M * 2)) / 2;
+      details.forEach((item, index) => {
+        const col = index % 2;
+        const row = Math.floor(index / 2);
+        const curX = M + (col * colWidth);
+        const curY = y + (row * 60);
+
+        doc.setFont("helvetica", "bold").setFontSize(9).setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.text(item.label, curX, curY);
+        
+        doc.setFont("helvetica", "bold").setFontSize(12).setTextColor(textDark[0], textDark[1], textDark[2]);
+        const lines = doc.splitTextToSize(String(item.value), colWidth - 20);
+        doc.text(lines, curX, curY + 18);
       });
 
-      y += 16;
-      doc.setFont("helvetica", "bold").setFontSize(13).setTextColor(20, 20, 20);
-      doc.text("Prochaines etapes", M, y);
-      y += 10;
+      y += (Math.ceil(details.length / 2) * 60) + 30;
+
+      // --- SEPARATOR ---
+      doc.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
       doc.line(M, y, W - M, y);
-      y += 24;
+      y += 40;
+
+      // NEXT STEPS SECTION
+      doc.setFont("helvetica", "bold").setFontSize(14).setTextColor(brandBlue[0], brandBlue[1], brandBlue[2]);
+      doc.text("PROCHAINES ÉTAPES", M, y);
+      y += 25;
 
       nextSteps.forEach((s, i) => {
-        doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(32, 48, 128);
+        doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(textDark[0], textDark[1], textDark[2]);
         doc.text(`${i + 1}. ${s.title}`, M, y);
-        y += 16;
-        doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(70, 74, 90);
-        const lines = doc.splitTextToSize(s.text, W - M * 2);
+        y += 18;
+        doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(textGray[0], textGray[1], textGray[2]);
+        const lines = doc.splitTextToSize(s.text, W - (M * 2));
         doc.text(lines, M, y);
-        y += lines.length * 13 + 12;
+        y += (lines.length * 13) + 15;
       });
 
-      y += 8;
-      doc.setDrawColor(220, 224, 235);
+      // --- FOOTER SECTION ---
+      y = H - 100;
+      doc.setDrawColor(lightGray[0], lightGray[1], lightGray[2]);
       doc.line(M, y, W - M, y);
-      y += 22;
-      doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(20, 20, 20);
-      doc.text("Contact", M, y);
-      y += 16;
-      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(70, 74, 90);
-      doc.text(`Telephone : ${settings.contact_phone}`, M, y);
-      y += 14;
-      doc.text(`Email : ${settings.contact_email}`, M, y);
-      y += 14;
-      doc.text("Modification ou annulation : merci de nous prevenir au moins 24h a l'avance.", M, y);
+      y += 25;
 
-      doc.setFontSize(9).setTextColor(150, 154, 168);
+      doc.setFont("helvetica", "bold").setFontSize(11).setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.text("CONTACT & INFORMATIONS", M, y);
+      
+      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(textGray[0], textGray[1], textGray[2]);
+      y += 18;
+      doc.text(`Téléphone : ${settings.contact_phone}`, M, y);
+      doc.text(`Email : ${settings.contact_email}`, M + 150, y);
+      y += 16;
+      doc.text("Important : Merci de nous prévenir au moins 24h à l'avance pour toute modification ou annulation.", M, y);
+
+      // Generation Date
+      doc.setFontSize(8).setTextColor(180, 180, 180);
       doc.text(
-        `Document genere le ${new Date().toLocaleDateString("fr-FR")}`,
+        `Document généré le ${new Date().toLocaleDateString("fr-FR")} — ${settings.site_name}`,
         M,
-        doc.internal.pageSize.getHeight() - 36,
+        H - 30,
       );
 
       doc.save(`rendez-vous-${appt.id.slice(0, 8)}.pdf`);
+    } catch (error) {
+      console.error("PDF generation failed:", error);
     } finally {
       setDownloading(false);
     }
