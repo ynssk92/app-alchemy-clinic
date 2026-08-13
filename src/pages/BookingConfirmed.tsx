@@ -190,12 +190,14 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "bold").setFontSize(18);
       doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 120);
 
-      const patientName = appt.profiles?.full_name || guest?.email || "Patient non renseigné";
+      const patientDisplayName = appt.patient_intake?.first_name && appt.patient_intake?.last_name
+        ? `${appt.patient_intake.first_name} ${appt.patient_intake.last_name}`
+        : appt.profiles?.full_name || "Patient non renseigné";
       
       doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
       doc.text("PATIENT", M, 85);
       doc.setFont("helvetica", "bold").setFontSize(14);
-      doc.text(patientName.toUpperCase(), M, 100);
+      doc.text(patientDisplayName.toUpperCase(), M, 100);
 
       const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
       doc.setFont("helvetica", "normal").setFontSize(11);
