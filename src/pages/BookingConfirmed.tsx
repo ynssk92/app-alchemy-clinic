@@ -20,7 +20,14 @@ type Appt = {
   reason: string | null;
   status: string;
   reference?: string | null;
-  doctors: { full_name: string; avatar_url: string | null; specialties: { name: string } | null; clinics: { name: string; address: string | null } | null } | null;
+  patient_id: string;
+  profiles: { full_name: string | null } | null;
+  doctors: { 
+    full_name: string; 
+    avatar_url: string | null; 
+    specialties: { name: string } | null; 
+    clinics: { name: string; address: string | null } | null 
+  } | null;
 };
 
 type GuestState = {
