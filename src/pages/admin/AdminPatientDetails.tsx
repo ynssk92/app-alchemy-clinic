@@ -12,8 +12,10 @@ import {
   ArrowLeft, Search, Phone, MessageSquare, Video, CalendarPlus,
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
-  ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2
+  ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2,
+  Receipt, Eye, FileText
 } from "lucide-react";
+import { formatMoney } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -84,15 +86,27 @@ const statusPill = (status: string) => {
     upcoming: "bg-primary/10 text-primary",
     completed: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
     cancelled: "bg-destructive/10 text-destructive",
+    // Invoice statuses
+    paid: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    partially_paid: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    pending: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    cancelled_invoice: "bg-destructive/10 text-destructive",
+    draft: "bg-muted text-muted-foreground",
   };
   const label: Record<string, string> = {
     upcoming: "Schedule",
     completed: "Checked Out",
     cancelled: "Cancelled",
+    paid: "Paid",
+    partially_paid: "Partial",
+    pending: "Pending",
+    cancelled_invoice: "Cancelled",
+    draft: "Draft",
   };
+  const statusKey = status === 'cancelled' && map[status] ? status : (status === 'cancelled' ? 'cancelled_invoice' : status);
   return (
-    <span className={cn("px-2.5 py-1 rounded-md text-xs font-semibold", map[status] || "bg-muted text-muted-foreground")}>
-      {label[status] || status}
+    <span className={cn("px-2.5 py-1 rounded-md text-xs font-semibold", map[statusKey] || "bg-muted text-muted-foreground")}>
+      {label[statusKey] || status}
     </span>
   );
 };
@@ -110,6 +124,9 @@ const AdminPatientDetails = () => {
   const [appts, setAppts] = useState<any[]>([]);
   const [q, setQ] = useState("");
   const [apptSearch, setApptSearch] = useState("");
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
+  const [invoiceError, setInvoiceError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -309,8 +326,38 @@ const AdminPatientDetails = () => {
           .eq("patient_id", view.profileId)
           .order("appointment_date", { ascending: false });
         setAppts(a || []);
+
+        // Fetch Invoices
+        setLoadingInvoices(true);
+        setInvoiceError(false);
+        try {
+          const { data: invs, error: invErr } = await supabase
+            .from("invoices")
+            .select(`
+              id, 
+              invoice_number, 
+              issue_date, 
+              status, 
+              total, 
+              paid, 
+              due,
+              appointment_id,
+              doctors (full_name)
+            `)
+            .eq("patient_id", view.profileId)
+            .order("issue_date", { ascending: false });
+          
+          if (invErr) throw invErr;
+          setInvoices(invs || []);
+        } catch (err) {
+          console.error("Error loading transactions:", err);
+          setInvoiceError(true);
+        } finally {
+          setLoadingInvoices(false);
+        }
       } else {
         setAppts([]);
+        setInvoices([]);
       }
     })();
   }, [id, reloadTick]);
@@ -831,8 +878,82 @@ const AdminPatientDetails = () => {
                     )}
                   </TabsContent>
 
-                  <TabsContent value="transactions" className="m-0 p-10 text-center text-muted-foreground">
-                    No transactions on file.
+                  <TabsContent value="transactions" className="m-0 p-6 pt-4">
+                    {!registered ? (
+                      <div className="py-10 text-center text-sm text-muted-foreground">
+                        Financial transactions become available after the patient registers an account.
+                      </div>
+                    ) : loadingInvoices ? (
+                      <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                        <p className="text-sm">Loading transactions...</p>
+                      </div>
+                    ) : invoiceError ? (
+                      <div className="py-10 text-center text-sm text-destructive">
+                        Unable to load transactions. Please try again.
+                      </div>
+                    ) : invoices.length === 0 ? (
+                      <div className="py-20 flex flex-col items-center justify-center gap-3 text-muted-foreground">
+                        <Receipt className="w-12 h-12 opacity-20" />
+                        <p className="text-sm font-medium">No transactions on file.</p>
+                        <Button asChild variant="outline" size="sm" className="mt-2">
+                          <Link to="/admin/billing/invoices/new">Create First Invoice</Link>
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-border text-left">
+                              <th className="pb-3 font-bold">Invoice #</th>
+                              <th className="pb-3 font-bold">Date</th>
+                              <th className="pb-3 font-bold">Doctor</th>
+                              <th className="pb-3 font-bold">Total</th>
+                              <th className="pb-3 font-bold">Paid</th>
+                              <th className="pb-3 font-bold">Status</th>
+                              <th className="pb-3 text-right">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-border">
+                            {invoices.map((inv) => (
+                              <tr key={inv.id} className="group hover:bg-muted/30 transition-colors">
+                                <td className="py-4">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary/10">
+                                      <FileText className="w-4 h-4" />
+                                    </div>
+                                    <span className="font-semibold">{inv.invoice_number}</span>
+                                  </div>
+                                </td>
+                                <td className="py-4 text-muted-foreground">
+                                  {fmtDate(inv.issue_date)}
+                                </td>
+                                <td className="py-4 text-muted-foreground">
+                                  {inv.doctors?.full_name ? `Dr. ${inv.doctors.full_name}` : "—"}
+                                </td>
+                                <td className="py-4 font-medium">
+                                  {formatMoney(inv.total)}
+                                </td>
+                                <td className="py-4 text-emerald-600 font-medium">
+                                  {formatMoney(inv.paid)}
+                                </td>
+                                <td className="py-4">
+                                  {statusPill(inv.status)}
+                                </td>
+                                <td className="py-4 text-right">
+                                  <Button asChild variant="ghost" size="sm" className="gap-2 h-8">
+                                    <Link to={`/admin/billing/invoices/${inv.id}`}>
+                                      <Eye className="w-3.5 h-3.5" />
+                                      View
+                                    </Link>
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                   </TabsContent>
                 </Tabs>
               </Card>
