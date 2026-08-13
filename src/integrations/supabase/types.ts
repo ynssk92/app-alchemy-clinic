@@ -2208,6 +2208,33 @@ export type Database = {
         }
         Relationships: []
       }
+      translation_overrides: {
+        Row: {
+          created_at: string | null
+          id: string
+          key: string
+          lang: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key: string
+          lang: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key?: string
+          lang?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       user_role_assignments: {
         Row: {
           created_at: string
