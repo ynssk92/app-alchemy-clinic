@@ -92,6 +92,7 @@ const BookingConfirmed = () => {
   const [loading, setLoading] = useState(!guest);
   const [downloading, setDownloading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
 
   const reference = appt?.reference || (id ? `RDV-${id.slice(0, 8).toUpperCase()}` : "");
