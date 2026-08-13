@@ -30,6 +30,7 @@ type Appt = {
   reference?: string | null;
   patient_id: string;
   profiles: { full_name: string | null } | null;
+  patient_intake: { first_name: string | null; last_name: string | null } | null;
   doctors: { 
     full_name: string; 
     avatar_url: string | null; 
