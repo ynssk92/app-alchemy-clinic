@@ -77,7 +77,8 @@ const BookingConfirmed = () => {
           status: "pending",
           reference: guest.reference,
           patient_id: "",
-          profiles: { full_name: guest.email },
+          profiles: { full_name: guest.first_name && guest.last_name ? `${guest.first_name} ${guest.last_name}` : null },
+          patient_intake: { first_name: guest.first_name || null, last_name: guest.last_name || null },
           doctors: {
             full_name: guest.doctorName ?? "—",
             avatar_url: null,
