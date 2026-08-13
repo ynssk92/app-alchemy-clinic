@@ -65,6 +65,8 @@ const BookingConfirmed = () => {
           reason: guest.reason ?? null,
           status: "pending",
           reference: guest.reference,
+          patient_id: "", // Temporary or from guest context if possible
+          profiles: { full_name: guest.email }, // Using email as fallback name if name not passed
           doctors: {
             full_name: guest.doctorName ?? "—",
             avatar_url: null,
