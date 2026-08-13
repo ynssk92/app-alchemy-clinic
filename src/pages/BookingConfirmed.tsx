@@ -444,7 +444,7 @@ const BookingConfirmed = () => {
                     ))}
                   </ol>
 
-                  <div className="mt-6 rounded-2xl border bg-muted/40 p-4">
+                  <div className="mt-6 rounded-2xl border bg-muted/40 p-4 print:bg-transparent">
                     <p className="text-sm font-semibold">Besoin de modifier ou annuler ?</p>
                     <p className="mt-1 text-sm text-muted-foreground">Contactez-nous au moins 24h à l'avance.</p>
                     <div className="mt-3 flex flex-col gap-2 text-sm">
