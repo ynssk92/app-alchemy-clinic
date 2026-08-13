@@ -68,5 +68,43 @@
     "viewSite": "View Site",
     "signOut": "Sign Out",
     "profile": "Profile"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening"
+    },
+    "stats": {
+      "activePractitioners": "Active practitioners",
+      "registeredProfiles": "Registered profiles",
+      "allTimeBookings": "All time bookings",
+      "upcoming": "Upcoming",
+      "scheduledAhead": "Scheduled ahead"
+    },
+    "status": {
+      "clinicOpen": "Clinic Open"
+    },
+    "charts": {
+      "appointmentStats": {
+        "title": "Appointment Statistics",
+        "desc": "Distribution across the past 12 months"
+      },
+      "activityGrowth": {
+        "title": "Activity Growth",
+        "desc": "Total bookings per month"
+      }
+    },
+    "schedule": {
+      "title": "Today's Schedule",
+      "desc": "Next visits on the timeline"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "desc": "Latest events across the clinic"
+    },
+    "actions": {
+      "desc": "Jump straight to work"
+    }
   }
 }

@@ -68,5 +68,43 @@
     "viewSite": "Voir le site",
     "signOut": "Déconnexion",
     "profile": "Profil"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "Bonjour",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir"
+    },
+    "stats": {
+      "activePractitioners": "Praticiens actifs",
+      "registeredProfiles": "Profils enregistrés",
+      "allTimeBookings": "Réservations totales",
+      "upcoming": "À venir",
+      "scheduledAhead": "Prévu à l'avance"
+    },
+    "status": {
+      "clinicOpen": "Clinique Ouverte"
+    },
+    "charts": {
+      "appointmentStats": {
+        "title": "Statistiques des rendez-vous",
+        "desc": "Répartition sur les 12 derniers mois"
+      },
+      "activityGrowth": {
+        "title": "Croissance de l'activité",
+        "desc": "Réservations totales par mois"
+      }
+    },
+    "schedule": {
+      "title": "Planning du jour",
+      "desc": "Prochaines visites sur la chronologie"
+    },
+    "activity": {
+      "title": "Activité récente",
+      "desc": "Derniers événements de la clinique"
+    },
+    "actions": {
+      "desc": "Accédez directement au travail"
+    }
   }
 }

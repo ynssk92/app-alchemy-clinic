@@ -68,5 +68,43 @@
     "viewSite": "عرض الموقع",
     "signOut": "تسجيل الخروج",
     "profile": "الملف الشخصي"
+  },
+  "dashboard": {
+    "greeting": {
+      "morning": "صباح الخير",
+      "afternoon": "مساء الخير",
+      "evening": "مساء الخير"
+    },
+    "stats": {
+      "activePractitioners": "الممارسين النشطين",
+      "registeredProfiles": "الملفات المسجلة",
+      "allTimeBookings": "إجمالي الحجوزات",
+      "upcoming": "القادمة",
+      "scheduledAhead": "المجدولة مسبقاً"
+    },
+    "status": {
+      "clinicOpen": "العيادة مفتوحة"
+    },
+    "charts": {
+      "appointmentStats": {
+        "title": "إحصائيات المواعيد",
+        "desc": "التوزيع خلال الـ 12 شهراً الماضية"
+      },
+      "activityGrowth": {
+        "title": "نمو النشاط",
+        "desc": "إجمالي الحجوزات لكل شهر"
+      }
+    },
+    "schedule": {
+      "title": "جدول اليوم",
+      "desc": "الزيارات القادمة على الجدول الزمني"
+    },
+    "activity": {
+      "title": "النشاط الأخير",
+      "desc": "أحدث الأحداث في العيادة"
+    },
+    "actions": {
+      "desc": "انتقل مباشرة إلى العمل"
+    }
   }
 }
