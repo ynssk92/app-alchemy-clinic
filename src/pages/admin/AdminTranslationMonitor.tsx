@@ -18,8 +18,10 @@ import { Progress } from "@/components/ui/progress";
 interface TranslationError {
   timestamp: string;
   error: string;
-  texts: string[];
-  count: number;
+  texts?: string[];
+  count?: number;
+  type?: "credit" | "error" | "fallback";
+  reason?: string;
 }
 
 const AdminTranslationMonitor = () => {
@@ -189,7 +191,8 @@ const AdminTranslationMonitor = () => {
                 <thead className="bg-muted/50 text-muted-foreground uppercase text-[10px] font-bold">
                   <tr>
                     <th className="px-4 py-3">Timestamp</th>
-                    <th className="px-4 py-3">Error Detail</th>
+                    <th className="px-4 py-3">Type</th>
+                    <th className="px-4 py-3">Detail</th>
                     <th className="px-4 py-3">Context</th>
                     <th className="px-4 py-3 text-right">Items</th>
                   </tr>
@@ -201,15 +204,25 @@ const AdminTranslationMonitor = () => {
                         {format(new Date(err.timestamp), "MMM d, HH:mm:ss", { locale: fr })}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-destructive line-clamp-1">{err.error}</div>
+                        <Badge 
+                          variant={err.type === "error" ? "destructive" : err.type === "credit" ? "secondary" : "outline"}
+                          className="text-[10px] uppercase px-1.5 py-0"
+                        >
+                          {err.type || "unknown"}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className={`font-medium line-clamp-1 ${err.type === "error" ? "text-destructive" : "text-muted-foreground"}`}>
+                          {err.error}
+                        </div>
                       </td>
                       <td className="px-4 py-3 max-w-xs">
                         <div className="text-xs text-muted-foreground truncate">
-                          "{err.texts.join('", "')}"
+                          {err.texts ? `"${err.texts.join('", "')}"` : "—"}
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right font-medium">
-                        {err.count}
+                        {err.count || "—"}
                       </td>
                     </tr>
                   ))}

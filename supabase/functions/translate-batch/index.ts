@@ -54,9 +54,26 @@ Deno.serve(async (req: Request) => {
     });
 
     if (!res.ok) {
+      // If we are out of credits or the gateway is down, return the original texts with a 200 OK.
+      // This prevents noisy errors in the console and allows the app to function normally.
       const errText = await res.text();
-      return new Response(JSON.stringify({ error: "AI gateway error", detail: errText }), {
-        status: res.status,
+      let isCreditError = false;
+      try {
+        const errJson = JSON.parse(errText);
+        isCreditError = res.status === 402 || errJson.error === "payment_required" || (errJson.detail && errJson.detail.includes("credits"));
+      } catch {
+        isCreditError = res.status === 402;
+      }
+
+      console.warn(`Translation gateway error (${res.status}):`, errText);
+      
+      return new Response(JSON.stringify({ 
+        translations: texts, 
+        status: "fallback",
+        reason: isCreditError ? "out_of_credits" : "gateway_error",
+        detail: errText
+      }), {
+        status: 200, // Return 200 to be silent in the frontend
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
