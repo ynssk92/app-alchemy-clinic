@@ -69,10 +69,12 @@ const AdminDoctors = () => {
   };
 
   const load = async () => {
+    setLoading(true);
     const { data } = await supabase.from("doctors")
       .select("*, specialties(name), clinics(name)")
       .order("created_at", { ascending: false });
     setRows((data as any) || []);
+    setLoading(false);
   };
 
   useEffect(() => {
