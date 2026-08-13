@@ -70,6 +70,7 @@ import Payments from "./pages/admin/billing/Payments";
 import Services from "./pages/admin/billing/Services";
 import Categories from "./pages/admin/billing/Categories";
 import AdminLandingPage from "./pages/admin/AdminLandingPage";
+import AdminTranslationMonitor from "./pages/admin/AdminTranslationMonitor";
 
 const queryClient = new QueryClient();
 
