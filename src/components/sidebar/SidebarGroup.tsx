@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./SidebarContext";
 
@@ -10,6 +11,7 @@ export const SidebarGroup = ({
   children: ReactNode;
 }) => {
   const { collapsed } = useSidebar();
+  const { t } = useTranslation();
   return (
     <div className={collapsed ? "" : "space-y-1"}>
       <div
@@ -19,7 +21,7 @@ export const SidebarGroup = ({
         )}
         aria-hidden={collapsed}
       >
-        {title}
+        {t(title)}
       </div>
       <div
         className={cn(
