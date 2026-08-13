@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   CalendarCheck, CalendarDays, Clock, UserRound, MapPin, Phone, Mail,
   CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download, KeyRound, Home,
-  Eye, Printer, X
+  Eye, Printer, X, QrCode
 } from "lucide-react";
+import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppSettings } from "@/hooks/useAppSettings";
