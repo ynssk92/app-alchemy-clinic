@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   CalendarCheck, CalendarDays, Clock, UserRound, MapPin, Phone, Mail,
   CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download, KeyRound, Home,
-  Eye, Printer, X
+  Eye, Printer, X, QrCode
 } from "lucide-react";
+import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppSettings } from "@/hooks/useAppSettings";
@@ -92,6 +93,17 @@ const BookingConfirmed = () => {
   const [downloading, setDownloading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+
+  const reference = appt?.reference || (id ? `RDV-${id.slice(0, 8).toUpperCase()}` : "");
+
+  useEffect(() => {
+    if (reference) {
+      QRCode.toDataURL(reference, { margin: 1, width: 200 })
+        .then(url => setQrCodeUrl(url))
+        .catch(err => console.error("Error generating QR code:", err));
+    }
+  }, [reference]);
 
   useEffect(() => {
     if (guest || !id || authLoading) return;
@@ -206,6 +218,18 @@ const BookingConfirmed = () => {
       doc.text("RÉFÉRENCE", M, 180);
       doc.setFont("helvetica", "bold").setFontSize(12);
       doc.text(reference, M, 195);
+
+      // QR Code in the header
+      try {
+        const qrDataUrl = await QRCode.toDataURL(reference, { margin: 1, width: 60 });
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(W - M - 70, 30, 70, 70, 10, 10, "F");
+        doc.addImage(qrDataUrl, "PNG", W - M - 65, 35, 60, 60);
+        doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(255, 255, 255);
+        doc.text("SCANNER", W - M - 60, 110);
+      } catch (qrErr) {
+        console.error("QR Code generation failed:", qrErr);
+      }
 
       y = headerH + 40;
       doc.setTextColor(textDark[0], textDark[1], textDark[2]);
@@ -381,9 +405,16 @@ const BookingConfirmed = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Référence</p>
-                    <p className="text-xl font-mono font-bold">{appt?.reference || `RDV-${appt?.id.slice(0, 8).toUpperCase()}`}</p>
+                  <div className="text-right flex items-start gap-4">
+                    <div className="text-right">
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Référence</p>
+                      <p className="text-xl font-mono font-bold">{reference}</p>
+                    </div>
+                    {qrCodeUrl && (
+                      <div className="bg-white p-1 rounded-lg border">
+                        <img src={qrCodeUrl} alt="QR Code" className="w-16 h-16" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
