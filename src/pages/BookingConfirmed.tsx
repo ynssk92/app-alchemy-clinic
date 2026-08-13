@@ -44,6 +44,8 @@ type GuestState = {
   isNewAccount: boolean;
   emailSent: boolean;
   email: string;
+  first_name?: string;
+  last_name?: string;
   doctorName?: string;
   specialty?: string | null;
   clinic?: string | null;
