@@ -110,6 +110,7 @@ const BookingConfirmed = () => {
         reference,
         patient_id,
         profiles(full_name),
+        patient_intake:patient_intake!patient_id(first_name, last_name),
         doctors(
           full_name, 
           avatar_url, 
