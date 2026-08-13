@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import {
   CalendarCheck, CalendarDays, Clock, UserRound, MapPin, Phone, Mail,
   CheckCircle2, BellRing, FileText, ArrowRight, Loader2, CalendarPlus, Download, KeyRound, Home,
+  Eye, Printer, X
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,6 +13,13 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 type Appt = {
   id: string;
@@ -78,6 +86,8 @@ const BookingConfirmed = () => {
   );
   const [loading, setLoading] = useState(!guest);
   const [downloading, setDownloading] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (guest || !id || authLoading) return;
@@ -372,14 +382,14 @@ const BookingConfirmed = () => {
                       variant="outline"
                       className="h-12 flex-1 rounded-xl"
                       disabled={!appt || downloading}
-                      onClick={handleDownloadPdf}
+                      onClick={handlePreviewPdf}
                     >
                       {downloading ? (
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
-                        <Download className="mr-2 h-4 w-4" />
+                        <Eye className="mr-2 h-4 w-4" />
                       )}
-                      Télécharger la confirmation (PDF)
+                      Aperçu de la confirmation
                     </Button>
                   </div>
                   <Button asChild variant="ghost" className="mt-3 h-11 w-full rounded-xl">
