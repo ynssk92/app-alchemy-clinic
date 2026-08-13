@@ -183,7 +183,7 @@ const BookingConfirmed = () => {
       const textGray = [110, 116, 135];
       const lightGray = [220, 224, 235];
 
-      const headerH = 200;
+      const headerH = 180;
       doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
       doc.rect(0, 0, W, headerH, "F");
 
@@ -206,27 +206,34 @@ const BookingConfirmed = () => {
         ? `${appt.patient_intake.first_name} ${appt.patient_intake.last_name}`
         : appt.profiles?.full_name || "Patient non renseigné";
       
-      // PATIENT Block
-      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
-      doc.text("PATIENT", M, 145);
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.text(patientDisplayName.toUpperCase(), M, 160);
-
-      // RÉFÉRENCE Block
       const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
-      doc.setFont("helvetica", "normal").setFontSize(10);
-      doc.text("RÉFÉRENCE", M, 180);
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.text(reference, M, 195);
 
-      // QR Code in the header
+      // RIGHT SIDE HEADER CONTENT (aligned to right margin M)
+      const rightAlignX = W - M;
+      
+      // PATIENT Block (Right Aligned)
+      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
+      doc.text("PATIENT", rightAlignX, 55, { align: "right" });
+      doc.setFont("helvetica", "bold").setFontSize(14);
+      const nameLines = doc.splitTextToSize(patientDisplayName.toUpperCase(), 200);
+      doc.text(nameLines, rightAlignX, 72, { align: "right" });
+
+      // RÉFÉRENCE Block (Right Aligned)
+      const refY = 72 + (nameLines.length * 16) + 5;
+      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.text("RÉFÉRENCE", rightAlignX, refY, { align: "right" });
+      doc.setFont("helvetica", "bold").setFontSize(14);
+      doc.text(reference, rightAlignX, refY + 17, { align: "right" });
+
+      // QR Code in the footer instead of header for better layout
       try {
-        const qrDataUrl = await QRCode.toDataURL(reference, { margin: 1, width: 60 });
+        const qrDataUrl = await QRCode.toDataURL(reference, { margin: 1, width: 50 });
+        const footerY = H - 85;
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(W - M - 70, 30, 70, 70, 10, 10, "F");
-        doc.addImage(qrDataUrl, "PNG", W - M - 65, 35, 60, 60);
-        doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(255, 255, 255);
-        doc.text("SCANNER", W - M - 60, 110);
+        doc.roundedRect(W - M - 60, footerY, 60, 60, 8, 8, "F");
+        doc.addImage(qrDataUrl, "PNG", W - M - 55, footerY + 5, 50, 50);
+        doc.setFont("helvetica", "normal").setFontSize(6).setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.text("SCANNER", W - M - 55, footerY + 70);
       } catch (qrErr) {
         console.error("QR Code generation failed:", qrErr);
       }
