@@ -43,6 +43,7 @@ type Row = {
 };
 
 const AdminPatients = () => {
+  const { t } = useTranslation();
   const [rows, setRows] = useState<Row[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "registered" | "not_registered">("all");
@@ -199,19 +200,19 @@ const AdminPatients = () => {
               value="all" 
               className="px-4 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
             >
-              All Patients
+              {t("patients.list.allPatients", { defaultValue: "All Patients" })}
             </TabsTrigger>
             <TabsTrigger 
               value="registered"
               className="px-4 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
             >
-              Registered
+              {t("patients.list.registered", { defaultValue: "Registered" })}
             </TabsTrigger>
             <TabsTrigger 
               value="not_registered"
               className="px-4 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
             >
-              Not Registered
+              {t("patients.list.notRegistered", { defaultValue: "Not Registered" })}
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -221,7 +222,7 @@ const AdminPatients = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search patients..."
+            placeholder={t("patients.list.searchPlaceholder", { defaultValue: "Search patients..." })}
             className="pl-10 h-10 border-border/60 bg-background/50 focus:bg-background transition-all rounded-lg"
           />
         </div>
@@ -249,15 +250,15 @@ const AdminPatients = () => {
                     {p.full_name || "Unnamed Patient"}
                   </h3>
                   <Badge className="bg-primary/10 text-primary border-none text-[10px] uppercase font-bold tracking-wider hover:bg-primary/15">
-                    Patient
+                    {t("nav.patients")}
                   </Badge>
                   {p.profile_id ? (
                     <Badge className="bg-emerald-50 text-emerald-600 border-none text-[10px] uppercase font-bold tracking-wider hover:bg-emerald-100/50">
-                      Registered
+                      {t("patients.list.registered", { defaultValue: "Registered" })}
                     </Badge>
                   ) : (
                     <Badge className="bg-slate-100 text-slate-500 border-none text-[10px] uppercase font-bold tracking-wider hover:bg-slate-200/50">
-                      Not Registered
+                      {t("patients.list.notRegistered", { defaultValue: "Not Registered" })}
                     </Badge>
                   )}
                 </div>
