@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -115,6 +116,7 @@ const fmtDate = (d?: string | null) =>
   d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
 const AdminPatientDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -453,7 +455,7 @@ const AdminPatientDetails = () => {
           <Link to="/admin/patients" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          Patients
+          {t("nav.patients")}
         </h1>
       </div>
 
@@ -462,7 +464,7 @@ const AdminPatientDetails = () => {
         <Card className="p-4 border-border h-fit">
           <div className="relative mb-3">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search patients…" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input placeholder={t("patients.list.searchPlaceholder", { defaultValue: "Search patients…" })} value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <div className="space-y-1 max-h-[70vh] overflow-y-auto">
             {filteredList.map((p) => {
@@ -486,14 +488,14 @@ const AdminPatientDetails = () => {
                           : "border-border text-muted-foreground"
                       )}
                     >
-                      New
+                      {t("common.new", { defaultValue: "New" })}
                     </span>
                   )}
                 </button>
               );
             })}
             {filteredList.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-4">No patients</p>
+              <p className="text-xs text-muted-foreground text-center py-4">{t("dashboard.appointments.empty")}</p>
             )}
           </div>
         </Card>
