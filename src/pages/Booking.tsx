@@ -176,6 +176,8 @@ const Booking = () => {
           isNewAccount: payload.is_new_account,
           emailSent: payload.email_sent,
           email: v.email,
+          first_name: v.first_name,
+          last_name: v.last_name,
           doctorName: payload.doctor_name ?? selectedDoctor?.full_name,
           specialty: selectedDoctor?.specialty ?? null,
           clinic: selectedDoctor?.clinic ?? null,
