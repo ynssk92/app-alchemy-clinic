@@ -2263,60 +2263,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_guest_booking:
-        | {
-            Args: {
-              _custom_reason?: string
-              _date?: string
-              _dob?: string
-              _doctor_id?: string
-              _email: string
-              _first_name: string
-              _gender?: string
-              _last_name: string
-              _phone: string
-              _reason?: string
-              _reason_id?: string
-              _service_id?: string
-              _time?: string
-              _user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _date: string
-              _dob: string
-              _doctor_id: string
-              _email: string
-              _first_name: string
-              _gender: string
-              _last_name: string
-              _phone: string
-              _reason: string
-              _time: string
-              _user_id: string
-            }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _custom_reason?: string
-              _date: string
-              _dob: string
-              _doctor_id: string
-              _email: string
-              _first_name: string
-              _gender: string
-              _last_name: string
-              _phone: string
-              _reason: string
-              _reason_id?: string
-              _time: string
-              _user_id: string
-            }
-            Returns: Json
-          }
+      create_guest_booking: {
+        Args: {
+          _custom_reason?: string
+          _date?: string
+          _dob?: string
+          _doctor_id?: string
+          _email: string
+          _first_name: string
+          _gender?: string
+          _last_name: string
+          _phone: string
+          _reason?: string
+          _reason_id?: string
+          _service_id?: string
+          _time?: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       has_permission: {
         Args: { _action: string; _module: string; _user_id: string }
         Returns: boolean
