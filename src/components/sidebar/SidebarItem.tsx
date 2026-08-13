@@ -25,11 +25,11 @@ export const collapsedItemClasses = ({ isActive }: { isActive: boolean }) =>
     "group relative flex items-center justify-center mx-auto",
     "w-12 h-12 rounded-[14px] cursor-pointer",
     "transition-[transform,background-color,color,box-shadow] duration-200 ease-out",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white",
     "motion-safe:hover:scale-[1.05]",
     isActive
-      ? "bg-primary text-white shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_8px_24px_-6px_hsl(var(--primary)/0.55)]"
-      : "text-slate-400 hover:bg-slate-700 hover:text-white",
+      ? "bg-[#E8EEFF] text-[#243B8F] shadow-sm"
+      : "text-[#334155] hover:bg-[#EEF2FF] hover:text-[#243B8F]",
   );
 
 export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarItemProps) => {
@@ -72,7 +72,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
               {isActive && (
                 <span
                   aria-hidden="true"
-                  className="absolute -left-0.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-white/90 shadow-[0_0_8px_hsl(var(--primary))]"
+                  className="absolute -left-0.5 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-[#243B8F] shadow-sm"
                 />
               )}
               <Icon className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -94,12 +94,12 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
           className={cn(
             "group relative w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
             isChildActive
-              ? "bg-primary/10 text-primary"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              ? "bg-[#E8EEFF] text-[#243B8F] font-semibold"
+              : "text-[#475569] hover:bg-[#EEF2FF] hover:text-[#243B8F]",
           )}
         >
           {isChildActive && (
-            <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary" />
+            <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-[#243B8F]" />
           )}
           <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
           <span className="flex-1 truncate text-left">{t(label)}</span>
@@ -128,14 +128,14 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
                     className={cn(
                       "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
                       isActive
-                        ? "font-semibold text-primary"
-                        : "text-muted-foreground hover:text-foreground",
+                        ? "font-semibold text-[#243B8F]"
+                        : "text-[#475569] hover:text-[#243B8F]",
                     )}
                   >
                     <span
                       className={cn(
                         "h-1.5 w-1.5 rounded-full transition-colors",
-                        isActive ? "bg-primary" : "bg-muted-foreground/30",
+                        isActive ? "bg-[#243B8F]" : "bg-slate-300",
                       )}
                     />
                     {t(c.label)}
@@ -159,8 +159,8 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
         cn(
           "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
           isActive
-            ? "bg-primary text-primary-foreground shadow-soft"
-            : "text-muted-foreground hover:bg-muted hover:text-foreground",
+            ? "bg-[#E8EEFF] text-[#243B8F] font-semibold"
+            : "text-[#475569] hover:bg-[#EEF2FF] hover:text-[#243B8F]",
         )
       }
     >
@@ -169,7 +169,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
           {isActive && (
             <span
               aria-hidden="true"
-              className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary-foreground/80"
+              className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-[#243B8F]"
             />
           )}
           <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
