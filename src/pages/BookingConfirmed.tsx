@@ -87,7 +87,22 @@ const BookingConfirmed = () => {
     }
     supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, reason, status, reference, doctors(full_name, avatar_url, specialties(name), clinics(name, address))")
+      .select(`
+        id, 
+        appointment_date, 
+        appointment_time, 
+        reason, 
+        status, 
+        reference,
+        patient_id,
+        profiles(full_name),
+        doctors(
+          full_name, 
+          avatar_url, 
+          specialties(name), 
+          clinics(name, address)
+        )
+      `)
       .eq("id", id)
       .maybeSingle()
       .then(({ data }) => {
