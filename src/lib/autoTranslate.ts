@@ -114,24 +114,57 @@ const requestTranslation = async (
   });
   if (error || !data?.translations) {
     const errorMsg = error?.message || (typeof error === 'string' ? error : "Unknown error");
-    console.warn("Translation failed:", errorMsg);
+    
+    // Only log real errors, not credit exhaustion which we now handle gracefully
+    const isCreditError = errorMsg.includes("402") || errorMsg.toLowerCase().includes("credits");
+    
+    if (!isCreditError) {
+      console.warn("Translation failed:", errorMsg);
+    }
     
     // Log error to localStorage for Admin Monitor
     try {
       const logs = JSON.parse(localStorage.getItem("ladune_translation_errors") || "[]");
-      logs.unshift({
-        timestamp: new Date().toISOString(),
-        error: errorMsg,
-        texts: texts.slice(0, 3), // store first 3 to give context
-        count: texts.length
-      });
-      localStorage.setItem("ladune_translation_errors", JSON.stringify(logs.slice(0, 50)));
+      // Check if the last log was the same error to prevent flooding
+      if (logs.length === 0 || logs[0].error !== errorMsg || (Date.now() - new Date(logs[0].timestamp).getTime() > 60000)) {
+        logs.unshift({
+          timestamp: new Date().toISOString(),
+          error: errorMsg,
+          texts: texts.slice(0, 3), // store first 3 to give context
+          count: texts.length,
+          type: isCreditError ? "credit" : "error"
+        });
+        localStorage.setItem("ladune_translation_errors", JSON.stringify(logs.slice(0, 50)));
+      }
     } catch (e) {
       console.error("Failed to log translation error", e);
     }
 
     return texts;
   }
+  
+  // Even if status is 200, check if it's a fallback
+  if (data.status === "fallback") {
+    // Silently log fallback to monitor if it's new
+    try {
+      const logs = JSON.parse(localStorage.getItem("ladune_translation_errors") || "[]");
+      const lastLog = logs[0];
+      const isRecent = lastLog && (Date.now() - new Date(lastLog.timestamp).getTime() < 300000); // 5 mins
+      
+      if (!isRecent || lastLog.reason !== data.reason) {
+        logs.unshift({
+          timestamp: new Date().toISOString(),
+          error: `Service in fallback mode: ${data.reason}`,
+          reason: data.reason,
+          type: "fallback"
+        });
+        localStorage.setItem("ladune_translation_errors", JSON.stringify(logs.slice(0, 50)));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
   return data.translations as string[];
 };
 
