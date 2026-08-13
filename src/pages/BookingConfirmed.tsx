@@ -171,7 +171,7 @@ const BookingConfirmed = () => {
       const textGray = [110, 116, 135];
       const lightGray = [220, 224, 235];
 
-      const headerH = 140;
+      const headerH = 200;
       doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
       doc.rect(0, 0, W, headerH, "F");
 
@@ -182,28 +182,30 @@ const BookingConfirmed = () => {
         const logoWidth = Math.min(180, (logo.w / logo.h) * logoH);
         const boxW = logoWidth + 28;
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(M, 35, boxW, boxH, 12, 12, "F");
-        doc.addImage(logo.data, M + 14, 35 + (boxH - logoH) / 2, logoWidth, logoH, undefined, "FAST");
+        doc.roundedRect(M, 30, boxW, boxH, 12, 12, "F");
+        doc.addImage(logo.data, M + 14, 30 + (boxH - logoH) / 2, logoWidth, logoH, undefined, "FAST");
       }
 
       doc.setTextColor(255, 255, 255);
-      doc.setFont("helvetica", "bold").setFontSize(18);
-      doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 120);
+      doc.setFont("helvetica", "bold").setFontSize(14);
+      doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 115);
 
       const patientDisplayName = appt.patient_intake?.first_name && appt.patient_intake?.last_name
         ? `${appt.patient_intake.first_name} ${appt.patient_intake.last_name}`
         : appt.profiles?.full_name || "Patient non renseigné";
       
+      // PATIENT Block
       doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
-      doc.text("PATIENT", M, 85);
-      doc.setFont("helvetica", "bold").setFontSize(14);
-      doc.text(patientDisplayName.toUpperCase(), M, 100);
+      doc.text("PATIENT", M, 145);
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.text(patientDisplayName.toUpperCase(), M, 160);
 
+      // RÉFÉRENCE Block
       const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
-      doc.setFont("helvetica", "normal").setFontSize(11);
-      doc.text("RÉFÉRENCE", W - M, 85, { align: "right" });
-      doc.setFont("helvetica", "bold").setFontSize(16);
-      doc.text(reference, W - M, 105, { align: "right" });
+      doc.setFont("helvetica", "normal").setFontSize(10);
+      doc.text("RÉFÉRENCE", M, 180);
+      doc.setFont("helvetica", "bold").setFontSize(12);
+      doc.text(reference, M, 195);
 
       y = headerH + 40;
       doc.setTextColor(textDark[0], textDark[1], textDark[2]);
