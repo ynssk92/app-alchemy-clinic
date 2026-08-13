@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X, CalendarClock, CalendarPlus, Search, Filter, UserRound } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, Loader2, ListChecks, Save, X, CalendarClock, CalendarPlus, Search, Filter, UserRound, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
