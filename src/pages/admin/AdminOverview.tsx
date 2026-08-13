@@ -157,16 +157,16 @@ const AdminOverview = () => {
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
-    if (h < 12) return t("dashboard.greeting.morning", { defaultValue: "Good morning" });
-    if (h < 18) return t("dashboard.greeting.afternoon", { defaultValue: "Good afternoon" });
-    return t("dashboard.greeting.evening", { defaultValue: "Good evening" });
+    if (h < 12) return t("dashboard.greeting.morning");
+    if (h < 18) return t("dashboard.greeting.afternoon");
+    return t("dashboard.greeting.evening");
   }, [t]);
 
   const kpis = [
-    { label: t("nav.doctors"), value: stats.doctors, subtitle: t("dashboard.stats.activePractitioners", { defaultValue: "Active practitioners" }), delta: "+12%", up: true, tint: "stat-blue", icon: Stethoscope, chart: "area" as const },
-    { label: t("nav.patients"), value: stats.patients, subtitle: t("dashboard.stats.registeredProfiles", { defaultValue: "Registered profiles" }), delta: "+25%", up: true, tint: "stat-violet", icon: Users, chart: "bar" as const },
-    { label: t("nav.appointments"), value: stats.appts, subtitle: t("dashboard.stats.allTimeBookings", { defaultValue: "All time bookings" }), delta: "+18%", up: true, tint: "stat-cyan", icon: Calendar, chart: "area" as const },
-    { label: t("dashboard.stats.upcoming", { defaultValue: "Upcoming" }), value: stats.upcoming, subtitle: t("dashboard.stats.scheduledAhead", { defaultValue: "Scheduled ahead" }), delta: "-4%", up: false, tint: "stat-green", icon: TrendingUp, chart: "line" as const },
+    { label: t("nav.doctors"), value: stats.doctors, subtitle: t("dashboard.stats.activePractitioners"), delta: "+12%", up: true, tint: "stat-blue", icon: Stethoscope, chart: "area" as const },
+    { label: t("nav.patients"), value: stats.patients, subtitle: t("dashboard.stats.registeredProfiles"), delta: "+25%", up: true, tint: "stat-violet", icon: Users, chart: "bar" as const },
+    { label: t("nav.appointments"), value: stats.appts, subtitle: t("dashboard.stats.allTimeBookings"), delta: "+18%", up: true, tint: "stat-cyan", icon: Calendar, chart: "area" as const },
+    { label: t("dashboard.stats.upcoming"), value: stats.upcoming, subtitle: t("dashboard.stats.scheduledAhead"), delta: "-4%", up: false, tint: "stat-green", icon: TrendingUp, chart: "line" as const },
   ];
 
   const quickActions = [
@@ -209,10 +209,10 @@ const AdminOverview = () => {
             {greeting} 👋
           </h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-            <span>{format(new Date(), "EEEE, MMMM d")}</span>
+            <span className="capitalize">{format(new Date(), "EEEE, MMMM d", { locale: i18n.language === 'fr' ? fr : undefined })}</span>
             <span className="hidden h-1 w-1 rounded-full bg-border sm:block" />
             <span className="inline-flex items-center gap-1.5 rounded-full bg-positive/12 px-2 py-0.5 font-semibold text-positive">
-              <CircleDot className="h-3 w-3" /> {t("dashboard.status.clinicOpen", { defaultValue: "Clinic Open" })}
+              <CircleDot className="h-3 w-3" /> {t("dashboard.status.clinicOpen")}
             </span>
           </div>
         </div>
@@ -240,8 +240,8 @@ const AdminOverview = () => {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <WidgetCard
           className="lg:col-span-7"
-          title={t("dashboard.charts.appointmentStats.title", { defaultValue: "Appointment Statistics" })}
-          description={t("dashboard.charts.appointmentStats.desc", { defaultValue: "Distribution across the past 12 months" })}
+          title={t("dashboard.charts.appointmentStats.title")}
+          description={t("dashboard.charts.appointmentStats.desc")}
           icon={Activity}
           tint="stat-cyan"
           action={{ label: t("nav.appointments"), to: "/admin/appointments" }}
@@ -311,8 +311,8 @@ const AdminOverview = () => {
         {/* Today's schedule timeline */}
         <WidgetCard
           className="lg:col-span-5"
-          title={t("dashboard.schedule.title", { defaultValue: "Today's Schedule" })}
-          description={t("dashboard.schedule.desc", { defaultValue: "Next visits on the timeline" })}
+          title={t("dashboard.schedule.title")}
+          description={t("dashboard.schedule.desc")}
           icon={Clock}
           tint="stat-blue"
           action={{ label: t("nav.calendar"), to: "/admin/appointments/calendar" }}
@@ -351,8 +351,8 @@ const AdminOverview = () => {
         {/* Recent activity */}
         <WidgetCard
           className="lg:col-span-4"
-          title={t("dashboard.activity.title", { defaultValue: "Recent Activity" })}
-          description={t("dashboard.activity.desc", { defaultValue: "Latest events across the clinic" })}
+          title={t("dashboard.activity.title")}
+          description={t("dashboard.activity.desc")}
           icon={Activity}
           tint="stat-violet"
         >
@@ -382,7 +382,7 @@ const AdminOverview = () => {
         <WidgetCard
           className="lg:col-span-3"
           title={t("common.quickActions")}
-          description={t("dashboard.actions.desc", { defaultValue: "Jump straight to work" })}
+          description={t("dashboard.actions.desc")}
           icon={Zap}
           tint="stat-amber"
         >
@@ -501,7 +501,7 @@ const AdminOverview = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[13px] font-semibold">{p.name}</div>
-                      <div className="text-[11px] text-muted-foreground">Loyal patient</div>
+                      <div className="text-[11px] text-muted-foreground">{t("dashboard.appointments.topPatients")}</div>
                     </div>
                     <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                       {p.count} appts
