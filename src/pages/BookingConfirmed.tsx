@@ -310,7 +310,7 @@ const BookingConfirmed = () => {
             </div>
           ) : (
             <>
-              <div className="text-center">
+              <div className="text-center print:hidden">
                 <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <CheckCircle2 className="h-9 w-9" />
                 </div>
@@ -323,8 +323,32 @@ const BookingConfirmed = () => {
                     ? "Votre demande a bien été reçue et votre dossier patient a été créé. Consultez votre email pour définir votre mot de passe et accéder à votre espace."
                     : "Merci ! Voici le récapitulatif de votre visite et les prochaines étapes."}
                 </p>
+
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+                  <Button 
+                    onClick={handleDownloadPdf} 
+                    disabled={!appt || downloading}
+                    className="h-11 rounded-xl bg-gradient-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all"
+                  >
+                    {downloading ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="mr-2 h-4 w-4" />
+                    )}
+                    Download PDF
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => window.print()}
+                    className="h-11 rounded-xl border-primary/20 hover:bg-primary/5"
+                  >
+                    <Printer className="mr-2 h-4 w-4" />
+                    Print
+                  </Button>
+                </div>
+
                 {guest?.isNewAccount ? (
-                  <div className="mx-auto mt-6 flex max-w-xl flex-col justify-center gap-3 sm:flex-row">
+                  <div className="mx-auto mt-8 flex max-w-xl flex-col justify-center gap-3 sm:flex-row">
                     <Button asChild className="h-12 rounded-xl px-6">
                       <Link to="/auth">
                         <KeyRound className="mr-2 h-4 w-4" /> Compléter mon compte
@@ -339,8 +363,26 @@ const BookingConfirmed = () => {
                 ) : null}
               </div>
 
-              <div className="mt-10 grid gap-6 lg:grid-cols-5">
-                <Card className="rounded-3xl p-6 lg:col-span-3">
+              {/* Print-only Header */}
+              <div className="hidden print:block mb-8 text-center">
+                <div className="flex justify-between items-start mb-10">
+                  <div className="text-left">
+                    <h2 className="text-2xl font-bold text-primary">{settings.site_name || "La Dune Clinique Dentaire"}</h2>
+                    <p className="text-sm text-muted-foreground mt-1">Confirmation de rendez-vous</p>
+                    <div className="mt-4">
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Patient</p>
+                      <p className="text-lg font-bold">{appt?.profiles?.full_name || guest?.email || "—"}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Référence</p>
+                    <p className="text-xl font-mono font-bold">{appt?.reference || `RDV-${appt?.id.slice(0, 8).toUpperCase()}`}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-10 grid gap-6 lg:grid-cols-5 print:grid-cols-1 print:mt-0">
+                <Card className="rounded-3xl p-6 lg:col-span-3 print:border-none print:shadow-none print:p-0">
                   <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                     <CalendarCheck className="h-4 w-4" /> Détails du rendez-vous
                   </div>
@@ -363,12 +405,7 @@ const BookingConfirmed = () => {
                     </p>
                   )}
 
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                    <Button asChild className="h-12 flex-1 rounded-xl">
-                      <Link to="/patient-dashboard">
-                        Mon espace patient <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row print:hidden">
                     <Button
                       type="button"
                       variant="outline"
@@ -383,15 +420,15 @@ const BookingConfirmed = () => {
                       )}
                       Aperçu de la confirmation
                     </Button>
+                    <Button asChild variant="outline" className="h-12 flex-1 rounded-xl">
+                      <Link to="/booking">
+                        <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau rendez-vous
+                      </Link>
+                    </Button>
                   </div>
-                  <Button asChild variant="ghost" className="mt-3 h-11 w-full rounded-xl">
-                    <Link to="/booking">
-                      <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau rendez-vous
-                    </Link>
-                  </Button>
                 </Card>
 
-                <Card className="rounded-3xl p-6 lg:col-span-2">
+                <Card className="rounded-3xl p-6 lg:col-span-2 print:border-none print:shadow-none print:p-0 print:mt-10">
                   <div className="text-sm font-semibold text-muted-foreground">Prochaines étapes</div>
                   <ol className="mt-5 space-y-5">
                     {nextSteps.map((s, i) => (
@@ -407,7 +444,7 @@ const BookingConfirmed = () => {
                     ))}
                   </ol>
 
-                  <div className="mt-6 rounded-2xl border bg-muted/40 p-4">
+                  <div className="mt-6 rounded-2xl border bg-muted/40 p-4 print:bg-transparent">
                     <p className="text-sm font-semibold">Besoin de modifier ou annuler ?</p>
                     <p className="mt-1 text-sm text-muted-foreground">Contactez-nous au moins 24h à l'avance.</p>
                     <div className="mt-3 flex flex-col gap-2 text-sm">
