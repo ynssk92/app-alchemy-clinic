@@ -130,6 +130,7 @@ const sections: Section[] = [
   {
     title: "System",
     items: [
+      { to: "/admin/translation-monitor", icon: Zap, label: "AI & Translation", adminOnly: true },
       { to: "/admin/settings", icon: Settings, label: "Settings", module: "settings", action: "edit" },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants", adminOnly: true },
     ],
