@@ -18,8 +18,10 @@ import { Progress } from "@/components/ui/progress";
 interface TranslationError {
   timestamp: string;
   error: string;
-  texts: string[];
-  count: number;
+  texts?: string[];
+  count?: number;
+  type?: "credit" | "error" | "fallback";
+  reason?: string;
 }
 
 const AdminTranslationMonitor = () => {
