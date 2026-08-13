@@ -160,6 +160,7 @@ const BookingConfirmed = () => {
     if (!appt) return null;
     try {
       const { jsPDF } = await import("jspdf");
+      const QRCode = await import("qrcode");
       const doc = new jsPDF({ unit: "pt", format: "a4" });
       const W = doc.internal.pageSize.getWidth();
       const H = doc.internal.pageSize.getHeight();
