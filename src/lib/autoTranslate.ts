@@ -112,7 +112,10 @@ const requestTranslation = async (
   const { data, error } = await supabase.functions.invoke("translate-batch", {
     body: { texts, from, to },
   });
-  if (error || !data?.translations) return texts;
+  if (error || !data?.translations) {
+    console.warn("Translation failed:", error || "No data");
+    return texts;
+  }
   return data.translations as string[];
 };
 
