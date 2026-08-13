@@ -52,7 +52,10 @@
     "aiTranslation": "IA & Traduction",
     "verifyAssistants": "Vérifier les assistants",
     "languages": "Langues",
-    "searchPlaceholder": "Rechercher patients, docteurs, rendez-vous…"
+    "searchPlaceholder": "Rechercher patients, docteurs, rendez-vous…",
+    "gallery": "Galerie",
+    "landingPage": "Page d'accueil",
+    "cmsPages": "Pages CMS"
   },
   "common": {
     "language": "Langue",
@@ -69,7 +72,37 @@
     "viewSite": "Voir le site",
     "signOut": "Déconnexion",
     "profile": "Profil",
-    "bookAppointment": "Prendre RDV"
+    "bookAppointment": "Prendre RDV",
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Enregistrement...",
+    "backToWebsite": "Retour au site",
+    "registered": "Inscrit",
+    "notRegistered": "Non inscrit",
+    "pending": "En attente",
+    "approved": "Approuvé",
+    "rejected": "Rejeté",
+    "details": "Détails",
+    "close": "Fermer",
+    "print": "Imprimer",
+    "download": "Télécharger",
+    "downloadPdf": "Télécharger PDF",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "address": "Adresse",
+    "dob": "Date de naissance",
+    "gender": "Genre",
+    "city": "Ville",
+    "country": "Pays",
+    "fullName": "Nom complet",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "experience": "Expérience",
+    "clinic": "Cabinet",
+    "specialty": "Spécialité",
+    "male": "Homme",
+    "female": "Femme",
+    "other": "Autre",
+    "learnMore": "En savoir plus"
   },
   "dashboard": {
     "greeting": {
@@ -82,10 +115,16 @@
       "registeredProfiles": "Profils enregistrés",
       "allTimeBookings": "Réservations totales",
       "upcoming": "À venir",
-      "scheduledAhead": "Prévu à l'avance"
+      "scheduledAhead": "Prévu à l'avance",
+      "healthScore": "Score de santé",
+      "scheduledVisits": "Visites prévues",
+      "visitsThisYear": "Visites cette année",
+      "achievements": "Succès",
+      "unlocked": "{{count}} sur 10 débloqués"
     },
     "status": {
-      "clinicOpen": "Clinique Ouverte"
+      "clinicOpen": "Clinique Ouverte",
+      "condition": "Excellente condition"
     },
     "charts": {
       "appointmentStats": {
@@ -99,7 +138,8 @@
     },
     "schedule": {
       "title": "Planning du jour",
-      "desc": "Prochaines visites sur la chronologie"
+      "desc": "Prochaines visites sur la chronologie",
+      "empty": "Rien de prévu aujourd'hui"
     },
     "activity": {
       "title": "Activité récente",
@@ -107,6 +147,101 @@
     },
     "actions": {
       "desc": "Accédez directement au travail"
+    },
+    "appointments": {
+      "title": "Vos Rendez-vous",
+      "desc": "{{total}} au total · {{upcoming}} à venir",
+      "upcomingTitle": "Rendez-vous à venir",
+      "upcomingDesc": "Aperçu compact avec actions rapides",
+      "bookNew": "Réserver",
+      "empty": "Aucun rendez-vous pour le moment.",
+      "findDoctor": "Trouver un Docteur",
+      "nextVisit": "Prochaine Visite",
+      "closest": "Votre prochain rendez-vous",
+      "noUpcoming": "Aucune visite prévue",
+      "popularDoctors": "Docteurs Populaires",
+      "rankedBookings": "Classés par réservations totales",
+      "recentMessages": "Messages Récents",
+      "latestEnquiries": "Dernières demandes de contact",
+      "topPatients": "Meilleurs Patients",
+      "mostFrequent": "Visiteurs les plus fréquents"
+    },
+    "achievements": {
+      "title": "Succès",
+      "desc": "Gardez le rythme",
+      "consistency": "Série de constance",
+      "consistencyMeta": "3 visites consécutives",
+      "healthySmile": "Sourire sain",
+      "checkupCompleted": "Bilan terminé",
+      "level2": "Patient de niveau 2",
+      "badgesCount": "7 badges sur 10"
     }
+  },
+  "booking": {
+    "title": "Prendre un Rendez-vous",
+    "steps": {
+      "service": "Service",
+      "doctor": "Praticien",
+      "dateTime": "Date & Heure",
+      "details": "Détails",
+      "summary": "Résumé"
+    },
+    "doctor": {
+      "noneSelected": "Aucun praticien sélectionné",
+      "choosePrompt": "Choisissez un praticien pour voir son profil et ses disponibilités.",
+      "experienceYears": "{{years}} ans de pratique",
+      "confirmedPractitioner": "Praticien confirmé",
+      "languages": "Langues",
+      "clinic": "Cabinet",
+      "nextAvailable": "Prochaine dispo : {{date}}"
+    },
+    "confirmation": {
+      "title": "Rendez-vous Confirmé !",
+      "subtitle": "Votre rendez-vous a été programmé avec succès. Nous avons hâte de vous voir.",
+      "bookingId": "ID de réservation",
+      "nextSteps": "Prochaines étapes",
+      "modifyPrompt": "Besoin de modifier ou annuler ?",
+      "notice": "Contactez-nous au moins 24h à l'avance.",
+      "printConfirmation": "Imprimer la confirmation",
+      "preview": "Aperçu de la confirmation",
+      "previewDesc": "Vérifiez les informations avant l'impression ou le téléchargement."
+    }
+  },
+  "patients": {
+    "vitalSigns": "Signes Vitaux",
+    "registrationStatus": "Statut d'inscription",
+    "bloodPressure": "Tension Artérielle",
+    "heartRate": "Fréquence Cardiaque",
+    "temperature": "Température",
+    "weight": "Poids",
+    "about": "À propos",
+    "accountStatus": "Statut du compte",
+    "linkedEmail": "E-mail associé",
+    "signedUp": "Inscrit le",
+    "addedOn": "Ajouté le",
+    "intakeRecord": "Dossier d'admission",
+    "onFile": "Présent",
+    "notCreated": "Non créé",
+    "accountId": "ID du compte",
+    "location": "Localisation",
+    "patientCode": "Code Patient",
+    "bloodGroup": "Groupe Sanguin",
+    "lastVisited": "Dernière visite",
+    "noPatients": "Aucun patient trouvé",
+    "editPatient": "Modifier le patient",
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Enregistrement…"
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signUp": "Créer un compte",
+    "forgotPassword": "Mot de passe oublié ?",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "welcomeBack": "Bon retour",
+    "joinClinic": "Rejoignez notre clinique",
+    "createAccount": "Créer un compte",
+    "resetSent": "Lien de réinitialisation envoyé à {{email}}"
   }
 }
