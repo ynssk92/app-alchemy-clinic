@@ -348,20 +348,13 @@ const BookingConfirmed = () => {
                   </Button>
                 </div>
 
-                {guest?.isNewAccount ? (
-                  <div className="mx-auto mt-8 flex max-w-xl flex-col justify-center gap-3 sm:flex-row">
-                    <Button asChild className="h-12 rounded-xl px-6">
-                      <Link to="/auth">
-                        <KeyRound className="mr-2 h-4 w-4" /> Compléter mon compte
-                      </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="h-12 rounded-xl px-6">
-                      <Link to="/">
-                        <Home className="mr-2 h-4 w-4" /> Retour à l'accueil
-                      </Link>
-                    </Button>
-                  </div>
-                ) : null}
+                <div className="mx-auto mt-8 flex max-w-xl flex-col justify-center gap-3 sm:flex-row">
+                  <Button asChild variant="outline" className="h-12 rounded-xl px-6">
+                    <Link to="/">
+                      <Home className="mr-2 h-4 w-4" /> Retour à l'accueil
+                    </Link>
+                  </Button>
+                </div>
               </div>
 
               {/* Print-only Header */}
