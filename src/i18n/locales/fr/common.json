@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "about": "À propos",
+    "soins": "Soins",
+    "expertise": "Expertise",
+    "team": "Équipe",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "contact": "Contact",
+    "dashboard": "Tableau de bord",
+    "appointments": "Rendez-vous",
+    "patients": "Patients",
+    "doctors": "Docteurs",
+    "billing": "Facturation",
+    "services": "Services",
+    "messages": "Messages",
+    "settings": "Paramètres"
+  },
+  "common": {
+    "language": "Langue",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "search": "Rechercher",
+    "view": "Voir",
+    "actions": "Actions"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "about": "حول",
+    "soins": "العلاجات",
+    "expertise": "الخبرة",
+    "team": "الفريق",
+    "faq": "الأسئلة الشائعة",
+    "blog": "المدونة",
+    "contact": "اتصل بنا",
+    "dashboard": "لوحة القيادة",
+    "appointments": "المواعيد",
+    "patients": "المرضى",
+    "doctors": "الأطباء",
+    "billing": "الفواتير",
+    "services": "الخدمات",
+    "messages": "الرسائل",
+    "settings": "الإعدادات"
+  },
+  "common": {
+    "language": "اللغة",
+    "loading": "جاري التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "view": "عرض",
+    "actions": "إجراءات"
+  }
+}
