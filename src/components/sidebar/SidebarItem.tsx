@@ -1,7 +1,7 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, ChevronDown } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useState, useMemo } from "react";
-import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "./SidebarContext";
 import { SidebarTooltip } from "./SidebarTooltip";
@@ -34,6 +34,7 @@ export const collapsedItemClasses = ({ isActive }: { isActive: boolean }) =>
 
 export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarItemProps) => {
   const { collapsed, setMobileOpen, device } = useSidebar();
+  const { t } = useTranslation();
   const { pathname } = useLocation();
 
   const matches = (target: string, exact?: boolean) =>
@@ -58,7 +59,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
   // ---------- COLLAPSED RAIL ----------
   if (collapsed) {
     return (
-      <SidebarTooltip label={label}>
+      <SidebarTooltip label={t(label)}>
         <NavLink
           to={to}
           end={end}
