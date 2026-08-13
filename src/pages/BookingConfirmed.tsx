@@ -405,9 +405,16 @@ const BookingConfirmed = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Référence</p>
-                    <p className="text-xl font-mono font-bold">{appt?.reference || `RDV-${appt?.id.slice(0, 8).toUpperCase()}`}</p>
+                  <div className="text-right flex items-start gap-4">
+                    <div className="text-right">
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Référence</p>
+                      <p className="text-xl font-mono font-bold">{reference}</p>
+                    </div>
+                    {qrCodeUrl && (
+                      <div className="bg-white p-1 rounded-lg border">
+                        <img src={qrCodeUrl} alt="QR Code" className="w-16 h-16" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
