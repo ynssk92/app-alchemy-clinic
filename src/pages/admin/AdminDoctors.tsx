@@ -33,6 +33,18 @@ const AdminDoctors = () => {
   const [form, setForm] = useState<any>(empty);
   const [uploading, setUploading] = useState(false);
   const [scheduleFor, setScheduleFor] = useState<Doctor | null>(null);
+  const [search, setSearch] = useState("");
+  const [filterSpecialty, setFilterSpecialty] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [loading, setLoading] = useState(true);
+
+  const filteredRows = rows.filter(r => {
+    const matchesSearch = r.full_name.toLowerCase().includes(search.toLowerCase());
+    const matchesSpecialty = filterSpecialty === "all" || r.specialty_id === filterSpecialty;
+    const matchesStatus = filterStatus === "all" || (filterStatus === "available" ? r.is_available : !r.is_available);
+    return matchesSearch && matchesSpecialty && matchesStatus;
+  });
+
 
 
   const uploadAvatar = async (file: File) => {
