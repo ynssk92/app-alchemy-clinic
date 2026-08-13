@@ -372,7 +372,11 @@ const BookingConfirmed = () => {
                     <p className="text-sm text-muted-foreground mt-1">Confirmation de rendez-vous</p>
                     <div className="mt-4">
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Patient</p>
-                      <p className="text-lg font-bold">{appt?.profiles?.full_name || guest?.email || "Patient non renseigné"}</p>
+                      <p className="text-lg font-bold">
+                        {appt?.patient_intake?.first_name && appt?.patient_intake?.last_name 
+                          ? `${appt.patient_intake.first_name} ${appt.patient_intake.last_name}`
+                          : appt?.profiles?.full_name || "Patient non renseigné"}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
