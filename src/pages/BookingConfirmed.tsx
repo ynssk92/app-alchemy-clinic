@@ -92,7 +92,17 @@ const BookingConfirmed = () => {
   const [loading, setLoading] = useState(!guest);
   const [downloading, setDownloading] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+
+  const reference = appt?.reference || (id ? `RDV-${id.slice(0, 8).toUpperCase()}` : "");
+
+  useEffect(() => {
+    if (reference) {
+      QRCode.toDataURL(reference, { margin: 1, width: 200 })
+        .then(url => setQrCodeUrl(url))
+        .catch(err => console.error("Error generating QR code:", err));
+    }
+  }, [reference]);
 
   useEffect(() => {
     if (guest || !id || authLoading) return;
