@@ -101,7 +101,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
             <span className="absolute left-0 top-1.5 bottom-1.5 w-0.5 rounded-r bg-primary" />
           )}
           <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span className="flex-1 truncate text-left">{label}</span>
+          <span className="flex-1 truncate text-left">{t(label)}</span>
           <ChevronDown
             className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")}
             aria-hidden="true"
@@ -137,7 +137,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
                         isActive ? "bg-primary" : "bg-muted-foreground/30",
                       )}
                     />
-                    {c.label}
+                    {t(c.label)}
                   </NavLink>
                 );
               })}
@@ -172,7 +172,7 @@ export const SidebarItem = ({ to, icon: Icon, label, end, children }: SidebarIte
             />
           )}
           <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-          <span className="truncate">{label}</span>
+          <span className="truncate">{t(label)}</span>
         </>
       )}
     </NavLink>
