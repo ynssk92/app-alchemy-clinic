@@ -1,0 +1,31 @@
+{
+  "nav": {
+    "about": "About",
+    "soins": "Care",
+    "expertise": "Expertise",
+    "team": "Team",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "contact": "Contact",
+    "dashboard": "Dashboard",
+    "appointments": "Appointments",
+    "patients": "Patients",
+    "doctors": "Doctors",
+    "billing": "Billing",
+    "services": "Services",
+    "messages": "Messages",
+    "settings": "Settings"
+  },
+  "common": {
+    "language": "Language",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "view": "View",
+    "actions": "Actions"
+  }
+}
