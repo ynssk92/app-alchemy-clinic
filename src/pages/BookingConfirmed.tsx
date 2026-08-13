@@ -428,7 +428,7 @@ const BookingConfirmed = () => {
                   </div>
                 </Card>
 
-                <Card className="rounded-3xl p-6 lg:col-span-2">
+                <Card className="rounded-3xl p-6 lg:col-span-2 print:border-none print:shadow-none print:p-0 print:mt-10">
                   <div className="text-sm font-semibold text-muted-foreground">Prochaines étapes</div>
                   <ol className="mt-5 space-y-5">
                     {nextSteps.map((s, i) => (
