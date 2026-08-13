@@ -1,5 +1,6 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -37,102 +38,101 @@ type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
   {
-    title: "Main",
+    title: "nav.main",
     items: [
-      { to: "/admin", icon: LayoutDashboard, label: "Dashboard", end: true, staff: true },
-      { to: "/admin/pages", icon: FileStack, label: "Website CMS (Pages)", adminOnly: true },
-      { to: "/admin/media", icon: FolderOpen, label: "Media Library", adminOnly: true },
-
+      { to: "/admin", icon: LayoutDashboard, label: "nav.dashboard", end: true, staff: true },
+      { to: "/admin/pages", icon: FileStack, label: "nav.websiteCms", adminOnly: true },
+      { to: "/admin/media", icon: FolderOpen, label: "nav.mediaLibrary", adminOnly: true },
     ],
   },
   {
-    title: "Clinic",
+    title: "nav.clinic",
     items: [
       {
-        to: "/admin/doctors", icon: Stethoscope, label: "Doctors", module: "Doctors",
+        to: "/admin/doctors", icon: Stethoscope, label: "nav.doctors", module: "Doctors",
         children: [
-          { to: "/admin/doctors", label: "Doctors" },
-          { to: "/admin/doctors/details", label: "Doctor Details" },
-          { to: "/admin/doctors/new", label: "Add Doctor" },
-          { to: "/admin/doctors/schedule", label: "Doctor Schedule" },
+          { to: "/admin/doctors", label: "nav.doctors" },
+          { to: "/admin/doctors/details", label: "nav.doctorDetails" },
+          { to: "/admin/doctors/new", label: "nav.addDoctor" },
+          { to: "/admin/doctors/schedule", label: "nav.doctorSchedule" },
         ],
       },
       {
-        to: "/admin/patients", icon: Users, label: "Patients", module: "Patients",
+        to: "/admin/patients", icon: Users, label: "nav.patients", module: "Patients",
         children: [
-          { to: "/admin/patients", label: "Patients" },
-          { to: "/admin/patients/details", label: "Patient Details" },
-          { to: "/admin/patients/create", label: "Create Patient" },
-          { to: "/admin/patients/approvals", label: "Approvals" },
+          { to: "/admin/patients", label: "nav.patients" },
+          { to: "/admin/patients/details", label: "nav.patientDetails" },
+          { to: "/admin/patients/create", label: "nav.createPatient" },
+          { to: "/admin/patients/approvals", label: "nav.approvals" },
         ],
       },
       {
-        to: "/admin/appointments", icon: Calendar, label: "Appointments", module: "Appointments", staff: true,
+        to: "/admin/appointments", icon: Calendar, label: "nav.appointments", module: "Appointments", staff: true,
         children: [
-          { to: "/admin/appointments", label: "Appointments" },
-          { to: "/admin/appointments/new", label: "New Appointment" },
-          { to: "/admin/appointments/calendar", label: "Calendar" },
-          { to: "/admin/appointments/kanban", label: "Kanban View" },
-          { to: "/admin/appointments/requests", label: "Requests" },
+          { to: "/admin/appointments", label: "nav.appointments" },
+          { to: "/admin/appointments/new", label: "nav.newAppointment" },
+          { to: "/admin/appointments/calendar", label: "nav.calendar" },
+          { to: "/admin/appointments/kanban", label: "nav.kanbanView" },
+          { to: "/admin/appointments/requests", label: "nav.requests" },
         ],
       },
-      { to: "/admin/specialties", icon: Tag, label: "Specialties", module: "Specialties" },
-      { to: "/admin/clinics", icon: Building2, label: "Clinics", module: "Clinics" },
-      { to: "/admin/clinics/audit", icon: History, label: "Clinic Audit", module: "Clinics" },
+      { to: "/admin/specialties", icon: Tag, label: "nav.specialties", module: "Specialties" },
+      { to: "/admin/clinics", icon: Building2, label: "nav.clinics", module: "Clinics" },
+      { to: "/admin/clinics/audit", icon: History, label: "nav.clinicAudit", module: "Clinics" },
     ],
   },
   {
-    title: "Billing",
+    title: "nav.billing",
     items: [
       {
-        to: "/admin/billing", icon: Receipt, label: "Billing & Services", module: "Billing",
+        to: "/admin/billing", icon: Receipt, label: "nav.billingServices", module: "Billing",
         children: [
-          { to: "/admin/billing", label: "Dashboard", end: true },
-          { to: "/admin/billing/services", label: "Services Catalog" },
-          { to: "/admin/billing/categories", label: "Service Categories" },
-          { to: "/admin/billing/invoices", label: "Invoices" },
-          { to: "/admin/billing/invoices/new", label: "New Invoice" },
-          { to: "/admin/billing/payments", label: "Payments" },
+          { to: "/admin/billing", label: "nav.dashboard", end: true },
+          { to: "/admin/billing/services", label: "nav.servicesCatalog" },
+          { to: "/admin/billing/categories", label: "nav.serviceCategories" },
+          { to: "/admin/billing/invoices", label: "nav.invoices" },
+          { to: "/admin/billing/invoices/new", label: "nav.newInvoice" },
+          { to: "/admin/billing/payments", label: "nav.payments" },
         ],
       },
     ],
   },
   {
-    title: "Content & Comms",
+    title: "nav.contentComms",
     items: [
-      { to: "/admin/blog", icon: FileText, label: "Blog", module: "Blog" },
-      { to: "/admin/messages", icon: Inbox, label: "Messages", module: "Messages", staff: true },
+      { to: "/admin/blog", icon: FileText, label: "nav.blog", module: "Blog" },
+      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "Messages", staff: true },
     ],
   },
   {
-    title: "Administration",
+    title: "nav.administration",
     items: [
       {
-        to: "/admin/users", icon: User, label: "Users", adminOnly: true,
+        to: "/admin/users", icon: User, label: "nav.users", adminOnly: true,
         children: [
-          { to: "/admin/users", label: "Users" },
-          { to: "/admin/roles", label: "Roles & Permissions" },
-          { to: "/admin/delete-requests", label: "Delete Requests" },
+          { to: "/admin/users", label: "nav.users" },
+          { to: "/admin/roles", label: "nav.rolesPermissions" },
+          { to: "/admin/delete-requests", label: "nav.deleteRequests" },
         ],
       },
-      { to: "/admin/reports", icon: BarChart3, label: "Reports", module: "Reports" },
+      { to: "/admin/reports", icon: BarChart3, label: "nav.reports", module: "Reports" },
     ],
   },
   {
-    title: "Content",
+    title: "nav.content",
     items: [
-      { to: "/admin/pages", icon: FileStack, label: "Pages", adminOnly: true },
-      { to: "/admin/location", icon: MapPin, label: "Location", adminOnly: true },
-      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "Testimonials", adminOnly: true },
-      { to: "/admin/faq", icon: HelpCircle, label: "FAQ", adminOnly: true },
+      { to: "/admin/pages", icon: FileStack, label: "nav.pages", adminOnly: true },
+      { to: "/admin/location", icon: MapPin, label: "nav.location", adminOnly: true },
+      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
+      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true },
     ],
   },
   {
-    title: "System",
+    title: "nav.system",
     items: [
-      { to: "/admin/translation-monitor", icon: Zap, label: "AI & Translation", adminOnly: true },
-      { to: "/admin/settings", icon: Settings, label: "Settings", module: "settings", action: "edit" },
-      { to: "/admin/verify-assistants", icon: UserCheck, label: "Verify Assistants", adminOnly: true },
+      { to: "/admin/translation-monitor", icon: Zap, label: "nav.aiTranslation", adminOnly: true },
+      { to: "/admin/settings", icon: Settings, label: "nav.settings", module: "settings", action: "edit" },
+      { to: "/admin/verify-assistants", icon: UserCheck, label: "nav.verifyAssistants", adminOnly: true },
     ],
   },
 ];
@@ -283,6 +283,7 @@ const SidebarFooterContent = ({
 
 const AdminShell = () => {
   const { signOut, user, isAdmin, isAssistant } = useAuth();
+  const { t } = useTranslation();
   const { can } = usePermissions();
   const navigate = useNavigate();
   const { setMobileOpen } = useSidebar();
