@@ -273,10 +273,10 @@ const SidebarFooterContent = ({
 
   return (
     <SidebarFooter>
-      {isAdmin && <Btn icon={Settings} label="Settings" onClick={() => navigate("/admin/settings")} />}
-      <Btn icon={User} label="Profile" onClick={() => navigate("/profile")} />
-      <Btn icon={Home} label="View Site" onClick={() => navigate("/")} />
-      <Btn icon={LogOut} label="Sign Out" destructive onClick={async () => { await signOut(); navigate("/"); }} />
+      {isAdmin && <Btn icon={Settings} label={t("nav.settings")} onClick={() => navigate("/admin/settings")} />}
+      <Btn icon={User} label={t("common.profile")} onClick={() => navigate("/profile")} />
+      <Btn icon={Home} label={t("common.viewSite")} onClick={() => navigate("/")} />
+      <Btn icon={LogOut} label={t("common.signOut")} destructive onClick={async () => { await signOut(); navigate("/"); }} />
     </SidebarFooter>
   );
 };
@@ -425,7 +425,7 @@ const AdminShell = () => {
             <DropdownMenuTrigger asChild>
               <Button size="sm" className="gap-2 bg-gradient-primary text-primary-foreground">
                 <Zap className="w-4 h-4" />
-                <span className="hidden sm:inline">Quick Actions</span>
+                <span className="hidden sm:inline">{t("common.quickActions")}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-popover">
