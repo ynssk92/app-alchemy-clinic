@@ -225,14 +225,15 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "bold").setFontSize(14);
       doc.text(reference, rightAlignX, refY + 17, { align: "right" });
 
-      // QR Code in the header
+      // QR Code in the footer instead of header for better layout
       try {
-        const qrDataUrl = await QRCode.toDataURL(reference, { margin: 1, width: 60 });
+        const qrDataUrl = await QRCode.toDataURL(reference, { margin: 1, width: 50 });
+        const footerY = H - 85;
         doc.setFillColor(255, 255, 255);
-        doc.roundedRect(W - M - 70, 30, 70, 70, 10, 10, "F");
-        doc.addImage(qrDataUrl, "PNG", W - M - 65, 35, 60, 60);
-        doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(255, 255, 255);
-        doc.text("SCANNER", W - M - 60, 110);
+        doc.roundedRect(W - M - 60, footerY, 60, 60, 8, 8, "F");
+        doc.addImage(qrDataUrl, "PNG", W - M - 55, footerY + 5, 50, 50);
+        doc.setFont("helvetica", "normal").setFontSize(6).setTextColor(textGray[0], textGray[1], textGray[2]);
+        doc.text("SCANNER", W - M - 55, footerY + 70);
       } catch (qrErr) {
         console.error("QR Code generation failed:", qrErr);
       }
