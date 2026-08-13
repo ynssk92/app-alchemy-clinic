@@ -113,7 +113,23 @@ const requestTranslation = async (
     body: { texts, from, to },
   });
   if (error || !data?.translations) {
-    console.warn("Translation failed:", error || "No data");
+    const errorMsg = error?.message || (typeof error === 'string' ? error : "Unknown error");
+    console.warn("Translation failed:", errorMsg);
+    
+    // Log error to localStorage for Admin Monitor
+    try {
+      const logs = JSON.parse(localStorage.getItem("ladune_translation_errors") || "[]");
+      logs.unshift({
+        timestamp: new Date().toISOString(),
+        error: errorMsg,
+        texts: texts.slice(0, 3), // store first 3 to give context
+        count: texts.length
+      });
+      localStorage.setItem("ladune_translation_errors", JSON.stringify(logs.slice(0, 50)));
+    } catch (e) {
+      console.error("Failed to log translation error", e);
+    }
+
     return texts;
   }
   return data.translations as string[];
