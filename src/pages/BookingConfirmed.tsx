@@ -381,8 +381,8 @@ const BookingConfirmed = () => {
                 </div>
               </div>
 
-              <div className="mt-10 grid gap-6 lg:grid-cols-5">
-                <Card className="rounded-3xl p-6 lg:col-span-3">
+              <div className="mt-10 grid gap-6 lg:grid-cols-5 print:grid-cols-1 print:mt-0">
+                <Card className="rounded-3xl p-6 lg:col-span-3 print:border-none print:shadow-none print:p-0">
                   <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
                     <CalendarCheck className="h-4 w-4" /> Détails du rendez-vous
                   </div>
