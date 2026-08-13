@@ -185,11 +185,12 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "bold").setFontSize(18);
       doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 120);
 
-      const patientName = appt.profiles?.full_name || "—";
-      doc.setFontSize(11).setFont("helvetica", "normal");
+      const patientName = appt.profiles?.full_name || guest?.email || "Patient non renseigné";
+      
+      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
       doc.text("PATIENT", M, 85);
       doc.setFont("helvetica", "bold").setFontSize(14);
-      doc.text(patientName, M, 100);
+      doc.text(patientName.toUpperCase(), M, 100);
 
       const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
       doc.setFont("helvetica", "normal").setFontSize(11);
@@ -371,7 +372,7 @@ const BookingConfirmed = () => {
                     <p className="text-sm text-muted-foreground mt-1">Confirmation de rendez-vous</p>
                     <div className="mt-4">
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Patient</p>
-                      <p className="text-lg font-bold">{appt?.profiles?.full_name || guest?.email || "—"}</p>
+                      <p className="text-lg font-bold">{appt?.profiles?.full_name || guest?.email || "Patient non renseigné"}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -389,6 +390,7 @@ const BookingConfirmed = () => {
 
                   {appt ? (
                     <div className="mt-5 space-y-4">
+                      <Row icon={UserRound} label="Patient" value={appt.profiles?.full_name || guest?.email || "Patient non renseigné"} />
                       <Row icon={UserRound} label="Praticien" value={appt.doctors?.full_name ?? "—"} hint={appt.doctors?.specialties?.name ?? undefined} />
                       <Row icon={CalendarDays} label="Date" value={dateLabel} />
                       <Row icon={Clock} label="Heure" value={appt.appointment_time} />
