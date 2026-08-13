@@ -186,10 +186,11 @@ const BookingConfirmed = () => {
       doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 120);
 
       const patientName = appt.profiles?.full_name || guest?.email || "Patient non renseigné";
-      doc.setFontSize(11).setFont("helvetica", "normal");
+      
+      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
       doc.text("PATIENT", M, 85);
       doc.setFont("helvetica", "bold").setFontSize(14);
-      doc.text(patientName, M, 100);
+      doc.text(patientName.toUpperCase(), M, 100);
 
       const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
       doc.setFont("helvetica", "normal").setFontSize(11);
