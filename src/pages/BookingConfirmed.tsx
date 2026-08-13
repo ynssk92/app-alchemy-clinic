@@ -185,7 +185,7 @@ const BookingConfirmed = () => {
       doc.setFont("helvetica", "bold").setFontSize(18);
       doc.text(settings.site_name || "La Dune Clinique Dentaire", M, 120);
 
-      const patientName = appt.profiles?.full_name || "—";
+      const patientName = appt.profiles?.full_name || guest?.email || "Patient non renseigné";
       doc.setFontSize(11).setFont("helvetica", "normal");
       doc.text("PATIENT", M, 85);
       doc.setFont("helvetica", "bold").setFontSize(14);
