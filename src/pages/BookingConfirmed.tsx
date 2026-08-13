@@ -405,12 +405,7 @@ const BookingConfirmed = () => {
                     </p>
                   )}
 
-                  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                    <Button asChild className="h-12 flex-1 rounded-xl">
-                      <Link to="/patient-dashboard">
-                        Mon espace patient <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
+                  <div className="mt-6 flex flex-col gap-3 sm:flex-row print:hidden">
                     <Button
                       type="button"
                       variant="outline"
@@ -425,12 +420,12 @@ const BookingConfirmed = () => {
                       )}
                       Aperçu de la confirmation
                     </Button>
+                    <Button asChild variant="outline" className="h-12 flex-1 rounded-xl">
+                      <Link to="/booking">
+                        <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau rendez-vous
+                      </Link>
+                    </Button>
                   </div>
-                  <Button asChild variant="ghost" className="mt-3 h-11 w-full rounded-xl">
-                    <Link to="/booking">
-                      <CalendarPlus className="mr-2 h-4 w-4" /> Nouveau rendez-vous
-                    </Link>
-                  </Button>
                 </Card>
 
                 <Card className="rounded-3xl p-6 lg:col-span-2">
