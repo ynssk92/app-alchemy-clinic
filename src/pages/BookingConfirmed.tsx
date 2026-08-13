@@ -183,7 +183,7 @@ const BookingConfirmed = () => {
       const textGray = [110, 116, 135];
       const lightGray = [220, 224, 235];
 
-      const headerH = 200;
+      const headerH = 180;
       doc.setFillColor(brandBlue[0], brandBlue[1], brandBlue[2]);
       doc.rect(0, 0, W, headerH, "F");
 
@@ -206,18 +206,24 @@ const BookingConfirmed = () => {
         ? `${appt.patient_intake.first_name} ${appt.patient_intake.last_name}`
         : appt.profiles?.full_name || "Patient non renseigné";
       
-      // PATIENT Block
-      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
-      doc.text("PATIENT", M, 145);
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.text(patientDisplayName.toUpperCase(), M, 160);
-
-      // RÉFÉRENCE Block
       const reference = appt.reference || `RDV-${appt.id.slice(0, 8).toUpperCase()}`;
+
+      // RIGHT SIDE HEADER CONTENT (aligned to right margin M)
+      const rightAlignX = W - M;
+      
+      // PATIENT Block (Right Aligned)
+      doc.setFont("helvetica", "normal").setFontSize(10).setTextColor(255, 255, 255);
+      doc.text("PATIENT", rightAlignX, 55, { align: "right" });
+      doc.setFont("helvetica", "bold").setFontSize(14);
+      const nameLines = doc.splitTextToSize(patientDisplayName.toUpperCase(), 200);
+      doc.text(nameLines, rightAlignX, 72, { align: "right" });
+
+      // RÉFÉRENCE Block (Right Aligned)
+      const refY = 72 + (nameLines.length * 16) + 5;
       doc.setFont("helvetica", "normal").setFontSize(10);
-      doc.text("RÉFÉRENCE", M, 180);
-      doc.setFont("helvetica", "bold").setFontSize(12);
-      doc.text(reference, M, 195);
+      doc.text("RÉFÉRENCE", rightAlignX, refY, { align: "right" });
+      doc.setFont("helvetica", "bold").setFontSize(14);
+      doc.text(reference, rightAlignX, refY + 17, { align: "right" });
 
       // QR Code in the header
       try {
