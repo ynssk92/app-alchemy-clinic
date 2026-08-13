@@ -131,6 +131,7 @@ const sections: Section[] = [
     title: "nav.system",
     items: [
       { to: "/admin/translation-monitor", icon: Zap, label: "nav.aiTranslation", adminOnly: true },
+      { to: "/admin/languages", icon: Globe, label: "nav.languages", adminOnly: true },
       { to: "/admin/settings", icon: Settings, label: "nav.settings", module: "settings", action: "edit" },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "nav.verifyAssistants", adminOnly: true },
     ],
