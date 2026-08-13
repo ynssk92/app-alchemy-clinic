@@ -14,6 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import KpiCard from "@/components/dashboard/KpiCard";
 import { WidgetCard, EmptyState } from "@/components/dashboard/WidgetCard";
 import {
@@ -217,13 +218,13 @@ const AdminOverview = () => {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm" className="h-9 rounded-xl text-xs font-semibold">
-            <Link to="/admin/patients/create"><UserPlus className="mr-1.5 h-3.5 w-3.5" />New Patient</Link>
+            <Link to="/admin/patients/create"><UserPlus className="mr-1.5 h-3.5 w-3.5" />{t("nav.createPatient")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
-            <Link to="/admin/billing/invoices"><FileText className="mr-1.5 h-3.5 w-3.5" />Invoice</Link>
+            <Link to="/admin/billing/invoices"><FileText className="mr-1.5 h-3.5 w-3.5" />{t("nav.invoices")}</Link>
           </Button>
           <Button asChild size="sm" className="h-9 rounded-xl bg-gradient-primary text-xs font-semibold">
-            <Link to="/admin/appointments/new"><Plus className="mr-1.5 h-3.5 w-3.5" />Appointment</Link>
+            <Link to="/admin/appointments/new"><Plus className="mr-1.5 h-3.5 w-3.5" />{t("nav.appointments")}</Link>
           </Button>
         </div>
       </header>
@@ -247,9 +248,9 @@ const AdminOverview = () => {
         >
           <div className="mb-4 grid grid-cols-3 gap-2">
             {[
-              { label: "Completed", value: monthly.reduce((s, m) => s + m.completed, 0), color: "stat-cyan" },
-              { label: "Ongoing", value: monthly.reduce((s, m) => s + m.ongoing, 0), color: "stat-blue" },
-              { label: "Cancelled", value: monthly.reduce((s, m) => s + m.cancelled, 0), color: "stat-violet" },
+              { label: t("common.completed", { defaultValue: "Completed" }), value: monthly.reduce((s, m) => s + m.completed, 0), color: "stat-cyan" },
+              { label: t("common.ongoing", { defaultValue: "Ongoing" }), value: monthly.reduce((s, m) => s + m.ongoing, 0), color: "stat-blue" },
+              { label: t("common.cancelled", { defaultValue: "Cancelled" }), value: monthly.reduce((s, m) => s + m.cancelled, 0), color: "stat-violet" },
             ].map((s) => (
               <div key={s.label} className="rounded-xl bg-muted/50 px-3 py-2">
                 <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -317,7 +318,7 @@ const AdminOverview = () => {
           action={{ label: t("nav.calendar"), to: "/admin/appointments/calendar" }}
         >
           {upcomingAppts.length === 0 ? (
-            <EmptyState label="Nothing on the schedule" />
+            <EmptyState label={t("dashboard.schedule.empty")} />
           ) : (
             <ol className="relative space-y-3 pl-[62px]">
               <span className="absolute left-[54px] top-1 bottom-1 w-px bg-border" />
