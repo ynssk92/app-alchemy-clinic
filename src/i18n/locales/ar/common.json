@@ -67,7 +67,8 @@
     "quickActions": "إجراءات سريعة",
     "viewSite": "عرض الموقع",
     "signOut": "تسجيل الخروج",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "bookAppointment": "احجز موعداً"
   },
   "dashboard": {
     "greeting": {

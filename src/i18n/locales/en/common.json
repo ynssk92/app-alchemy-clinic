@@ -67,7 +67,8 @@
     "quickActions": "Quick Actions",
     "viewSite": "View Site",
     "signOut": "Sign Out",
-    "profile": "Profile"
+    "profile": "Profile",
+    "bookAppointment": "Book Appointment"
   },
   "dashboard": {
     "greeting": {

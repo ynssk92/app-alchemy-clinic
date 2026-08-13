@@ -67,7 +67,8 @@
     "quickActions": "Actions rapides",
     "viewSite": "Voir le site",
     "signOut": "Déconnexion",
-    "profile": "Profil"
+    "profile": "Profil",
+    "bookAppointment": "Prendre RDV"
   },
   "dashboard": {
     "greeting": {

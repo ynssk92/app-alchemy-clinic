@@ -101,7 +101,7 @@ export const SiteHeader = () => {
                 bookingActive && "ring-2 ring-primary/20 ring-offset-2 shadow-md",
               )}
             >
-              Book an Appointment
+              {t("common.bookAppointment", { defaultValue: "Book an Appointment" })}
             </Button>
           </Link>
 
@@ -176,7 +176,7 @@ export const SiteHeader = () => {
                       )}
                     >
                       <CalendarPlus className="h-5 w-5" aria-hidden="true" />
-                      Rendez-vous
+                      {t("common.bookAppointment", { defaultValue: "Rendez-vous" })}
                     </Link>
                     <Link
                       to="/doctors"
@@ -248,7 +248,7 @@ export const SiteHeader = () => {
                   <Button
                     className="w-full h-12 text-base font-bold shadow-medium hover:shadow-lg transition-all active:scale-95"
                   >
-                    Rendez-vous
+                    {t("common.bookAppointment", { defaultValue: "Rendez-vous" })}
                   </Button>
                 </Link>
               </div>
