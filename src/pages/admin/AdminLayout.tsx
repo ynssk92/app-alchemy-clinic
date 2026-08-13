@@ -413,7 +413,7 @@ const AdminShell = () => {
           </Link>
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search patients, doctors, appointments…" className="pl-9 bg-muted/50 border-0" />
+            <Input placeholder={t("nav.searchPlaceholder", { defaultValue: "Search patients, doctors, appointments…" })} className="pl-9 bg-muted/50 border-0" />
           </div>
           <div className="flex-1" />
           <LanguageToggle />
