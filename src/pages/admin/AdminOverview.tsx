@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +34,7 @@ const initials = (name?: string | null) =>
     .toUpperCase();
 
 const AdminOverview = () => {
+  const { t } = useTranslation();
   const [stats, setStats] = useState<Stats>({
     doctors: 0, appts: 0, patients: 0, clinics: 0, upcoming: 0, messages: 0,
   });
@@ -154,27 +156,25 @@ const AdminOverview = () => {
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
-    if (h < 12) return "Good morning";
-    if (h < 18) return "Good afternoon";
-    return "Good evening";
-  }, []);
+    if (h < 12) return t("dashboard.greeting.morning", { defaultValue: "Good morning" });
+    if (h < 18) return t("dashboard.greeting.afternoon", { defaultValue: "Good afternoon" });
+    return t("dashboard.greeting.evening", { defaultValue: "Good evening" });
+  }, [t]);
 
   const kpis = [
-    { label: "Doctors", value: stats.doctors, subtitle: "Active practitioners", delta: "+12%", up: true, tint: "stat-blue", icon: Stethoscope, chart: "area" as const },
-    { label: "Patients", value: stats.patients, subtitle: "Registered profiles", delta: "+25%", up: true, tint: "stat-violet", icon: Users, chart: "bar" as const },
-    { label: "Appointments", value: stats.appts, subtitle: "All time bookings", delta: "+18%", up: true, tint: "stat-cyan", icon: Calendar, chart: "area" as const },
-    { label: "Upcoming", value: stats.upcoming, subtitle: "Scheduled ahead", delta: "-4%", up: false, tint: "stat-green", icon: TrendingUp, chart: "line" as const },
+    { label: t("nav.doctors"), value: stats.doctors, subtitle: t("dashboard.stats.activePractitioners", { defaultValue: "Active practitioners" }), delta: "+12%", up: true, tint: "stat-blue", icon: Stethoscope, chart: "area" as const },
+    { label: t("nav.patients"), value: stats.patients, subtitle: t("dashboard.stats.registeredProfiles", { defaultValue: "Registered profiles" }), delta: "+25%", up: true, tint: "stat-violet", icon: Users, chart: "bar" as const },
+    { label: t("nav.appointments"), value: stats.appts, subtitle: t("dashboard.stats.allTimeBookings", { defaultValue: "All time bookings" }), delta: "+18%", up: true, tint: "stat-cyan", icon: Calendar, chart: "area" as const },
+    { label: t("dashboard.stats.upcoming", { defaultValue: "Upcoming" }), value: stats.upcoming, subtitle: t("dashboard.stats.scheduledAhead", { defaultValue: "Scheduled ahead" }), delta: "-4%", up: false, tint: "stat-green", icon: TrendingUp, chart: "line" as const },
   ];
 
   const quickActions = [
-    { label: "New Patient", to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
-    { label: "Book Appointment", to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan" },
-    { label: "Create Invoice", to: "/admin/billing/invoices", icon: FileText, tint: "stat-green" },
-    { label: "Doctors", to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet" },
-    { label: "Messages", to: "/admin/messages", icon: MessageSquare, tint: "stat-amber" },
-    { label: "Website CMS", to: "/admin/pages", icon: FileStack, tint: "stat-blue" },
-    { label: "New Patient", to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
-
+    { label: t("nav.createPatient"), to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
+    { label: t("nav.newAppointment"), to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan" },
+    { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green" },
+    { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet" },
+    { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber" },
+    { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue" },
   ];
 
   const activity = useMemo(() => {
@@ -211,7 +211,7 @@ const AdminOverview = () => {
             <span>{format(new Date(), "EEEE, MMMM d")}</span>
             <span className="hidden h-1 w-1 rounded-full bg-border sm:block" />
             <span className="inline-flex items-center gap-1.5 rounded-full bg-positive/12 px-2 py-0.5 font-semibold text-positive">
-              <CircleDot className="h-3 w-3" /> Clinic Open
+              <CircleDot className="h-3 w-3" /> {t("dashboard.status.clinicOpen", { defaultValue: "Clinic Open" })}
             </span>
           </div>
         </div>
@@ -239,11 +239,11 @@ const AdminOverview = () => {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <WidgetCard
           className="lg:col-span-7"
-          title="Appointment Statistics"
-          description="Distribution across the past 12 months"
+          title={t("dashboard.charts.appointmentStats.title", { defaultValue: "Appointment Statistics" })}
+          description={t("dashboard.charts.appointmentStats.desc", { defaultValue: "Distribution across the past 12 months" })}
           icon={Activity}
           tint="stat-cyan"
-          action={{ label: "Appointments", to: "/admin/appointments" }}
+          action={{ label: t("nav.appointments"), to: "/admin/appointments" }}
         >
           <div className="mb-4 grid grid-cols-3 gap-2">
             {[
@@ -280,8 +280,8 @@ const AdminOverview = () => {
 
         <WidgetCard
           className="lg:col-span-5"
-          title="Activity Growth"
-          description="Total bookings per month"
+          title={t("dashboard.charts.activityGrowth.title", { defaultValue: "Activity Growth" })}
+          description={t("dashboard.charts.activityGrowth.desc", { defaultValue: "Total bookings per month" })}
           icon={TrendingUp}
           tint="stat-green"
         >
@@ -310,11 +310,11 @@ const AdminOverview = () => {
         {/* Today's schedule timeline */}
         <WidgetCard
           className="lg:col-span-5"
-          title="Today's Schedule"
-          description="Next visits on the timeline"
+          title={t("dashboard.schedule.title", { defaultValue: "Today's Schedule" })}
+          description={t("dashboard.schedule.desc", { defaultValue: "Next visits on the timeline" })}
           icon={Clock}
           tint="stat-blue"
-          action={{ label: "Calendar", to: "/admin/appointments/calendar" }}
+          action={{ label: t("nav.calendar"), to: "/admin/appointments/calendar" }}
         >
           {upcomingAppts.length === 0 ? (
             <EmptyState label="Nothing on the schedule" />
@@ -350,8 +350,8 @@ const AdminOverview = () => {
         {/* Recent activity */}
         <WidgetCard
           className="lg:col-span-4"
-          title="Recent Activity"
-          description="Latest events across the clinic"
+          title={t("dashboard.activity.title", { defaultValue: "Recent Activity" })}
+          description={t("dashboard.activity.desc", { defaultValue: "Latest events across the clinic" })}
           icon={Activity}
           tint="stat-violet"
         >
@@ -380,8 +380,8 @@ const AdminOverview = () => {
         {/* Quick actions */}
         <WidgetCard
           className="lg:col-span-3"
-          title="Quick Actions"
-          description="Jump straight to work"
+          title={t("common.quickActions")}
+          description={t("dashboard.actions.desc", { defaultValue: "Jump straight to work" })}
           icon={Zap}
           tint="stat-amber"
         >
