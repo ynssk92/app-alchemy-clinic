@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -115,6 +116,7 @@ const fmtDate = (d?: string | null) =>
   d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
 
 const AdminPatientDetails = () => {
+  const { t } = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -453,7 +455,7 @@ const AdminPatientDetails = () => {
           <Link to="/admin/patients" className="text-muted-foreground hover:text-foreground">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          Patients
+          {t("nav.patients")}
         </h1>
       </div>
 
@@ -462,7 +464,7 @@ const AdminPatientDetails = () => {
         <Card className="p-4 border-border h-fit">
           <div className="relative mb-3">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search patients…" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+            <Input placeholder={t("patients.list.searchPlaceholder", { defaultValue: "Search patients…" })} value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
           </div>
           <div className="space-y-1 max-h-[70vh] overflow-y-auto">
             {filteredList.map((p) => {
@@ -486,14 +488,14 @@ const AdminPatientDetails = () => {
                           : "border-border text-muted-foreground"
                       )}
                     >
-                      New
+                      {t("common.new", { defaultValue: "New" })}
                     </span>
                   )}
                 </button>
               );
             })}
             {filteredList.length === 0 && (
-              <p className="text-xs text-muted-foreground text-center py-4">No patients</p>
+              <p className="text-xs text-muted-foreground text-center py-4">{t("dashboard.appointments.empty")}</p>
             )}
           </div>
         </Card>
@@ -502,7 +504,7 @@ const AdminPatientDetails = () => {
         <div className="space-y-6">
           {notFound ? (
             <Card className="p-10 border-border text-center text-muted-foreground">
-              Patient not found.
+              {t("patients.list.empty")}
             </Card>
           ) : patient ? (
             <>
@@ -523,22 +525,22 @@ const AdminPatientDetails = () => {
                       <h2 className="text-2xl font-bold text-foreground">{patient.full_name}</h2>
                       {registered ? (
                         <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100 border-transparent gap-1">
-                          <ShieldCheck className="w-3 h-3" /> Registered
+                          <ShieldCheck className="w-3 h-3" /> {t("patients.list.registered")}
                         </Badge>
                       ) : (
                         <Badge variant="outline" className="gap-1">
-                          <ShieldAlert className="w-3 h-3" /> Not registered
+                          <ShieldAlert className="w-3 h-3" /> {t("patients.list.notRegistered")}
                         </Badge>
                       )}
                     </div>
                     <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
                       <span className="flex items-center gap-1.5 text-muted-foreground">
                         <Phone className="w-4 h-4 text-primary" />
-                        <span className="font-semibold text-foreground">Phone :</span> {patient.phone || "—"}
+                        <span className="font-semibold text-foreground">{t("auth.phoneNumber")} :</span> {patient.phone || "—"}
                       </span>
                       <span className="flex items-center gap-1.5 text-muted-foreground">
                         <CalendarDays className="w-4 h-4 text-primary" />
-                        <span className="font-semibold text-foreground">Last Visited :</span>{" "}
+                        <span className="font-semibold text-foreground">{t("dashboard.appointments.upcomingTitle")} :</span>{" "}
                         {fmtDate(lastVisited)}
                       </span>
                     </div>
@@ -556,10 +558,10 @@ const AdminPatientDetails = () => {
                         <>
                           <Button onClick={handleSave} disabled={saving} className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 h-9 px-4 rounded-full">
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            Save
+                            {t("common.save")}
                           </Button>
                           <Button variant="outline" onClick={() => setIsEditing(false)} disabled={saving} className="rounded-full h-9 px-4 gap-2">
-                            <X className="w-4 h-4" /> Cancel
+                            <X className="w-4 h-4" /> {t("common.cancel")}
                           </Button>
                         </>
                       )}
@@ -567,10 +569,10 @@ const AdminPatientDetails = () => {
                     {!isEditing && (
                       <div className="flex gap-2">
                         <Button variant="outline" className="gap-2" onClick={() => setIsEditing(true)}>
-                          <Pencil className="w-4 h-4" />Edit
+                          <Pencil className="w-4 h-4" />{t("common.edit")}
                         </Button>
                         <Button asChild className="bg-gradient-primary text-primary-foreground gap-2">
-                          <Link to="/booking"><CalendarPlus className="w-4 h-4" />Book Appointment</Link>
+                          <Link to="/booking"><CalendarPlus className="w-4 h-4" />{t("nav.newAppointment")}</Link>
                         </Button>
                       </div>
                     )}
@@ -581,19 +583,19 @@ const AdminPatientDetails = () => {
               {/* Registration status */}
               <Card className="p-6 border-border">
                 <h3 className="font-bold mb-5 flex items-center gap-2 text-primary">
-                  <UserCheck className="w-4 h-4" /> Registration Status
+                  <UserCheck className="w-4 h-4" /> {t("patients.details.registrationStatus", { defaultValue: "Registration Status" })}
                 </h3>
                 <div className="grid md:grid-cols-3 gap-5">
                   <div className="space-y-1.5">
                     <Label className="text-muted-foreground flex items-center gap-2">
-                      <ShieldCheck className="w-3.5 h-3.5" /> Account status
+                      <ShieldCheck className="w-3.5 h-3.5" /> {t("patients.details.accountStatus", { defaultValue: "Account status" })}
                     </Label>
                     {!isEditing ? (
                       <div className="font-semibold flex items-center gap-2">
                         {registered ? (
-                          <span className="text-emerald-600 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> Registered</span>
+                          <span className="text-emerald-600 flex items-center gap-1.5"><ShieldCheck className="w-4 h-4" /> {t("patients.list.registered")}</span>
                         ) : (
-                          <span className="text-amber-600 flex items-center gap-1.5"><ShieldAlert className="w-4 h-4" /> Not registered</span>
+                          <span className="text-amber-600 flex items-center gap-1.5"><ShieldAlert className="w-4 h-4" /> {t("patients.list.notRegistered")}</span>
                         )}
                       </div>
                     ) : (
@@ -606,9 +608,9 @@ const AdminPatientDetails = () => {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="pending">Pending</SelectItem>
-                          <SelectItem value="approved">Approved</SelectItem>
-                          <SelectItem value="rejected">Rejected</SelectItem>
+                          <SelectItem value="pending">{t("common.pending")}</SelectItem>
+                          <SelectItem value="approved">{t("common.approved", { defaultValue: "Approved" })}</SelectItem>
+                          <SelectItem value="rejected">{t("common.rejected", { defaultValue: "Rejected" })}</SelectItem>
                         </SelectContent>
                       </Select>
                     )}
@@ -616,27 +618,27 @@ const AdminPatientDetails = () => {
 
                   <InfoTile
                     icon={Mail}
-                    label="Linked email"
+                    label={t("auth.email")}
                     value={patient.email || "—"}
                   />
                   <InfoTile
                     icon={CalendarDays}
-                    label={registered ? "Signed up" : "Added on"}
+                    label={registered ? t("patients.details.signedUp", { defaultValue: "Signed up" }) : t("patients.details.addedOn", { defaultValue: "Added on" })}
                     value={fmtDate(registered ? patient.registered_at : patient.added_at)}
                   />
                   <InfoTile
                     icon={BookOpen}
-                    label="Intake record"
-                    value={patient.intakeId ? "On file" : "Not created"}
+                    label={t("patients.details.intakeRecord", { defaultValue: "Intake record" })}
+                    value={patient.intakeId ? t("common.onFile", { defaultValue: "On file" }) : t("common.notCreated", { defaultValue: "Not created" })}
                   />
                   <InfoTile
                     icon={UserCheck}
-                    label="Account ID"
+                    label={t("patients.details.accountId", { defaultValue: "Account ID" })}
                     value={patient.profileId ? patient.profileId.slice(0, 8) + "…" : "—"}
                   />
                   <InfoTile
                     icon={MapPin}
-                    label="Location"
+                    label={t("patients.details.location", { defaultValue: "Location" })}
                     value={
                       [patient.city, patient.country].filter(Boolean).join(", ") || "—"
                     }
@@ -654,22 +656,22 @@ const AdminPatientDetails = () => {
               <div className="grid md:grid-cols-2 gap-6">
                 <Card className="p-6 border-border">
                   <h3 className="font-bold mb-5 flex items-center gap-2 text-primary">
-                    <BookOpen className="w-4 h-4" /> About
+                    <BookOpen className="w-4 h-4" /> {t("patients.details.about", { defaultValue: "About" })}
                   </h3>
                   <div className="grid grid-cols-2 gap-x-5 gap-y-4">
                     {!isEditing ? (
                       <>
-                        <InfoTile icon={Cake} label="DOB" value={fmtDate(patient.dob)} />
-                        <InfoTile icon={Droplet} label="Blood Group" value={patient.blood_group || "—"} />
-                        <InfoTile icon={VenetianMask} label="Gender" value={patient.gender ? patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1) : "—"} />
-                        <InfoTile icon={Mail} label="Email" value={patient.email || "—"} />
-                        <InfoTile icon={MapPin} label="Address" value={patient.address_1 || "—"} />
-                        <InfoTile icon={MapPin} label="City" value={patient.city || "—"} />
+                        <InfoTile icon={Cake} label={t("auth.dob")} value={fmtDate(patient.dob)} />
+                        <InfoTile icon={Droplet} label={t("auth.bloodGroup")} value={patient.blood_group || "—"} />
+                        <InfoTile icon={VenetianMask} label={t("auth.gender")} value={patient.gender ? t(`auth.genderOptions.${patient.gender}`) : "—"} />
+                        <InfoTile icon={Mail} label={t("auth.email")} value={patient.email || "—"} />
+                        <InfoTile icon={MapPin} label={t("auth.address")} value={patient.address_1 || "—"} />
+                        <InfoTile icon={MapPin} label={t("auth.city")} value={patient.city || "—"} />
                       </>
                     ) : (
                       <>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Full Name</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.fullName")}</Label>
                           <Input
                             className="h-9"
                             value={form.full_name}
@@ -678,7 +680,7 @@ const AdminPatientDetails = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Email</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.email")}</Label>
                           <Input
                             className="h-9"
                             type="email"
@@ -688,7 +690,7 @@ const AdminPatientDetails = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Phone</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.phoneNumber")}</Label>
                           <Input
                             className="h-9"
                             value={form.phone}
@@ -697,7 +699,7 @@ const AdminPatientDetails = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Date of Birth</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.dob")}</Label>
                           <Input
                             className="h-9"
                             type="date"
@@ -707,31 +709,31 @@ const AdminPatientDetails = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Gender</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.gender")}</Label>
                           <Select
                             value={form.gender}
                             onValueChange={(v) => setForm(f => ({ ...f, gender: v }))}
                             disabled={saving}
                           >
                             <SelectTrigger className="h-9">
-                              <SelectValue placeholder="Select" />
+                              <SelectValue placeholder={t("common.select")} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="male">Male</SelectItem>
-                              <SelectItem value="female">Female</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="male">{t("auth.genderOptions.male")}</SelectItem>
+                              <SelectItem value="female">{t("auth.genderOptions.female")}</SelectItem>
+                              <SelectItem value="other">{t("auth.genderOptions.other")}</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Blood Group</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.bloodGroup")}</Label>
                           <Select
                             value={form.blood_group}
                             onValueChange={(v) => setForm(f => ({ ...f, blood_group: v }))}
                             disabled={saving}
                           >
                             <SelectTrigger className="h-9">
-                              <SelectValue placeholder="Select" />
+                              <SelectValue placeholder={t("common.select")} />
                             </SelectTrigger>
                             <SelectContent>
                               {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(g => (
@@ -741,7 +743,7 @@ const AdminPatientDetails = () => {
                           </Select>
                         </div>
                         <div className="col-span-2 space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Address</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.address")}</Label>
                           <Input
                             className="h-9"
                             value={form.address_1}
@@ -750,7 +752,7 @@ const AdminPatientDetails = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">City</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.city")}</Label>
                           <Input
                             className="h-9"
                             value={form.city}
@@ -759,7 +761,7 @@ const AdminPatientDetails = () => {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">Country</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center gap-1.5">{t("auth.country")}</Label>
                           <Input
                             className="h-9"
                             value={form.country}
@@ -774,15 +776,15 @@ const AdminPatientDetails = () => {
 
                 <Card className="p-6 border-border">
                   <h3 className="font-bold mb-5 flex items-center gap-2">
-                    <BookOpen className="w-4 h-4 text-primary" /> Vital Signs
+                    <BookOpen className="w-4 h-4 text-primary" /> {t("patients.details.vitalSigns", { defaultValue: "Vital Signs" })}
                   </h3>
                   <div className="grid grid-cols-3 gap-5">
-                    <VitalTile icon={Droplet} label="Blood Pressure" value="—" dot="muted" />
-                    <VitalTile icon={Heart} label="Heart Rate" value="—" dot="muted" />
-                    <VitalTile icon={Activity} label="SPO2" value="—" dot="muted" />
-                    <VitalTile icon={Thermometer} label="Temperature" value="—" dot="muted" />
-                    <VitalTile icon={Wind} label="Respiratory Rate" value="—" dot="muted" />
-                    <VitalTile icon={Weight} label="Weight" value="—" dot="muted" />
+                    <VitalTile icon={Droplet} label={t("patients.details.vitals.bloodPressure", { defaultValue: "Blood Pressure" })} value="—" dot="muted" />
+                    <VitalTile icon={Heart} label={t("patients.details.vitals.heartRate", { defaultValue: "Heart Rate" })} value="—" dot="muted" />
+                    <VitalTile icon={Activity} label={t("patients.details.vitals.spo2", { defaultValue: "SPO2" })} value="—" dot="muted" />
+                    <VitalTile icon={Thermometer} label={t("patients.details.vitals.temperature", { defaultValue: "Temperature" })} value="—" dot="muted" />
+                    <VitalTile icon={Wind} label={t("patients.details.vitals.respiratoryRate", { defaultValue: "Respiratory Rate" })} value="—" dot="muted" />
+                    <VitalTile icon={Weight} label={t("patients.details.vitals.weight", { defaultValue: "Weight" })} value="—" dot="muted" />
                   </div>
                 </Card>
               </div>
@@ -796,13 +798,13 @@ const AdminPatientDetails = () => {
                         value="appointments"
                         className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
                       >
-                        Appointments
+                        {t("nav.appointments")}
                       </TabsTrigger>
                       <TabsTrigger
                         value="transactions"
                         className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
                       >
-                        Transactions
+                        {t("nav.billing")}
                       </TabsTrigger>
                     </TabsList>
                   </div>
@@ -816,7 +818,7 @@ const AdminPatientDetails = () => {
                       <>
                         <div className="flex items-center gap-3 mb-4">
                           <div className="relative w-48">
-                            <Input placeholder="Search" value={apptSearch} onChange={(e) => setApptSearch(e.target.value)} />
+                            <Input placeholder={t("common.search")} value={apptSearch} onChange={(e) => setApptSearch(e.target.value)} />
                           </div>
                           <Button variant="outline" size="sm" className="gap-2">
                             <CalendarDays className="w-4 h-4" />

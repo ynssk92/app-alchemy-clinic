@@ -14,6 +14,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 import KpiCard from "@/components/dashboard/KpiCard";
 import { WidgetCard, EmptyState } from "@/components/dashboard/WidgetCard";
 import {
@@ -34,7 +35,7 @@ const initials = (name?: string | null) =>
     .toUpperCase();
 
 const AdminOverview = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [stats, setStats] = useState<Stats>({
     doctors: 0, appts: 0, patients: 0, clinics: 0, upcoming: 0, messages: 0,
   });
@@ -156,16 +157,16 @@ const AdminOverview = () => {
 
   const greeting = useMemo(() => {
     const h = new Date().getHours();
-    if (h < 12) return t("dashboard.greeting.morning", { defaultValue: "Good morning" });
-    if (h < 18) return t("dashboard.greeting.afternoon", { defaultValue: "Good afternoon" });
-    return t("dashboard.greeting.evening", { defaultValue: "Good evening" });
+    if (h < 12) return t("dashboard.greeting.morning");
+    if (h < 18) return t("dashboard.greeting.afternoon");
+    return t("dashboard.greeting.evening");
   }, [t]);
 
   const kpis = [
-    { label: t("nav.doctors"), value: stats.doctors, subtitle: t("dashboard.stats.activePractitioners", { defaultValue: "Active practitioners" }), delta: "+12%", up: true, tint: "stat-blue", icon: Stethoscope, chart: "area" as const },
-    { label: t("nav.patients"), value: stats.patients, subtitle: t("dashboard.stats.registeredProfiles", { defaultValue: "Registered profiles" }), delta: "+25%", up: true, tint: "stat-violet", icon: Users, chart: "bar" as const },
-    { label: t("nav.appointments"), value: stats.appts, subtitle: t("dashboard.stats.allTimeBookings", { defaultValue: "All time bookings" }), delta: "+18%", up: true, tint: "stat-cyan", icon: Calendar, chart: "area" as const },
-    { label: t("dashboard.stats.upcoming", { defaultValue: "Upcoming" }), value: stats.upcoming, subtitle: t("dashboard.stats.scheduledAhead", { defaultValue: "Scheduled ahead" }), delta: "-4%", up: false, tint: "stat-green", icon: TrendingUp, chart: "line" as const },
+    { label: t("nav.doctors"), value: stats.doctors, subtitle: t("dashboard.stats.activePractitioners"), delta: "+12%", up: true, tint: "stat-blue", icon: Stethoscope, chart: "area" as const },
+    { label: t("nav.patients"), value: stats.patients, subtitle: t("dashboard.stats.registeredProfiles"), delta: "+25%", up: true, tint: "stat-violet", icon: Users, chart: "bar" as const },
+    { label: t("nav.appointments"), value: stats.appts, subtitle: t("dashboard.stats.allTimeBookings"), delta: "+18%", up: true, tint: "stat-cyan", icon: Calendar, chart: "area" as const },
+    { label: t("dashboard.stats.upcoming"), value: stats.upcoming, subtitle: t("dashboard.stats.scheduledAhead"), delta: "-4%", up: false, tint: "stat-green", icon: TrendingUp, chart: "line" as const },
   ];
 
   const quickActions = [
@@ -208,22 +209,22 @@ const AdminOverview = () => {
             {greeting} 👋
           </h1>
           <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-            <span>{format(new Date(), "EEEE, MMMM d")}</span>
+            <span className="capitalize">{format(new Date(), "EEEE, MMMM d", { locale: i18n.language === 'fr' ? fr : undefined })}</span>
             <span className="hidden h-1 w-1 rounded-full bg-border sm:block" />
             <span className="inline-flex items-center gap-1.5 rounded-full bg-positive/12 px-2 py-0.5 font-semibold text-positive">
-              <CircleDot className="h-3 w-3" /> {t("dashboard.status.clinicOpen", { defaultValue: "Clinic Open" })}
+              <CircleDot className="h-3 w-3" /> {t("dashboard.status.clinicOpen")}
             </span>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button asChild variant="outline" size="sm" className="h-9 rounded-xl text-xs font-semibold">
-            <Link to="/admin/patients/create"><UserPlus className="mr-1.5 h-3.5 w-3.5" />New Patient</Link>
+            <Link to="/admin/patients/create"><UserPlus className="mr-1.5 h-3.5 w-3.5" />{t("nav.createPatient")}</Link>
           </Button>
           <Button asChild variant="outline" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
-            <Link to="/admin/billing/invoices"><FileText className="mr-1.5 h-3.5 w-3.5" />Invoice</Link>
+            <Link to="/admin/billing/invoices"><FileText className="mr-1.5 h-3.5 w-3.5" />{t("nav.invoices")}</Link>
           </Button>
           <Button asChild size="sm" className="h-9 rounded-xl bg-gradient-primary text-xs font-semibold">
-            <Link to="/admin/appointments/new"><Plus className="mr-1.5 h-3.5 w-3.5" />Appointment</Link>
+            <Link to="/admin/appointments/new"><Plus className="mr-1.5 h-3.5 w-3.5" />{t("nav.appointments")}</Link>
           </Button>
         </div>
       </header>
@@ -239,17 +240,17 @@ const AdminOverview = () => {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <WidgetCard
           className="lg:col-span-7"
-          title={t("dashboard.charts.appointmentStats.title", { defaultValue: "Appointment Statistics" })}
-          description={t("dashboard.charts.appointmentStats.desc", { defaultValue: "Distribution across the past 12 months" })}
+          title={t("dashboard.charts.appointmentStats.title")}
+          description={t("dashboard.charts.appointmentStats.desc")}
           icon={Activity}
           tint="stat-cyan"
           action={{ label: t("nav.appointments"), to: "/admin/appointments" }}
         >
           <div className="mb-4 grid grid-cols-3 gap-2">
             {[
-              { label: "Completed", value: monthly.reduce((s, m) => s + m.completed, 0), color: "stat-cyan" },
-              { label: "Ongoing", value: monthly.reduce((s, m) => s + m.ongoing, 0), color: "stat-blue" },
-              { label: "Cancelled", value: monthly.reduce((s, m) => s + m.cancelled, 0), color: "stat-violet" },
+              { label: t("common.completed", { defaultValue: "Completed" }), value: monthly.reduce((s, m) => s + m.completed, 0), color: "stat-cyan" },
+              { label: t("common.ongoing", { defaultValue: "Ongoing" }), value: monthly.reduce((s, m) => s + m.ongoing, 0), color: "stat-blue" },
+              { label: t("common.cancelled", { defaultValue: "Cancelled" }), value: monthly.reduce((s, m) => s + m.cancelled, 0), color: "stat-violet" },
             ].map((s) => (
               <div key={s.label} className="rounded-xl bg-muted/50 px-3 py-2">
                 <div className="flex items-center gap-1.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -310,14 +311,14 @@ const AdminOverview = () => {
         {/* Today's schedule timeline */}
         <WidgetCard
           className="lg:col-span-5"
-          title={t("dashboard.schedule.title", { defaultValue: "Today's Schedule" })}
-          description={t("dashboard.schedule.desc", { defaultValue: "Next visits on the timeline" })}
+          title={t("dashboard.schedule.title")}
+          description={t("dashboard.schedule.desc")}
           icon={Clock}
           tint="stat-blue"
           action={{ label: t("nav.calendar"), to: "/admin/appointments/calendar" }}
         >
           {upcomingAppts.length === 0 ? (
-            <EmptyState label="Nothing on the schedule" />
+            <EmptyState label={t("dashboard.schedule.empty")} />
           ) : (
             <ol className="relative space-y-3 pl-[62px]">
               <span className="absolute left-[54px] top-1 bottom-1 w-px bg-border" />
@@ -350,8 +351,8 @@ const AdminOverview = () => {
         {/* Recent activity */}
         <WidgetCard
           className="lg:col-span-4"
-          title={t("dashboard.activity.title", { defaultValue: "Recent Activity" })}
-          description={t("dashboard.activity.desc", { defaultValue: "Latest events across the clinic" })}
+          title={t("dashboard.activity.title")}
+          description={t("dashboard.activity.desc")}
           icon={Activity}
           tint="stat-violet"
         >
@@ -381,7 +382,7 @@ const AdminOverview = () => {
         <WidgetCard
           className="lg:col-span-3"
           title={t("common.quickActions")}
-          description={t("dashboard.actions.desc", { defaultValue: "Jump straight to work" })}
+          description={t("dashboard.actions.desc")}
           icon={Zap}
           tint="stat-amber"
         >
@@ -410,14 +411,14 @@ const AdminOverview = () => {
         {/* Compact appointment cards */}
         <WidgetCard
           className="lg:col-span-8"
-          title="Upcoming Appointments"
-          description="Compact overview with quick actions"
+          title={t("dashboard.appointments.upcomingTitle")}
+          description={t("dashboard.appointments.upcomingDesc")}
           icon={CalendarCheck}
           tint="stat-cyan"
-          action={{ label: "View all", to: "/admin/appointments" }}
+          action={{ label: t("common.view"), to: "/admin/appointments" }}
         >
           {upcomingAppts.length === 0 ? (
-            <EmptyState label="No upcoming appointments" />
+            <EmptyState label={t("dashboard.appointments.noUpcoming")} />
           ) : (
             <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
               {upcomingAppts.map((a: any, i: number) => {
@@ -478,14 +479,14 @@ const AdminOverview = () => {
         {/* Recent patients */}
         <WidgetCard
           className="lg:col-span-4"
-          title="Top Patients"
-          description="Most frequent visitors"
+          title={t("dashboard.appointments.topPatients")}
+          description={t("dashboard.appointments.mostFrequent")}
           icon={Users}
           tint="stat-green"
-          action={{ label: "All patients", to: "/admin/patients" }}
+          action={{ label: t("common.view"), to: "/admin/patients" }}
         >
           {topPatients.length === 0 ? (
-            <EmptyState label="No patient activity yet" />
+            <EmptyState label={t("dashboard.appointments.empty")} />
           ) : (
             <ul className="space-y-2">
               {topPatients.map((p, i) => {
@@ -500,7 +501,7 @@ const AdminOverview = () => {
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-[13px] font-semibold">{p.name}</div>
-                      <div className="text-[11px] text-muted-foreground">Loyal patient</div>
+                      <div className="text-[11px] text-muted-foreground">{t("dashboard.appointments.topPatients")}</div>
                     </div>
                     <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                       {p.count} appts
@@ -517,14 +518,14 @@ const AdminOverview = () => {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <WidgetCard
           className="lg:col-span-7"
-          title="Popular Doctors"
-          description="Ranked by total bookings"
+          title={t("dashboard.appointments.popularDoctors")}
+          description={t("dashboard.appointments.rankedBookings")}
           icon={Stethoscope}
           tint="stat-blue"
-          action={{ label: "All doctors", to: "/admin/doctors" }}
+          action={{ label: t("common.view"), to: "/admin/doctors" }}
         >
           {topDoctors.length === 0 ? (
-            <EmptyState label="No doctor bookings yet" />
+            <EmptyState label={t("dashboard.appointments.empty")} />
           ) : (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               {topDoctors.map((doc: any, i: number) => {
@@ -548,7 +549,7 @@ const AdminOverview = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-bold leading-none">{doc.bookings}</div>
-                      <div className="text-[10px] text-muted-foreground">bookings</div>
+                      <div className="text-[10px] text-muted-foreground">{t("dashboard.appointments.rankedBookings")}</div>
                     </div>
                   </div>
                 );
@@ -559,14 +560,14 @@ const AdminOverview = () => {
 
         <WidgetCard
           className="lg:col-span-5"
-          title="Recent Messages"
-          description="Latest contact enquiries"
+          title={t("dashboard.appointments.recentMessages")}
+          description={t("dashboard.appointments.latestEnquiries")}
           icon={MessageSquare}
           tint="stat-amber"
-          action={{ label: "Inbox", to: "/admin/messages" }}
+          action={{ label: t("nav.messages"), to: "/admin/messages" }}
         >
           {recentMessages.length === 0 ? (
-            <EmptyState label="No messages yet" />
+            <EmptyState label={t("dashboard.appointments.empty")} />
           ) : (
             <ul className="space-y-2">
               {recentMessages.map((m: any) => (
@@ -580,7 +581,7 @@ const AdminOverview = () => {
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-semibold">{m.subject || "New enquiry"}</div>
                     <div className="truncate text-[11px] text-muted-foreground">
-                      {m.name} · {format(new Date(m.created_at), "MMM d")}
+                      {m.name} · {format(new Date(m.created_at), "MMM d", { locale: i18n.language === 'fr' ? fr : undefined })}
                     </div>
                   </div>
                   <Badge

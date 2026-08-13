@@ -52,7 +52,10 @@
     "aiTranslation": "AI & Translation",
     "verifyAssistants": "Verify Assistants",
     "languages": "Languages",
-    "searchPlaceholder": "Search patients, doctors, appointments…"
+    "searchPlaceholder": "Search patients, doctors, appointments…",
+    "gallery": "Gallery",
+    "landingPage": "Landing Page",
+    "cmsPages": "CMS Pages"
   },
   "common": {
     "language": "Language",
@@ -69,7 +72,37 @@
     "viewSite": "View Site",
     "signOut": "Sign Out",
     "profile": "Profile",
-    "bookAppointment": "Book Appointment"
+    "bookAppointment": "Book Appointment",
+    "saveChanges": "Save Changes",
+    "saving": "Saving...",
+    "backToWebsite": "Back to website",
+    "registered": "Registered",
+    "notRegistered": "Not registered",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected",
+    "details": "Details",
+    "close": "Close",
+    "print": "Print",
+    "download": "Download",
+    "downloadPdf": "Download PDF",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "dob": "Date of Birth",
+    "gender": "Gender",
+    "city": "City",
+    "country": "Country",
+    "fullName": "Full Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "experience": "Experience",
+    "clinic": "Clinic",
+    "specialty": "Specialty",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "learnMore": "Learn more"
   },
   "dashboard": {
     "greeting": {
@@ -82,10 +115,16 @@
       "registeredProfiles": "Registered profiles",
       "allTimeBookings": "All time bookings",
       "upcoming": "Upcoming",
-      "scheduledAhead": "Scheduled ahead"
+      "scheduledAhead": "Scheduled ahead",
+      "healthScore": "Health Score",
+      "scheduledVisits": "Scheduled visits",
+      "visitsThisYear": "Visits this year",
+      "achievements": "Achievements",
+      "unlocked": "{{count}} of 10 unlocked"
     },
     "status": {
-      "clinicOpen": "Clinic Open"
+      "clinicOpen": "Clinic Open",
+      "condition": "Excellent condition"
     },
     "charts": {
       "appointmentStats": {
@@ -99,7 +138,8 @@
     },
     "schedule": {
       "title": "Today's Schedule",
-      "desc": "Next visits on the timeline"
+      "desc": "Next visits on the timeline",
+      "empty": "Nothing scheduled today"
     },
     "activity": {
       "title": "Recent Activity",
@@ -107,6 +147,101 @@
     },
     "actions": {
       "desc": "Jump straight to work"
+    },
+    "appointments": {
+      "title": "Your Appointments",
+      "desc": "{{total}} total · {{upcoming}} upcoming",
+      "upcomingTitle": "Upcoming Appointments",
+      "upcomingDesc": "Compact overview with quick actions",
+      "bookNew": "Book new",
+      "empty": "No appointments yet.",
+      "findDoctor": "Find a Doctor",
+      "nextVisit": "Next Visit",
+      "closest": "Your closest appointment",
+      "noUpcoming": "No upcoming visit scheduled",
+      "popularDoctors": "Popular Doctors",
+      "rankedBookings": "Ranked by total bookings",
+      "recentMessages": "Recent Messages",
+      "latestEnquiries": "Latest contact enquiries",
+      "topPatients": "Top Patients",
+      "mostFrequent": "Most frequent visitors"
+    },
+    "achievements": {
+      "title": "Achievements",
+      "desc": "Keep your streak alive",
+      "consistency": "Consistency streak",
+      "consistencyMeta": "3 visits in a row",
+      "healthySmile": "Healthy smile",
+      "checkupCompleted": "Checkup completed",
+      "level2": "Level 2 patient",
+      "badgesCount": "7 of 10 badges"
     }
+  },
+  "booking": {
+    "title": "Book an Appointment",
+    "steps": {
+      "service": "Service",
+      "doctor": "Practitioner",
+      "dateTime": "Date & Time",
+      "details": "Details",
+      "summary": "Summary"
+    },
+    "doctor": {
+      "noneSelected": "No practitioner selected",
+      "choosePrompt": "Choose a practitioner to see their profile and availability.",
+      "experienceYears": "{{years}} years of practice",
+      "confirmedPractitioner": "Confirmed practitioner",
+      "languages": "Languages",
+      "clinic": "Clinic",
+      "nextAvailable": "Next available: {{date}}"
+    },
+    "confirmation": {
+      "title": "Appointment Confirmed!",
+      "subtitle": "Your appointment is successfully scheduled. We look forward to seeing you.",
+      "bookingId": "Booking ID",
+      "nextSteps": "Next Steps",
+      "modifyPrompt": "Need to change or cancel?",
+      "notice": "Please contact us at least 24h in advance.",
+      "printConfirmation": "Print Confirmation",
+      "preview": "Confirmation Preview",
+      "previewDesc": "Verify information before printing or downloading."
+    }
+  },
+  "patients": {
+    "vitalSigns": "Vital Signs",
+    "registrationStatus": "Registration Status",
+    "bloodPressure": "Blood Pressure",
+    "heartRate": "Heart Rate",
+    "temperature": "Temperature",
+    "weight": "Weight",
+    "about": "About",
+    "accountStatus": "Account Status",
+    "linkedEmail": "Linked email",
+    "signedUp": "Signed up",
+    "addedOn": "Added on",
+    "intakeRecord": "Intake record",
+    "onFile": "On file",
+    "notCreated": "Not created",
+    "accountId": "Account ID",
+    "location": "Location",
+    "patientCode": "Patient Code",
+    "bloodGroup": "Blood Group",
+    "lastVisited": "Last Visited",
+    "noPatients": "No patients found",
+    "editPatient": "Edit patient",
+    "saveChanges": "Save changes",
+    "saving": "Saving…"
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "forgotPassword": "Forgot Password?",
+    "email": "Email Address",
+    "password": "Password",
+    "fullName": "Full Name",
+    "welcomeBack": "Welcome Back",
+    "joinClinic": "Join Our Clinic",
+    "createAccount": "Create Account",
+    "resetSent": "Reset link sent to {{email}}"
   }
 }
