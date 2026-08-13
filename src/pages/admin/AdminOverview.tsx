@@ -35,7 +35,7 @@ const initials = (name?: string | null) =>
     .toUpperCase();
 
 const AdminOverview = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [stats, setStats] = useState<Stats>({
     doctors: 0, appts: 0, patients: 0, clinics: 0, upcoming: 0, messages: 0,
   });
@@ -549,7 +549,7 @@ const AdminOverview = () => {
                     </div>
                     <div className="text-right">
                       <div className="text-sm font-bold leading-none">{doc.bookings}</div>
-                      <div className="text-[10px] text-muted-foreground">bookings</div>
+                      <div className="text-[10px] text-muted-foreground">{t("dashboard.appointments.rankedBookings")}</div>
                     </div>
                   </div>
                 );
@@ -581,7 +581,7 @@ const AdminOverview = () => {
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-semibold">{m.subject || "New enquiry"}</div>
                     <div className="truncate text-[11px] text-muted-foreground">
-                      {m.name} · {format(new Date(m.created_at), "MMM d")}
+                      {m.name} · {format(new Date(m.created_at), "MMM d", { locale: i18n.language === 'fr' ? fr : undefined })}
                     </div>
                   </div>
                   <Badge
