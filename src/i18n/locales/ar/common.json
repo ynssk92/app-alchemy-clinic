@@ -52,7 +52,10 @@
     "aiTranslation": "الذكاء الاصطناعي والترجمة",
     "verifyAssistants": "التحقق من المساعدين",
     "languages": "اللغات",
-    "searchPlaceholder": "البحث عن المرضى والأطباء والمواعيد..."
+    "searchPlaceholder": "البحث عن المرضى والأطباء والمواعيد...",
+    "gallery": "المعرض",
+    "landingPage": "الصفحة الرئيسية",
+    "cmsPages": "إدارة صفحات المحتوى"
   },
   "common": {
     "language": "اللغة",
@@ -69,7 +72,37 @@
     "viewSite": "عرض الموقع",
     "signOut": "تسجيل الخروج",
     "profile": "الملف الشخصي",
-    "bookAppointment": "احجز موعداً"
+    "bookAppointment": "احجز موعداً",
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جاري الحفظ...",
+    "backToWebsite": "العودة للموقع",
+    "registered": "مسجل",
+    "notRegistered": "غير مسجل",
+    "pending": "قيد الانتظار",
+    "approved": "تمت الموافقة",
+    "rejected": "مرفوض",
+    "details": "التفاصيل",
+    "close": "إغلاق",
+    "print": "طباعة",
+    "download": "تحميل",
+    "downloadPdf": "تحميل PDF",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "address": "العنوان",
+    "dob": "تاريخ الميلاد",
+    "gender": "الجنس",
+    "city": "المدينة",
+    "country": "البلد",
+    "fullName": "الاسم الكامل",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "experience": "الخبرة",
+    "clinic": "العيادة",
+    "specialty": "التخصص",
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "أخرى",
+    "learnMore": "اعرف المزيد"
   },
   "dashboard": {
     "greeting": {
@@ -82,10 +115,16 @@
       "registeredProfiles": "الملفات المسجلة",
       "allTimeBookings": "إجمالي الحجوزات",
       "upcoming": "القادمة",
-      "scheduledAhead": "المجدولة مسبقاً"
+      "scheduledAhead": "المجدولة مسبقاً",
+      "healthScore": "مستوى الصحة",
+      "scheduledVisits": "الزيارات المجدولة",
+      "visitsThisYear": "زيارات هذا العام",
+      "achievements": "الإنجازات",
+      "unlocked": "{{count}} من 10 تم فتحها"
     },
     "status": {
-      "clinicOpen": "العيادة مفتوحة"
+      "clinicOpen": "العيادة مفتوحة",
+      "condition": "حالة ممتازة"
     },
     "charts": {
       "appointmentStats": {
@@ -99,7 +138,8 @@
     },
     "schedule": {
       "title": "جدول اليوم",
-      "desc": "الزيارات القادمة على الجدول الزمني"
+      "desc": "الزيارات القادمة على الجدول الزمني",
+      "empty": "لا شيء مجدول اليوم"
     },
     "activity": {
       "title": "النشاط الأخير",
@@ -107,6 +147,101 @@
     },
     "actions": {
       "desc": "انتقل مباشرة إلى العمل"
+    },
+    "appointments": {
+      "title": "مواعيدك",
+      "desc": "إجمالي {{total}} · {{upcoming}} قادمة",
+      "upcomingTitle": "المواعيد القادمة",
+      "upcomingDesc": "نظرة عامة مختصرة مع إجراءات سريعة",
+      "bookNew": "حجز جديد",
+      "empty": "لا توجد مواعيد بعد.",
+      "findDoctor": "ابحث عن طبيب",
+      "nextVisit": "الزيارة القادمة",
+      "closest": "أقرب موعد لك",
+      "noUpcoming": "لا توجد زيارة قادمة مجدولة",
+      "popularDoctors": "الأطباء الأكثر طلباً",
+      "rankedBookings": "مصنفة حسب إجمالي الحجوزات",
+      "recentMessages": "الرسائل الأخيرة",
+      "latestEnquiries": "أحدث استفسارات التواصل",
+      "topPatients": "أفضل المرضى",
+      "mostFrequent": "أكثر الزوار تكراراً"
+    },
+    "achievements": {
+      "title": "الإنجازات",
+      "desc": "حافظ على استمراريتك",
+      "consistency": "سلسلة الالتزام",
+      "consistencyMeta": "3 زيارات متتالية",
+      "healthySmile": "ابتسامة صحية",
+      "checkupCompleted": "تم إكمال الفحص",
+      "level2": "مريض من المستوى 2",
+      "badgesCount": "7 من 10 أوسمة"
     }
+  },
+  "booking": {
+    "title": "احجز موعداً",
+    "steps": {
+      "service": "الخدمة",
+      "doctor": "الطبيب",
+      "dateTime": "التاريخ والوقت",
+      "details": "التفاصيل",
+      "summary": "الملخص"
+    },
+    "doctor": {
+      "noneSelected": "لم يتم اختيار طبيب",
+      "choosePrompt": "اختر طبيباً لعرض ملفه الشخصي ومواعيده المتاحة.",
+      "experienceYears": "{{years}} سنوات من الممارسة",
+      "confirmedPractitioner": "طبيب معتمد",
+      "languages": "اللغات",
+      "clinic": "العيادة",
+      "nextAvailable": "أقرب متاح: {{date}}"
+    },
+    "confirmation": {
+      "title": "تم تأكيد الموعد!",
+      "subtitle": "تم تحديد موعدك بنجاح. نتطلع لرؤيتك.",
+      "bookingId": "معرف الحجز",
+      "nextSteps": "الخطوات التالية",
+      "modifyPrompt": "هل تحتاج للتعديل أو الإلغاء؟",
+      "notice": "يرجى التواصل معنا قبل 24 ساعة على الأقل.",
+      "printConfirmation": "طباعة التأكيد",
+      "preview": "معاينة التأكيد",
+      "previewDesc": "تحقق من المعلومات قبل الطباعة أو التحميل."
+    }
+  },
+  "patients": {
+    "vitalSigns": "العلامات الحيوية",
+    "registrationStatus": "حالة التسجيل",
+    "bloodPressure": "ضغط الدم",
+    "heartRate": "معدل نبضات القلب",
+    "temperature": "درجة الحرارة",
+    "weight": "الوزن",
+    "about": "حول المريض",
+    "accountStatus": "حالة الحساب",
+    "linkedEmail": "البريد المرتبط",
+    "signedUp": "تاريخ التسجيل",
+    "addedOn": "تاريخ الإضافة",
+    "intakeRecord": "سجل الدخول",
+    "onFile": "موجود",
+    "notCreated": "غير منشأ",
+    "accountId": "معرف الحساب",
+    "location": "الموقع",
+    "patientCode": "رمز المريض",
+    "bloodGroup": "فصيلة الدم",
+    "lastVisited": "آخر زيارة",
+    "noPatients": "لا يوجد مرضى",
+    "editPatient": "تعديل بيانات المريض",
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جاري الحفظ..."
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "fullName": "الاسم الكامل",
+    "welcomeBack": "مرحباً بعودتك",
+    "joinClinic": "انضم إلى عيادتنا",
+    "createAccount": "إنشاء حساب",
+    "resetSent": "تم إرسال رابط إعادة التعيين إلى {{email}}"
   }
 }
