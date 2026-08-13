@@ -16,9 +16,43 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const authHeader = req.headers.get("Authorization");
+  const isServiceRole = authHeader === `Bearer ${SERVICE_ROLE_KEY}`;
+  
+  let user: any = null;
+  const tempSupabase = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    auth: { persistSession: false },
+  });
+
+  if (!isServiceRole && authHeader) {
+    const { data: { user: authUser } } = await tempSupabase.auth.getUser(authHeader.replace("Bearer ", ""));
+    user = authUser;
+  }
+
+  if (!isServiceRole && !user) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
     auth: { persistSession: false },
   });
+
+  // If not service role, check if user is admin
+  if (!isServiceRole) {
+    const { data: hasRole } = await supabase.rpc("has_role", { 
+      _user_id: user.id, 
+      _role: "admin" 
+    });
+    if (!hasRole) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+  }
 
   try {
     // Pull every user_roles row to see who is admin and who is assistant.
