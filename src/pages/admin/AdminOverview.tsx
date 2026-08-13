@@ -410,14 +410,14 @@ const AdminOverview = () => {
         {/* Compact appointment cards */}
         <WidgetCard
           className="lg:col-span-8"
-          title="Upcoming Appointments"
-          description="Compact overview with quick actions"
+          title={t("dashboard.appointments.upcomingTitle")}
+          description={t("dashboard.appointments.upcomingDesc")}
           icon={CalendarCheck}
           tint="stat-cyan"
-          action={{ label: "View all", to: "/admin/appointments" }}
+          action={{ label: t("common.view"), to: "/admin/appointments" }}
         >
           {upcomingAppts.length === 0 ? (
-            <EmptyState label="No upcoming appointments" />
+            <EmptyState label={t("dashboard.appointments.noUpcoming")} />
           ) : (
             <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
               {upcomingAppts.map((a: any, i: number) => {
@@ -478,14 +478,14 @@ const AdminOverview = () => {
         {/* Recent patients */}
         <WidgetCard
           className="lg:col-span-4"
-          title="Top Patients"
-          description="Most frequent visitors"
+          title={t("dashboard.appointments.topPatients")}
+          description={t("dashboard.appointments.mostFrequent")}
           icon={Users}
           tint="stat-green"
-          action={{ label: "All patients", to: "/admin/patients" }}
+          action={{ label: t("common.view"), to: "/admin/patients" }}
         >
           {topPatients.length === 0 ? (
-            <EmptyState label="No patient activity yet" />
+            <EmptyState label={t("dashboard.appointments.empty")} />
           ) : (
             <ul className="space-y-2">
               {topPatients.map((p, i) => {
@@ -517,14 +517,14 @@ const AdminOverview = () => {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         <WidgetCard
           className="lg:col-span-7"
-          title="Popular Doctors"
-          description="Ranked by total bookings"
+          title={t("dashboard.appointments.popularDoctors")}
+          description={t("dashboard.appointments.rankedBookings")}
           icon={Stethoscope}
           tint="stat-blue"
-          action={{ label: "All doctors", to: "/admin/doctors" }}
+          action={{ label: t("common.view"), to: "/admin/doctors" }}
         >
           {topDoctors.length === 0 ? (
-            <EmptyState label="No doctor bookings yet" />
+            <EmptyState label={t("dashboard.appointments.empty")} />
           ) : (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
               {topDoctors.map((doc: any, i: number) => {
@@ -559,14 +559,14 @@ const AdminOverview = () => {
 
         <WidgetCard
           className="lg:col-span-5"
-          title="Recent Messages"
-          description="Latest contact enquiries"
+          title={t("dashboard.appointments.recentMessages")}
+          description={t("dashboard.appointments.latestEnquiries")}
           icon={MessageSquare}
           tint="stat-amber"
-          action={{ label: "Inbox", to: "/admin/messages" }}
+          action={{ label: t("nav.messages"), to: "/admin/messages" }}
         >
           {recentMessages.length === 0 ? (
-            <EmptyState label="No messages yet" />
+            <EmptyState label={t("dashboard.appointments.empty")} />
           ) : (
             <ul className="space-y-2">
               {recentMessages.map((m: any) => (
