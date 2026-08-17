@@ -16,12 +16,13 @@ export const SidebarGroup = ({
     <div className={collapsed ? "" : "space-y-1"}>
       <div
         className={cn(
-          "px-3 mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition-opacity duration-200",
-          collapsed ? "h-0 opacity-0 overflow-hidden mb-0" : "h-4 opacity-100",
+          "px-3 mb-1 font-semibold uppercase tracking-wider text-muted-foreground transition-opacity duration-200",
+          collapsed ? "h-0 opacity-0 overflow-hidden mb-0" : "opacity-100",
         )}
         aria-hidden={collapsed}
       >
-        {t(title)}
+        <div className="text-[14px] leading-tight">{t(title).split(" ").length > 1 && !isNaN(parseInt(t(title).split(" ")[0])) ? t(title).split(" ")[0] : ""}</div>
+        <div className="text-[10px]">{t(title).split(" ").length > 1 && !isNaN(parseInt(t(title).split(" ")[0])) ? t(title).split(" ").slice(1).join(" ") : t(title)}</div>
       </div>
       <div
         className={cn(

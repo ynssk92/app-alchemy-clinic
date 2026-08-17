@@ -38,15 +38,7 @@ type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
   {
-    title: "nav.main",
-    items: [
-      { to: "/admin", icon: LayoutDashboard, label: "nav.dashboard", end: true, staff: true },
-      { to: "/admin/pages", icon: FileStack, label: "nav.websiteCms", adminOnly: true },
-      { to: "/admin/media", icon: FolderOpen, label: "nav.mediaLibrary", adminOnly: true },
-    ],
-  },
-  {
-    title: "nav.clinic",
+    title: "01 CLINIQUE",
     items: [
       {
         to: "/admin/doctors", icon: Stethoscope, label: "nav.doctors", module: "Doctors",
@@ -82,7 +74,7 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "nav.billing",
+    title: "02 FACTURATION",
     items: [
       {
         to: "/admin/billing", icon: Receipt, label: "nav.billingServices", module: "Billing",
@@ -98,15 +90,22 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "nav.contentComms",
+    title: "03 WEBSITE & CONTENT",
     items: [
+      { to: "/admin/landing-page", icon: Globe, label: "nav.landingPage", adminOnly: true },
+      { to: "/admin/pages", icon: FileStack, label: "nav.websiteCms", adminOnly: true },
       { to: "/admin/blog", icon: FileText, label: "nav.blog", module: "Blog" },
-      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "Messages", staff: true },
+      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
+      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
+      { to: "/admin/media", icon: FolderOpen, label: "nav.mediaLibrary", adminOnly: true },
+      { to: "/admin/gallery", icon: LayoutGrid, label: "nav.gallery", adminOnly: true },
+      { to: "/admin/location", icon: MapPin, label: "nav.location", adminOnly: true },
     ],
   },
   {
-    title: "nav.administration",
+    title: "ADMINISTRATION",
     items: [
+      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "Messages", staff: true },
       {
         to: "/admin/users", icon: User, label: "nav.users", adminOnly: true,
         children: [
@@ -119,17 +118,7 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "nav.content",
-    items: [
-      { to: "/admin/pages", icon: FileStack, label: "nav.pages", adminOnly: true },
-      { to: "/admin/location", icon: MapPin, label: "nav.location", adminOnly: true },
-      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
-      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
-      { to: "/admin/gallery", icon: LayoutGrid, label: "nav.gallery", adminOnly: true },
-    ],
-  },
-  {
-    title: "nav.system",
+    title: "04 SYSTÈME",
     items: [
       { to: "/admin/languages", icon: Globe, label: "nav.languages", adminOnly: true },
       { to: "/admin/settings", icon: Settings, label: "nav.settings", module: "settings", action: "edit" },
@@ -347,66 +336,19 @@ const AdminShell = () => {
           if (visible.length === 0) return null;
           return (
             <SidebarGroup key={section.title} title={section.title}>
-              {visible.map((l) => 
-                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" || l.to === "/admin/gallery" || l.to === "/admin/location" ? null : (
-                  <SidebarItem
-                    key={l.to}
-                    to={l.to}
-                    icon={l.icon}
-                    label={l.label}
-                    end={l.end}
-                    children={l.children}
-                  />
-                )
-              )}
+              {visible.map((l) => (
+                <SidebarItem
+                  key={l.to}
+                  to={l.to}
+                  icon={l.icon}
+                  label={l.label}
+                  end={l.end}
+                  children={l.children}
+                />
+              ))}
             </SidebarGroup>
           );
         })}
-
-        {isAdmin && (
-          <SidebarGroup title="Website & Content">
-            <SidebarItem
-              icon={Globe}
-              label="Landing Page"
-              to="/admin/landing-page"
-            />
-            <SidebarItem
-              icon={FileStack}
-              label="CMS Pages"
-              to="/admin/pages"
-            />
-            <SidebarItem
-              icon={Layers}
-              label="Blog"
-              to="/admin/blog"
-            />
-            <SidebarItem
-              icon={MessageSquare}
-              label="Testimonials"
-              to="/admin/testimonials"
-            />
-            <SidebarItem
-              icon={HelpCircle}
-              label="FAQ"
-              to="/admin/faq"
-            />
-            <SidebarItem
-              icon={ImageIcon}
-              label="Media Library"
-              to="/admin/media"
-            />
-            <SidebarItem
-              icon={LayoutGrid}
-              label="Gallery"
-              to="/admin/gallery"
-            />
-            <SidebarItem
-              icon={MapPin}
-              label="Location"
-              to="/admin/location"
-            />
-          </SidebarGroup>
-        )}
       </Sidebar>
 
       <main className="flex-1 flex flex-col overflow-hidden min-w-0">
