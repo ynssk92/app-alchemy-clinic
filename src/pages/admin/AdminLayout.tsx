@@ -124,7 +124,8 @@ const sections: Section[] = [
       { to: "/admin/pages", icon: FileStack, label: "nav.pages", adminOnly: true },
       { to: "/admin/location", icon: MapPin, label: "nav.location", adminOnly: true },
       { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
-      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true },
+      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
+      { to: "/admin/gallery", icon: LayoutGrid, label: "nav.gallery", adminOnly: true },
     ],
   },
   {
