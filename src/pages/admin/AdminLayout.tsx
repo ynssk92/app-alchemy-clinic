@@ -38,7 +38,7 @@ type Section = { title: string; items: LinkItem[] };
 
 const sections: Section[] = [
   {
-    title: "01 CLINIQUE",
+    title: "01 — CLINIQUE",
     items: [
       {
         to: "/admin/doctors", icon: Stethoscope, label: "nav.doctors", module: "Doctors",
@@ -74,7 +74,7 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "02 FACTURATION",
+    title: "02 — FACTURATION",
     items: [
       {
         to: "/admin/billing", icon: Receipt, label: "nav.billingServices", module: "Billing",
@@ -90,20 +90,20 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "03 WEBSITE & CONTENT",
+    title: "03 — WEBSITE & CONTENT",
     items: [
       { to: "/admin/landing-page", icon: Globe, label: "nav.landingPage", adminOnly: true },
       { to: "/admin/pages", icon: FileStack, label: "nav.websiteCms", adminOnly: true },
       { to: "/admin/blog", icon: FileText, label: "nav.blog", module: "Blog" },
-      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
       { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
+      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
       { to: "/admin/media", icon: FolderOpen, label: "nav.mediaLibrary", adminOnly: true },
       { to: "/admin/gallery", icon: LayoutGrid, label: "nav.gallery", adminOnly: true },
       { to: "/admin/location", icon: MapPin, label: "nav.location", adminOnly: true },
     ],
   },
   {
-    title: "ADMINISTRATION",
+    title: "04 — ADMINISTRATION",
     items: [
       { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "Messages", staff: true },
       {
@@ -118,9 +118,10 @@ const sections: Section[] = [
     ],
   },
   {
-    title: "04 SYSTÈME",
+    title: "05 — SYSTÈME",
     items: [
       { to: "/admin/languages", icon: Globe, label: "nav.languages", adminOnly: true },
+      { to: "/admin/settings", icon: Settings, label: "nav.settings", module: "settings", action: "edit" },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "nav.verifyAssistants", adminOnly: true },
     ],
   },
