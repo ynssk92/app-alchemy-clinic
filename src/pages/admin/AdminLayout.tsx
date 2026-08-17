@@ -371,7 +371,7 @@ const AdminShell = () => {
               to="/admin/landing-page"
             />
             <SidebarItem
-              icon={FileText}
+              icon={FileStack}
               label="CMS Pages"
               to="/admin/pages"
             />
@@ -386,6 +386,11 @@ const AdminShell = () => {
               to="/admin/testimonials"
             />
             <SidebarItem
+              icon={HelpCircle}
+              label="FAQ"
+              to="/admin/faq"
+            />
+            <SidebarItem
               icon={ImageIcon}
               label="Media Library"
               to="/admin/media"
@@ -394,6 +399,11 @@ const AdminShell = () => {
               icon={LayoutGrid}
               label="Gallery"
               to="/admin/gallery"
+            />
+            <SidebarItem
+              icon={MapPin}
+              label="Location"
+              to="/admin/location"
             />
           </SidebarGroup>
         )}
