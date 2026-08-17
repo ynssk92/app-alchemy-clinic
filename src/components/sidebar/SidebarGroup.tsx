@@ -12,6 +12,11 @@ export const SidebarGroup = ({
 }) => {
   const { collapsed } = useSidebar();
   const { t } = useTranslation();
+  const titleParts = t(title).split(" ");
+  const hasNumberPrefix = titleParts.length > 1 && /^\d+$/.test(titleParts[0]);
+  const numberPrefix = hasNumberPrefix ? titleParts[0] : "";
+  const mainTitle = hasNumberPrefix ? titleParts.slice(1).join(" ") : t(title);
+
   return (
     <div className={collapsed ? "" : "space-y-1"}>
       <div
@@ -21,8 +26,10 @@ export const SidebarGroup = ({
         )}
         aria-hidden={collapsed}
       >
-        <div className="text-[14px] leading-tight">{t(title).split(" ").length > 1 && !isNaN(parseInt(t(title).split(" ")[0])) ? t(title).split(" ")[0] : ""}</div>
-        <div className="text-[10px]">{t(title).split(" ").length > 1 && !isNaN(parseInt(t(title).split(" ")[0])) ? t(title).split(" ").slice(1).join(" ") : t(title)}</div>
+        {numberPrefix && (
+          <div className="text-[14px] leading-tight mb-0.5">{numberPrefix}</div>
+        )}
+        <div className="text-[10px]">{mainTitle}</div>
       </div>
       <div
         className={cn(
