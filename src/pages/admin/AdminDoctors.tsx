@@ -193,7 +193,11 @@ const AdminDoctors = () => {
       </Dialog>
       
       {scheduleFor && (
-        <DoctorScheduleDialog doctor={scheduleFor} onClose={() => setScheduleFor(null)} />
+        <DoctorScheduleDialog 
+          doctorId={scheduleFor.id} 
+          doctorName={scheduleFor.full_name} 
+          onClose={() => setScheduleFor(null)} 
+        />
       )}
     </div>
   );
