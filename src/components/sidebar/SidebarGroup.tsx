@@ -13,21 +13,7 @@ export const SidebarGroup = ({
   const { collapsed } = useSidebar();
   const { t } = useTranslation();
   const titleText = t(title);
-  const titleParts = titleText.split(" ");
-  const hasNumberPrefix = titleParts.length > 1 && /^\d+$/.test(titleParts[0]);
-  const numberPrefix = hasNumberPrefix ? titleParts[0] : "";
   
-  // Strip both the number and an optional dash if it follows the number
-  let mainTitle = titleText;
-  if (hasNumberPrefix) {
-    // Check if the next part is a dash
-    if (titleParts[1] === "—" || titleParts[1] === "-") {
-      mainTitle = titleParts.slice(2).join(" ");
-    } else {
-      mainTitle = titleParts.slice(1).join(" ");
-    }
-  }
-
   return (
     <div className={collapsed ? "" : "space-y-1"}>
       <div
@@ -37,10 +23,7 @@ export const SidebarGroup = ({
         )}
         aria-hidden={collapsed}
       >
-        {numberPrefix && (
-          <div className="text-[14px] leading-tight mb-0.5">{numberPrefix}</div>
-        )}
-        <div className="text-[10px]">{mainTitle}</div>
+        <div className="text-[10px]">{titleText}</div>
       </div>
       <div
         className={cn(
