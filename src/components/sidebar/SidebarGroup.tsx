@@ -12,10 +12,21 @@ export const SidebarGroup = ({
 }) => {
   const { collapsed } = useSidebar();
   const { t } = useTranslation();
-  const titleParts = t(title).split(" ");
+  const titleText = t(title);
+  const titleParts = titleText.split(" ");
   const hasNumberPrefix = titleParts.length > 1 && /^\d+$/.test(titleParts[0]);
   const numberPrefix = hasNumberPrefix ? titleParts[0] : "";
-  const mainTitle = hasNumberPrefix ? titleParts.slice(1).join(" ") : t(title);
+  
+  // Strip both the number and an optional dash if it follows the number
+  let mainTitle = titleText;
+  if (hasNumberPrefix) {
+    // Check if the next part is a dash
+    if (titleParts[1] === "—" || titleParts[1] === "-") {
+      mainTitle = titleParts.slice(2).join(" ");
+    } else {
+      mainTitle = titleParts.slice(1).join(" ");
+    }
+  }
 
   return (
     <div className={collapsed ? "" : "space-y-1"}>
