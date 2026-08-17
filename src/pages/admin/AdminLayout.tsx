@@ -129,14 +129,7 @@ const sections: Section[] = [
 const SidebarHeader = () => {
   const { collapsed } = useSidebar();
   const { logoUrl } = useAppSettings();
-  const contentMenuItems = [
-    { icon: Globe, label: "Landing Page", path: "/admin/landing-page" },
-    { icon: FileText, label: "CMS Pages", path: "/admin/pages" },
-    { icon: Layers, label: "Blog", path: "/admin/blog" },
-    { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },
-    { icon: ImageIcon, label: "Media Library", path: "/admin/media" },
-    { icon: LayoutGrid, label: "Gallery", path: "/admin/gallery" },
-  ];
+
 
   return (
     <div
