@@ -348,7 +348,7 @@ const AdminShell = () => {
           return (
             <SidebarGroup key={section.title} title={section.title}>
               {visible.map((l) => 
-                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" || l.to === "/admin/gallery" ? null : (
+                l.to === "/admin/pages" || l.to === "/admin/media" || l.to === "/admin/testimonials" || l.to === "/admin/blog" || l.to === "/admin/faq" || l.to === "/admin/gallery" || l.to === "/admin/location" ? null : (
                   <SidebarItem
                     key={l.to}
                     to={l.to}
