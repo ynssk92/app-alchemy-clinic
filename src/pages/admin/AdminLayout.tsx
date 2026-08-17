@@ -126,7 +126,6 @@ const sections: Section[] = [
     ],
   },
 ];
-];
 
 const SidebarHeader = () => {
   const { collapsed } = useSidebar();
