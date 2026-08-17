@@ -95,8 +95,8 @@ const sections: Section[] = [
       { to: "/admin/landing-page", icon: Globe, label: "nav.landingPage", adminOnly: true },
       { to: "/admin/pages", icon: FileStack, label: "nav.websiteCms", adminOnly: true },
       { to: "/admin/blog", icon: FileText, label: "nav.blog", module: "Blog" },
-      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
       { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
+      { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
       { to: "/admin/media", icon: FolderOpen, label: "nav.mediaLibrary", adminOnly: true },
       { to: "/admin/gallery", icon: LayoutGrid, label: "nav.gallery", adminOnly: true },
       { to: "/admin/location", icon: MapPin, label: "nav.location", adminOnly: true },
@@ -121,7 +121,6 @@ const sections: Section[] = [
     title: "04 SYSTÈME",
     items: [
       { to: "/admin/languages", icon: Globe, label: "nav.languages", adminOnly: true },
-      { to: "/admin/settings", icon: Settings, label: "nav.settings", module: "settings", action: "edit" },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "nav.verifyAssistants", adminOnly: true },
     ],
   },
@@ -130,14 +129,7 @@ const sections: Section[] = [
 const SidebarHeader = () => {
   const { collapsed } = useSidebar();
   const { logoUrl } = useAppSettings();
-  const contentMenuItems = [
-    { icon: Globe, label: "Landing Page", path: "/admin/landing-page" },
-    { icon: FileText, label: "CMS Pages", path: "/admin/pages" },
-    { icon: Layers, label: "Blog", path: "/admin/blog" },
-    { icon: MessageSquare, label: "Testimonials", path: "/admin/testimonials" },
-    { icon: ImageIcon, label: "Media Library", path: "/admin/media" },
-    { icon: LayoutGrid, label: "Gallery", path: "/admin/gallery" },
-  ];
+
 
   return (
     <div
