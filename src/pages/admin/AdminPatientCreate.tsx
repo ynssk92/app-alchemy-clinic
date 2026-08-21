@@ -418,9 +418,11 @@ const AdminPatientCreate = () => {
                     className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
-              </div>
-            {/* 4. INSURANCE & MEDICAL */}
-            <section className="space-y-6">
+              </section>
+
+              {/* 4. INSURANCE & MEDICAL */}
+              <section className="space-y-6">
+
               <div className="flex items-center gap-4">
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">04</span>
                 <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insurance & Medical</h3>
