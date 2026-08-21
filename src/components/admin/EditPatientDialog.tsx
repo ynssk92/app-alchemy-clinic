@@ -104,7 +104,13 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       if (profileId) {
         const { data: p } = await supabase
           .from("profiles")
-          .select("full_name, phone, nationality, identity_document_type, identity_document_number")
+          .select(`
+            full_name, phone, nationality, identity_document_type, identity_document_number,
+            patient_type, languages, profession, family_situation,
+            emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+            insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes,
+            rhesus
+          `)
           .eq("id", profileId)
           .maybeSingle();
         profileData = p;
