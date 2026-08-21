@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { UserPlus, BookOpen, ShieldCheck, Activity, Baby } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -34,25 +35,54 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     address_1: "",
     city: "",
     country: "",
+    // New fields
+    patient_type: "adult" as "adult" | "minor",
+    languages: [] as string[],
+    profession: "",
+    family_situation: "",
+    emergency_contact_name: "",
+    emergency_contact_phone: "",
+    emergency_contact_relation: "",
+    insurance_name: "",
+    insurance_number: "",
+    insurance_policy: "",
+    insurance_status: "",
+    insurance_notes: "",
+    rhesus: "",
+    allergies: "",
+    chronic_diseases: "",
+    current_medications: "",
+    medical_history: "",
+    family_history: "",
+    surgical_history: "",
+    previous_hospitalizations: "",
+    birth_type: "",
+    birth_weight: "" as string | number,
+    birth_height: "" as string | number,
+    apgar_score: "",
+    breastfeeding: "",
+    birth_complications: "",
+    psychomotor_development: "",
+    development_notes: "",
   });
 
   useEffect(() => {
     if (!open) return;
     (async () => {
       let intake: any = null;
+      const query = `
+        id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number,
+        patient_type, languages, profession, family_situation,
+        emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+        insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes,
+        rhesus, allergies, chronic_diseases, current_medications, medical_history, family_history, surgical_history, previous_hospitalizations,
+        birth_type, birth_weight, birth_height, apgar_score, breastfeeding, birth_complications, psychomotor_development, development_notes
+      `;
       if (intakeIdProp) {
-        const { data } = await supabase
-          .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number")
-          .eq("id", intakeIdProp)
-          .maybeSingle();
+        const { data } = await supabase.from("patient_intake").select(query).eq("id", intakeIdProp).maybeSingle();
         intake = data;
       } else if (profileId) {
-        const { data } = await supabase
-          .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number")
-          .eq("user_id", profileId)
-          .maybeSingle();
+        const { data } = await supabase.from("patient_intake").select(query).eq("user_id", profileId).maybeSingle();
         intake = data;
       }
       setIntakeId(intake?.id ?? null);
@@ -61,21 +91,16 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       if (profileId) {
         const { data: p } = await supabase
           .from("profiles")
-          .select("full_name, phone, nationality, identity_document_type, identity_document_number")
+          .select("full_name, phone, nationality, identity_document_type, identity_document_number, patient_type, languages, profession, family_situation, emergency_contact_name, emergency_contact_phone, emergency_contact_relation, insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes, rhesus")
           .eq("id", profileId)
           .maybeSingle();
         profileData = p;
       }
 
-      const composedFullName =
-        profileData?.full_name ||
-        [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") ||
-        "";
-
       setForm({
         first_name: intake?.first_name || "",
         last_name: intake?.last_name || "",
-        full_name: composedFullName,
+        full_name: profileData?.full_name || [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") || "",
         email: intake?.email || "",
         phone: profileData?.phone || intake?.phone || "",
         nationality: profileData?.nationality || intake?.nationality || "",
@@ -87,16 +112,43 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         address_1: intake?.address_1 || "",
         city: intake?.city || "",
         country: intake?.country || "",
+        patient_type: profileData?.patient_type || intake?.patient_type || "adult",
+        languages: profileData?.languages || intake?.languages || [],
+        profession: profileData?.profession || intake?.profession || "",
+        family_situation: profileData?.family_situation || intake?.family_situation || "",
+        emergency_contact_name: profileData?.emergency_contact_name || intake?.emergency_contact_name || "",
+        emergency_contact_phone: profileData?.emergency_contact_phone || intake?.emergency_contact_phone || "",
+        emergency_contact_relation: profileData?.emergency_contact_relation || intake?.emergency_contact_relation || "",
+        insurance_name: profileData?.insurance_name || intake?.insurance_name || "",
+        insurance_number: profileData?.insurance_number || intake?.insurance_number || "",
+        insurance_policy: profileData?.insurance_policy || intake?.insurance_policy || "",
+        insurance_status: profileData?.insurance_status || intake?.insurance_status || "",
+        insurance_notes: profileData?.insurance_notes || intake?.insurance_notes || "",
+        rhesus: profileData?.rhesus || intake?.rhesus || "",
+        allergies: intake?.allergies || "",
+        chronic_diseases: intake?.chronic_diseases || "",
+        current_medications: intake?.current_medications || "",
+        medical_history: intake?.medical_history || "",
+        family_history: intake?.family_history || "",
+        surgical_history: intake?.surgical_history || "",
+        previous_hospitalizations: intake?.previous_hospitalizations || "",
+        birth_type: intake?.birth_type || "",
+        birth_weight: intake?.birth_weight || "",
+        birth_height: intake?.birth_height || "",
+        apgar_score: intake?.apgar_score || "",
+        breastfeeding: intake?.breastfeeding || "",
+        birth_complications: intake?.birth_complications || "",
+        psychomotor_development: intake?.psychomotor_development || "",
+        development_notes: intake?.development_notes || "",
       });
     })();
   }, [open, profileId, intakeIdProp]);
 
-  const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: string, v: string | any) => setForm((f) => ({ ...f, [k]: v }));
 
   const onSubmit = async () => {
     setSaving(true);
     try {
-      // Update profile (if patient is registered)
       if (profileId) {
         const { error: pErr } = await supabase
           .from("profiles")
@@ -106,12 +158,24 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
             nationality: form.nationality.trim() || null,
             identity_document_type: form.identity_document_type || null,
             identity_document_number: form.identity_document_number.trim() || null,
+            patient_type: form.patient_type,
+            languages: form.languages,
+            profession: form.profession.trim() || null,
+            family_situation: form.family_situation.trim() || null,
+            emergency_contact_name: form.emergency_contact_name.trim() || null,
+            emergency_contact_phone: form.emergency_contact_phone.trim() || null,
+            emergency_contact_relation: form.emergency_contact_relation.trim() || null,
+            insurance_name: form.insurance_name.trim() || null,
+            insurance_number: form.insurance_number.trim() || null,
+            insurance_policy: form.insurance_policy.trim() || null,
+            insurance_status: form.insurance_status.trim() || null,
+            insurance_notes: form.insurance_notes.trim() || null,
+            rhesus: form.rhesus.trim() || null,
           })
           .eq("id", profileId);
         if (pErr) throw pErr;
       }
 
-      // Derive first/last from full name when editing a registered patient
       const parts = (form.full_name || "").trim().split(/\s+/);
       const derivedFirst = form.first_name || parts.shift() || "Patient";
       const derivedLast = form.last_name || parts.join(" ") || "-";
@@ -130,6 +194,34 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         address_1: form.address_1 || null,
         city: form.city || null,
         country: form.country || null,
+        patient_type: form.patient_type,
+        languages: form.languages,
+        profession: form.profession.trim() || null,
+        family_situation: form.family_situation.trim() || null,
+        emergency_contact_name: form.emergency_contact_name.trim() || null,
+        emergency_contact_phone: form.emergency_contact_phone.trim() || null,
+        emergency_contact_relation: form.emergency_contact_relation.trim() || null,
+        insurance_name: form.insurance_name.trim() || null,
+        insurance_number: form.insurance_number.trim() || null,
+        insurance_policy: form.insurance_policy.trim() || null,
+        insurance_status: form.insurance_status.trim() || null,
+        insurance_notes: form.insurance_notes.trim() || null,
+        rhesus: form.rhesus.trim() || null,
+        allergies: form.allergies.trim() || null,
+        chronic_diseases: form.chronic_diseases.trim() || null,
+        current_medications: form.current_medications.trim() || null,
+        medical_history: form.medical_history.trim() || null,
+        family_history: form.family_history.trim() || null,
+        surgical_history: form.surgical_history.trim() || null,
+        previous_hospitalizations: form.previous_hospitalizations.trim() || null,
+        birth_type: form.birth_type.trim() || null,
+        birth_weight: form.birth_weight || null,
+        birth_height: form.birth_height || null,
+        apgar_score: form.apgar_score.trim() || null,
+        breastfeeding: form.breastfeeding.trim() || null,
+        birth_complications: form.birth_complications.trim() || null,
+        psychomotor_development: form.psychomotor_development.trim() || null,
+        development_notes: form.development_notes.trim() || null,
       };
 
       if (intakeId) {
@@ -137,11 +229,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         if (error) throw error;
       } else if (profileId) {
         const { data: authUser } = await supabase.auth.getUser();
-        const { error } = await supabase.from("patient_intake").insert({
-          ...intakePayload,
-          user_id: profileId,
-          created_by: authUser.user?.id ?? null,
-        });
+        const { error } = await supabase.from("patient_intake").insert({ ...intakePayload, user_id: profileId, created_by: authUser.user?.id ?? null });
         if (error) throw error;
       }
 
@@ -155,227 +243,141 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     }
   };
 
-  const isRegistered = !!profileId;
+  const SectionHeader = ({ num, title, icon: Icon }: { num: string; title: string; icon?: any }) => (
+    <div className="flex items-center gap-4 mb-6">
+      <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 text-primary text-xs font-bold ring-1 ring-primary/20">
+        {num}
+      </span>
+      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+        {Icon && <Icon className="w-4 h-4 text-primary/60" />}
+        {title}
+      </h3>
+      <div className="h-px bg-slate-100 flex-1" />
+    </div>
+  );
+
+  const FormItem = ({ label, children, colSpan = 1 }: { label: string; children: React.ReactNode; colSpan?: number }) => (
+    <div className={`space-y-2 ${colSpan === 2 ? "md:col-span-2" : ""}`}>
+      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+      {children}
+    </div>
+  );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[92vh] overflow-y-auto p-0 border border-slate-100 shadow-2xl rounded-2xl bg-white">
-        <div className="bg-white px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-          <DialogHeader className="space-y-1">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-              </div>
-              <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight">
-                {isRegistered ? "Registered Patient File" : "Guest Intake Record"}
-              </DialogTitle>
-            </div>
-            <p className="text-sm text-slate-500 font-medium pl-12">
-              Update {form.full_name || "patient"} information
-            </p>
-          </DialogHeader>
-        </div>
-
-        <div className="p-8 space-y-10">
-          {/* 1. PATIENT IDENTITY */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">01</span>
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Patient Identity</h3>
-            </div>
-            <div className="h-px bg-slate-100 w-full" />
-            
+      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl bg-white">
+        <div className="p-10 space-y-16">
+          {/* SECTION 1: IDENTITY */}
+          <section>
+            <SectionHeader num="01" title="Patient Identity" icon={UserPlus} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              {isRegistered ? (
-                <div className="md:col-span-2 space-y-2">
-                  <Label className="text-xs font-semibold text-slate-500 uppercase">Full Name *</Label>
-                  <Input 
-                    value={form.full_name} 
-                    onChange={(e) => set("full_name", e.target.value)}
-                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                  />
-                </div>
-              ) : (
-                <>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-slate-500 uppercase">First Name *</Label>
-                    <Input 
-                      value={form.first_name} 
-                      onChange={(e) => set("first_name", e.target.value)}
-                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-slate-500 uppercase">Last Name *</Label>
-                    <Input 
-                      value={form.last_name} 
-                      onChange={(e) => set("last_name", e.target.value)}
-                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                    />
-                  </div>
-                </>
-              )}
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Email Address</Label>
-                <Input 
-                  type="email" 
-                  value={form.email} 
-                  onChange={(e) => set("email", e.target.value)} 
-                  disabled={isRegistered}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all disabled:opacity-70 disabled:bg-slate-50"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Phone Number</Label>
-                <Input 
-                  value={form.phone} 
-                  onChange={(e) => set("phone", e.target.value)}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                  placeholder="+212 ..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Nationality</Label>
-                <Input 
-                  value={form.nationality} 
-                  onChange={(e) => set("nationality", e.target.value)}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                  placeholder="e.g. Moroccan"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Type</Label>
-                  <Select value={form.identity_document_type} onValueChange={(v) => set("identity_document_type", v)}>
-                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CIN">CIN</SelectItem>
-                      <SelectItem value="Passport">Passport</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Number</Label>
-                  <Input 
-                    value={form.identity_document_number} 
-                    onChange={(e) => set("identity_document_number", e.target.value)}
-                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                  />
-                </div>
-              </div>
+              <FormItem label="Full Name">
+                <Input className="h-11 rounded-xl" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
+              </FormItem>
+              <FormItem label="Email">
+                <Input className="h-11 rounded-xl" value={form.email} onChange={(e) => set("email", e.target.value)} />
+              </FormItem>
+              <FormItem label="Phone">
+                <Input className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              </FormItem>
+              <FormItem label="Nationality">
+                <Input className="h-11 rounded-xl" value={form.nationality} onChange={(e) => set("nationality", e.target.value)} />
+              </FormItem>
             </div>
           </section>
 
-          {/* 2. PERSONAL INFORMATION */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">02</span>
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Personal Information</h3>
-            </div>
-            <div className="h-px bg-slate-100 w-full" />
-            
+          {/* SECTION 2: PERSONAL */}
+          <section>
+            <SectionHeader num="02" title="Personal Information" icon={BookOpen} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Date of Birth</Label>
-                <Input 
-                  type="date" 
-                  value={form.dob} 
-                  onChange={(e) => set("dob", e.target.value)}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Gender</Label>
+              <FormItem label="Date of Birth">
+                <Input type="date" className="h-11 rounded-xl" value={form.dob} onChange={(e) => set("dob", e.target.value)} />
+              </FormItem>
+              <FormItem label="Gender">
                 <Select value={form.gender} onValueChange={(v) => set("gender", v)}>
-                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
+                  <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="male">Male</SelectItem>
                     <SelectItem value="female">Female</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Blood Group</Label>
-                <Select value={form.blood_group} onValueChange={(v) => set("blood_group", v)}>
-                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
-                    <SelectValue placeholder="Select" />
-                  </SelectTrigger>
+              </FormItem>
+              <FormItem label="Patient Type">
+                <Select value={form.patient_type} onValueChange={(v) => set("patient_type", v)}>
+                  <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map((g) => (
-                      <SelectItem key={g} value={g}>{g}</SelectItem>
-                    ))}
+                    <SelectItem value="adult">Adult</SelectItem>
+                    <SelectItem value="minor">Minor (Pediatric)</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </FormItem>
+              <FormItem label="Profession">
+                <Input className="h-11 rounded-xl" value={form.profession} onChange={(e) => set("profession", e.target.value)} />
+              </FormItem>
             </div>
           </section>
 
-          {/* 3. ADDRESS */}
-          <section className="space-y-6">
-            <div className="flex items-center gap-4">
-              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">03</span>
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Address</h3>
+          {/* SECTION 3: INSURANCE */}
+          <section>
+            <SectionHeader num="03" title="Insurance & Billing" icon={ShieldCheck} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+              <FormItem label="Provider Name">
+                <Input className="h-11 rounded-xl" value={form.insurance_name} onChange={(e) => set("insurance_name", e.target.value)} />
+              </FormItem>
+              <FormItem label="Policy Number">
+                <Input className="h-11 rounded-xl" value={form.insurance_number} onChange={(e) => set("insurance_number", e.target.value)} />
+              </FormItem>
+              <FormItem label="Status">
+                <Input className="h-11 rounded-xl" value={form.insurance_status} onChange={(e) => set("insurance_status", e.target.value)} />
+              </FormItem>
             </div>
-            <div className="h-px bg-slate-100 w-full" />
-            
+          </section>
+
+          {/* SECTION 4: MEDICAL HISTORY */}
+          <section>
+            <SectionHeader num="04" title="Medical History" icon={Activity} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <div className="md:col-span-2 space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Home Address</Label>
-                <Input 
-                  value={form.address_1} 
-                  onChange={(e) => set("address_1", e.target.value)}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                  placeholder="Street name, building number..."
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">City</Label>
-                <Input 
-                  value={form.city} 
-                  onChange={(e) => set("city", e.target.value)}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-xs font-semibold text-slate-500 uppercase">Country</Label>
-                <Input 
-                  value={form.country} 
-                  onChange={(e) => set("country", e.target.value)}
-                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
-                />
-              </div>
+              <FormItem label="Allergies" colSpan={2}>
+                <Input className="h-11 rounded-xl" value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
+              </FormItem>
+              <FormItem label="Chronic Diseases">
+                <Input className="h-11 rounded-xl" value={form.chronic_diseases} onChange={(e) => set("chronic_diseases", e.target.value)} />
+              </FormItem>
+              <FormItem label="Current Medications">
+                <Input className="h-11 rounded-xl" value={form.current_medications} onChange={(e) => set("current_medications", e.target.value)} />
+              </FormItem>
             </div>
           </section>
-        </div>
 
-        <DialogFooter className="bg-slate-50/50 border-t border-slate-100 p-6 sm:justify-end gap-3 rounded-b-2xl">
-          <Button 
-            variant="ghost" 
-            onClick={() => onOpenChange(false)}
-            className="h-11 px-6 font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={onSubmit} 
-            disabled={saving} 
-            className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all active:scale-95"
-          >
-            {saving ? "Updating Patient..." : "Save Changes"}
+          {/* SECTION 5: PEDIATRIC (Optional) */}
+          {form.patient_type === "minor" && (
+            <section className="animate-in fade-in slide-in-from-top-4 duration-500">
+              <SectionHeader num="05" title="Pediatric Information" icon={Baby} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                <FormItem label="Birth Weight (kg)">
+                  <Input type="number" step="0.01" className="h-11 rounded-xl" value={form.birth_weight} onChange={(e) => set("birth_weight", e.target.value)} />
+                </FormItem>
+                <FormItem label="Birth Height (cm)">
+                  <Input type="number" step="0.1" className="h-11 rounded-xl" value={form.birth_height} onChange={(e) => set("birth_height", e.target.value)} />
+                </FormItem>
+                <FormItem label="Birth Type">
+                  <Input className="h-11 rounded-xl" value={form.birth_type} onChange={(e) => set("birth_type", e.target.value)} placeholder="e.g. Vaginal, C-section" />
+                </FormItem>
+                <FormItem label="Apgar Score">
+                  <Input className="h-11 rounded-xl" value={form.apgar_score} onChange={(e) => set("apgar_score", e.target.value)} />
+                </FormItem>
+                <FormItem label="Breastfeeding">
+                  <Input className="h-11 rounded-xl" value={form.breastfeeding} onChange={(e) => set("breastfeeding", e.target.value)} />
+                </FormItem>
+              </div>
+            </section>
+          )}
+        </div>
+        <DialogFooter className="p-8 bg-slate-50/50 border-t border-slate-100">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-8 rounded-xl">Cancel</Button>
+          <Button onClick={onSubmit} disabled={saving} className="h-11 px-10 rounded-xl shadow-lg shadow-primary/20">
+            {saving ? "Saving..." : "Save Patient Profile"}
           </Button>
         </DialogFooter>
       </DialogContent>

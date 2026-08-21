@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowLeft, ImagePlus, UserPlus } from "lucide-react";
+import { ArrowLeft, ImagePlus, UserPlus, BookOpen, ShieldCheck, Activity, Baby } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -30,6 +30,9 @@ const schema = z.object({
   state: z.string().max(80).optional().or(z.literal("")),
   city: z.string().max(80).optional().or(z.literal("")),
   pincode: z.string().max(20).optional().or(z.literal("")),
+  patient_type: z.string().optional().or(z.literal("")),
+  insurance_name: z.string().optional().or(z.literal("")),
+  allergies: z.string().optional().or(z.literal("")),
 });
 
 const empty = {
@@ -38,6 +41,35 @@ const empty = {
   dob: "", gender: "", blood_group: "", status: "active",
   primary_doctor_id: "", address_1: "", address_2: "",
   country: "", state: "", city: "", pincode: "",
+  // New fields
+  patient_type: "adult" as "adult" | "minor",
+  languages: [] as string[],
+  profession: "",
+  family_situation: "",
+  emergency_contact_name: "",
+  emergency_contact_phone: "",
+  emergency_contact_relation: "",
+  insurance_name: "",
+  insurance_number: "",
+  insurance_policy: "",
+  insurance_status: "",
+  insurance_notes: "",
+  rhesus: "",
+  allergies: "",
+  chronic_diseases: "",
+  current_medications: "",
+  medical_history: "",
+  family_history: "",
+  surgical_history: "",
+  previous_hospitalizations: "",
+  birth_type: "",
+  birth_weight: "" as string | number,
+  birth_height: "" as string | number,
+  apgar_score: "",
+  breastfeeding: "",
+  birth_complications: "",
+  psychomotor_development: "",
+  development_notes: "",
 };
 
 const SectionTitle = ({ children }: { children: React.ReactNode }) => (
@@ -86,6 +118,35 @@ const AdminPatientCreate = () => {
         identity_document_number: parsed.data.identity_document_number || null,
         primary_doctor_id: parsed.data.primary_doctor_id || null,
         created_by: userRes.user?.id || null,
+        // Map new fields from form state
+        patient_type: form.patient_type,
+        languages: form.languages,
+        profession: form.profession.trim() || null,
+        family_situation: form.family_situation.trim() || null,
+        emergency_contact_name: form.emergency_contact_name.trim() || null,
+        emergency_contact_phone: form.emergency_contact_phone.trim() || null,
+        emergency_contact_relation: form.emergency_contact_relation.trim() || null,
+        insurance_name: form.insurance_name.trim() || null,
+        insurance_number: form.insurance_number.trim() || null,
+        insurance_policy: form.insurance_policy.trim() || null,
+        insurance_status: form.insurance_status.trim() || null,
+        insurance_notes: form.insurance_notes.trim() || null,
+        rhesus: form.rhesus.trim() || null,
+        allergies: form.allergies.trim() || null,
+        chronic_diseases: form.chronic_diseases.trim() || null,
+        current_medications: form.current_medications.trim() || null,
+        medical_history: form.medical_history.trim() || null,
+        family_history: form.family_history.trim() || null,
+        surgical_history: form.surgical_history.trim() || null,
+        previous_hospitalizations: form.previous_hospitalizations.trim() || null,
+        birth_type: form.birth_type.trim() || null,
+        birth_weight: form.birth_weight || null,
+        birth_height: form.birth_height || null,
+        apgar_score: form.apgar_score.trim() || null,
+        breastfeeding: form.breastfeeding.trim() || null,
+        birth_complications: form.birth_complications.trim() || null,
+        psychomotor_development: form.psychomotor_development.trim() || null,
+        development_notes: form.development_notes.trim() || null,
       };
       const { error } = await supabase.from("patient_intake").insert(payload);
       if (error) throw error;
@@ -362,13 +423,97 @@ const AdminPatientCreate = () => {
                 </div>
               </div>
             </section>
+
+            {/* 4. INSURANCE & MEDICAL */}
+            <section className="space-y-6">
+
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">04</span>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insurance & Medical</h3>
+              </div>
+              <div className="h-px bg-slate-100 w-full" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Patient Type</Label>
+                  <Select value={form.patient_type} onValueChange={(v: any) => set("patient_type")(v)}>
+                    <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="adult">Adult</SelectItem>
+                      <SelectItem value="minor">Minor (Pediatric)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Insurance Provider</Label>
+                  <Input 
+                    value={form.insurance_name} 
+                    onChange={(e) => set("insurance_name")(e.target.value)}
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Allergies</Label>
+                  <Input 
+                    value={form.allergies} 
+                    onChange={(e) => set("allergies")(e.target.value)}
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* 5. PEDIATRIC (CONDITIONAL) */}
+            {form.patient_type === "minor" && (
+              <section className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">05</span>
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Pediatric Information</h3>
+                </div>
+                <div className="h-px bg-slate-100 w-full" />
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Birth Weight (kg)</Label>
+                    <Input 
+                      type="number" step="0.01"
+                      value={form.birth_weight} 
+                      onChange={(e) => set("birth_weight")(e.target.value)}
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Birth Type</Label>
+                    <Input 
+                      value={form.birth_type} 
+                      onChange={(e) => set("birth_type")(e.target.value)}
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Apgar Score</Label>
+                    <Input 
+                      value={form.apgar_score} 
+                      onChange={(e) => set("apgar_score")(e.target.value)}
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
+
           </div>
+
 
           <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-4">
             <Button 
               type="button" 
               variant="ghost" 
               onClick={() => navigate("/admin/patients")}
+
               className="h-11 px-6 font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
             >
               Cancel

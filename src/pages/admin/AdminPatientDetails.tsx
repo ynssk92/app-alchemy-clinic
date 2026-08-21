@@ -535,6 +535,19 @@ const AdminPatientDetails = () => {
             identity_document_type: form.identity_document_type || null,
             identity_document_number: form.identity_document_number.trim() || null,
             status: form.status,
+            patient_type: form.patient_type,
+            languages: form.languages,
+            profession: form.profession.trim() || null,
+            family_situation: form.family_situation.trim() || null,
+            emergency_contact_name: form.emergency_contact_name.trim() || null,
+            emergency_contact_phone: form.emergency_contact_phone.trim() || null,
+            emergency_contact_relation: form.emergency_contact_relation.trim() || null,
+            insurance_name: form.insurance_name.trim() || null,
+            insurance_number: form.insurance_number.trim() || null,
+            insurance_policy: form.insurance_policy.trim() || null,
+            insurance_status: form.insurance_status.trim() || null,
+            insurance_notes: form.insurance_notes.trim() || null,
+            rhesus: form.rhesus.trim() || null,
           })
           .eq("id", patient.profileId);
         if (pErr) throw pErr;
@@ -564,6 +577,34 @@ const AdminPatientDetails = () => {
         address_1: form.address_1 || null,
         city: form.city || null,
         country: form.country || null,
+        patient_type: form.patient_type,
+        languages: form.languages,
+        profession: form.profession.trim() || null,
+        family_situation: form.family_situation.trim() || null,
+        emergency_contact_name: form.emergency_contact_name.trim() || null,
+        emergency_contact_phone: form.emergency_contact_phone.trim() || null,
+        emergency_contact_relation: form.emergency_contact_relation.trim() || null,
+        insurance_name: form.insurance_name.trim() || null,
+        insurance_number: form.insurance_number.trim() || null,
+        insurance_policy: form.insurance_policy.trim() || null,
+        insurance_status: form.insurance_status.trim() || null,
+        insurance_notes: form.insurance_notes.trim() || null,
+        rhesus: form.rhesus.trim() || null,
+        allergies: form.allergies.trim() || null,
+        chronic_diseases: form.chronic_diseases.trim() || null,
+        current_medications: form.current_medications.trim() || null,
+        medical_history: form.medical_history.trim() || null,
+        family_history: form.family_history.trim() || null,
+        surgical_history: form.surgical_history.trim() || null,
+        previous_hospitalizations: form.previous_hospitalizations.trim() || null,
+        birth_type: form.birth_type.trim() || null,
+        birth_weight: form.birth_weight || null,
+        birth_height: form.birth_height || null,
+        apgar_score: form.apgar_score.trim() || null,
+        breastfeeding: form.breastfeeding.trim() || null,
+        birth_complications: form.birth_complications.trim() || null,
+        psychomotor_development: form.psychomotor_development.trim() || null,
+        development_notes: form.development_notes.trim() || null,
       };
 
       if (patient.intakeId) {
@@ -930,27 +971,92 @@ const AdminPatientDetails = () => {
                 </Card>
               </div>
 
-              {/* Appointments tab */}
-              <Card className="border-border">
-                <Tabs defaultValue="appointments">
-                  <div className="border-b border-border px-6 pt-4">
-                    <TabsList className="bg-transparent p-0 h-auto gap-6">
+              {/* CRM Tabs */}
+              <Card className="border-border shadow-sm">
+                <Tabs defaultValue="appointments" className="w-full">
+                  <div className="border-b border-border px-6 pt-2">
+                    <TabsList className="bg-transparent p-0 h-auto gap-8 flex flex-wrap">
+                      <TabsTrigger
+                        value="medical"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                      >
+                        {t("patients.details.tabs.medical", { defaultValue: "Medical Profile" })}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="insurance"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                      >
+                        {t("patients.details.tabs.insurance", { defaultValue: "Insurance" })}
+                      </TabsTrigger>
+                      {patient.patient_type === "minor" && (
+                        <TabsTrigger
+                          value="pediatrics"
+                          className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                        >
+                          {t("patients.details.tabs.pediatrics", { defaultValue: "Pediatrics" })}
+                        </TabsTrigger>
+                      )}
                       <TabsTrigger
                         value="appointments"
-                        className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
                       >
                         {t("nav.appointments")}
                       </TabsTrigger>
                       <TabsTrigger
                         value="transactions"
-                        className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
                       >
                         {t("nav.billing")}
                       </TabsTrigger>
                     </TabsList>
                   </div>
 
+                  <TabsContent value="medical" className="m-0 p-8 pt-6">
+                    <div className="space-y-8">
+                      <div className="grid md:grid-cols-2 gap-8">
+                        <div className="space-y-4">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                            <Droplet className="w-3.5 h-3.5 text-red-500" /> Medical Overview
+                          </h4>
+                          <div className="space-y-3">
+                            <InfoTile icon={Activity} label="Allergies" value={patient.allergies || "None declared"} />
+                            <InfoTile icon={Activity} label="Chronic Diseases" value={patient.chronic_diseases || "None declared"} />
+                            <InfoTile icon={Activity} label="Current Medications" value={patient.current_medications || "None"} />
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                            <BookOpen className="w-3.5 h-3.5 text-indigo-500" /> History
+                          </h4>
+                          <div className="space-y-3">
+                            <InfoTile icon={BookOpen} label="Medical History" value={patient.medical_history || "No records"} />
+                            <InfoTile icon={BookOpen} label="Surgical History" value={patient.surgical_history || "No records"} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="insurance" className="m-0 p-8 pt-6">
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <InfoTile icon={ShieldCheck} label="Provider" value={patient.insurance_name || "Self-pay"} />
+                      <InfoTile icon={Receipt} label="Policy #" value={patient.insurance_number || "—"} />
+                      <InfoTile icon={FileText} label="Status" value={patient.insurance_status || "Unknown"} />
+                    </div>
+                  </TabsContent>
+
+                  {patient.patient_type === "minor" && (
+                    <TabsContent value="pediatrics" className="m-0 p-8 pt-6">
+                      <div className="grid md:grid-cols-3 gap-6">
+                        <InfoTile icon={Cake} label="Birth Weight" value={patient.birth_weight ? `${patient.birth_weight} kg` : "—"} />
+                        <InfoTile icon={Thermometer} label="Birth Type" value={patient.birth_type || "—"} />
+                        <InfoTile icon={Activity} label="Psychomotor" value={patient.psychomotor_development || "—"} />
+                      </div>
+                    </TabsContent>
+                  )}
+
                   <TabsContent value="appointments" className="m-0 p-6 pt-4">
+
                     {!registered ? (
                       <div className="py-10 text-center text-sm text-muted-foreground">
                         Appointments become available after the patient registers an account.
