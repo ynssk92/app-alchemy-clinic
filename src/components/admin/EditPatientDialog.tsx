@@ -364,22 +364,30 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                   className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                   placeholder="e.g. Moroccan"
                 />
+          {/* 4. INSURANCE & MEDICAL */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">04</span>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insurance & Medical</h3>
+            </div>
+            <div className="h-px bg-slate-100 w-full" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Insurance Name</Label>
+                <Input value={form.insurance_name} onChange={(e) => set("insurance_name", e.target.value)} className="h-[46px] rounded-[10px] bg-white border-slate-200" />
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Type</Label>
-                  <Select value={form.identity_document_type} onValueChange={(v) => set("identity_document_type", v)}>
-                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="CIN">CIN</SelectItem>
-                      <SelectItem value="Passport">Passport</SelectItem>
-                      <SelectItem value="Other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Insurance Number</Label>
+                <Input value={form.insurance_number} onChange={(e) => set("insurance_number", e.target.value)} className="h-[46px] rounded-[10px] bg-white border-slate-200" />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Medical History</Label>
+                <Input value={form.medical_history} onChange={(e) => set("medical_history", e.target.value)} className="h-[46px] rounded-[10px] bg-white border-slate-200" />
+              </div>
+            </div>
+          </section>
+        </div>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Number</Label>
                   <Input 
