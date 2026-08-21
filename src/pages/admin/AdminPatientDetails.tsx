@@ -505,37 +505,176 @@ const AdminPatientDetails = () => {
       <div className="flex-1 overflow-y-auto p-6">
         {patient && (
           <div className="space-y-6">
-            {/* Header / Info ... */}
-            {/* ... (rest of the component structure) */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Avatar className="w-16 h-16 border-2 border-primary/20">
+                  <AvatarImage src={patient.avatar_path || ""} />
+                  <AvatarFallback className="bg-primary/5 text-primary text-xl">
+                    {patient.full_name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h1 className="text-2xl font-bold text-slate-900">{patient.full_name}</h1>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider">
+                      ID: {patient.profileId || patient.intakeId?.substring(0, 8)}
+                    </Badge>
+                    {patient.dob && (
+                      <span className="text-xs text-slate-500">
+                        {new Date().getFullYear() - new Date(patient.dob).getFullYear()} years old
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+                  <Pencil className="w-4 h-4 mr-2" />
+                  Edit Profile
+                </Button>
+                <Button className="bg-gradient-primary" size="sm">
+                  <Plus className="w-4 h-4 mr-2" />
+                  New Consultation
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Card className="p-4 border-none shadow-sm bg-blue-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                    <Droplet className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-blue-600/60 uppercase tracking-wider">Blood Group</p>
+                    <p className="text-lg font-bold text-blue-900">{patient.blood_group || "—"}</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 border-none shadow-sm bg-rose-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-600">
+                    <AlertCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-rose-600/60 uppercase tracking-wider">Allergies</p>
+                    <p className="text-lg font-bold text-rose-900">{patient.allergies ? "Yes" : "None"}</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 border-none shadow-sm bg-amber-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
+                    <Activity className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-amber-600/60 uppercase tracking-wider">Condition</p>
+                    <p className="text-lg font-bold text-amber-900">Stable</p>
+                  </div>
+                </div>
+              </Card>
+              <Card className="p-4 border-none shadow-sm bg-emerald-50/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-wider">Insurance</p>
+                    <p className="text-lg font-bold text-emerald-900 truncate">{patient.insurance_name || "—"}</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
 
             <Tabs defaultValue="medical" className="w-full">
-              <div className="border-b border-border px-6 pt-2">
-                <TabsList className="bg-transparent p-0 h-auto gap-8 flex flex-wrap">
-                  <TabsTrigger
-                    value="medical"
-                    className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
-                  >
-                    {t("patients.details.tabs.medical", { defaultValue: "Medical Profile" })}
-                  </TabsTrigger>
-                  <TabsTrigger value="archive" className="flex items-center gap-2">
-                    <FolderOpen className="w-4 h-4" />
-                    <span>Medical Archive</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="prescriptions" className="flex items-center gap-2">
-                    <ScrollText className="w-4 h-4" />
-                    <span>Prescriptions</span>
-                  </TabsTrigger>
-                  <TabsContent value="medical" className="m-0 p-8 pt-6">
-                    {/* ... medical content ... */}
-                  </TabsContent>
-                  <TabsContent value="archive" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
-                    <MedicalArchive patientId={patient.profileId || patient.intakeId || ""} />
-                  </TabsContent>
-                  <TabsContent value="prescriptions" className="mt-0 space-y-6 animate-in fade-in-50 duration-300">
-                    <PrescriptionList patientId={patient.profileId || patient.intakeId || ""} />
-                  </TabsContent>
-                </TabsList>
-              </div>
+              <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
+                <TabsTrigger
+                  value="medical"
+                  className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                >
+                  Medical Profile
+                </TabsTrigger>
+                <TabsTrigger
+                  value="archive"
+                  className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                >
+                  Medical Archive
+                </TabsTrigger>
+                <TabsTrigger
+                  value="prescriptions"
+                  className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                >
+                  Prescriptions
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="medical" className="mt-6 space-y-6 animate-in fade-in-50 duration-300">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="p-6 border-slate-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <Activity className="w-4 h-4 text-primary" />
+                        Medical History
+                      </h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Chronic Diseases</p>
+                        <p className="text-sm text-slate-700">{patient.chronic_diseases || "No chronic diseases recorded."}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Current Medications</p>
+                        <p className="text-sm text-slate-700">{patient.current_medications || "No current medications recorded."}</p>
+                      </div>
+                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Surgical History</p>
+                        <p className="text-sm text-slate-700">{patient.surgical_history || "No surgical history recorded."}</p>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-6 border-slate-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <Info className="w-4 h-4 text-primary" />
+                        Patient Information
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gender</p>
+                        <p className="text-sm font-medium text-slate-700 capitalize">{patient.gender || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nationality</p>
+                        <p className="text-sm font-medium text-slate-700">{patient.nationality || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phone</p>
+                        <p className="text-sm font-medium text-slate-700">{patient.phone || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</p>
+                        <p className="text-sm font-medium text-slate-700 truncate">{patient.email || "—"}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Address</p>
+                        <p className="text-sm font-medium text-slate-700">
+                          {[patient.address_1, patient.city, patient.country].filter(Boolean).join(", ") || "—"}
+                        </p>
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="archive" className="mt-6 animate-in fade-in-50 duration-300">
+                <MedicalArchive patientId={patient.profileId || patient.intakeId || ""} />
+              </TabsContent>
+
+              <TabsContent value="prescriptions" className="mt-6 animate-in fade-in-50 duration-300">
+                <PrescriptionList patientId={patient.profileId || patient.intakeId || ""} />
+              </TabsContent>
             </Tabs>
           </div>
         )}
