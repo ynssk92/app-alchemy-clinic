@@ -81,6 +81,9 @@ const AdminPatientCreate = () => {
         ...parsed.data,
         email: parsed.data.email.toLowerCase(),
         dob: parsed.data.dob || null,
+        nationality: parsed.data.nationality || null,
+        identity_document_type: parsed.data.identity_document_type || null,
+        identity_document_number: parsed.data.identity_document_number || null,
         primary_doctor_id: parsed.data.primary_doctor_id || null,
         created_by: userRes.user?.id || null,
       };
