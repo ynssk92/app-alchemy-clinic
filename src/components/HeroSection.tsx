@@ -6,9 +6,9 @@ import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
   badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Enable Supabase for this project.",
-  heading: "Exceptional dental care.",
-  highlight: "A confident smile.",
-  description: "Advanced dental expertise, modern technology and personalized care, all in one place.",
+  heading: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            01- Connect my app's data layer to a Supabase Postgres database and migrate existing tables without resetting data.\n\n02- Enable Supabase Storage for any file uploads and wire it into the existing storage usage.\n\n03 - Set up Supabase Row Level Security policies so patients and doctors can only access their own appointments and billing records.",
+  highlight: "",
+  description: "",
   primaryCTA: "Book an Appointment",
   primaryURL: "/booking",
   secondaryCTA: "Discover Our Care",
