@@ -85,8 +85,8 @@ const Index = () => {
   return (
     <PublicLayout>
       <Seo
-        title={page?.seo_title || "La Dune Clinique Dentaire — Exceptional Dental Care"}
-        description={page?.seo_description || "Premium modern dental clinic in Agadir. Advanced technology, experienced specialists, and personalized care."}
+        title={page?.seo_title || "HealthBook - Book Healthcare Appointments in Seconds"}
+        description={page?.seo_description || "Find and book appointments with top doctors instantly. Manage your health records, receive reminders, and take control of your healthcare journey."}
         path="/"
       />
 
