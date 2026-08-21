@@ -34,6 +34,7 @@ const schema = z.object({
 
 const empty = {
   first_name: "", last_name: "", email: "", phone: "",
+  nationality: "", identity_document_type: "", identity_document_number: "",
   dob: "", gender: "", blood_group: "", status: "active",
   primary_doctor_id: "", address_1: "", address_2: "",
   country: "", state: "", city: "", pincode: "",
