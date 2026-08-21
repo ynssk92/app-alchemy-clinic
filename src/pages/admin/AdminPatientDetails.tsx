@@ -187,6 +187,52 @@ const AdminPatientDetails = () => {
   });
 
   const [form, setForm] = useState({
+    first_name: "",
+    last_name: "",
+    full_name: "",
+    email: "",
+    phone: "",
+    nationality: "",
+    identity_document_type: "",
+    identity_document_number: "",
+    dob: "",
+    gender: "",
+    blood_group: "",
+    address_1: "",
+    city: "",
+    country: "",
+    status: "approved" as "pending" | "approved" | "rejected",
+    // New fields
+    patient_type: "adult" as "adult" | "minor",
+    languages: [] as string[],
+    profession: "",
+    family_situation: "",
+    emergency_contact_name: "",
+    emergency_contact_phone: "",
+    emergency_contact_relation: "",
+    insurance_name: "",
+    insurance_number: "",
+    insurance_policy: "",
+    insurance_status: "",
+    insurance_notes: "",
+    rhesus: "",
+    allergies: "",
+    chronic_diseases: "",
+    current_medications: "",
+    medical_history: "",
+    family_history: "",
+    surgical_history: "",
+    previous_hospitalizations: "",
+    birth_type: "",
+    birth_weight: "" as string | number,
+    birth_height: "" as string | number,
+    apgar_score: "",
+    breastfeeding: "",
+    birth_complications: "",
+    psychomotor_development: "",
+    development_notes: "",
+  });
+  const [reloadTick, setReloadTick] = useState(0);
   const [notFound, setNotFound] = useState(false);
 
   // --- Sidebar list (merged intake + profiles) ---
