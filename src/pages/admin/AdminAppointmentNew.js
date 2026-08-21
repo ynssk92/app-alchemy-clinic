@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, Clock, User, Stethoscope, FileText, Plus, ChevronLeft, Info, Search, Check } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 const AdminAppointmentNew = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
