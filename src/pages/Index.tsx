@@ -80,6 +80,8 @@ const Index = () => {
 
   const currentDept = departments.find((d) => d.id === activeDept) || departments[0];
 
+  const hero = page?.hero_config || {};
+
   return (
     <PublicLayout>
       <Seo
@@ -100,9 +102,11 @@ const Index = () => {
       <section className="bg-slate-50 py-24 md:py-32">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mb-16">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Our Dental Care</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+              {hero.servicesLabel || "Our Dental Care"}
+            </span>
             <h2 className="mt-4 text-[40px] md:text-[52px] font-bold tracking-tight text-slate-900 leading-[1.1]">
-              Comprehensive treatments designed around your needs.
+              {hero.servicesHeading || "Comprehensive treatments designed around your needs."}
             </h2>
           </div>
 
@@ -142,12 +146,14 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
               <div className="max-w-2xl">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Our Team</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  {hero.teamLabel || "Our Team"}
+                </span>
                 <h2 className="mt-4 text-[40px] md:text-[52px] font-bold tracking-tight text-slate-900 leading-[1.1]">
-                  Meet our experts
+                  {hero.teamHeading || "Meet our experts"}
                 </h2>
                 <p className="mt-6 text-lg text-slate-500 leading-relaxed">
-                  A multidisciplinary team dedicated to your oral health, combining years of clinical experience with continuous training.
+                  {hero.teamDescription || "A multidisciplinary team dedicated to your oral health, combining years of clinical experience with continuous training."}
                 </p>
               </div>
               <Button asChild variant="outline" className="h-12 rounded-full px-8 border-slate-200 hover:bg-slate-50 group">
@@ -192,9 +198,11 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
               <div className="max-w-2xl">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Blog</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                  {hero.blogLabel || "Blog"}
+                </span>
                 <h2 className="mt-4 text-[40px] md:text-[52px] font-bold tracking-tight text-slate-900 leading-[1.1]">
-                  Latest from our blog
+                  {hero.blogHeading || "Latest from our blog"}
                 </h2>
               </div>
               <Button asChild variant="ghost" className="h-12 rounded-full px-8 text-slate-600 hover:text-primary transition-colors">

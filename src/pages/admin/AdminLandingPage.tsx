@@ -25,7 +25,8 @@ import {
   Layout, 
   Settings,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Pencil
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { SitePage } from "@/hooks/usePageContent";
@@ -46,6 +47,14 @@ interface HeroConfig {
   imageUrl?: string;
   testimonialStyle: 'grid' | 'carousel';
   testimonialLimit: number;
+  // Section Headers
+  servicesLabel?: string;
+  servicesHeading?: string;
+  teamLabel?: string;
+  teamHeading?: string;
+  teamDescription?: string;
+  blogLabel?: string;
+  blogHeading?: string;
 }
 
 const AdminLandingPage = () => {
@@ -129,7 +138,7 @@ const AdminLandingPage = () => {
     return <div className="p-8 text-center">Loading landing page configuration...</div>;
   }
 
-  const hero = (page?.hero_config as HeroConfig) || {};
+  const hero = (page?.hero_config as HeroConfig) || {} as HeroConfig;
 
   return (
     <div className="space-y-6">
@@ -161,12 +170,12 @@ const AdminLandingPage = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
+        <TabsList className="grid w-full grid-cols-5 lg:w-[750px]">
           <TabsTrigger value="hero">Hero Section</TabsTrigger>
           <TabsTrigger value="sections">Sections</TabsTrigger>
+          <TabsTrigger value="headers">Headers</TabsTrigger>
           <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
           <TabsTrigger value="seo">SEO & Metadata</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="hero" className="mt-6 space-y-6">
@@ -305,19 +314,122 @@ const AdminLandingPage = () => {
         </TabsContent>
 
         <TabsContent value="sections" className="mt-6">
-          <Card className="p-10 text-center border-dashed">
-            <Settings className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium">Manage Other Sections</h3>
-            <p className="text-muted-foreground max-w-sm mx-auto mb-6">
-              Use the "Pages" admin section to manage specific content blocks like Trust markers, Expertise, and Why La Dune.
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Layout className="h-5 w-5 text-primary" />
+                Homepage Content Sections
+              </h2>
+              <Button asChild size="sm">
+                <Link to="/admin/pages">
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit Detailed Content
+                </Link>
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              The homepage is composed of dynamic sections. Click below to manage individual blocks for Trust markers, Expertise, Services, and more.
             </p>
-            <Button asChild variant="outline">
-              <Link to="/admin/pages">
-                Go to Pages Editor
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { title: "Trust Markers", desc: "Logos and highlights at the top", kind: "trust" },
+                { title: "Dental Services", desc: "Treatment categories and tabs", kind: "department" },
+                { title: "Clinical Expertise", desc: "Features and tech highlights", kind: "expertise" },
+                { title: "Why La Dune", desc: "Differentiation and core values", kind: "why-us" },
+                { title: "Patient Reviews", desc: "Testimonial cards and quotes", kind: "experience" },
+                { title: "Call to Action", desc: "Final booking banner", kind: "final-cta" },
+              ].map((section) => (
+                <div key={section.kind} className="p-4 border rounded-lg hover:border-primary/50 transition-colors">
+                  <h3 className="font-medium">{section.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{section.desc}</p>
+                </div>
+              ))}
+            </div>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="headers" className="mt-6 space-y-6">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                Services Section
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Label (Eyebrow)</Label>
+                  <Input 
+                    value={hero.servicesLabel || ""} 
+                    onChange={(e) => handleHeroChange("servicesLabel", e.target.value)}
+                    placeholder="Our Dental Care"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Heading</Label>
+                  <Textarea 
+                    value={hero.servicesHeading || ""} 
+                    onChange={(e) => handleHeroChange("servicesHeading", e.target.value)}
+                    placeholder="Comprehensive treatments designed around your needs."
+                  />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                Team Section
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Label (Eyebrow)</Label>
+                  <Input 
+                    value={hero.teamLabel || ""} 
+                    onChange={(e) => handleHeroChange("teamLabel", e.target.value)}
+                    placeholder="Our Team"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Heading</Label>
+                  <Input 
+                    value={hero.teamHeading || ""} 
+                    onChange={(e) => handleHeroChange("teamHeading", e.target.value)}
+                    placeholder="Meet our experts"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea 
+                    value={hero.teamDescription || ""} 
+                    onChange={(e) => handleHeroChange("teamDescription", e.target.value)}
+                    placeholder="A multidisciplinary team dedicated to your oral health..."
+                  />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                Blog Section
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Label (Eyebrow)</Label>
+                  <Input 
+                    value={hero.blogLabel || ""} 
+                    onChange={(e) => handleHeroChange("blogLabel", e.target.value)}
+                    placeholder="Blog"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Heading</Label>
+                  <Input 
+                    value={hero.blogHeading || ""} 
+                    onChange={(e) => handleHeroChange("blogHeading", e.target.value)}
+                    placeholder="Latest from our blog"
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="testimonials" className="mt-6 space-y-6">
