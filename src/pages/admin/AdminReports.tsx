@@ -436,6 +436,7 @@ export const AdminReports = () => {
                 <TableHead className="text-center">Rendez-vous</TableHead>
                 <TableHead className="text-center">Complétés</TableHead>
                 <TableHead className="text-center">Ordonnances</TableHead>
+                <TableHead className="text-center">Revenu (MAD)</TableHead>
                 <TableHead className="text-right">Taux de Complétion</TableHead>
               </TableRow>
             </TableHeader>
