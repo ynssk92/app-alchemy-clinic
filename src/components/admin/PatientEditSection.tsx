@@ -67,32 +67,82 @@ export const PatientEditSection = ({ patient, onSaved }: Props) => {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <div className="space-y-6 max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-slate-100">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
         <div className="space-y-2">
-          <Label>First Name</Label>
-          <Input value={form.first_name} onChange={(e) => setForm({...form, first_name: e.target.value})} />
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">First Name</Label>
+          <Input 
+            value={form.first_name} 
+            onChange={(e) => setForm({...form, first_name: e.target.value})} 
+            className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+          />
         </div>
         <div className="space-y-2">
-          <Label>Last Name</Label>
-          <Input value={form.last_name} onChange={(e) => setForm({...form, last_name: e.target.value})} />
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Last Name</Label>
+          <Input 
+            value={form.last_name} 
+            onChange={(e) => setForm({...form, last_name: e.target.value})} 
+            className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+          />
         </div>
         <div className="space-y-2">
-          <Label>Email</Label>
-          <Input value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} />
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Email</Label>
+          <Input 
+            value={form.email} 
+            onChange={(e) => setForm({...form, email: e.target.value})} 
+            className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+          />
         </div>
         <div className="space-y-2">
-          <Label>Phone</Label>
-          <Input value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} />
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Phone</Label>
+          <Input 
+            value={form.phone} 
+            onChange={(e) => setForm({...form, phone: e.target.value})} 
+            className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+          />
         </div>
         <div className="space-y-2">
-          <Label>DOB</Label>
-          <Input type="date" value={form.dob} onChange={(e) => setForm({...form, dob: e.target.value})} />
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Nationality</Label>
+          <Input 
+            value={form.nationality} 
+            onChange={(e) => setForm({...form, nationality: e.target.value})} 
+            className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Doc Type</Label>
+            <Select value={form.identity_document_type} onValueChange={(v) => setForm({...form, identity_document_type: v})}>
+              <SelectTrigger className="h-11 border-slate-200"><SelectValue placeholder="Type" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CIN">CIN</SelectItem>
+                <SelectItem value="Passport">Passport</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Doc Number</Label>
+            <Input 
+              value={form.identity_document_number} 
+              onChange={(e) => setForm({...form, identity_document_number: e.target.value})} 
+              className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+            />
+          </div>
         </div>
         <div className="space-y-2">
-          <Label>Gender</Label>
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">DOB</Label>
+          <Input 
+            type="date" 
+            value={form.dob} 
+            onChange={(e) => setForm({...form, dob: e.target.value})} 
+            className="h-11 border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Gender</Label>
           <Select value={form.gender} onValueChange={(v) => setForm({...form, gender: v})}>
-            <SelectTrigger><SelectValue placeholder="Gender" /></SelectTrigger>
+            <SelectTrigger className="h-11 border-slate-200"><SelectValue placeholder="Gender" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="male">Male</SelectItem>
               <SelectItem value="female">Female</SelectItem>
