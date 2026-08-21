@@ -368,22 +368,22 @@ export const AdminReports = () => {
         {/* Appointments by Status */}
         <WidgetCard 
           className="lg:col-span-4"
-          title="Statut des Rendez-vous"
-          description="Répartition par état actuel"
-          icon={Activity}
-          tint="stat-cyan"
+          title="Archives par Catégorie"
+          description="Documents par type de dossier"
+          icon={FileText}
+          tint="stat-violet"
         >
           <div className="h-[250px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={apptsByStatus}
+                  data={docsByCategory}
                   innerRadius={60}
                   outerRadius={80}
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {apptsByStatus.map((entry, index) => (
+                  {docsByCategory.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -399,14 +399,14 @@ export const AdminReports = () => {
         {/* Appointments by Type */}
         <WidgetCard 
           className="lg:col-span-8"
-          title="Activité par Type de Service"
-          description="Volume de consultations par catégorie"
-          icon={BarChart3}
-          tint="stat-blue"
+          title="Rendez-vous par Statut"
+          description="Répartition opérationnelle"
+          icon={Activity}
+          tint="stat-cyan"
         >
           <div className="h-[250px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={apptsByType}>
+              <BarChart data={apptsByStatus}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis fontSize={12} tickLine={false} axisLine={false} />
@@ -414,7 +414,7 @@ export const AdminReports = () => {
                   cursor={{ fill: 'hsl(var(--muted)/0.4)' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
-                <Bar dataKey="value" fill="hsl(var(--stat-blue))" radius={[4, 4, 0, 0]} barSize={40} />
+                <Bar dataKey="value" fill="hsl(var(--stat-cyan))" radius={[4, 4, 0, 0]} barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
