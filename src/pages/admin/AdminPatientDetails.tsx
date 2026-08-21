@@ -215,7 +215,7 @@ const AdminPatientDetails = () => {
       // 1) Try as profile — but only accept it if the account is patient-only
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, full_name, phone, created_at, avatar_url")
+        .select("id, full_name, phone, created_at, avatar_url, nationality, identity_document_type, identity_document_number")
         .eq("id", id)
         .maybeSingle();
       let profileIsPatient = false;
