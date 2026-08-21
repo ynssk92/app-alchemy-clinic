@@ -192,8 +192,8 @@ const Booking = () => {
   return (
     <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
-        title="Prendre rendez-vous — La Dune"
-        description="Réservez votre consultation en ligne sans créer de compte : choisissez un praticien, une date et un horaire."
+        title="Book an Appointment — HealthBook"
+        description="Schedule your consultation online: choose a practitioner, date, and time."
         path="/booking"
       />
       <SiteHeader />

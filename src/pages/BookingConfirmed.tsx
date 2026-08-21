@@ -334,8 +334,8 @@ const BookingConfirmed = () => {
   return (
     <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
-        title="Rendez-vous confirmé — La Dune"
-        description="Récapitulatif de votre rendez-vous et prochaines étapes avant votre visite."
+        title="Booking Confirmed — HealthBook"
+        description="Summary of your appointment and next steps before your visit."
         path="/booking/confirmed"
       />
       <SiteHeader />
