@@ -306,7 +306,7 @@ const AdminShell = () => {
   
 
   return (
-    <div className="min-h-screen flex bg-muted/30">
+    <div className="min-h-screen flex bg-gray-50/80">
       <Sidebar
         header={<SidebarHeader />}
         footer={

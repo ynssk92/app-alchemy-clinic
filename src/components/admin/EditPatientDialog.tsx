@@ -159,19 +159,21 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none bg-slate-50/50 backdrop-blur-xl">
-        <div className="bg-white px-8 py-6 border-b sticky top-0 z-10 flex items-center justify-between">
+      <DialogContent className="max-w-2xl max-h-[92vh] overflow-y-auto p-0 border border-slate-100 shadow-2xl rounded-2xl bg-white">
+        <div className="bg-white px-8 py-6 border-b border-slate-100 flex items-center justify-between">
           <DialogHeader className="space-y-1">
-            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
-              {form.full_name || "Patient Profile"}
-            </DialogTitle>
-            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">
-              {isRegistered ? "Registered Patient File" : "Guest Intake Record"}
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              </div>
+              <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight">
+                {isRegistered ? "Registered Patient File" : "Guest Intake Record"}
+              </DialogTitle>
+            </div>
+            <p className="text-sm text-slate-500 font-medium pl-12">
+              Update {form.full_name || "patient"} information
             </p>
           </DialogHeader>
-          <div className="h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
-            <span className="text-primary font-bold">{form.full_name ? form.full_name.substring(0, 1) : "P"}</span>
-          </div>
         </div>
 
         <div className="p-8 space-y-10">
@@ -357,7 +359,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           </section>
         </div>
 
-        <DialogFooter className="bg-white border-t p-6 sticky bottom-0 z-10 sm:justify-end gap-3">
+        <DialogFooter className="bg-slate-50/50 border-t border-slate-100 p-6 sm:justify-end gap-3 rounded-b-2xl">
           <Button 
             variant="ghost" 
             onClick={() => onOpenChange(false)}
@@ -368,7 +370,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           <Button 
             onClick={onSubmit} 
             disabled={saving} 
-            className="h-11 px-8 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+            className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all active:scale-95"
           >
             {saving ? "Updating Patient..." : "Save Changes"}
           </Button>
