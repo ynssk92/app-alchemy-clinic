@@ -281,8 +281,11 @@ export const AdminReports = () => {
           <Button variant="outline" className="hidden sm:flex" onClick={() => window.print()}>
             <Printer className="w-4 h-4 mr-2" /> Imprimer
           </Button>
-          <Button className="bg-gradient-primary shadow-md">
-            <Download className="w-4 h-4 mr-2" /> Exporter
+          <Button 
+            className="bg-gradient-primary shadow-md"
+            onClick={() => exportToCSV(filteredData.invoices, 'rapport_facturation')}
+          >
+            <Download className="w-4 h-4 mr-2" /> Exporter CSV
           </Button>
         </div>
       </header>
