@@ -80,6 +80,8 @@ const Index = () => {
 
   const currentDept = departments.find((d) => d.id === activeDept) || departments[0];
 
+  const hero = page?.hero_config || {};
+
   return (
     <PublicLayout>
       <Seo
@@ -100,9 +102,11 @@ const Index = () => {
       <section className="bg-slate-50 py-24 md:py-32">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mb-16">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Our Dental Care</span>
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+              {hero.servicesLabel || "Our Dental Care"}
+            </span>
             <h2 className="mt-4 text-[40px] md:text-[52px] font-bold tracking-tight text-slate-900 leading-[1.1]">
-              Comprehensive treatments designed around your needs.
+              {hero.servicesHeading || "Comprehensive treatments designed around your needs."}
             </h2>
           </div>
 
