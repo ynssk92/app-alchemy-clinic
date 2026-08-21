@@ -72,7 +72,14 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       if (intakeIdProp) {
         const { data } = await supabase
           .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number")
+          .select(`
+            id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number,
+            patient_type, languages, profession, family_situation,
+            emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+            insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes,
+            rhesus, allergies, chronic_diseases, current_medications, medical_history, family_history, surgical_history, previous_hospitalizations,
+            birth_type, birth_weight, birth_height, apgar_score, breastfeeding, birth_complications, psychomotor_development, development_notes
+          `)
           .eq("id", intakeIdProp)
           .maybeSingle();
         intake = data;
