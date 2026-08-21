@@ -418,19 +418,18 @@ const AdminPatientCreate = () => {
                     className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
-              </section>
             </section>
 
             {/* 4. INSURANCE & MEDICAL */}
             <section className="space-y-6">
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">04</span>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insurance & Medical</h3>
+              </div>
+              <div className="h-px bg-slate-100 w-full" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-                <div className="flex items-center gap-4">
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">04</span>
-                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insurance & Medical</h3>
-                </div>
-                <div className="h-px bg-slate-100 w-full" />
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Patient Type</Label>
                   <Select value={form.patient_type} onValueChange={(v: any) => set("patient_type")(v)}>
