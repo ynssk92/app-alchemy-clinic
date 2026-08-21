@@ -159,79 +159,218 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit patient</DialogTitle>
-        </DialogHeader>
-        <div className="grid grid-cols-2 gap-4">
-          {isRegistered ? (
-            <div className="col-span-2">
-              <Label>Full name</Label>
-              <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
-            </div>
-          ) : (
-            <>
-              <div>
-                <Label>First name</Label>
-                <Input value={form.first_name} onChange={(e) => set("first_name", e.target.value)} />
-              </div>
-              <div>
-                <Label>Last name</Label>
-                <Input value={form.last_name} onChange={(e) => set("last_name", e.target.value)} />
-              </div>
-            </>
-          )}
-          <div>
-            <Label>Email</Label>
-            <Input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} disabled={isRegistered} />
-          </div>
-          <div>
-            <Label>Phone</Label>
-            <Input value={form.phone} onChange={(e) => set("phone", e.target.value)} />
-          </div>
-          <div>
-            <Label>Date of birth</Label>
-            <Input type="date" value={form.dob} onChange={(e) => set("dob", e.target.value)} />
-          </div>
-          <div>
-            <Label>Gender</Label>
-            <Select value={form.gender} onValueChange={(v) => set("gender", v)}>
-              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>Blood group</Label>
-            <Select value={form.blood_group} onValueChange={(v) => set("blood_group", v)}>
-              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-              <SelectContent>
-                {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map((g) => (
-                  <SelectItem key={g} value={g}>{g}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="col-span-2">
-            <Label>Address</Label>
-            <Input value={form.address_1} onChange={(e) => set("address_1", e.target.value)} />
-          </div>
-          <div>
-            <Label>City</Label>
-            <Input value={form.city} onChange={(e) => set("city", e.target.value)} />
-          </div>
-          <div>
-            <Label>Country</Label>
-            <Input value={form.country} onChange={(e) => set("country", e.target.value)} />
+      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none bg-slate-50/50 backdrop-blur-xl">
+        <div className="bg-white px-8 py-6 border-b sticky top-0 z-10 flex items-center justify-between">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
+              {form.full_name || "Patient Profile"}
+            </DialogTitle>
+            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">
+              {isRegistered ? "Registered Patient File" : "Guest Intake Record"}
+            </p>
+          </DialogHeader>
+          <div className="h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
+            <span className="text-primary font-bold">{form.full_name ? form.full_name.substring(0, 1) : "P"}</span>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={onSubmit} disabled={saving} className="bg-gradient-primary text-primary-foreground">
-            {saving ? "Saving…" : "Save changes"}
+
+        <div className="p-8 space-y-10">
+          {/* 1. PATIENT IDENTITY */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">1. Patient Identity</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              {isRegistered ? (
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Full Name *</Label>
+                  <Input 
+                    value={form.full_name} 
+                    onChange={(e) => set("full_name", e.target.value)}
+                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  />
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">First Name *</Label>
+                    <Input 
+                      value={form.first_name} 
+                      onChange={(e) => set("first_name", e.target.value)}
+                      className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Last Name *</Label>
+                    <Input 
+                      value={form.last_name} 
+                      onChange={(e) => set("last_name", e.target.value)}
+                      className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Email Address</Label>
+                <Input 
+                  type="email" 
+                  value={form.email} 
+                  onChange={(e) => set("email", e.target.value)} 
+                  disabled={isRegistered}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all disabled:opacity-70 disabled:bg-slate-50"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Phone Number</Label>
+                <Input 
+                  value={form.phone} 
+                  onChange={(e) => set("phone", e.target.value)}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  placeholder="+212 ..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Nationality</Label>
+                <Input 
+                  value={form.nationality} 
+                  onChange={(e) => set("nationality", e.target.value)}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  placeholder="e.g. Moroccan"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Type</Label>
+                  <Select value={form.identity_document_type} onValueChange={(v) => set("identity_document_type", v)}>
+                    <SelectTrigger className="h-11 bg-white border-slate-200">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CIN">CIN</SelectItem>
+                      <SelectItem value="Passport">Passport</SelectItem>
+                      <SelectItem value="Other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Number</Label>
+                  <Input 
+                    value={form.identity_document_number} 
+                    onChange={(e) => set("identity_document_number", e.target.value)}
+                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* 2. PERSONAL INFORMATION */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">2. Personal Information</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Date of Birth</Label>
+                <Input 
+                  type="date" 
+                  value={form.dob} 
+                  onChange={(e) => set("dob", e.target.value)}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Gender</Label>
+                <Select value={form.gender} onValueChange={(v) => set("gender", v)}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Blood Group</Label>
+                <Select value={form.blood_group} onValueChange={(v) => set("blood_group", v)}>
+                  <SelectTrigger className="h-11 bg-white border-slate-200">
+                    <SelectValue placeholder="Select" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {["A+","A-","B+","B-","AB+","AB-","O+","O-"].map((g) => (
+                      <SelectItem key={g} value={g}>{g}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </section>
+
+          {/* 3. ADDRESS */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
+              <div className="h-2 w-2 rounded-full bg-primary" />
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">3. Address</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <div className="md:col-span-2 space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Home Address</Label>
+                <Input 
+                  value={form.address_1} 
+                  onChange={(e) => set("address_1", e.target.value)}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  placeholder="Street name, building number..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">City</Label>
+                <Input 
+                  value={form.city} 
+                  onChange={(e) => set("city", e.target.value)}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-semibold text-slate-500 uppercase">Country</Label>
+                <Input 
+                  value={form.country} 
+                  onChange={(e) => set("country", e.target.value)}
+                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                />
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <DialogFooter className="bg-white border-t p-6 sticky bottom-0 z-10 sm:justify-end gap-3">
+          <Button 
+            variant="ghost" 
+            onClick={() => onOpenChange(false)}
+            className="h-11 px-6 font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={onSubmit} 
+            disabled={saving} 
+            className="h-11 px-8 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+          >
+            {saving ? "Updating Patient..." : "Save Changes"}
           </Button>
         </DialogFooter>
       </DialogContent>
