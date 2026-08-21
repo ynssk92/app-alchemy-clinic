@@ -1,32 +1,29 @@
-# CMS Synchronization Complete
+# Redesign Patient Edit Form and Extend Identity Data
 
-I have successfully synchronized the homepage sections with the backend CMS, ensuring that all content is dynamic and manageable via the admin panel.
+Redesign the patient form UI to be premium, sectioned, and two-column, while safely adding identity document fields to the backend.
 
-## Changes Implemented
+## Technical Details
 
-### 1. Enhanced Homepage Controller (`src/pages/Index.tsx`)
-- Connected the **Services**, **Team**, and **Blog** sections to the CMS configuration.
-- Added dynamic headers (labels, headings, descriptions) that fallback to default medical branding if not specified in the CMS.
-- Integrated the `hero` configuration object to drive these UI labels.
+### 1. Database Schema Update
+- Add nullable columns to `patient_intake`: `nationality` (if missing), `identity_document_type`, `identity_document_number`.
+- Add nullable columns to `profiles`: `identity_document_type`, `identity_document_number` (it already has `nationality`).
+- Ensure all new columns are additive and safe (no destructive changes).
 
-### 2. Expanded Page CMS (`src/pages/admin/AdminPages.tsx`)
-- Updated the "home" slug configuration to support all necessary block types:
-    - `trust` (Trust markers/logos)
-    - `department` (Dental services/tabs)
-    - `expertise` (Clinical tech/expertise)
-    - `why-us` (Differentiation)
-    - `experience` (Patient testimonials)
-    - `final-cta` (Booking banner)
-- This allows the **Pages** editor to manage every block currently visible on the homepage.
+### 2. Form UI Redesign (`EditPatientDialog.tsx` & `AdminPatientCreate.tsx`)
+- **Sections**:
+    1. **Patient Identity**: Full name, Email, Phone, Nationality, Document Type, Document Number.
+    2. **Personal Information**: DOB, Gender, Blood Group.
+    3. **Address**: Address, City, Country.
+- **Layout**: Two-column grid on desktop, single-column on mobile.
+- **Aesthetic**: Premium medical UI with white cards, subtle borders, and generous spacing.
+- **Validation**: Keep existing required fields (Full name, etc.) and validation logic.
 
-### 3. Unified Landing Page CMS (`src/pages/admin/AdminLandingPage.tsx`)
-- Added a new **Headers** tab to manage the titles and subtitles of all homepage sections in one place.
-- Redesigned the **Sections** tab to provide quick access and visual summaries of the dynamic blocks.
-- Unified the interface so admins can edit Hero, SEO, Headers, and Content Blocks from a single dashboard.
+### 3. Data Flow
+- Ensure `identity_document_type` and `identity_document_number` are saved to `patient_intake` and synced to `profiles` where applicable.
+- Preserve all existing patient relationships and history.
 
-### 4. Technical Hardening
-- Updated TypeScript interfaces (`HeroConfig`) to include the new dynamic header fields.
-- Fixed build errors related to missing icon imports (`Pencil`) and type safety.
-- Verified RLS policies allow admins to perform full CRUD operations on all site content.
+## User Review Required
 
-All homepage sections now reflect CMS changes instantly without requiring code modifications.
+> [!IMPORTANT]
+> - Do you have a specific list of nationalities you'd like to prioritize in the dropdown, or should it be a free-text input?
+> - For the "Patient Photo", the current application does not seem to have a dedicated storage bucket for patient photos in the default schema. I will omit this for now as requested to avoid breaking the workflow unless I find an existing one.
