@@ -65,7 +65,7 @@ export const AdminReports = () => {
       const [pRes, aRes, prRes, dRes] = await Promise.all([
         supabase.from("profiles").select("*"),
         supabase.from("appointments").select("*, doctors(full_name), profiles(full_name), services(name)"),
-        supabase.from("prescriptions").select("*, doctors(full_name), profiles(full_name), prescription_items(*)"),
+        supabase.from("prescriptions").select("*, doctors(full_name), profiles(full_name)"),
         supabase.from("doctors").select("*")
       ]);
 
@@ -112,6 +112,7 @@ export const AdminReports = () => {
     if (!data.patients.length) return { patients: [], appointments: [], prescriptions: [] };
 
     const filterByDate = (item: any, dateKey: string) => {
+      if (!item[dateKey]) return false;
       const date = parseISO(item[dateKey]);
       const start = new Date(dateInterval.start);
       start.setHours(0, 0, 0, 0);
@@ -172,7 +173,7 @@ export const AdminReports = () => {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         <div className="flex justify-between items-center">
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-10 w-64" />
@@ -189,7 +190,7 @@ export const AdminReports = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+    <div className="space-y-8 animate-in fade-in duration-500 pb-10 p-6 max-w-7xl mx-auto">
       {/* Top Bar */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -283,7 +284,7 @@ export const AdminReports = () => {
                 <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
-                <Legend />
+                <Legend verticalAlign="bottom" />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -345,9 +346,9 @@ export const AdminReports = () => {
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
-                          {doc.name.charAt(0)}
+                          {doc.name ? doc.name.charAt(0) : 'D'}
                         </div>
-                        {doc.name}
+                        {doc.name || 'Inconnu'}
                       </div>
                     </TableCell>
                     <TableCell className="text-center">{doc.appointments}</TableCell>
@@ -373,7 +374,6 @@ export const AdminReports = () => {
           description="Aperçu des rendez-vous récents"
           icon={CalendarCheck}
           tint="stat-cyan"
-          action={{ label: "Voir tout", to: "/admin/appointments" }}
         >
           <div className="space-y-4 mt-2">
             {filteredData.appointments.slice(0, 5).map((a, i) => (
@@ -383,8 +383,8 @@ export const AdminReports = () => {
                     <Calendar className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{a.profiles?.full_name}</div>
-                    <div className="text-xs text-muted-foreground">{a.doctors?.full_name} • {a.services?.name || 'Consultation'}</div>
+                    <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{a.profiles?.full_name || 'Patient'}</div>
+                    <div className="text-xs text-muted-foreground">{a.doctors?.full_name || 'Dr.'} • {a.services?.name || 'Consultation'}</div>
                   </div>
                 </div>
                 <div className="text-right">
@@ -416,13 +416,13 @@ export const AdminReports = () => {
                     <FileText className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{p.profiles?.full_name}</div>
-                    <div className="text-xs text-muted-foreground">Dr. {p.doctors?.full_name} • {p.prescription_items?.length || 0} médicaments</div>
+                    <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{p.profiles?.full_name || 'Patient'}</div>
+                    <div className="text-xs text-muted-foreground">Dr. {p.doctors?.full_name || 'Médecin'}</div>
                   </div>
                 </div>
                 <div className="text-right">
                   <div className="text-xs font-bold text-foreground">{format(parseISO(p.created_at), 'dd MMM yyyy')}</div>
-                  <div className="text-[10px] text-muted-foreground">Réf: {p.id.split('-')[0].toUpperCase()}</div>
+                  <div className="text-[10px] text-muted-foreground truncate max-w-[80px]">Réf: {p.id.split('-')[0].toUpperCase()}</div>
                 </div>
               </div>
             ))}
