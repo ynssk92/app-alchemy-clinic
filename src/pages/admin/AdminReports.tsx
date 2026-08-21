@@ -66,18 +66,22 @@ export const AdminReports = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [pRes, aRes, prRes, dRes] = await Promise.all([
+      const [pRes, aRes, prRes, dRes, invRes, docRes] = await Promise.all([
         supabase.from("profiles").select("*"),
         supabase.from("appointments").select("*, doctors(full_name), profiles(full_name), services(name)"),
         supabase.from("prescriptions").select("*, doctors(full_name), profiles(full_name)"),
-        supabase.from("doctors").select("*")
+        supabase.from("doctors").select("*"),
+        supabase.from("invoices").select("*, doctors(full_name), profiles(full_name)"),
+        supabase.from("patient_documents").select("*, profiles(full_name)")
       ]);
 
       setData({
         patients: pRes.data || [],
         appointments: aRes.data || [],
         prescriptions: prRes.data || [],
-        doctors: dRes.data || []
+        doctors: dRes.data || [],
+        invoices: invRes.data || [],
+        documents: docRes.data || []
       });
     } catch (error) {
       console.error("Error loading reports:", error);
