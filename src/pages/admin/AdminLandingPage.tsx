@@ -348,6 +348,90 @@ const AdminLandingPage = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="headers" className="mt-6 space-y-6">
+          <div className="grid lg:grid-cols-2 gap-6">
+            <Card className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                Services Section
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Label (Eyebrow)</Label>
+                  <Input 
+                    value={hero.servicesLabel || ""} 
+                    onChange={(e) => handleHeroChange("servicesLabel", e.target.value)}
+                    placeholder="Our Dental Care"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Heading</Label>
+                  <Textarea 
+                    value={hero.servicesHeading || ""} 
+                    onChange={(e) => handleHeroChange("servicesHeading", e.target.value)}
+                    placeholder="Comprehensive treatments designed around your needs."
+                  />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                Team Section
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Label (Eyebrow)</Label>
+                  <Input 
+                    value={hero.teamLabel || ""} 
+                    onChange={(e) => handleHeroChange("teamLabel", e.target.value)}
+                    placeholder="Our Team"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Heading</Label>
+                  <Input 
+                    value={hero.teamHeading || ""} 
+                    onChange={(e) => handleHeroChange("teamHeading", e.target.value)}
+                    placeholder="Meet our experts"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea 
+                    value={hero.teamDescription || ""} 
+                    onChange={(e) => handleHeroChange("teamDescription", e.target.value)}
+                    placeholder="A multidisciplinary team dedicated to your oral health..."
+                  />
+                </div>
+              </div>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <h2 className="text-lg font-semibold flex items-center gap-2 text-primary">
+                Blog Section
+              </h2>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Label (Eyebrow)</Label>
+                  <Input 
+                    value={hero.blogLabel || ""} 
+                    onChange={(e) => handleHeroChange("blogLabel", e.target.value)}
+                    placeholder="Blog"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Heading</Label>
+                  <Input 
+                    value={hero.blogHeading || ""} 
+                    onChange={(e) => handleHeroChange("blogHeading", e.target.value)}
+                    placeholder="Latest from our blog"
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
+        </TabsContent>
+
         <TabsContent value="testimonials" className="mt-6 space-y-6">
           <Card className="p-6 space-y-4">
             <h2 className="text-lg font-semibold flex items-center gap-2">
