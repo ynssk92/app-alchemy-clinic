@@ -408,6 +408,9 @@ const AdminPatientDetails = () => {
           .update({
             full_name: form.full_name.trim() || null,
             phone: form.phone.trim() || null,
+            nationality: form.nationality.trim() || null,
+            identity_document_type: form.identity_document_type || null,
+            identity_document_number: form.identity_document_number.trim() || null,
             status: form.status,
           })
           .eq("id", patient.profileId);
