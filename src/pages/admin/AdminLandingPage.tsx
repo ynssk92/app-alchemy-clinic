@@ -305,18 +305,37 @@ const AdminLandingPage = () => {
         </TabsContent>
 
         <TabsContent value="sections" className="mt-6">
-          <Card className="p-10 text-center border-dashed">
-            <Settings className="h-10 w-10 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium">Manage Other Sections</h3>
-            <p className="text-muted-foreground max-w-sm mx-auto mb-6">
-              Use the "Pages" admin section to manage specific content blocks like Trust markers, Expertise, and Why La Dune.
+          <Card className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Layout className="h-5 w-5 text-primary" />
+                Homepage Content Sections
+              </h2>
+              <Button asChild size="sm">
+                <Link to="/admin/pages">
+                  <Pencil className="h-4 w-4 mr-2" />
+                  Edit Detailed Content
+                </Link>
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-6">
+              The homepage is composed of dynamic sections. Click below to manage individual blocks for Trust markers, Expertise, Services, and more.
             </p>
-            <Button asChild variant="outline">
-              <Link to="/admin/pages">
-                Go to Pages Editor
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { title: "Trust Markers", desc: "Logos and highlights at the top", kind: "trust" },
+                { title: "Dental Services", desc: "Treatment categories and tabs", kind: "department" },
+                { title: "Clinical Expertise", desc: "Features and tech highlights", kind: "expertise" },
+                { title: "Why La Dune", desc: "Differentiation and core values", kind: "why-us" },
+                { title: "Patient Reviews", desc: "Testimonial cards and quotes", kind: "experience" },
+                { title: "Call to Action", desc: "Final booking banner", kind: "final-cta" },
+              ].map((section) => (
+                <div key={section.kind} className="p-4 border rounded-lg hover:border-primary/50 transition-colors">
+                  <h3 className="font-medium">{section.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{section.desc}</p>
+                </div>
+              ))}
+            </div>
           </Card>
         </TabsContent>
 
