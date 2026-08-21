@@ -14,6 +14,6 @@ const Stub = ({ title, description }: { title: string; description: string }) =>
 
 
 export const AdminDeleteRequests = () => <Stub title="Delete Account Requests" description="Review and process user account deletion requests." />;
-export const AdminReports = () => <Stub title="Reports" description="Clinic activity, appointments, and revenue reports." />;
+
 export const AdminLocation = () => <Stub title="Location" description="Manage clinic locations and map settings." />;
 export const AdminTestimonials = () => <Stub title="Testimonials" description="Manage patient testimonials shown on the website." />;

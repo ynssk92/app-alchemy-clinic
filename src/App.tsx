@@ -49,10 +49,8 @@ import AdminPatientCreate from "./pages/admin/AdminPatientCreate";
 import AdminDoctorDetails from "./pages/admin/AdminDoctorDetails";
 import AdminDoctorAdd from "./pages/admin/AdminDoctorAdd";
 import AdminDoctorSchedule from "./pages/admin/AdminDoctorSchedule";
-import {
-  AdminDeleteRequests, AdminReports,
-  AdminLocation,
-} from "./pages/admin/AdminStubs";
+import { AdminDeleteRequests, AdminLocation } from "./pages/admin/AdminStubs";
+import AdminReports from "./pages/admin/AdminReports";
 import { AdminTestimonials } from "./pages/admin/AdminTestimonials";
 import AdminFaq from "./pages/admin/AdminFaq";
 import AdminPages from "./pages/admin/AdminPages";
