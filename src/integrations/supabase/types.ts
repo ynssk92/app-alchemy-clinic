@@ -2855,7 +2855,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_clinic_staff: { Args: { _user_id: string }; Returns: boolean }
       next_invoice_number: { Args: never; Returns: string }
+      owns_patient_record: {
+        Args: { _patient_id: string; _user_id: string }
+        Returns: boolean
+      }
       recalc_invoice: { Args: { _invoice_id: string }; Returns: undefined }
     }
     Enums: {
