@@ -47,6 +47,14 @@ interface HeroConfig {
   imageUrl?: string;
   testimonialStyle: 'grid' | 'carousel';
   testimonialLimit: number;
+  // Section Headers
+  servicesLabel?: string;
+  servicesHeading?: string;
+  teamLabel?: string;
+  teamHeading?: string;
+  teamDescription?: string;
+  blogLabel?: string;
+  blogHeading?: string;
 }
 
 const AdminLandingPage = () => {
