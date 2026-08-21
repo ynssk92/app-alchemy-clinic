@@ -242,21 +242,143 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     }
   };
 
+  const SectionHeader = ({ num, title, icon: Icon }: { num: string; title: string; icon?: any }) => (
+    <div className="flex items-center gap-4 mb-6">
+      <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 text-primary text-xs font-bold ring-1 ring-primary/20">
+        {num}
+      </span>
+      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+        {Icon && <Icon className="w-4 h-4 text-primary/60" />}
+        {title}
+      </h3>
+      <div className="h-px bg-slate-100 flex-1" />
+    </div>
+  );
+
+  const FormItem = ({ label, children, colSpan = 1 }: { label: string; children: React.ReactNode; colSpan?: number }) => (
+    <div className={`space-y-2 ${colSpan === 2 ? "md:col-span-2" : ""}`}>
+      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+      {children}
+    </div>
+  );
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto p-0 border border-slate-100 shadow-2xl rounded-2xl bg-white">
-        {/* Simplified dialog structure for brevity, sectioned correctly */}
-        <div className="p-8 space-y-10">
+      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl bg-white">
+        <div className="p-10 space-y-16">
+          {/* SECTION 1: IDENTITY */}
           <section>
-            <h3 className="text-lg font-bold">Patient Details</h3>
-            <div className="grid md:grid-cols-2 gap-4">
-              <Input placeholder="First Name" value={form.first_name} onChange={(e) => set("first_name", e.target.value)} />
-              <Input placeholder="Last Name" value={form.last_name} onChange={(e) => set("last_name", e.target.value)} />
-              <Input placeholder="Insurance" value={form.insurance_name} onChange={(e) => set("insurance_name", e.target.value)} />
+            <SectionHeader num="01" title="Patient Identity" icon={UserPlus} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <FormItem label="Full Name">
+                <Input className="h-11 rounded-xl" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
+              </FormItem>
+              <FormItem label="Email">
+                <Input className="h-11 rounded-xl" value={form.email} onChange={(e) => set("email", e.target.value)} />
+              </FormItem>
+              <FormItem label="Phone">
+                <Input className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              </FormItem>
+              <FormItem label="Nationality">
+                <Input className="h-11 rounded-xl" value={form.nationality} onChange={(e) => set("nationality", e.target.value)} />
+              </FormItem>
             </div>
           </section>
+
+          {/* SECTION 2: PERSONAL */}
+          <section>
+            <SectionHeader num="02" title="Personal Information" icon={BookOpen} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <FormItem label="Date of Birth">
+                <Input type="date" className="h-11 rounded-xl" value={form.dob} onChange={(e) => set("dob", e.target.value)} />
+              </FormItem>
+              <FormItem label="Gender">
+                <Select value={form.gender} onValueChange={(v) => set("gender", v)}>
+                  <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="male">Male</SelectItem>
+                    <SelectItem value="female">Female</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+              <FormItem label="Patient Type">
+                <Select value={form.patient_type} onValueChange={(v) => set("patient_type", v)}>
+                  <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="adult">Adult</SelectItem>
+                    <SelectItem value="minor">Minor (Pediatric)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+              <FormItem label="Profession">
+                <Input className="h-11 rounded-xl" value={form.profession} onChange={(e) => set("profession", e.target.value)} />
+              </FormItem>
+            </div>
+          </section>
+
+          {/* SECTION 3: INSURANCE */}
+          <section>
+            <SectionHeader num="03" title="Insurance & Billing" icon={ShieldCheck} />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+              <FormItem label="Provider Name">
+                <Input className="h-11 rounded-xl" value={form.insurance_name} onChange={(e) => set("insurance_name", e.target.value)} />
+              </FormItem>
+              <FormItem label="Policy Number">
+                <Input className="h-11 rounded-xl" value={form.insurance_number} onChange={(e) => set("insurance_number", e.target.value)} />
+              </FormItem>
+              <FormItem label="Status">
+                <Input className="h-11 rounded-xl" value={form.insurance_status} onChange={(e) => set("insurance_status", e.target.value)} />
+              </FormItem>
+            </div>
+          </section>
+
+          {/* SECTION 4: MEDICAL HISTORY */}
+          <section>
+            <SectionHeader num="04" title="Medical History" icon={Activity} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <FormItem label="Allergies" colSpan={2}>
+                <Input className="h-11 rounded-xl" value={form.allergies} onChange={(e) => set("allergies", e.target.value)} />
+              </FormItem>
+              <FormItem label="Chronic Diseases">
+                <Input className="h-11 rounded-xl" value={form.chronic_diseases} onChange={(e) => set("chronic_diseases", e.target.value)} />
+              </FormItem>
+              <FormItem label="Current Medications">
+                <Input className="h-11 rounded-xl" value={form.current_medications} onChange={(e) => set("current_medications", e.target.value)} />
+              </FormItem>
+            </div>
+          </section>
+
+          {/* SECTION 5: PEDIATRIC (Optional) */}
+          {form.patient_type === "minor" && (
+            <section className="animate-in fade-in slide-in-from-top-4 duration-500">
+              <SectionHeader num="05" title="Pediatric Information" icon={Baby} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                <FormItem label="Birth Weight (kg)">
+                  <Input type="number" step="0.01" className="h-11 rounded-xl" value={form.birth_weight} onChange={(e) => set("birth_weight", e.target.value)} />
+                </FormItem>
+                <FormItem label="Birth Height (cm)">
+                  <Input type="number" step="0.1" className="h-11 rounded-xl" value={form.birth_height} onChange={(e) => set("birth_height", e.target.value)} />
+                </FormItem>
+                <FormItem label="Birth Type">
+                  <Input className="h-11 rounded-xl" value={form.birth_type} onChange={(e) => set("birth_type", e.target.value)} placeholder="e.g. Vaginal, C-section" />
+                </FormItem>
+                <FormItem label="Apgar Score">
+                  <Input className="h-11 rounded-xl" value={form.apgar_score} onChange={(e) => set("apgar_score", e.target.value)} />
+                </FormItem>
+                <FormItem label="Breastfeeding">
+                  <Input className="h-11 rounded-xl" value={form.breastfeeding} onChange={(e) => set("breastfeeding", e.target.value)} />
+                </FormItem>
+              </div>
+            </section>
+          )}
         </div>
-        <DialogFooter className="p-6 border-t"><Button onClick={onSubmit} disabled={saving}>Save Changes</Button></DialogFooter>
+        <DialogFooter className="p-8 bg-slate-50/50 border-t border-slate-100">
+          <Button variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-8 rounded-xl">Cancel</Button>
+          <Button onClick={onSubmit} disabled={saving} className="h-11 px-10 rounded-xl shadow-lg shadow-primary/20">
+            {saving ? "Saving..." : "Save Patient Profile"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
