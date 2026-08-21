@@ -419,8 +419,84 @@ const AdminPatientCreate = () => {
                   />
                 </div>
               </div>
+            {/* 4. INSURANCE & MEDICAL */}
+            <section className="space-y-6">
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">04</span>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Insurance & Medical</h3>
+              </div>
+              <div className="h-px bg-slate-100 w-full" />
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Patient Type</Label>
+                  <Select value={form.patient_type} onValueChange={(v: any) => set("patient_type")(v)}>
+                    <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
+                      <SelectValue placeholder="Select" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="adult">Adult</SelectItem>
+                      <SelectItem value="minor">Minor (Pediatric)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Insurance Provider</Label>
+                  <Input 
+                    value={form.insurance_name} 
+                    onChange={(e) => set("insurance_name")(e.target.value)}
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Allergies</Label>
+                  <Input 
+                    value={form.allergies} 
+                    onChange={(e) => set("allergies")(e.target.value)}
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                  />
+                </div>
+              </div>
             </section>
-          </div>
+
+            {/* 5. PEDIATRIC (CONDITIONAL) */}
+            {form.patient_type === "minor" && (
+              <section className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                <div className="flex items-center gap-4">
+                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">05</span>
+                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Pediatric Information</h3>
+                </div>
+                <div className="h-px bg-slate-100 w-full" />
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Birth Weight (kg)</Label>
+                    <Input 
+                      type="number" step="0.01"
+                      value={form.birth_weight} 
+                      onChange={(e) => set("birth_weight")(e.target.value)}
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Birth Type</Label>
+                    <Input 
+                      value={form.birth_type} 
+                      onChange={(e) => set("birth_type")(e.target.value)}
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs font-semibold text-slate-500 uppercase">Apgar Score</Label>
+                    <Input 
+                      value={form.apgar_score} 
+                      onChange={(e) => set("apgar_score")(e.target.value)}
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                    />
+                  </div>
+                </div>
+              </section>
+            )}
 
           <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-4">
             <Button 
