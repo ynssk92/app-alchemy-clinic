@@ -5,11 +5,11 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Enable Supabase for this project.",
-  heading: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            01- Connect my app's data layer to a Supabase Postgres database and migrate existing tables without resetting data.\n\n02- Enable Supabase Storage for any file uploads and wire it into the existing storage usage.\n\n03 - Set up Supabase Row Level Security policies so patients and doctors can only access their own appointments and billing records.",
+  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Load the security issues from the scan results and fix the selected issues.",
+  heading: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Load the security issues from the scan results and fix the selected issues.",
   highlight: "",
   description: "",
-  primaryCTA: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Enable Supabase for this project.",
+  primaryCTA: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Load the security issues from the scan results and fix the selected issues.",
   primaryURL: "/booking",
   secondaryCTA: "Discover Our Care",
   secondaryURL: "/soins",
