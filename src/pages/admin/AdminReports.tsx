@@ -270,6 +270,7 @@ export const AdminReports = () => {
       </header>
 
       {/* Summary KPI Cards */}
+      {/* Summary KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard 
           label="Total Patients" 
@@ -288,19 +289,79 @@ export const AdminReports = () => {
           tint="stat-cyan"
         />
         <KpiCard 
-          label="Consultations" 
-          value={stats.completedAppts} 
-          subtitle={`${((stats.completedAppts / (stats.totalAppts || 1)) * 100).toFixed(0)}% de complétion`}
-          icon={Stethoscope} 
+          label="Chiffre d'Affaires" 
+          value={`${stats.totalBilled.toLocaleString()} MAD`}
+          subtitle={`${stats.totalInvoices} factures`}
+          icon={TrendingUp} 
           tint="stat-green"
+          up={true}
         />
         <KpiCard 
-          label="Ordonnances" 
-          value={stats.totalPrescriptions} 
-          subtitle="Générées cette période"
+          label="Archives Médicales" 
+          value={stats.totalDocuments} 
+          subtitle="Documents téléchargés"
           icon={FileText} 
           tint="stat-violet"
         />
+      </div>
+
+      {/* Billing & Revenue Reports */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <WidgetCard 
+          className="lg:col-span-8"
+          title="Rapport Financier"
+          description="Performance des revenus par médecin (MAD)"
+          icon={TrendingUp}
+          tint="stat-green"
+        >
+          <div className="h-[300px] mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={revenueByDoctor}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}`} />
+                <Tooltip 
+                  formatter={(value: any) => [`${value.toLocaleString()} MAD`, "Revenu"]}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Bar dataKey="value" fill="hsl(var(--stat-green))" radius={[4, 4, 0, 0]} barSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </WidgetCard>
+
+        <WidgetCard 
+          className="lg:col-span-4"
+          title="Statut des Paiements"
+          description="Répartition encaissé vs restant"
+          icon={PieChartIcon}
+          tint="stat-blue"
+        >
+          <div className="h-[300px] mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Payé', value: stats.totalPaid },
+                    { name: 'À percevoir', value: stats.balance }
+                  ]}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  <Cell fill="#059669" />
+                  <Cell fill="#dc2626" />
+                </Pie>
+                <Tooltip 
+                  formatter={(value: any) => [`${value.toLocaleString()} MAD`, "Montant"]}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Legend verticalAlign="bottom" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </WidgetCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
