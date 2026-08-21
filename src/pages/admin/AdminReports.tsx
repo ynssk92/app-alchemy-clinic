@@ -461,6 +461,9 @@ export const AdminReports = () => {
                     <TableCell className="text-center">{doc.appointments}</TableCell>
                     <TableCell className="text-center">{doc.completed}</TableCell>
                     <TableCell className="text-center">{doc.prescriptions}</TableCell>
+                    <TableCell className="text-center font-bold text-emerald-600">
+                      {doc.revenue.toLocaleString()}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-none">
                         {doc.appointments > 0 ? ((doc.completed / doc.appointments) * 100).toFixed(0) : 0}%
