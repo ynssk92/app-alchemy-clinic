@@ -36,6 +36,9 @@ type PatientView = {
   full_name: string;
   phone: string | null;
   email: string | null;       // best available email (intake > profile-less)
+  nationality: string | null;
+  identity_document_type: string | null;
+  identity_document_number: string | null;
   dob: string | null;
   gender: string | null;
   blood_group: string | null;
@@ -137,6 +140,9 @@ const AdminPatientDetails = () => {
     full_name: "",
     email: "",
     phone: "",
+    nationality: "",
+    identity_document_type: "",
+    identity_document_number: "",
     dob: "",
     gender: "",
     blood_group: "",
@@ -209,7 +215,7 @@ const AdminPatientDetails = () => {
       // 1) Try as profile — but only accept it if the account is patient-only
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, full_name, phone, created_at, avatar_url")
+        .select("id, full_name, phone, created_at, avatar_url, nationality, identity_document_type, identity_document_number")
         .eq("id", id)
         .maybeSingle();
       let profileIsPatient = false;
@@ -283,6 +289,9 @@ const AdminPatientDetails = () => {
           intakeRow?.email && !intakeRow.email.endsWith("@placeholder.local")
             ? intakeRow.email
             : null,
+        nationality: profileRow?.nationality || intakeRow?.nationality || null,
+        identity_document_type: profileRow?.identity_document_type || intakeRow?.identity_document_type || null,
+        identity_document_number: profileRow?.identity_document_number || intakeRow?.identity_document_number || null,
         dob: intakeRow?.dob || null,
         gender: intakeRow?.gender || null,
         blood_group: intakeRow?.blood_group || null,
@@ -301,6 +310,9 @@ const AdminPatientDetails = () => {
         full_name: view.full_name,
         email: view.email || "",
         phone: view.phone || "",
+        nationality: view.nationality || "",
+        identity_document_type: view.identity_document_type || "",
+        identity_document_number: view.identity_document_number || "",
         dob: view.dob || "",
         gender: view.gender || "",
         blood_group: view.blood_group || "",
@@ -396,6 +408,9 @@ const AdminPatientDetails = () => {
           .update({
             full_name: form.full_name.trim() || null,
             phone: form.phone.trim() || null,
+            nationality: form.nationality.trim() || null,
+            identity_document_type: form.identity_document_type || null,
+            identity_document_number: form.identity_document_number.trim() || null,
             status: form.status,
           })
           .eq("id", patient.profileId);
@@ -417,6 +432,9 @@ const AdminPatientDetails = () => {
         last_name: derivedLast,
         email: form.email || (patient.profileId ? `${patient.profileId}@placeholder.local` : "unknown@placeholder.local"),
         phone: form.phone || null,
+        nationality: form.nationality || null,
+        identity_document_type: form.identity_document_type || null,
+        identity_document_number: form.identity_document_number || null,
         dob: form.dob || null,
         gender: form.gender || null,
         blood_group: form.blood_group || null,
