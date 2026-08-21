@@ -14,9 +14,12 @@ import {
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
   ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2,
-  Receipt, Eye, FileText, Plus, AlertCircle, Pill, StethoscopeIcon, HistoryIcon, ShieldPlus
+  Receipt, Eye, FileText, Plus, AlertCircle, Pill, StethoscopeIcon, HistoryIcon, ShieldPlus,
+  FolderOpen, ScrollText
 } from "lucide-react";
 import { AddAllergyDialog, AddMedicationDialog } from "@/components/admin/AddMedicalRecordDialogs";
+import MedicalArchive from "@/components/admin/MedicalArchive";
+import PrescriptionList from "@/components/admin/PrescriptionList";
 import { formatMoney } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
