@@ -14,8 +14,9 @@ import {
   Cake, Droplet, VenetianMask, Mail, BookOpen, Activity, Heart,
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
   ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2,
-  Receipt, Eye, FileText
+  Receipt, Eye, FileText, Plus, AlertCircle, Pill, StethoscopeIcon, HistoryIcon, ShieldPlus
 } from "lucide-react";
+import { AddAllergyDialog, AddMedicationDialog } from "@/components/admin/AddMedicalRecordDialogs";
 import { formatMoney } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -164,53 +165,28 @@ const AdminPatientDetails = () => {
   const [invoiceError, setInvoiceError] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
-    full_name: "",
-    email: "",
-    phone: "",
-    nationality: "",
-    identity_document_type: "",
-    identity_document_number: "",
-    dob: "",
-    gender: "",
-    blood_group: "",
-    address_1: "",
-    city: "",
-    country: "",
-    status: "approved" as "pending" | "approved" | "rejected",
-    // New fields
-    patient_type: "adult" as "adult" | "minor",
-    languages: [] as string[],
-    profession: "",
-    family_situation: "",
-    emergency_contact_name: "",
-    emergency_contact_phone: "",
-    emergency_contact_relation: "",
-    insurance_name: "",
-    insurance_number: "",
-    insurance_policy: "",
-    insurance_status: "",
-    insurance_notes: "",
-    rhesus: "",
-    allergies: "",
-    chronic_diseases: "",
-    current_medications: "",
-    medical_history: "",
-    family_history: "",
-    surgical_history: "",
-    previous_hospitalizations: "",
-    birth_type: "",
-    birth_weight: "" as string | number,
-    birth_height: "" as string | number,
-    apgar_score: "",
-    breastfeeding: "",
-    birth_complications: "",
-    psychomotor_development: "",
-    development_notes: "",
+  const [activeDialog, setActiveDialog] = useState<string | null>(null);
+  const [medicalData, setMedicalData] = useState<{
+    allergies: any[];
+    medications: any[];
+    history: any[];
+    surgeries: any[];
+    chronic: any[];
+    family: any[];
+    vaccines: any[];
+    hospitalizations: any[];
+  }>({
+    allergies: [],
+    medications: [],
+    history: [],
+    surgeries: [],
+    chronic: [],
+    family: [],
+    vaccines: [],
+    hospitalizations: [],
   });
-  const [reloadTick, setReloadTick] = useState(0);
+
+  const [form, setForm] = useState({
   const [notFound, setNotFound] = useState(false);
 
   // --- Sidebar list (merged intake + profiles) ---
@@ -444,6 +420,41 @@ const AdminPatientDetails = () => {
         psychomotor_development: view.psychomotor_development || "",
         development_notes: view.development_notes || "",
       });
+
+      // Load Medical Records V2
+      const pId = profileRow?.id || intakeRow?.user_id;
+      if (pId) {
+        const [
+          { data: allergies },
+          { data: medications },
+          { data: history },
+          { data: surgeries },
+          { data: chronic },
+          { data: family },
+          { data: vaccines },
+          { data: hospitalizations },
+        ] = await Promise.all([
+          supabase.from("patient_allergies_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_medications_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_medical_history_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_surgeries_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_chronic_diseases_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_family_history_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_vaccinations_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_hospitalizations_v2").select("*").eq("patient_id", pId),
+        ]);
+
+        setMedicalData({
+          allergies: allergies || [],
+          medications: medications || [],
+          history: history || [],
+          surgeries: surgeries || [],
+          chronic: chronic || [],
+          family: family || [],
+          vaccines: vaccines || [],
+          hospitalizations: hospitalizations || [],
+        });
+      }
 
       // Avatar signed URL
       if (avatarPath) {
@@ -1012,25 +1023,132 @@ const AdminPatientDetails = () => {
                   </div>
 
                   <TabsContent value="medical" className="m-0 p-8 pt-6">
-                    <div className="space-y-8">
+                    <div className="space-y-10">
+                      {/* Action Header */}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-lg font-bold text-foreground">Medical Records</h3>
+                          <p className="text-sm text-muted-foreground">Complete clinical history and current status</p>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" className="gap-2" onClick={() => setActiveDialog("allergy")}>
+                            <AlertCircle className="w-4 h-4" /> Add Allergy
+                          </Button>
+                          <Button size="sm" className="gap-2" onClick={() => setActiveDialog("medication")}>
+                            <Pencil className="w-4 h-4" /> Add Medication
+                          </Button>
+                        </div>
+                      </div>
+
                       <div className="grid md:grid-cols-2 gap-8">
-                        <div className="space-y-4">
-                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                            <Droplet className="w-3.5 h-3.5 text-red-500" /> Medical Overview
-                          </h4>
-                          <div className="space-y-3">
-                            <InfoTile icon={Activity} label="Allergies" value={patient.allergies || "None declared"} />
-                            <InfoTile icon={Activity} label="Chronic Diseases" value={patient.chronic_diseases || "None declared"} />
-                            <InfoTile icon={Activity} label="Current Medications" value={patient.current_medications || "None"} />
+                        <div className="space-y-6">
+                          {/* Allergies Section */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between border-b pb-2 border-border">
+                              <h4 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <AlertCircle className="w-3.5 h-3.5 text-red-500" /> Allergies
+                              </h4>
+                              <Badge variant="outline" className="text-[10px]">{medicalData.allergies.length}</Badge>
+                            </div>
+                            <div className="space-y-3">
+                              {medicalData.allergies.length > 0 ? (
+                                medicalData.allergies.map((a) => (
+                                  <div key={a.id} className="p-3 rounded-lg bg-slate-50 border border-slate-100 flex justify-between items-start">
+                                    <div>
+                                      <div className="font-bold text-sm text-slate-900">{a.allergen}</div>
+                                      <div className="text-xs text-slate-500 mt-1">{a.reaction || "No reaction specified"}</div>
+                                    </div>
+                                    <Badge className={cn(
+                                      "text-[10px] font-bold uppercase",
+                                      a.severity === 'severe' ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+                                    )}>
+                                      {a.severity}
+                                    </Badge>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-muted-foreground italic">No known allergies recorded.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Chronic Conditions */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between border-b pb-2 border-border">
+                              <h4 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <Activity className="w-3.5 h-3.5 text-indigo-500" /> Chronic Diseases
+                              </h4>
+                            </div>
+                            <div className="space-y-3">
+                              {medicalData.chronic.length > 0 ? (
+                                medicalData.chronic.map((c) => (
+                                  <div key={c.id} className="flex items-start gap-3">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0" />
+                                    <div>
+                                      <div className="text-sm font-semibold">{c.disease_name}</div>
+                                      <div className="text-xs text-muted-foreground">{c.status} since {fmtDate(c.diagnosis_date)}</div>
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-muted-foreground italic">No chronic conditions declared.</p>
+                              )}
+                            </div>
                           </div>
                         </div>
-                        <div className="space-y-4">
-                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
-                            <BookOpen className="w-3.5 h-3.5 text-indigo-500" /> History
-                          </h4>
-                          <div className="space-y-3">
-                            <InfoTile icon={BookOpen} label="Medical History" value={patient.medical_history || "No records"} />
-                            <InfoTile icon={BookOpen} label="Surgical History" value={patient.surgical_history || "No records"} />
+
+                        <div className="space-y-6">
+                          {/* Current Medications */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between border-b pb-2 border-border">
+                              <h4 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <Pill className="w-3.5 h-3.5 text-emerald-500" /> Medications
+                              </h4>
+                              <Badge variant="outline" className="text-[10px]">{medicalData.medications.length}</Badge>
+                            </div>
+                            <div className="space-y-3">
+                              {medicalData.medications.length > 0 ? (
+                                medicalData.medications.map((m) => (
+                                  <div key={m.id} className="p-3 rounded-lg border border-border flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded bg-emerald-50 flex items-center justify-center text-emerald-600">
+                                      <Pill className="w-4 h-4" />
+                                    </div>
+                                    <div className="flex-1">
+                                      <div className="text-sm font-bold">{m.medication_name}</div>
+                                      <div className="text-xs text-muted-foreground">{m.dosage} • {m.frequency}</div>
+                                    </div>
+                                    <Badge variant="secondary" className="text-[10px]">{m.route}</Badge>
+                                  </div>
+                                ))
+                              ) : (
+                                <p className="text-xs text-muted-foreground italic">No active medications.</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Recent History / Surgeries */}
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between border-b pb-2 border-border">
+                              <h4 className="text-[11px] font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                                <HistoryIcon className="w-3.5 h-3.5 text-slate-500" /> History & Surgeries
+                              </h4>
+                            </div>
+                            <div className="space-y-4">
+                              {medicalData.surgeries.map(s => (
+                                <div key={s.id} className="flex gap-3">
+                                  <div className="w-8 h-8 rounded bg-slate-100 flex items-center justify-center shrink-0">
+                                    <StethoscopeIcon className="w-4 h-4 text-slate-500" />
+                                  </div>
+                                  <div>
+                                    <div className="text-sm font-semibold">{s.surgery_type}</div>
+                                    <div className="text-xs text-muted-foreground">{fmtDate(s.surgery_date)} • {s.hospital_name}</div>
+                                  </div>
+                                </div>
+                              ))}
+                              {medicalData.surgeries.length === 0 && medicalData.history.length === 0 && (
+                                <p className="text-xs text-muted-foreground italic">No history recorded.</p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
