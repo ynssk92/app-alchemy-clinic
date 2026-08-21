@@ -1467,10 +1467,13 @@ export type Database = {
           first_name: string
           gender: string | null
           id: string
+          identity_document_number: string | null
+          identity_document_type: string | null
           insurance_number: string | null
           insurance_provider: string | null
           last_name: string
           medical_conditions: string | null
+          nationality: string | null
           phone: string | null
           pincode: string | null
           primary_doctor_id: string | null
@@ -1496,10 +1499,13 @@ export type Database = {
           first_name: string
           gender?: string | null
           id?: string
+          identity_document_number?: string | null
+          identity_document_type?: string | null
           insurance_number?: string | null
           insurance_provider?: string | null
           last_name: string
           medical_conditions?: string | null
+          nationality?: string | null
           phone?: string | null
           pincode?: string | null
           primary_doctor_id?: string | null
@@ -1525,10 +1531,13 @@ export type Database = {
           first_name?: string
           gender?: string | null
           id?: string
+          identity_document_number?: string | null
+          identity_document_type?: string | null
           insurance_number?: string | null
           insurance_provider?: string | null
           last_name?: string
           medical_conditions?: string | null
+          nationality?: string | null
           phone?: string | null
           pincode?: string | null
           primary_doctor_id?: string | null
@@ -1908,6 +1917,8 @@ export type Database = {
           full_name: string | null
           gender: string | null
           id: string
+          identity_document_number: string | null
+          identity_document_type: string | null
           nationality: string | null
           notification_preferences: Json | null
           phone: string | null
@@ -1934,6 +1945,8 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id: string
+          identity_document_number?: string | null
+          identity_document_type?: string | null
           nationality?: string | null
           notification_preferences?: Json | null
           phone?: string | null
@@ -1960,6 +1973,8 @@ export type Database = {
           full_name?: string | null
           gender?: string | null
           id?: string
+          identity_document_number?: string | null
+          identity_document_type?: string | null
           nationality?: string | null
           notification_preferences?: Json | null
           phone?: string | null
