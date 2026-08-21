@@ -138,7 +138,7 @@ const AdminLandingPage = () => {
     return <div className="p-8 text-center">Loading landing page configuration...</div>;
   }
 
-  const hero = (page?.hero_config as HeroConfig) || {};
+  const hero = (page?.hero_config as HeroConfig) || {} as HeroConfig;
 
   return (
     <div className="space-y-6">
