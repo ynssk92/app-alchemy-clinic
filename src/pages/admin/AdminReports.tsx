@@ -52,34 +52,60 @@ export const AdminReports = () => {
     appointments: any[];
     prescriptions: any[];
     doctors: any[];
+    invoices: any[];
+    documents: any[];
   }>({
     patients: [],
     appointments: [],
     prescriptions: [],
-    doctors: []
+    doctors: [],
+    invoices: [],
+    documents: []
   });
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const [pRes, aRes, prRes, dRes] = await Promise.all([
+      const [pRes, aRes, prRes, dRes, invRes, docRes] = await Promise.all([
         supabase.from("profiles").select("*"),
         supabase.from("appointments").select("*, doctors(full_name), profiles(full_name), services(name)"),
         supabase.from("prescriptions").select("*, doctors(full_name), profiles(full_name)"),
-        supabase.from("doctors").select("*")
+        supabase.from("doctors").select("*"),
+        supabase.from("invoices").select("*, doctors(full_name), profiles(full_name)"),
+        supabase.from("patient_documents").select("*, profiles(full_name)")
       ]);
 
       setData({
         patients: pRes.data || [],
         appointments: aRes.data || [],
         prescriptions: prRes.data || [],
-        doctors: dRes.data || []
+        doctors: dRes.data || [],
+        invoices: invRes.data || [],
+        documents: docRes.data || []
       });
     } catch (error) {
       console.error("Error loading reports:", error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const exportToCSV = (data: any[], filename: string) => {
+    if (!data.length) return;
+    const headers = Object.keys(data[0]).join(",");
+    const rows = data.map(obj => 
+      Object.values(obj).map(val => 
+        typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
+      ).join(",")
+    );
+    const csvContent = "data:text/csv;charset=utf-8," + headers + "\n" + rows.join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${filename}_${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   useEffect(() => {
@@ -109,7 +135,9 @@ export const AdminReports = () => {
   }, [range]);
 
   const filteredData = useMemo(() => {
-    if (!data.patients.length) return { patients: [], appointments: [], prescriptions: [] };
+    if (!data.patients.length && !data.appointments.length && !data.invoices.length) {
+      return { patients: [], appointments: [], prescriptions: [], invoices: [], documents: [] };
+    }
 
     const filterByDate = (item: any, dateKey: string) => {
       if (!item[dateKey]) return false;
@@ -124,12 +152,20 @@ export const AdminReports = () => {
     return {
       patients: data.patients.filter(p => filterByDate(p, "created_at")),
       appointments: data.appointments.filter(a => filterByDate(a, "appointment_date")),
-      prescriptions: data.prescriptions.filter(p => filterByDate(p, "created_at"))
+      prescriptions: data.prescriptions.filter(p => filterByDate(p, "created_at")),
+      invoices: data.invoices.filter(i => filterByDate(i, "issue_date")),
+      documents: data.documents.filter(d => filterByDate(d, "document_date"))
     };
   }, [data, dateInterval]);
 
   const stats = useMemo(() => {
     const appts = filteredData.appointments;
+    const invs = filteredData.invoices;
+    
+    const totalBilled = invs.reduce((sum, inv) => sum + (inv.total || 0), 0);
+    const totalPaid = invs.reduce((sum, inv) => sum + (inv.paid || 0), 0);
+    const balance = totalBilled - totalPaid;
+
     return {
       totalPatients: data.patients.length,
       newPatients: filteredData.patients.length,
@@ -139,6 +175,11 @@ export const AdminReports = () => {
       noShowAppts: appts.filter(a => a.status === "no-show").length,
       upcomingAppts: appts.filter(a => a.status === "upcoming").length,
       totalPrescriptions: filteredData.prescriptions.length,
+      totalDocuments: filteredData.documents.length,
+      totalBilled,
+      totalPaid,
+      balance,
+      totalInvoices: invs.length
     };
   }, [data.patients.length, filteredData]);
 
@@ -159,14 +200,36 @@ export const AdminReports = () => {
     }));
   }, [filteredData.appointments]);
 
+  const revenueByDoctor = useMemo(() => {
+    const revenue: Record<string, number> = {};
+    filteredData.invoices.forEach(inv => {
+      const name = inv.doctors?.full_name || "Clinique";
+      revenue[name] = (revenue[name] || 0) + (inv.total || 0);
+    });
+    return Object.entries(revenue).map(([name, value]) => ({ name, value }));
+  }, [filteredData.invoices]);
+
+  const docsByCategory = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredData.documents.forEach(doc => {
+      const cat = doc.category || "Autre";
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [filteredData.documents]);
+
   const doctorActivity = useMemo(() => {
     return data.doctors.map(d => {
       const docAppts = filteredData.appointments.filter(a => a.doctor_id === d.id);
+      const docInvs = filteredData.invoices.filter(i => i.doctor_id === d.id);
+      const revenue = docInvs.reduce((sum, inv) => sum + (inv.total || 0), 0);
+      
       return {
         name: d.full_name,
         appointments: docAppts.length,
         completed: docAppts.filter(a => a.status === "completed").length,
-        prescriptions: filteredData.prescriptions.filter(p => p.doctor_id === d.id).length
+        prescriptions: filteredData.prescriptions.filter(p => p.doctor_id === d.id).length,
+        revenue
       };
     }).sort((a, b) => b.appointments - a.appointments);
   }, [data.doctors, filteredData]);
@@ -218,8 +281,11 @@ export const AdminReports = () => {
           <Button variant="outline" className="hidden sm:flex" onClick={() => window.print()}>
             <Printer className="w-4 h-4 mr-2" /> Imprimer
           </Button>
-          <Button className="bg-gradient-primary shadow-md">
-            <Download className="w-4 h-4 mr-2" /> Exporter
+          <Button 
+            className="bg-gradient-primary shadow-md"
+            onClick={() => exportToCSV(filteredData.invoices, 'rapport_facturation')}
+          >
+            <Download className="w-4 h-4 mr-2" /> Exporter CSV
           </Button>
         </div>
       </header>
@@ -243,41 +309,101 @@ export const AdminReports = () => {
           tint="stat-cyan"
         />
         <KpiCard 
-          label="Consultations" 
-          value={stats.completedAppts} 
-          subtitle={`${((stats.completedAppts / (stats.totalAppts || 1)) * 100).toFixed(0)}% de complétion`}
-          icon={Stethoscope} 
+          label="Chiffre d'Affaires" 
+          value={`${stats.totalBilled.toLocaleString()} MAD`}
+          subtitle={`${stats.totalInvoices} factures`}
+          icon={TrendingUp} 
           tint="stat-green"
+          up={true}
         />
         <KpiCard 
-          label="Ordonnances" 
-          value={stats.totalPrescriptions} 
-          subtitle="Générées cette période"
+          label="Archives Médicales" 
+          value={stats.totalDocuments} 
+          subtitle="Documents téléchargés"
           icon={FileText} 
           tint="stat-violet"
         />
+      </div>
+
+      {/* Billing & Revenue Reports */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <WidgetCard 
+          className="lg:col-span-8"
+          title="Rapport Financier"
+          description="Performance des revenus par médecin (MAD)"
+          icon={TrendingUp}
+          tint="stat-green"
+        >
+          <div className="h-[300px] mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={revenueByDoctor}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tickFormatter={(val) => `${val}`} />
+                <Tooltip 
+                  formatter={(value: any) => [`${value.toLocaleString()} MAD`, "Revenu"]}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Bar dataKey="value" fill="hsl(var(--stat-green))" radius={[4, 4, 0, 0]} barSize={40} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </WidgetCard>
+
+        <WidgetCard 
+          className="lg:col-span-4"
+          title="Statut des Paiements"
+          description="Répartition encaissé vs restant"
+          icon={PieChartIcon}
+          tint="stat-blue"
+        >
+          <div className="h-[300px] mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={[
+                    { name: 'Payé', value: stats.totalPaid },
+                    { name: 'À percevoir', value: stats.balance }
+                  ]}
+                  innerRadius={60}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  <Cell fill="#059669" />
+                  <Cell fill="#dc2626" />
+                </Pie>
+                <Tooltip 
+                  formatter={(value: any) => [`${value.toLocaleString()} MAD`, "Montant"]}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Legend verticalAlign="bottom" />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </WidgetCard>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Appointments by Status */}
         <WidgetCard 
           className="lg:col-span-4"
-          title="Statut des Rendez-vous"
-          description="Répartition par état actuel"
-          icon={Activity}
-          tint="stat-cyan"
+          title="Archives par Catégorie"
+          description="Documents par type de dossier"
+          icon={FileText}
+          tint="stat-violet"
         >
           <div className="h-[250px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={apptsByStatus}
+                  data={docsByCategory}
                   innerRadius={60}
                   outerRadius={80}
                   paddingAngle={5}
                   dataKey="value"
                 >
-                  {apptsByStatus.map((entry, index) => (
+                  {docsByCategory.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
@@ -293,14 +419,14 @@ export const AdminReports = () => {
         {/* Appointments by Type */}
         <WidgetCard 
           className="lg:col-span-8"
-          title="Activité par Type de Service"
-          description="Volume de consultations par catégorie"
-          icon={BarChart3}
-          tint="stat-blue"
+          title="Rendez-vous par Statut"
+          description="Répartition opérationnelle"
+          icon={Activity}
+          tint="stat-cyan"
         >
           <div className="h-[250px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={apptsByType}>
+              <BarChart data={apptsByStatus}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                 <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
                 <YAxis fontSize={12} tickLine={false} axisLine={false} />
@@ -308,7 +434,7 @@ export const AdminReports = () => {
                   cursor={{ fill: 'hsl(var(--muted)/0.4)' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
-                <Bar dataKey="value" fill="hsl(var(--stat-blue))" radius={[4, 4, 0, 0]} barSize={40} />
+                <Bar dataKey="value" fill="hsl(var(--stat-cyan))" radius={[4, 4, 0, 0]} barSize={40} />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -330,6 +456,7 @@ export const AdminReports = () => {
                 <TableHead className="text-center">Rendez-vous</TableHead>
                 <TableHead className="text-center">Complétés</TableHead>
                 <TableHead className="text-center">Ordonnances</TableHead>
+                <TableHead className="text-center">Revenu (MAD)</TableHead>
                 <TableHead className="text-right">Taux de Complétion</TableHead>
               </TableRow>
             </TableHeader>
@@ -354,6 +481,9 @@ export const AdminReports = () => {
                     <TableCell className="text-center">{doc.appointments}</TableCell>
                     <TableCell className="text-center">{doc.completed}</TableCell>
                     <TableCell className="text-center">{doc.prescriptions}</TableCell>
+                    <TableCell className="text-center font-bold text-emerald-600">
+                      {doc.revenue.toLocaleString()}
+                    </TableCell>
                     <TableCell className="text-right">
                       <Badge variant="secondary" className="bg-emerald-50 text-emerald-600 border-none">
                         {doc.appointments > 0 ? ((doc.completed / doc.appointments) * 100).toFixed(0) : 0}%
@@ -430,6 +560,56 @@ export const AdminReports = () => {
           </div>
         </WidgetCard>
       </div>
+
+      {/* Financial Details Table */}
+      <WidgetCard
+        title="Dernières Factures"
+        description="Suivi des transactions récentes"
+        icon={TrendingUp}
+        tint="stat-green"
+      >
+        <div className="mt-4 border border-border/50 rounded-xl overflow-hidden bg-card/50">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead>N° Facture</TableHead>
+                <TableHead>Patient</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead className="text-center">Total</TableHead>
+                <TableHead className="text-center">Payé</TableHead>
+                <TableHead className="text-right">Statut</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredData.invoices.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                    Aucune facture sur cette période
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredData.invoices.slice(0, 5).map((inv, i) => (
+                  <TableRow key={i} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-medium">{inv.invoice_number}</TableCell>
+                    <TableCell>{inv.profiles?.full_name || 'Patient'}</TableCell>
+                    <TableCell>{format(parseISO(inv.issue_date), 'dd MMM yyyy')}</TableCell>
+                    <TableCell className="text-center">{inv.total?.toLocaleString()} MAD</TableCell>
+                    <TableCell className="text-center">{inv.paid?.toLocaleString()} MAD</TableCell>
+                    <TableCell className="text-right">
+                      <Badge className={
+                        inv.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                        inv.status === 'unpaid' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                      }>
+                        {inv.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </WidgetCard>
     </div>
   );
 };
