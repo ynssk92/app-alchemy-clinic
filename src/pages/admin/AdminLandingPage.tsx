@@ -25,7 +25,8 @@ import {
   Layout, 
   Settings,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Pencil
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { SitePage } from "@/hooks/usePageContent";
