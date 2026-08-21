@@ -499,11 +499,15 @@ const AdminPatientCreate = () => {
               </section>
             )}
 
+            </div>
+          </div>
+
           <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-4">
             <Button 
               type="button" 
               variant="ghost" 
               onClick={() => navigate("/admin/patients")}
+
               className="h-11 px-6 font-semibold text-slate-600 hover:bg-slate-200 transition-colors"
             >
               Cancel
