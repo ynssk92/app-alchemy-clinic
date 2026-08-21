@@ -34,7 +34,7 @@ export const AddAllergyDialog = ({ open, onOpenChange, patientId, onSuccess }: B
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    allergen: "",
+    allergy: "",
     reaction: "",
     severity: "moderate",
     notes: "",
@@ -46,7 +46,7 @@ export const AddAllergyDialog = ({ open, onOpenChange, patientId, onSuccess }: B
     try {
       const { error } = await supabase.from("patient_allergies_v2").insert({
         patient_id: patientId,
-        allergy: form.allergen,
+        allergy: form.allergy,
         reaction: form.reaction,
         severity: form.severity,
         notes: form.notes,
@@ -75,8 +75,8 @@ export const AddAllergyDialog = ({ open, onOpenChange, patientId, onSuccess }: B
               <Input
                 required
                 placeholder="e.g. Penicillin, Peanuts"
-                value={form.allergen}
-                onChange={(e) => setForm({ ...form, allergen: e.target.value })}
+                value={form.allergy}
+                onChange={(e) => setForm({ ...form, allergy: e.target.value })}
               />
             </div>
             <div className="space-y-2">
@@ -132,12 +132,11 @@ export const AddMedicationDialog = ({ open, onOpenChange, patientId, onSuccess }
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    medication_name: "",
+    medication: "",
     dosage: "",
     frequency: "",
     route: "oral",
     start_date: "",
-    is_current: true,
     notes: "",
   });
 
@@ -147,7 +146,7 @@ export const AddMedicationDialog = ({ open, onOpenChange, patientId, onSuccess }
     try {
       const { error } = await supabase.from("patient_medications_v2").insert({
         patient_id: patientId,
-        medication: form.medication_name,
+        medication: form.medication,
         dosage: form.dosage,
         frequency: form.frequency,
         route: form.route,
@@ -178,8 +177,8 @@ export const AddMedicationDialog = ({ open, onOpenChange, patientId, onSuccess }
               <Input
                 required
                 placeholder="e.g. Amoxicillin"
-                value={form.medication_name}
-                onChange={(e) => setForm({ ...form, medication_name: e.target.value })}
+                value={form.medication}
+                onChange={(e) => setForm({ ...form, medication: e.target.value })}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
