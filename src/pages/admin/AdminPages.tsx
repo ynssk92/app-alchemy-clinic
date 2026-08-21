@@ -20,7 +20,12 @@ import type { PageBlock, SitePage } from "@/hooks/usePageContent";
 import { resolveIcon, resolveImage } from "@/lib/pageContent";
 
 const PAGES = [
-  { slug: "home", label: "Accueil", path: "/", kinds: ["step", "department", "stat"] },
+  { 
+    slug: "home", 
+    label: "Accueil", 
+    path: "/", 
+    kinds: ["department", "trust", "expertise", "why-us", "experience", "final-cta", "step", "stat"] 
+  },
   { slug: "about", label: "À Propos", path: "/about", kinds: ["mission", "value"] },
   { slug: "soins", label: "Nos Soins", path: "/soins", kinds: ["category"] },
   { slug: "expertise", label: "Expertise", path: "/expertise", kinds: ["feature", "stat"] },
