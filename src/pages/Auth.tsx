@@ -169,8 +169,8 @@ const Auth = () => {
   return (
     <div className="min-h-screen w-full flex bg-[#F8FAFC]">
       <Seo
-        title="Sign In or Sign Up — La Dune Clinic"
-        description="Access your La Dune account to book appointments, manage records, and track your care."
+        title="Sign In or Sign Up — HealthBook"
+        description="Access your HealthBook account to book appointments, manage records, and track your care."
         path="/auth"
       />
       
