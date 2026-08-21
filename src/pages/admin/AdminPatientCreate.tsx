@@ -501,8 +501,8 @@ const AdminPatientCreate = () => {
               </section>
             )}
 
-            </div>
           </div>
+
 
           <div className="p-8 bg-slate-50/50 border-t border-slate-100 flex items-center justify-end gap-4">
             <Button 
