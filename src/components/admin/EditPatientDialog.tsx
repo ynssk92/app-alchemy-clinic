@@ -43,34 +43,32 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       if (intakeIdProp) {
         const { data } = await supabase
           .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country")
+          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number")
           .eq("id", intakeIdProp)
           .maybeSingle();
         intake = data;
       } else if (profileId) {
         const { data } = await supabase
           .from("patient_intake")
-          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country")
+          .select("id, first_name, last_name, email, phone, dob, gender, blood_group, address_1, city, country, nationality, identity_document_type, identity_document_number")
           .eq("user_id", profileId)
           .maybeSingle();
         intake = data;
       }
       setIntakeId(intake?.id ?? null);
 
-      let profileName = "";
-      let profilePhone = "";
+      let profileData: any = null;
       if (profileId) {
         const { data: p } = await supabase
           .from("profiles")
-          .select("full_name, phone")
+          .select("full_name, phone, nationality, identity_document_type, identity_document_number")
           .eq("id", profileId)
           .maybeSingle();
-        profileName = p?.full_name || "";
-        profilePhone = p?.phone || "";
+        profileData = p;
       }
 
       const composedFullName =
-        profileName ||
+        profileData?.full_name ||
         [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") ||
         "";
 
@@ -79,7 +77,10 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         last_name: intake?.last_name || "",
         full_name: composedFullName,
         email: intake?.email || "",
-        phone: profilePhone || intake?.phone || "",
+        phone: profileData?.phone || intake?.phone || "",
+        nationality: profileData?.nationality || intake?.nationality || "",
+        identity_document_type: profileData?.identity_document_type || intake?.identity_document_type || "",
+        identity_document_number: profileData?.identity_document_number || intake?.identity_document_number || "",
         dob: intake?.dob || "",
         gender: intake?.gender || "",
         blood_group: intake?.blood_group || "",
