@@ -1235,6 +1235,69 @@ export type Database = {
           },
         ]
       }
+      patient_allergies_v2: {
+        Row: {
+          allergy: string
+          created_at: string | null
+          date_identified: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          reaction: string | null
+          severity: string | null
+        }
+        Insert: {
+          allergy: string
+          created_at?: string | null
+          date_identified?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reaction?: string | null
+          severity?: string | null
+        }
+        Update: {
+          allergy?: string
+          created_at?: string | null
+          date_identified?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reaction?: string | null
+          severity?: string | null
+        }
+        Relationships: []
+      }
+      patient_chronic_diseases: {
+        Row: {
+          created_at: string | null
+          diagnosis_date: string | null
+          disease: string
+          id: string
+          notes: string | null
+          patient_id: string
+          status: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          diagnosis_date?: string | null
+          disease: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          status?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          diagnosis_date?: string | null
+          disease?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
       patient_consent: {
         Row: {
           created_at: string | null
@@ -1410,6 +1473,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      patient_family_history: {
+        Row: {
+          condition: string
+          created_at: string | null
+          family_member: string
+          id: string
+          notes: string | null
+          patient_id: string
+        }
+        Insert: {
+          condition: string
+          created_at?: string | null
+          family_member: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+        }
+        Update: {
+          condition?: string
+          created_at?: string | null
+          family_member?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+        }
+        Relationships: []
+      }
+      patient_hospitalizations_v2: {
+        Row: {
+          admission_date: string | null
+          created_at: string | null
+          diagnosis: string | null
+          discharge_date: string | null
+          doctor: string | null
+          hospital: string
+          id: string
+          notes: string | null
+          patient_id: string
+          reason: string | null
+          treatment: string | null
+        }
+        Insert: {
+          admission_date?: string | null
+          created_at?: string | null
+          diagnosis?: string | null
+          discharge_date?: string | null
+          doctor?: string | null
+          hospital: string
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reason?: string | null
+          treatment?: string | null
+        }
+        Update: {
+          admission_date?: string | null
+          created_at?: string | null
+          diagnosis?: string | null
+          discharge_date?: string | null
+          doctor?: string | null
+          hospital?: string
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reason?: string | null
+          treatment?: string | null
+        }
+        Relationships: []
       }
       patient_insurance: {
         Row: {
@@ -1685,6 +1817,39 @@ export type Database = {
           },
         ]
       }
+      patient_medical_history_v2: {
+        Row: {
+          condition: string
+          created_at: string | null
+          diagnosis_date: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          condition: string
+          created_at?: string | null
+          diagnosis_date?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          condition?: string
+          created_at?: string | null
+          diagnosis_date?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       patient_medications: {
         Row: {
           created_at: string | null
@@ -1728,6 +1893,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      patient_medications_v2: {
+        Row: {
+          created_at: string | null
+          dosage: string | null
+          end_date: string | null
+          frequency: string | null
+          id: string
+          medication: string
+          notes: string | null
+          patient_id: string
+          prescribing_doctor: string | null
+          route: string | null
+          start_date: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          dosage?: string | null
+          end_date?: string | null
+          frequency?: string | null
+          id?: string
+          medication: string
+          notes?: string | null
+          patient_id: string
+          prescribing_doctor?: string | null
+          route?: string | null
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          dosage?: string | null
+          end_date?: string | null
+          frequency?: string | null
+          id?: string
+          medication?: string
+          notes?: string | null
+          patient_id?: string
+          prescribing_doctor?: string | null
+          route?: string | null
+          start_date?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       patient_notes: {
         Row: {
@@ -1848,6 +2058,69 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      patient_surgeries: {
+        Row: {
+          created_at: string | null
+          hospital: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          reason: string | null
+          surgery: string
+          surgery_date: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          hospital?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          reason?: string | null
+          surgery: string
+          surgery_date?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          hospital?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          reason?: string | null
+          surgery?: string
+          surgery_date?: string | null
+        }
+        Relationships: []
+      }
+      patient_vaccinations: {
+        Row: {
+          created_at: string | null
+          dose: string | null
+          id: string
+          notes: string | null
+          patient_id: string
+          vaccination_date: string | null
+          vaccine: string
+        }
+        Insert: {
+          created_at?: string | null
+          dose?: string | null
+          id?: string
+          notes?: string | null
+          patient_id: string
+          vaccination_date?: string | null
+          vaccine: string
+        }
+        Update: {
+          created_at?: string | null
+          dose?: string | null
+          id?: string
+          notes?: string | null
+          patient_id?: string
+          vaccination_date?: string | null
+          vaccine?: string
+        }
+        Relationships: []
       }
       patients: {
         Row: {
