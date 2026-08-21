@@ -1454,31 +1454,55 @@ export type Database = {
           address_1: string | null
           address_2: string | null
           allergies: string | null
+          apgar_score: string | null
           avatar_url: string | null
+          birth_complications: string | null
+          birth_height: number | null
+          birth_type: string | null
+          birth_weight: number | null
           blood_group: string | null
+          breastfeeding: string | null
+          chronic_diseases: string | null
           city: string | null
           country: string | null
           created_at: string
           created_by: string | null
+          current_medications: string | null
+          development_notes: string | null
           dob: string | null
           email: string
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
+          emergency_contact_relation: string | null
+          family_history: string | null
+          family_situation: string | null
           first_name: string
           gender: string | null
           id: string
           identity_document_number: string | null
           identity_document_type: string | null
+          insurance_name: string | null
+          insurance_notes: string | null
           insurance_number: string | null
+          insurance_policy: string | null
           insurance_provider: string | null
+          insurance_status: string | null
+          languages: string[] | null
           last_name: string
           medical_conditions: string | null
+          medical_history: string | null
           nationality: string | null
+          patient_type: Database["public"]["Enums"]["patient_type"] | null
           phone: string | null
           pincode: string | null
+          previous_hospitalizations: string | null
           primary_doctor_id: string | null
+          profession: string | null
+          psychomotor_development: string | null
+          rhesus: string | null
           state: string | null
           status: string | null
+          surgical_history: string | null
           updated_at: string
           user_id: string | null
         }
@@ -1486,31 +1510,55 @@ export type Database = {
           address_1?: string | null
           address_2?: string | null
           allergies?: string | null
+          apgar_score?: string | null
           avatar_url?: string | null
+          birth_complications?: string | null
+          birth_height?: number | null
+          birth_type?: string | null
+          birth_weight?: number | null
           blood_group?: string | null
+          breastfeeding?: string | null
+          chronic_diseases?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
           created_by?: string | null
+          current_medications?: string | null
+          development_notes?: string | null
           dob?: string | null
           email: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          emergency_contact_relation?: string | null
+          family_history?: string | null
+          family_situation?: string | null
           first_name: string
           gender?: string | null
           id?: string
           identity_document_number?: string | null
           identity_document_type?: string | null
+          insurance_name?: string | null
+          insurance_notes?: string | null
           insurance_number?: string | null
+          insurance_policy?: string | null
           insurance_provider?: string | null
+          insurance_status?: string | null
+          languages?: string[] | null
           last_name: string
           medical_conditions?: string | null
+          medical_history?: string | null
           nationality?: string | null
+          patient_type?: Database["public"]["Enums"]["patient_type"] | null
           phone?: string | null
           pincode?: string | null
+          previous_hospitalizations?: string | null
           primary_doctor_id?: string | null
+          profession?: string | null
+          psychomotor_development?: string | null
+          rhesus?: string | null
           state?: string | null
           status?: string | null
+          surgical_history?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -1518,31 +1566,55 @@ export type Database = {
           address_1?: string | null
           address_2?: string | null
           allergies?: string | null
+          apgar_score?: string | null
           avatar_url?: string | null
+          birth_complications?: string | null
+          birth_height?: number | null
+          birth_type?: string | null
+          birth_weight?: number | null
           blood_group?: string | null
+          breastfeeding?: string | null
+          chronic_diseases?: string | null
           city?: string | null
           country?: string | null
           created_at?: string
           created_by?: string | null
+          current_medications?: string | null
+          development_notes?: string | null
           dob?: string | null
           email?: string
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          emergency_contact_relation?: string | null
+          family_history?: string | null
+          family_situation?: string | null
           first_name?: string
           gender?: string | null
           id?: string
           identity_document_number?: string | null
           identity_document_type?: string | null
+          insurance_name?: string | null
+          insurance_notes?: string | null
           insurance_number?: string | null
+          insurance_policy?: string | null
           insurance_provider?: string | null
+          insurance_status?: string | null
+          languages?: string[] | null
           last_name?: string
           medical_conditions?: string | null
+          medical_history?: string | null
           nationality?: string | null
+          patient_type?: Database["public"]["Enums"]["patient_type"] | null
           phone?: string | null
           pincode?: string | null
+          previous_hospitalizations?: string | null
           primary_doctor_id?: string | null
+          profession?: string | null
+          psychomotor_development?: string | null
+          rhesus?: string | null
           state?: string | null
           status?: string | null
+          surgical_history?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -1914,17 +1986,28 @@ export type Database = {
           dob: string | null
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
+          emergency_contact_relation: string | null
+          family_situation: string | null
           full_name: string | null
           gender: string | null
           id: string
           identity_document_number: string | null
           identity_document_type: string | null
+          insurance_name: string | null
+          insurance_notes: string | null
+          insurance_number: string | null
+          insurance_policy: string | null
+          insurance_status: string | null
+          languages: string[] | null
           nationality: string | null
           notification_preferences: Json | null
+          patient_type: Database["public"]["Enums"]["patient_type"] | null
           phone: string | null
           preferred_communication: string | null
           preferred_language: string | null
           privacy_settings: Json | null
+          profession: string | null
+          rhesus: string | null
           role: string | null
           status: Database["public"]["Enums"]["profile_status"]
           status_reason: string | null
@@ -1942,17 +2025,28 @@ export type Database = {
           dob?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          emergency_contact_relation?: string | null
+          family_situation?: string | null
           full_name?: string | null
           gender?: string | null
           id: string
           identity_document_number?: string | null
           identity_document_type?: string | null
+          insurance_name?: string | null
+          insurance_notes?: string | null
+          insurance_number?: string | null
+          insurance_policy?: string | null
+          insurance_status?: string | null
+          languages?: string[] | null
           nationality?: string | null
           notification_preferences?: Json | null
+          patient_type?: Database["public"]["Enums"]["patient_type"] | null
           phone?: string | null
           preferred_communication?: string | null
           preferred_language?: string | null
           privacy_settings?: Json | null
+          profession?: string | null
+          rhesus?: string | null
           role?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           status_reason?: string | null
@@ -1970,17 +2064,28 @@ export type Database = {
           dob?: string | null
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          emergency_contact_relation?: string | null
+          family_situation?: string | null
           full_name?: string | null
           gender?: string | null
           id?: string
           identity_document_number?: string | null
           identity_document_type?: string | null
+          insurance_name?: string | null
+          insurance_notes?: string | null
+          insurance_number?: string | null
+          insurance_policy?: string | null
+          insurance_status?: string | null
+          languages?: string[] | null
           nationality?: string | null
           notification_preferences?: Json | null
+          patient_type?: Database["public"]["Enums"]["patient_type"] | null
           phone?: string | null
           preferred_communication?: string | null
           preferred_language?: string | null
           privacy_settings?: Json | null
+          profession?: string | null
+          rhesus?: string | null
           role?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
           status_reason?: string | null
@@ -2347,6 +2452,7 @@ export type Database = {
         | "partially_paid"
         | "paid"
         | "cancelled"
+      patient_type: "adult" | "minor"
       payment_method: "cash" | "card" | "insurance" | "transfer" | "online"
       profile_status: "pending" | "approved" | "rejected"
     }
@@ -2485,6 +2591,7 @@ export const Constants = {
         "paid",
         "cancelled",
       ],
+      patient_type: ["adult", "minor"],
       payment_method: ["cash", "card", "insurance", "transfer", "online"],
       profile_status: ["pending", "approved", "rejected"],
     },

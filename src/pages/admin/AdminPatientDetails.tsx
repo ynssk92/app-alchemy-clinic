@@ -31,11 +31,11 @@ type ListRow = {
 
 type PatientView = {
   routeId: string;
-  profileId: string | null;   // present when registered
-  intakeId: string | null;    // present when an intake record exists
+  profileId: string | null;
+  intakeId: string | null;
   full_name: string;
   phone: string | null;
-  email: string | null;       // best available email (intake > profile-less)
+  email: string | null;
   nationality: string | null;
   identity_document_type: string | null;
   identity_document_number: string | null;
@@ -45,9 +45,39 @@ type PatientView = {
   address_1: string | null;
   city: string | null;
   country: string | null;
-  avatar_path: string | null; // storage path in `avatars` bucket
-  registered_at: string | null; // profile.created_at when registered
-  added_at: string;             // intake.created_at or profile.created_at
+  avatar_path: string | null;
+  registered_at: string | null;
+  added_at: string;
+  // New fields
+  patient_type: "adult" | "minor";
+  languages: string[];
+  profession: string | null;
+  family_situation: string | null;
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  emergency_contact_relation: string | null;
+  insurance_name: string | null;
+  insurance_number: string | null;
+  insurance_policy: string | null;
+  insurance_status: string | null;
+  insurance_notes: string | null;
+  rhesus: string | null;
+  allergies: string | null;
+  chronic_diseases: string | null;
+  current_medications: string | null;
+  medical_history: string | null;
+  family_history: string | null;
+  surgical_history: string | null;
+  previous_hospitalizations: string | null;
+  // Pediatric
+  birth_type?: string | null;
+  birth_weight?: number | null;
+  birth_height?: number | null;
+  apgar_score?: string | null;
+  breastfeeding?: string | null;
+  birth_complications?: string | null;
+  psychomotor_development?: string | null;
+  development_notes?: string | null;
 };
 
 const InfoTile = ({ icon: Icon, label, value }: { icon: any; label: string; value: string }) => (
@@ -150,6 +180,35 @@ const AdminPatientDetails = () => {
     city: "",
     country: "",
     status: "approved" as "pending" | "approved" | "rejected",
+    // New fields
+    patient_type: "adult" as "adult" | "minor",
+    languages: [] as string[],
+    profession: "",
+    family_situation: "",
+    emergency_contact_name: "",
+    emergency_contact_phone: "",
+    emergency_contact_relation: "",
+    insurance_name: "",
+    insurance_number: "",
+    insurance_policy: "",
+    insurance_status: "",
+    insurance_notes: "",
+    rhesus: "",
+    allergies: "",
+    chronic_diseases: "",
+    current_medications: "",
+    medical_history: "",
+    family_history: "",
+    surgical_history: "",
+    previous_hospitalizations: "",
+    birth_type: "",
+    birth_weight: "" as string | number,
+    birth_height: "" as string | number,
+    apgar_score: "",
+    breastfeeding: "",
+    birth_complications: "",
+    psychomotor_development: "",
+    development_notes: "",
   });
   const [reloadTick, setReloadTick] = useState(0);
   const [notFound, setNotFound] = useState(false);
@@ -212,10 +271,17 @@ const AdminPatientDetails = () => {
     if (!id) return;
     (async () => {
       setNotFound(false);
-      // 1) Try as profile — but only accept it if the account is patient-only
+      // 1) Try as profile
       const { data: prof } = await supabase
         .from("profiles")
-        .select("id, full_name, phone, created_at, avatar_url, nationality, identity_document_type, identity_document_number")
+        .select(`
+          id, full_name, phone, created_at, avatar_url, nationality, 
+          identity_document_type, identity_document_number,
+          patient_type, languages, profession, family_situation,
+          emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+          insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes,
+          rhesus
+        `)
         .eq("id", id)
         .maybeSingle();
       let profileIsPatient = false;
@@ -301,6 +367,35 @@ const AdminPatientDetails = () => {
         avatar_path: avatarPath,
         registered_at: profileRow?.created_at || null,
         added_at: intakeRow?.created_at || profileRow?.created_at,
+        // New fields
+        patient_type: profileRow?.patient_type || intakeRow?.patient_type || "adult",
+        languages: profileRow?.languages || intakeRow?.languages || [],
+        profession: profileRow?.profession || intakeRow?.profession || null,
+        family_situation: profileRow?.family_situation || intakeRow?.family_situation || null,
+        emergency_contact_name: profileRow?.emergency_contact_name || intakeRow?.emergency_contact_name || null,
+        emergency_contact_phone: profileRow?.emergency_contact_phone || intakeRow?.emergency_contact_phone || null,
+        emergency_contact_relation: profileRow?.emergency_contact_relation || intakeRow?.emergency_contact_relation || null,
+        insurance_name: profileRow?.insurance_name || intakeRow?.insurance_name || null,
+        insurance_number: profileRow?.insurance_number || intakeRow?.insurance_number || null,
+        insurance_policy: profileRow?.insurance_policy || intakeRow?.insurance_policy || null,
+        insurance_status: profileRow?.insurance_status || intakeRow?.insurance_status || null,
+        insurance_notes: profileRow?.insurance_notes || intakeRow?.insurance_notes || null,
+        rhesus: profileRow?.rhesus || intakeRow?.rhesus || null,
+        allergies: intakeRow?.allergies || null,
+        chronic_diseases: intakeRow?.chronic_diseases || null,
+        current_medications: intakeRow?.current_medications || null,
+        medical_history: intakeRow?.medical_history || null,
+        family_history: intakeRow?.family_history || null,
+        surgical_history: intakeRow?.surgical_history || null,
+        previous_hospitalizations: intakeRow?.previous_hospitalizations || null,
+        birth_type: intakeRow?.birth_type,
+        birth_weight: intakeRow?.birth_weight,
+        birth_height: intakeRow?.birth_height,
+        apgar_score: intakeRow?.apgar_score,
+        breastfeeding: intakeRow?.breastfeeding,
+        birth_complications: intakeRow?.birth_complications,
+        psychomotor_development: intakeRow?.psychomotor_development,
+        development_notes: intakeRow?.development_notes,
       };
       setPatient(view);
 
@@ -320,6 +415,34 @@ const AdminPatientDetails = () => {
         city: view.city || "",
         country: view.country || "",
         status: (profileRow?.status as any) || "approved",
+        patient_type: view.patient_type,
+        languages: view.languages,
+        profession: view.profession || "",
+        family_situation: view.family_situation || "",
+        emergency_contact_name: view.emergency_contact_name || "",
+        emergency_contact_phone: view.emergency_contact_phone || "",
+        emergency_contact_relation: view.emergency_contact_relation || "",
+        insurance_name: view.insurance_name || "",
+        insurance_number: view.insurance_number || "",
+        insurance_policy: view.insurance_policy || "",
+        insurance_status: view.insurance_status || "",
+        insurance_notes: view.insurance_notes || "",
+        rhesus: view.rhesus || "",
+        allergies: view.allergies || "",
+        chronic_diseases: view.chronic_diseases || "",
+        current_medications: view.current_medications || "",
+        medical_history: view.medical_history || "",
+        family_history: view.family_history || "",
+        surgical_history: view.surgical_history || "",
+        previous_hospitalizations: view.previous_hospitalizations || "",
+        birth_type: view.birth_type || "",
+        birth_weight: view.birth_weight || "",
+        birth_height: view.birth_height || "",
+        apgar_score: view.apgar_score || "",
+        breastfeeding: view.breastfeeding || "",
+        birth_complications: view.birth_complications || "",
+        psychomotor_development: view.psychomotor_development || "",
+        development_notes: view.development_notes || "",
       });
 
       // Avatar signed URL
