@@ -117,7 +117,9 @@ export const AdminReports = () => {
   }, [range]);
 
   const filteredData = useMemo(() => {
-    if (!data.patients.length) return { patients: [], appointments: [], prescriptions: [] };
+    if (!data.patients.length && !data.appointments.length && !data.invoices.length) {
+      return { patients: [], appointments: [], prescriptions: [], invoices: [], documents: [] };
+    }
 
     const filterByDate = (item: any, dateKey: string) => {
       if (!item[dateKey]) return false;
@@ -132,12 +134,20 @@ export const AdminReports = () => {
     return {
       patients: data.patients.filter(p => filterByDate(p, "created_at")),
       appointments: data.appointments.filter(a => filterByDate(a, "appointment_date")),
-      prescriptions: data.prescriptions.filter(p => filterByDate(p, "created_at"))
+      prescriptions: data.prescriptions.filter(p => filterByDate(p, "created_at")),
+      invoices: data.invoices.filter(i => filterByDate(i, "issue_date")),
+      documents: data.documents.filter(d => filterByDate(d, "document_date"))
     };
   }, [data, dateInterval]);
 
   const stats = useMemo(() => {
     const appts = filteredData.appointments;
+    const invs = filteredData.invoices;
+    
+    const totalBilled = invs.reduce((sum, inv) => sum + (inv.total || 0), 0);
+    const totalPaid = invs.reduce((sum, inv) => sum + (inv.paid || 0), 0);
+    const balance = totalBilled - totalPaid;
+
     return {
       totalPatients: data.patients.length,
       newPatients: filteredData.patients.length,
@@ -147,6 +157,11 @@ export const AdminReports = () => {
       noShowAppts: appts.filter(a => a.status === "no-show").length,
       upcomingAppts: appts.filter(a => a.status === "upcoming").length,
       totalPrescriptions: filteredData.prescriptions.length,
+      totalDocuments: filteredData.documents.length,
+      totalBilled,
+      totalPaid,
+      balance,
+      totalInvoices: invs.length
     };
   }, [data.patients.length, filteredData]);
 
