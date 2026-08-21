@@ -971,27 +971,92 @@ const AdminPatientDetails = () => {
                 </Card>
               </div>
 
-              {/* Appointments tab */}
-              <Card className="border-border">
-                <Tabs defaultValue="appointments">
-                  <div className="border-b border-border px-6 pt-4">
-                    <TabsList className="bg-transparent p-0 h-auto gap-6">
+              {/* CRM Tabs */}
+              <Card className="border-border shadow-sm">
+                <Tabs defaultValue="appointments" className="w-full">
+                  <div className="border-b border-border px-6 pt-2">
+                    <TabsList className="bg-transparent p-0 h-auto gap-8 flex flex-wrap">
+                      <TabsTrigger
+                        value="medical"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                      >
+                        {t("patients.details.tabs.medical", { defaultValue: "Medical Profile" })}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="insurance"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                      >
+                        {t("patients.details.tabs.insurance", { defaultValue: "Insurance" })}
+                      </TabsTrigger>
+                      {patient.patient_type === "minor" && (
+                        <TabsTrigger
+                          value="pediatrics"
+                          className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                        >
+                          {t("patients.details.tabs.pediatrics", { defaultValue: "Pediatrics" })}
+                        </TabsTrigger>
+                      )}
                       <TabsTrigger
                         value="appointments"
-                        className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
                       >
                         {t("nav.appointments")}
                       </TabsTrigger>
                       <TabsTrigger
                         value="transactions"
-                        className="px-0 pb-3 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-semibold"
+                        className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
                       >
                         {t("nav.billing")}
                       </TabsTrigger>
                     </TabsList>
                   </div>
 
+                  <TabsContent value="medical" className="m-0 p-8 pt-6">
+                    <div className="space-y-8">
+                      <div className="grid md:grid-cols-2 gap-8">
+                        <div className="space-y-4">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                            <Droplet className="w-3.5 h-3.5 text-red-500" /> Medical Overview
+                          </h4>
+                          <div className="space-y-3">
+                            <InfoTile icon={Activity} label="Allergies" value={patient.allergies || "None declared"} />
+                            <InfoTile icon={Activity} label="Chronic Diseases" value={patient.chronic_diseases || "None declared"} />
+                            <InfoTile icon={Activity} label="Current Medications" value={patient.current_medications || "None"} />
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+                            <BookOpen className="w-3.5 h-3.5 text-indigo-500" /> History
+                          </h4>
+                          <div className="space-y-3">
+                            <InfoTile icon={BookOpen} label="Medical History" value={patient.medical_history || "No records"} />
+                            <InfoTile icon={BookOpen} label="Surgical History" value={patient.surgical_history || "No records"} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="insurance" className="m-0 p-8 pt-6">
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <InfoTile icon={ShieldCheck} label="Provider" value={patient.insurance_name || "Self-pay"} />
+                      <InfoTile icon={Receipt} label="Policy #" value={patient.insurance_number || "—"} />
+                      <InfoTile icon={FileText} label="Status" value={patient.insurance_status || "Unknown"} />
+                    </div>
+                  </TabsContent>
+
+                  {patient.patient_type === "minor" && (
+                    <TabsContent value="pediatrics" className="m-0 p-8 pt-6">
+                      <div className="grid md:grid-cols-3 gap-6">
+                        <InfoTile icon={Cake} label="Birth Weight" value={patient.birth_weight ? `${patient.birth_weight} kg` : "—"} />
+                        <InfoTile icon={Thermometer} label="Birth Type" value={patient.birth_type || "—"} />
+                        <InfoTile icon={Activity} label="Psychomotor" value={patient.psychomotor_development || "—"} />
+                      </div>
+                    </TabsContent>
+                  )}
+
                   <TabsContent value="appointments" className="m-0 p-6 pt-4">
+
                     {!registered ? (
                       <div className="py-10 text-center text-sm text-muted-foreground">
                         Appointments become available after the patient registers an account.
