@@ -36,6 +36,9 @@ type PatientView = {
   full_name: string;
   phone: string | null;
   email: string | null;       // best available email (intake > profile-less)
+  nationality: string | null;
+  identity_document_type: string | null;
+  identity_document_number: string | null;
   dob: string | null;
   gender: string | null;
   blood_group: string | null;
