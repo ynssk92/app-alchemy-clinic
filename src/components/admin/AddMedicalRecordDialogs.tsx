@@ -46,7 +46,10 @@ export const AddAllergyDialog = ({ open, onOpenChange, patientId, onSuccess }: B
     try {
       const { error } = await supabase.from("patient_allergies_v2").insert({
         patient_id: patientId,
-        ...form,
+        allergy: form.allergen,
+        reaction: form.reaction,
+        severity: form.severity,
+        notes: form.notes,
       });
       if (error) throw error;
       toast({ title: "Allergy added successfully" });
@@ -144,8 +147,12 @@ export const AddMedicationDialog = ({ open, onOpenChange, patientId, onSuccess }
     try {
       const { error } = await supabase.from("patient_medications_v2").insert({
         patient_id: patientId,
-        ...form,
+        medication: form.medication_name,
+        dosage: form.dosage,
+        frequency: form.frequency,
+        route: form.route,
         start_date: form.start_date || null,
+        notes: form.notes,
       });
       if (error) throw error;
       toast({ title: "Medication added successfully" });

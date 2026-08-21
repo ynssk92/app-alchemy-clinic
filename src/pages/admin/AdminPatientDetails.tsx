@@ -483,10 +483,10 @@ const AdminPatientDetails = () => {
           supabase.from("patient_allergies_v2").select("*").eq("patient_id", pId),
           supabase.from("patient_medications_v2").select("*").eq("patient_id", pId),
           supabase.from("patient_medical_history_v2").select("*").eq("patient_id", pId),
-          supabase.from("patient_surgeries_v2").select("*").eq("patient_id", pId),
-          supabase.from("patient_chronic_diseases_v2").select("*").eq("patient_id", pId),
-          supabase.from("patient_family_history_v2").select("*").eq("patient_id", pId),
-          supabase.from("patient_vaccinations_v2").select("*").eq("patient_id", pId),
+          supabase.from("patient_surgeries" as any).select("*").eq("patient_id", pId),
+          supabase.from("patient_chronic_diseases" as any).select("*").eq("patient_id", pId),
+          supabase.from("patient_family_history" as any).select("*").eq("patient_id", pId),
+          supabase.from("patient_vaccinations" as any).select("*").eq("patient_id", pId),
           supabase.from("patient_hospitalizations_v2").select("*").eq("patient_id", pId),
         ]);
 
@@ -1101,7 +1101,7 @@ const AdminPatientDetails = () => {
                                 medicalData.allergies.map((a) => (
                                   <div key={a.id} className="p-3 rounded-lg bg-slate-50 border border-slate-100 flex justify-between items-start">
                                     <div>
-                                      <div className="font-bold text-sm text-slate-900">{a.allergen}</div>
+                                      <div className="font-bold text-sm text-slate-900">{a.allergy}</div>
                                       <div className="text-xs text-slate-500 mt-1">{a.reaction || "No reaction specified"}</div>
                                     </div>
                                     <Badge className={cn(
@@ -1131,7 +1131,7 @@ const AdminPatientDetails = () => {
                                   <div key={c.id} className="flex items-start gap-3">
                                     <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0" />
                                     <div>
-                                      <div className="text-sm font-semibold">{c.disease_name}</div>
+                                      <div className="text-sm font-semibold">{c.disease}</div>
                                       <div className="text-xs text-muted-foreground">{c.status} since {fmtDate(c.diagnosis_date)}</div>
                                     </div>
                                   </div>
@@ -1160,7 +1160,7 @@ const AdminPatientDetails = () => {
                                       <Pill className="w-4 h-4" />
                                     </div>
                                     <div className="flex-1">
-                                      <div className="text-sm font-bold">{m.medication_name}</div>
+                                      <div className="text-sm font-bold">{m.medication}</div>
                                       <div className="text-xs text-muted-foreground">{m.dosage} • {m.frequency}</div>
                                     </div>
                                     <Badge variant="secondary" className="text-[10px]">{m.route}</Badge>
@@ -1186,8 +1186,8 @@ const AdminPatientDetails = () => {
                                     <StethoscopeIcon className="w-4 h-4 text-slate-500" />
                                   </div>
                                   <div>
-                                    <div className="text-sm font-semibold">{s.surgery_type}</div>
-                                    <div className="text-xs text-muted-foreground">{fmtDate(s.surgery_date)} • {s.hospital_name}</div>
+                                    <div className="text-sm font-semibold">{s.surgery}</div>
+                                    <div className="text-xs text-muted-foreground">{fmtDate(s.surgery_date)} • {s.hospital}</div>
                                   </div>
                                 </div>
                               ))}
