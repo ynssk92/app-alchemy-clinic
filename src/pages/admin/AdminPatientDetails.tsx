@@ -483,10 +483,10 @@ const AdminPatientDetails = () => {
           supabase.from("patient_allergies_v2").select("*").eq("patient_id", pId),
           supabase.from("patient_medications_v2").select("*").eq("patient_id", pId),
           supabase.from("patient_medical_history_v2").select("*").eq("patient_id", pId),
-          supabase.from("patient_surgeries" as any).select("*").eq("patient_id", pId),
-          supabase.from("patient_chronic_diseases" as any).select("*").eq("patient_id", pId),
-          supabase.from("patient_family_history" as any).select("*").eq("patient_id", pId),
-          supabase.from("patient_vaccinations" as any).select("*").eq("patient_id", pId),
+          supabase.from("patient_surgeries").select("*").eq("patient_id", pId),
+          supabase.from("patient_chronic_diseases").select("*").eq("patient_id", pId),
+          supabase.from("patient_family_history").select("*").eq("patient_id", pId),
+          supabase.from("patient_vaccinations").select("*").eq("patient_id", pId),
           supabase.from("patient_hospitalizations_v2").select("*").eq("patient_id", pId),
         ]);
 
