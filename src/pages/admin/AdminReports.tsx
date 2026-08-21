@@ -540,6 +540,56 @@ export const AdminReports = () => {
           </div>
         </WidgetCard>
       </div>
+
+      {/* Financial Details Table */}
+      <WidgetCard
+        title="Dernières Factures"
+        description="Suivi des transactions récentes"
+        icon={TrendingUp}
+        tint="stat-green"
+      >
+        <div className="mt-4 border border-border/50 rounded-xl overflow-hidden bg-card/50">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead>N° Facture</TableHead>
+                <TableHead>Patient</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead className="text-center">Total</TableHead>
+                <TableHead className="text-center">Payé</TableHead>
+                <TableHead className="text-right">Statut</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredData.invoices.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                    Aucune facture sur cette période
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredData.invoices.slice(0, 5).map((inv, i) => (
+                  <TableRow key={i} className="hover:bg-muted/30 transition-colors">
+                    <TableCell className="font-medium">{inv.invoice_number}</TableCell>
+                    <TableCell>{inv.profiles?.full_name || 'Patient'}</TableCell>
+                    <TableCell>{format(parseISO(inv.issue_date), 'dd MMM yyyy')}</TableCell>
+                    <TableCell className="text-center">{inv.total?.toLocaleString()} MAD</TableCell>
+                    <TableCell className="text-center">{inv.paid?.toLocaleString()} MAD</TableCell>
+                    <TableCell className="text-right">
+                      <Badge className={
+                        inv.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                        inv.status === 'unpaid' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                      }>
+                        {inv.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </WidgetCard>
     </div>
   );
 };
