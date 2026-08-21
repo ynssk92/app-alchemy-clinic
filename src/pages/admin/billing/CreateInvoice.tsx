@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { Plus, Trash2, Save, Send } from "lucide-react";
 import { formatMoney } from "@/lib/currency";
@@ -19,12 +19,14 @@ const emptyItem = (): Item => ({ key: Math.random().toString(36).slice(2), servi
 export default function CreateInvoice() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialPatientId = searchParams.get("patientId") || "";
   const [patients, setPatients] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [clinics, setClinics] = useState<any[]>([]);
-  const [patientId, setPatientId] = useState<string>("");
+  const [patientId, setPatientId] = useState<string>(initialPatientId);
   const [doctorId, setDoctorId] = useState<string>("");
   const [appointmentId, setAppointmentId] = useState<string>("");
   const [clinicId, setClinicId] = useState<string>("");

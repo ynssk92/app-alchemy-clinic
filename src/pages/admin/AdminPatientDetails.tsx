@@ -296,6 +296,30 @@ const AdminPatientDetails = () => {
     if (!id) return;
     (async () => {
       setNotFound(false);
+      
+      // Load appointments for this patient
+      const { data: appointmentData } = await supabase
+        .from("appointments")
+        .select("id, appointment_date, appointment_time, status, reason, doctors(full_name), services(name, duration, price)")
+        .eq("patient_id", id)
+        .order("appointment_date", { ascending: false });
+      setAppts(appointmentData || []);
+
+      // Load invoices for this patient
+      setLoadingInvoices(true);
+      const { data: invoiceData, error: invErr } = await supabase
+        .from("invoices")
+        .select("id, invoice_number, total, paid, due, status, issue_date")
+        .eq("patient_id", id)
+        .order("created_at", { ascending: false });
+      
+      if (invErr) {
+        setInvoiceError(true);
+      } else {
+        setInvoices(invoiceData || []);
+      }
+      setLoadingInvoices(false);
+
       // 1) Try as profile
       const { data: prof } = await supabase
         .from("profiles")
@@ -532,9 +556,13 @@ const AdminPatientDetails = () => {
                   <Pencil className="w-4 h-4 mr-2" />
                   Edit Profile
                 </Button>
-                <Button className="bg-gradient-primary" size="sm">
+                <Button 
+                  className="bg-gradient-primary" 
+                  size="sm"
+                  onClick={() => navigate(`/admin/appointments/new?patientId=${patient.profileId || id}`)}
+                >
                   <Plus className="w-4 h-4 mr-2" />
-                  New Consultation
+                  New Appointment
                 </Button>
               </div>
             </div>
@@ -606,6 +634,18 @@ const AdminPatientDetails = () => {
                 >
                   Prescriptions
                 </TabsTrigger>
+                <TabsTrigger
+                  value="appointments"
+                  className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                >
+                  Rendez-vous
+                </TabsTrigger>
+                <TabsTrigger
+                  value="billing"
+                  className="px-0 pb-4 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none font-bold uppercase text-[11px] tracking-wider transition-all"
+                >
+                  Facturation
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="medical" className="mt-6 space-y-6 animate-in fade-in-50 duration-300">
@@ -674,6 +714,142 @@ const AdminPatientDetails = () => {
 
               <TabsContent value="prescriptions" className="mt-6 animate-in fade-in-50 duration-300">
                 <PrescriptionList patientId={patient.profileId || patient.intakeId || ""} />
+              </TabsContent>
+
+              <TabsContent value="appointments" className="mt-6 animate-in fade-in-50 duration-300">
+                <Card className="p-6 border-slate-100 shadow-sm">
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                      <CalendarDays className="w-4 h-4 text-primary" />
+                      Appointment History
+                    </h3>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => navigate(`/admin/appointments/new?patientId=${patient.profileId || id}`)}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Appointment
+                    </Button>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {appts.length === 0 ? (
+                      <div className="py-12 text-center text-muted-foreground bg-slate-50 rounded-xl border border-dashed">
+                        No appointments found for this patient.
+                      </div>
+                    ) : (
+                      appts.map((appt) => (
+                        <div key={appt.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-primary/5 flex items-center justify-center text-primary">
+                              <CalendarDays className="w-5 h-5" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-bold text-slate-900">{appt.services?.name || appt.reason || "Consultation"}</p>
+                              <p className="text-xs text-slate-500">
+                                {fmtDate(appt.appointment_date)} at {appt.appointment_time?.slice(0, 5)} • Dr. {appt.doctors?.full_name || "Staff"}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {statusPill(appt.status)}
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400">
+                              <MoreVertical className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="billing" className="mt-6 animate-in fade-in-50 duration-300">
+                <div className="space-y-6">
+                  {/* Financial Summary */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="p-4 bg-slate-900 text-white border-none shadow-md">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Total Billed</p>
+                      <h4 className="text-2xl font-bold">{formatMoney(invoices.reduce((sum, inv) => sum + Number(inv.total || 0), 0))}</h4>
+                    </Card>
+                    <Card className="p-4 bg-emerald-600 text-white border-none shadow-md">
+                      <p className="text-[10px] font-bold text-emerald-100/60 uppercase tracking-wider mb-1">Total Paid</p>
+                      <h4 className="text-2xl font-bold">{formatMoney(invoices.reduce((sum, inv) => sum + Number(inv.paid || 0), 0))}</h4>
+                    </Card>
+                    <Card className="p-4 bg-amber-500 text-white border-none shadow-md">
+                      <p className="text-[10px] font-bold text-amber-100/60 uppercase tracking-wider mb-1">Remaining Due</p>
+                      <h4 className="text-2xl font-bold">{formatMoney(invoices.reduce((sum, inv) => sum + Number(inv.due || 0), 0))}</h4>
+                    </Card>
+                  </div>
+
+                  <Card className="p-6 border-slate-100 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <Receipt className="w-4 h-4 text-primary" />
+                        Billing History
+                      </h3>
+                      <Button 
+                        size="sm" 
+                        className="bg-primary text-white"
+                        onClick={() => navigate(`/admin/billing/invoices/new?patientId=${patient.profileId || id}`)}
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        Create Invoice
+                      </Button>
+                    </div>
+
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-50 border-y border-slate-100">
+                          <tr className="text-left text-slate-500">
+                            <th className="p-3 font-semibold uppercase text-[10px] tracking-wider">Invoice #</th>
+                            <th className="p-3 font-semibold uppercase text-[10px] tracking-wider">Date</th>
+                            <th className="p-3 font-semibold uppercase text-[10px] tracking-wider text-right">Amount</th>
+                            <th className="p-3 font-semibold uppercase text-[10px] tracking-wider">Status</th>
+                            <th className="p-3"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {loadingInvoices ? (
+                            <tr>
+                              <td colSpan={5} className="p-8 text-center">
+                                <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
+                              </td>
+                            </tr>
+                          ) : invoices.length === 0 ? (
+                            <tr>
+                              <td colSpan={5} className="p-12 text-center text-muted-foreground">
+                                <FileText className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                No billing records found.
+                              </td>
+                            </tr>
+                          ) : (
+                            invoices.map((inv) => (
+                              <tr key={inv.id} className="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                <td className="p-3 font-bold text-primary">
+                                  <Link to={`/admin/billing/invoices/${inv.id}`} className="hover:underline">
+                                    {inv.invoice_number}
+                                  </Link>
+                                </td>
+                                <td className="p-3 text-slate-600">{fmtDate(inv.issue_date)}</td>
+                                <td className="p-3 text-right font-semibold text-slate-900">{formatMoney(inv.total)}</td>
+                                <td className="p-3">{statusPill(inv.status)}</td>
+                                <td className="p-3 text-right">
+                                  <Button variant="ghost" size="icon" asChild className="h-8 w-8 text-slate-400">
+                                    <Link to={`/admin/billing/invoices/${inv.id}`}>
+                                      <Eye className="w-4 h-4" />
+                                    </Link>
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Card>
+                </div>
               </TabsContent>
             </Tabs>
           </div>

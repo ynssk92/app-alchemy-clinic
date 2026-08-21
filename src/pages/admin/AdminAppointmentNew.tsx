@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
   Calendar, 
   Clock, 
@@ -27,11 +27,13 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 
 const AdminAppointmentNew = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const initialPatientId = searchParams.get("patientId") || "";
   const [doctors, setDoctors] = useState<{ id: string; full_name: string }[]>([]);
   const [patients, setPatients] = useState<{ id: string; full_name: string | null }[]>([]);
   const [services, setServices] = useState<any[]>([]);
   const [form, setForm] = useState({
-    patient_id: "", doctor_id: "", appointment_date: "", appointment_time: "", reason: "", service_id: ""
+    patient_id: initialPatientId, doctor_id: "", appointment_date: "", appointment_time: "", reason: "", service_id: ""
   });
   const [saving, setSaving] = useState(false);
   const [serviceSearchOpen, setServiceSearchOpen] = useState(false);
