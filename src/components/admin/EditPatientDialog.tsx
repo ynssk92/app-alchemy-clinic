@@ -103,6 +103,9 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           .update({
             full_name: form.full_name.trim() || null,
             phone: form.phone.trim() || null,
+            nationality: form.nationality.trim() || null,
+            identity_document_type: form.identity_document_type || null,
+            identity_document_number: form.identity_document_number.trim() || null,
           })
           .eq("id", profileId);
         if (pErr) throw pErr;
