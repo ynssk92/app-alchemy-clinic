@@ -15,7 +15,7 @@ import {
   Thermometer, Wind, Weight, Filter, MoreVertical, CalendarDays, Pencil,
   ShieldCheck, ShieldAlert, MapPin, UserCheck, Save, X, Loader2,
   Receipt, Eye, FileText, Plus, AlertCircle, Pill, StethoscopeIcon, HistoryIcon, ShieldPlus,
-  FolderOpen, ScrollText
+  FolderOpen, ScrollText, Info
 } from "lucide-react";
 import { AddAllergyDialog, AddMedicationDialog } from "@/components/admin/AddMedicalRecordDialogs";
 import MedicalArchive from "@/components/admin/MedicalArchive";
