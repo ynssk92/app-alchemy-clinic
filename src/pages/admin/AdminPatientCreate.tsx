@@ -30,6 +30,9 @@ const schema = z.object({
   state: z.string().max(80).optional().or(z.literal("")),
   city: z.string().max(80).optional().or(z.literal("")),
   pincode: z.string().max(20).optional().or(z.literal("")),
+  patient_type: z.string().optional().or(z.literal("")),
+  insurance_name: z.string().optional().or(z.literal("")),
+  allergies: z.string().optional().or(z.literal("")),
 });
 
 const empty = {
