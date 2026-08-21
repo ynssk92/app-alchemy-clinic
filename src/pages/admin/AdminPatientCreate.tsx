@@ -418,7 +418,8 @@ const AdminPatientCreate = () => {
                     className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
-            </section>
+              </section>
+
 
             {/* 4. INSURANCE & MEDICAL */}
             <section className="space-y-6">
