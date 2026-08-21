@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import {
   Calendar, Clock, Award, TrendingUp, LogOut, Activity, Stethoscope,
-  HeartPulse, CircleDot, Search, User, Plus, ChevronRight, Flame,
+  HeartPulse, CircleDot, Search, User, Plus, ChevronRight, Flame, ArrowUpRight, ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
@@ -33,10 +32,10 @@ const initials = (name?: string | null) =>
 
 const statusTone = (status: string) =>
   status === "upcoming"
-    ? "bg-primary/12 text-primary"
+    ? "bg-primary/10 text-primary ring-1 ring-primary/20"
     : status === "cancelled"
-    ? "bg-negative/12 text-negative"
-    : "bg-positive/12 text-positive";
+    ? "bg-negative/10 text-negative ring-1 ring-negative/20"
+    : "bg-positive/10 text-positive ring-1 ring-positive/20";
 
 const PatientDashboard = () => {
   const { user, isAdmin, signOut } = useAuth();
@@ -98,68 +97,87 @@ const PatientDashboard = () => {
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-muted/30">
+    <div className="relative flex min-h-screen w-full flex-1 flex-col overflow-x-hidden bg-background">
       <Seo
         title="Your Dashboard — HealthBook"
         description="Track your health score, upcoming appointments, and achievements in your HealthBook dashboard."
         path="/patient-dashboard"
       />
 
-      {/* Sticky top bar */}
-      <nav className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-xl">
-        <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-2.5">
+      {/* Ambient background */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-[420px] opacity-[0.55]"
+        style={{
+          background:
+            "radial-gradient(60% 100% at 15% 0%, hsl(var(--primary) / 0.16), transparent 70%), radial-gradient(50% 100% at 85% 0%, hsl(var(--stat-cyan) / 0.14), transparent 70%)",
+        }}
+      />
+
+      {/* Top bar */}
+      <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+        <div className="container mx-auto flex items-center justify-between gap-3 px-4 py-3">
           <Link to="/" className="flex items-center gap-3">
             <img src={logo} alt="La Dune Clinique Dentaire" className="h-8" />
           </Link>
           <div className="flex items-center gap-1.5">
-            <Button asChild variant="ghost" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
+            <Button asChild variant="ghost" size="sm" className="hidden h-9 rounded-full px-4 text-xs font-semibold sm:inline-flex">
               <Link to="/doctors">Find Doctors</Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="hidden h-9 rounded-xl text-xs font-semibold sm:inline-flex">
+            <Button asChild variant="ghost" size="sm" className="hidden h-9 rounded-full px-4 text-xs font-semibold sm:inline-flex">
               <Link to="/profile">Profile</Link>
             </Button>
             {isAdmin && (
-              <Button asChild variant="secondary" size="sm" className="h-9 rounded-xl text-xs font-semibold">
+              <Button asChild variant="secondary" size="sm" className="h-9 rounded-full px-4 text-xs font-semibold">
                 <Link to="/admin">Admin Panel</Link>
               </Button>
             )}
-            <Button variant="outline" size="sm" className="h-9 rounded-xl text-xs font-semibold" onClick={signOut}>
+            <Button variant="outline" size="sm" className="h-9 rounded-full px-4 text-xs font-semibold" onClick={signOut}>
               <LogOut className="mr-1.5 h-3.5 w-3.5" />Sign Out
             </Button>
           </div>
         </div>
       </nav>
 
-      <main className="container mx-auto space-y-4 px-4 py-5">
-        {/* Header */}
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <Avatar className="h-11 w-11 shrink-0 rounded-2xl">
-              {avatarUrl && <AvatarImage src={avatarUrl} alt={profileName || "Profile photo"} className="object-cover" />}
-              <AvatarFallback className="rounded-2xl bg-gradient-primary text-sm font-bold text-primary-foreground">
-                {initials(profileName)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <h1 className="truncate text-xl font-bold tracking-tight text-foreground md:text-2xl">
-                {greeting}, {profileName?.split(" ")[0] || "there"} 👋
-              </h1>
-              <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
-                <span>{format(new Date(), "EEEE, MMMM d")}</span>
-                <span className="hidden h-1 w-1 rounded-full bg-border sm:block" />
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-positive/12 px-2 py-0.5 font-semibold text-positive">
-                  <CircleDot className="h-3 w-3" /> Clinic Open
-                </span>
+      <main className="container relative mx-auto space-y-5 px-4 py-6">
+        {/* Hero header */}
+        <header className="overflow-hidden rounded-[28px] border border-border/70 bg-card/80 p-6 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] backdrop-blur-sm md:p-7">
+          <div className="flex flex-wrap items-center justify-between gap-5">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="relative shrink-0">
+                <span className="absolute -inset-1 rounded-[22px] bg-gradient-primary opacity-25 blur-md" />
+                <Avatar className="relative h-14 w-14 rounded-[18px] ring-2 ring-card">
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt={profileName || "Profile photo"} className="object-cover" />}
+                  <AvatarFallback className="rounded-[18px] bg-gradient-primary text-base font-bold text-primary-foreground">
+                    {initials(profileName)}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+              <div className="min-w-0">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {format(new Date(), "EEEE, MMMM d")}
+                </p>
+                <h1 className="mt-1 truncate text-2xl font-bold tracking-tight text-foreground md:text-[28px]">
+                  {greeting}, {profileName?.split(" ")[0] || "there"}
+                </h1>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-positive/10 px-2.5 py-1 text-[11px] font-semibold text-positive ring-1 ring-positive/20">
+                    <CircleDot className="h-3 w-3" /> Clinic Open
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+                    <ShieldCheck className="h-3 w-3" /> Verified patient
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button asChild variant="outline" size="sm" className="h-9 rounded-xl text-xs font-semibold">
-              <Link to="/profile"><User className="mr-1.5 h-3.5 w-3.5" />Edit Profile</Link>
-            </Button>
-            <Button asChild size="sm" className="h-9 rounded-xl bg-gradient-primary text-xs font-semibold">
-              <Link to="/doctors"><Plus className="mr-1.5 h-3.5 w-3.5" />Book Appointment</Link>
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button asChild variant="outline" size="sm" className="h-10 rounded-full px-4 text-xs font-semibold">
+                <Link to="/profile"><User className="mr-1.5 h-3.5 w-3.5" />Edit Profile</Link>
+              </Button>
+              <Button asChild size="sm" className="h-10 rounded-full bg-gradient-primary px-5 text-xs font-semibold shadow-medium transition-transform hover:-translate-y-0.5">
+                <Link to="/doctors"><Plus className="mr-1.5 h-3.5 w-3.5" />Book Appointment</Link>
+              </Button>
+            </div>
           </div>
         </header>
 
@@ -169,26 +187,37 @@ const PatientDashboard = () => {
           {stats.map((s) => (
             <article
               key={s.label}
-              className="group flex min-h-[130px] flex-col justify-between rounded-[20px] border border-border bg-card p-4 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-medium"
+              className="group relative flex min-h-[142px] flex-col justify-between overflow-hidden rounded-[22px] border border-border/70 bg-card p-4 shadow-[0_1px_2px_hsl(var(--foreground)/0.04)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-large"
             >
-              <div className="flex items-start justify-between gap-2">
+              <span
+                aria-hidden
+                className="absolute -right-8 -top-10 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-300 group-hover:opacity-100"
+                style={{ background: `hsl(var(--${s.tint}) / 0.35)` }}
+              />
+              <div className="relative flex items-start justify-between gap-2">
                 <span
-                  className="flex h-8 w-8 items-center justify-center rounded-xl"
-                  style={{ background: `hsl(var(--${s.tint}) / 0.12)`, color: `hsl(var(--${s.tint}))` }}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-inset"
+                  style={{
+                    background: `hsl(var(--${s.tint}) / 0.10)`,
+                    color: `hsl(var(--${s.tint}))`,
+                    boxShadow: `inset 0 0 0 1px hsl(var(--${s.tint}) / 0.18)`,
+                  }}
                 >
                   <s.icon className="h-4 w-4" />
                 </span>
                 {s.badge && (
-                  <Badge className="border-0 bg-muted text-[10px] font-bold text-muted-foreground">{s.badge}</Badge>
+                  <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                    {s.badge}
+                  </span>
                 )}
               </div>
-              <div>
-                <div className="text-[26px] font-bold leading-none tracking-tight text-card-foreground">{s.value}</div>
-                <div className="mt-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              <div className="relative">
+                <div className="text-[30px] font-bold leading-none tracking-tight text-card-foreground">{s.value}</div>
+                <div className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                   {s.label}
                 </div>
                 <div className="text-[11px] text-muted-foreground">{s.sub}</div>
-                {s.progress !== undefined && <Progress value={s.progress} className="mt-2 h-1.5" />}
+                {s.progress !== undefined && <Progress value={s.progress} className="mt-2.5 h-1.5" />}
               </div>
             </article>
           ))}
@@ -198,7 +227,7 @@ const PatientDashboard = () => {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
           {/* Appointments list */}
           <WidgetCard
-            className="self-start lg:col-span-8"
+            className="self-start rounded-[22px] lg:col-span-8"
             title="Your Appointments"
             description={`${appointments.length} total · ${upcoming} upcoming`}
             icon={Calendar}
@@ -206,22 +235,27 @@ const PatientDashboard = () => {
             action={{ label: "Book new", to: "/doctors" }}
           >
             {appointments.length === 0 ? (
-              <div className="py-8 text-center">
+              <div className="py-10 text-center">
                 <p className="mb-3 text-sm text-muted-foreground">No appointments yet.</p>
-                <Button asChild size="sm" className="rounded-xl"><Link to="/doctors">Find a Doctor</Link></Button>
+                <Button asChild size="sm" className="rounded-full px-5"><Link to="/doctors">Find a Doctor</Link></Button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-2 xl:grid-cols-2">
+              <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2">
                 {appointments.map((a, i) => {
                   const tint = ["stat-blue", "stat-cyan", "stat-violet", "stat-green", "stat-amber", "stat-red"][i % 6];
                   return (
                     <div
                       key={a.id}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-card px-3 py-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-soft"
+                      className="group/appt relative flex items-center gap-3 overflow-hidden rounded-2xl border border-border/70 bg-card px-3.5 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-medium"
                     >
                       <span
-                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
-                        style={{ background: `hsl(var(--${tint}) / 0.14)`, color: `hsl(var(--${tint}))` }}
+                        aria-hidden
+                        className="absolute inset-y-0 left-0 w-[3px] opacity-70"
+                        style={{ background: `hsl(var(--${tint}))` }}
+                      />
+                      <span
+                        className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold"
+                        style={{ background: `hsl(var(--${tint}) / 0.12)`, color: `hsl(var(--${tint}))` }}
                       >
                         {initials(a.doctors?.full_name)}
                       </span>
@@ -230,14 +264,14 @@ const PatientDashboard = () => {
                           <span className="truncate text-[13px] font-semibold">
                             {a.doctors?.full_name || "Doctor"}
                           </span>
-                          <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase ${statusTone(a.status)}`}>
+                          <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide ${statusTone(a.status)}`}>
                             {a.status}
                           </span>
                         </div>
                         <div className="truncate text-[11px] text-muted-foreground">
                           {a.doctors?.specialties?.name || "General consultation"}
                         </div>
-                        <div className="mt-0.5 flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+                        <div className="mt-1 flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
                           <span className="inline-flex items-center gap-1">
                             <Calendar className="h-3 w-3" />{format(parseISO(a.appointment_date), "MMM d, yyyy")}
                           </span>
@@ -246,6 +280,7 @@ const PatientDashboard = () => {
                           </span>
                         </div>
                       </div>
+                      <ArrowUpRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover/appt:opacity-100" />
                     </div>
                   );
                 })}
@@ -255,26 +290,27 @@ const PatientDashboard = () => {
 
           {/* Right rail */}
           <div className="space-y-4 lg:col-span-4">
-            <WidgetCard title="Next Visit" description="Your closest appointment" icon={Clock} tint="stat-cyan">
+            <WidgetCard className="rounded-[22px]" title="Next Visit" description="Your closest appointment" icon={Clock} tint="stat-cyan">
               {!nextAppt ? (
                 <EmptyState label="No upcoming visit scheduled" />
               ) : (
-                <div className="rounded-xl bg-gradient-primary p-4 text-primary-foreground">
-                  <div className="text-[11px] font-semibold uppercase tracking-wide opacity-80">
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-primary p-5 text-primary-foreground shadow-medium">
+                  <span aria-hidden className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-primary-foreground/10 blur-xl" />
+                  <div className="relative text-[11px] font-semibold uppercase tracking-[0.16em] opacity-85">
                     {format(parseISO(nextAppt.appointment_date), "EEEE, MMM d")}
                   </div>
-                  <div className="mt-1 text-2xl font-bold leading-none">
+                  <div className="relative mt-1.5 text-[34px] font-bold leading-none tracking-tight">
                     {(nextAppt.appointment_time || "").slice(0, 5)}
                   </div>
-                  <div className="mt-2 text-[13px] font-semibold">{nextAppt.doctors?.full_name || "Doctor"}</div>
-                  <div className="text-[11px] opacity-80">
+                  <div className="relative mt-3 text-[13px] font-semibold">{nextAppt.doctors?.full_name || "Doctor"}</div>
+                  <div className="relative text-[11px] opacity-85">
                     {nextAppt.doctors?.specialties?.name || "General consultation"}
                   </div>
                 </div>
               )}
             </WidgetCard>
 
-            <WidgetCard title="Today's Schedule" description="Visits happening today" icon={Activity} tint="stat-violet">
+            <WidgetCard className="rounded-[22px]" title="Today's Schedule" description="Visits happening today" icon={Activity} tint="stat-violet">
               {todays.length === 0 ? (
                 <EmptyState label="Nothing scheduled today" />
               ) : (
@@ -298,16 +334,16 @@ const PatientDashboard = () => {
               )}
             </WidgetCard>
 
-            <WidgetCard title="Quick Actions" description="Get things done faster" icon={TrendingUp} tint="stat-amber">
-              <div className="grid grid-cols-2 gap-2">
+            <WidgetCard className="rounded-[22px]" title="Quick Actions" description="Get things done faster" icon={TrendingUp} tint="stat-amber">
+              <div className="grid grid-cols-2 gap-2.5">
                 {quickActions.map((q) => (
                   <Link
                     key={q.label}
                     to={q.to}
-                    className="flex flex-col items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card hover:shadow-soft"
+                    className="flex flex-col items-start gap-2.5 rounded-2xl border border-border/70 bg-muted/25 p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-card hover:shadow-medium"
                   >
                     <span
-                      className="flex h-8 w-8 items-center justify-center rounded-lg"
+                      className="flex h-9 w-9 items-center justify-center rounded-xl"
                       style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
                     >
                       <q.icon className="h-4 w-4" />
@@ -318,16 +354,16 @@ const PatientDashboard = () => {
               </div>
             </WidgetCard>
 
-            <WidgetCard title="Achievements" description="Keep your streak alive" icon={Award} tint="stat-green">
-              <ul className="space-y-2">
+            <WidgetCard className="rounded-[22px]" title="Achievements" description="Keep your streak alive" icon={Award} tint="stat-green">
+              <ul className="space-y-1.5">
                 {[
                   { icon: Flame, label: "Consistency streak", meta: "3 visits in a row", tint: "stat-amber" },
                   { icon: HeartPulse, label: "Healthy smile", meta: "Checkup completed", tint: "stat-green" },
                   { icon: Award, label: "Level 2 patient", meta: "7 of 10 badges", tint: "stat-violet" },
                 ].map((b) => (
-                  <li key={b.label} className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 transition-colors hover:bg-muted/60">
+                  <li key={b.label} className="flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60">
                     <span
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
                       style={{ background: `hsl(var(--${b.tint}) / 0.12)`, color: `hsl(var(--${b.tint}))` }}
                     >
                       <b.icon className="h-4 w-4" />
