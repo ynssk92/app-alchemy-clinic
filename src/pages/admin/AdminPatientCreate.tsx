@@ -115,7 +115,7 @@ const AdminPatientCreate = () => {
       </div>
 
       <form onSubmit={submit} className="space-y-6">
-        <Card className="border-none shadow-xl shadow-slate-200/50 overflow-hidden bg-white/80 backdrop-blur-sm">
+        <Card className="border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden bg-white">
           {/* Form Header / Image */}
           <div className="bg-slate-50/50 p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center gap-8">
             <div className="relative group mx-auto md:mx-0">
@@ -145,10 +145,11 @@ const AdminPatientCreate = () => {
           <div className="p-8 space-y-12">
             {/* 1. PATIENT IDENTITY */}
             <section className="space-y-6">
-              <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
-                <div className="h-2 w-2 rounded-full bg-primary" />
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">1. Patient Identity</h3>
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">01</span>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Patient Identity</h3>
               </div>
+              <div className="h-px bg-slate-100 w-full" />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="space-y-2">
@@ -156,7 +157,7 @@ const AdminPatientCreate = () => {
                   <Input 
                     value={form.first_name} 
                     onChange={(e) => set("first_name")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -164,7 +165,7 @@ const AdminPatientCreate = () => {
                   <Input 
                     value={form.last_name} 
                     onChange={(e) => set("last_name")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
 
@@ -174,7 +175,7 @@ const AdminPatientCreate = () => {
                     value={form.phone} 
                     onChange={(e) => set("phone")(e.target.value)} 
                     placeholder="+212 ..."
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -183,7 +184,7 @@ const AdminPatientCreate = () => {
                     type="email" 
                     value={form.email} 
                     onChange={(e) => set("email")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
 
@@ -193,7 +194,7 @@ const AdminPatientCreate = () => {
                     value={form.nationality} 
                     onChange={(e) => set("nationality")(e.target.value)}
                     placeholder="e.g. Moroccan"
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
 
@@ -201,7 +202,7 @@ const AdminPatientCreate = () => {
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Type</Label>
                     <Select value={form.identity_document_type} onValueChange={set("identity_document_type")}>
-                      <SelectTrigger className="h-11 bg-white border-slate-200 shadow-sm">
+                      <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
@@ -216,7 +217,7 @@ const AdminPatientCreate = () => {
                     <Input 
                       value={form.identity_document_number} 
                       onChange={(e) => set("identity_document_number")(e.target.value)}
-                      className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                     />
                   </div>
                 </div>
@@ -225,16 +226,17 @@ const AdminPatientCreate = () => {
 
             {/* 2. PERSONAL INFORMATION */}
             <section className="space-y-6">
-              <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
-                <div className="h-2 w-2 rounded-full bg-primary" />
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">2. Personal Information</h3>
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">02</span>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Personal Information</h3>
               </div>
+              <div className="h-px bg-slate-100 w-full" />
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Primary Doctor <Req /></Label>
                   <Select value={form.primary_doctor_id} onValueChange={set("primary_doctor_id")}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 shadow-sm">
+                    <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
                       <SelectValue placeholder="Select Doctor" />
                     </SelectTrigger>
                     <SelectContent>
@@ -250,14 +252,14 @@ const AdminPatientCreate = () => {
                     type="date" 
                     value={form.dob} 
                     onChange={(e) => set("dob")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Gender <Req /></Label>
                   <Select value={form.gender} onValueChange={set("gender")}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 shadow-sm">
+                    <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -270,7 +272,7 @@ const AdminPatientCreate = () => {
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Blood Group <Req /></Label>
                   <Select value={form.blood_group} onValueChange={set("blood_group")}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 shadow-sm">
+                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -284,7 +286,7 @@ const AdminPatientCreate = () => {
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Account Status <Req /></Label>
                   <Select value={form.status} onValueChange={set("status")}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200 shadow-sm">
+                    <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -298,10 +300,11 @@ const AdminPatientCreate = () => {
 
             {/* 3. ADDRESS */}
             <section className="space-y-6">
-              <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
-                <div className="h-2 w-2 rounded-full bg-primary" />
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">3. Address Information</h3>
+              <div className="flex items-center gap-4">
+                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">03</span>
+                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Address Information</h3>
               </div>
+              <div className="h-px bg-slate-100 w-full" />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div className="md:col-span-2 space-y-2">
@@ -309,7 +312,7 @@ const AdminPatientCreate = () => {
                   <Input 
                     value={form.address_1} 
                     onChange={(e) => set("address_1")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
@@ -317,7 +320,7 @@ const AdminPatientCreate = () => {
                   <Input 
                     value={form.address_2} 
                     onChange={(e) => set("address_2")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
 
@@ -327,7 +330,7 @@ const AdminPatientCreate = () => {
                     value={form.country} 
                     onChange={(e) => set("country")(e.target.value)} 
                     placeholder="Select"
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -336,7 +339,7 @@ const AdminPatientCreate = () => {
                     value={form.state} 
                     onChange={(e) => set("state")(e.target.value)} 
                     placeholder="Select"
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
 
@@ -346,7 +349,7 @@ const AdminPatientCreate = () => {
                     value={form.city} 
                     onChange={(e) => set("city")(e.target.value)} 
                     placeholder="Select"
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
                 <div className="space-y-2">
@@ -354,7 +357,7 @@ const AdminPatientCreate = () => {
                   <Input 
                     value={form.pincode} 
                     onChange={(e) => set("pincode")(e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all shadow-sm"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>
               </div>
@@ -373,7 +376,7 @@ const AdminPatientCreate = () => {
             <Button 
               type="submit" 
               disabled={busy} 
-              className="h-12 px-8 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all active:scale-95 flex items-center gap-2"
+              className="h-12 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all active:scale-95 flex items-center gap-2"
             >
               {busy ? (
                 <>Saving Record...</>

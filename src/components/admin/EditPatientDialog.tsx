@@ -159,28 +159,31 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none bg-slate-50/50 backdrop-blur-xl">
-        <div className="bg-white px-8 py-6 border-b sticky top-0 z-10 flex items-center justify-between">
+      <DialogContent className="max-w-2xl max-h-[92vh] overflow-y-auto p-0 border border-slate-100 shadow-2xl rounded-2xl bg-white">
+        <div className="bg-white px-8 py-6 border-b border-slate-100 flex items-center justify-between">
           <DialogHeader className="space-y-1">
-            <DialogTitle className="text-2xl font-bold text-slate-900 tracking-tight">
-              {form.full_name || "Patient Profile"}
-            </DialogTitle>
-            <p className="text-sm text-slate-500 font-medium uppercase tracking-wider">
-              {isRegistered ? "Registered Patient File" : "Guest Intake Record"}
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-indigo-50 text-indigo-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              </div>
+              <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight">
+                {isRegistered ? "Registered Patient File" : "Guest Intake Record"}
+              </DialogTitle>
+            </div>
+            <p className="text-sm text-slate-500 font-medium pl-12">
+              Update {form.full_name || "patient"} information
             </p>
           </DialogHeader>
-          <div className="h-12 w-12 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
-            <span className="text-primary font-bold">{form.full_name ? form.full_name.substring(0, 1) : "P"}</span>
-          </div>
         </div>
 
         <div className="p-8 space-y-10">
           {/* 1. PATIENT IDENTITY */}
           <section className="space-y-6">
-            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
-              <div className="h-2 w-2 rounded-full bg-primary" />
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">1. Patient Identity</h3>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">01</span>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Patient Identity</h3>
             </div>
+            <div className="h-px bg-slate-100 w-full" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               {isRegistered ? (
@@ -189,7 +192,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                   <Input 
                     value={form.full_name} 
                     onChange={(e) => set("full_name", e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                   />
                 </div>
               ) : (
@@ -199,7 +202,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                     <Input 
                       value={form.first_name} 
                       onChange={(e) => set("first_name", e.target.value)}
-                      className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                     />
                   </div>
                   <div className="space-y-2">
@@ -207,7 +210,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                     <Input 
                       value={form.last_name} 
                       onChange={(e) => set("last_name", e.target.value)}
-                      className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                      className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                     />
                   </div>
                 </>
@@ -220,7 +223,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                   value={form.email} 
                   onChange={(e) => set("email", e.target.value)} 
                   disabled={isRegistered}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all disabled:opacity-70 disabled:bg-slate-50"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all disabled:opacity-70 disabled:bg-slate-50"
                 />
               </div>
 
@@ -229,7 +232,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                 <Input 
                   value={form.phone} 
                   onChange={(e) => set("phone", e.target.value)}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                   placeholder="+212 ..."
                 />
               </div>
@@ -239,7 +242,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                 <Input 
                   value={form.nationality} 
                   onChange={(e) => set("nationality", e.target.value)}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                   placeholder="e.g. Moroccan"
                 />
               </div>
@@ -248,7 +251,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Doc Type</Label>
                   <Select value={form.identity_document_type} onValueChange={(v) => set("identity_document_type", v)}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200">
+                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
                       <SelectValue placeholder="Select" />
                     </SelectTrigger>
                     <SelectContent>
@@ -263,7 +266,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                   <Input 
                     value={form.identity_document_number} 
                     onChange={(e) => set("identity_document_number", e.target.value)}
-                    className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                   />
                 </div>
               </div>
@@ -272,10 +275,11 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
           {/* 2. PERSONAL INFORMATION */}
           <section className="space-y-6">
-            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
-              <div className="h-2 w-2 rounded-full bg-primary" />
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">2. Personal Information</h3>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">02</span>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Personal Information</h3>
             </div>
+            <div className="h-px bg-slate-100 w-full" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div className="space-y-2">
@@ -284,14 +288,14 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                   type="date" 
                   value={form.dob} 
                   onChange={(e) => set("dob", e.target.value)}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label className="text-xs font-semibold text-slate-500 uppercase">Gender</Label>
                 <Select value={form.gender} onValueChange={(v) => set("gender", v)}>
-                  <SelectTrigger className="h-11 bg-white border-slate-200">
+                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -305,7 +309,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
               <div className="space-y-2">
                 <Label className="text-xs font-semibold text-slate-500 uppercase">Blood Group</Label>
                 <Select value={form.blood_group} onValueChange={(v) => set("blood_group", v)}>
-                  <SelectTrigger className="h-11 bg-white border-slate-200">
+                  <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:ring-indigo-500/5 transition-all">
                     <SelectValue placeholder="Select" />
                   </SelectTrigger>
                   <SelectContent>
@@ -320,10 +324,11 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
           {/* 3. ADDRESS */}
           <section className="space-y-6">
-            <div className="flex items-center gap-3 pb-2 border-b border-slate-100">
-              <div className="h-2 w-2 rounded-full bg-primary" />
-              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">3. Address</h3>
+            <div className="flex items-center gap-4">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-900 text-white text-[10px] font-bold">03</span>
+              <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Address</h3>
             </div>
+            <div className="h-px bg-slate-100 w-full" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div className="md:col-span-2 space-y-2">
@@ -331,7 +336,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                 <Input 
                   value={form.address_1} 
                   onChange={(e) => set("address_1", e.target.value)}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                   placeholder="Street name, building number..."
                 />
               </div>
@@ -341,7 +346,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                 <Input 
                   value={form.city} 
                   onChange={(e) => set("city", e.target.value)}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                 />
               </div>
 
@@ -350,14 +355,14 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                 <Input 
                   value={form.country} 
                   onChange={(e) => set("country", e.target.value)}
-                  className="h-11 bg-white border-slate-200 focus:border-primary focus:ring-primary/5 transition-all"
+                  className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all"
                 />
               </div>
             </div>
           </section>
         </div>
 
-        <DialogFooter className="bg-white border-t p-6 sticky bottom-0 z-10 sm:justify-end gap-3">
+        <DialogFooter className="bg-slate-50/50 border-t border-slate-100 p-6 sm:justify-end gap-3 rounded-b-2xl">
           <Button 
             variant="ghost" 
             onClick={() => onOpenChange(false)}
@@ -368,7 +373,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           <Button 
             onClick={onSubmit} 
             disabled={saving} 
-            className="h-11 px-8 bg-primary hover:bg-primary/90 text-white font-bold shadow-lg shadow-primary/20 transition-all active:scale-95"
+            className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-semibold shadow-sm transition-all active:scale-95"
           >
             {saving ? "Updating Patient..." : "Save Changes"}
           </Button>
