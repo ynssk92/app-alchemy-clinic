@@ -289,6 +289,9 @@ const AdminPatientDetails = () => {
           intakeRow?.email && !intakeRow.email.endsWith("@placeholder.local")
             ? intakeRow.email
             : null,
+        nationality: profileRow?.nationality || intakeRow?.nationality || null,
+        identity_document_type: profileRow?.identity_document_type || intakeRow?.identity_document_type || null,
+        identity_document_number: profileRow?.identity_document_number || intakeRow?.identity_document_number || null,
         dob: intakeRow?.dob || null,
         gender: intakeRow?.gender || null,
         blood_group: intakeRow?.blood_group || null,
