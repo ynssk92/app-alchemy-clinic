@@ -182,14 +182,36 @@ export const AdminReports = () => {
     }));
   }, [filteredData.appointments]);
 
+  const revenueByDoctor = useMemo(() => {
+    const revenue: Record<string, number> = {};
+    filteredData.invoices.forEach(inv => {
+      const name = inv.doctors?.full_name || "Clinique";
+      revenue[name] = (revenue[name] || 0) + (inv.total || 0);
+    });
+    return Object.entries(revenue).map(([name, value]) => ({ name, value }));
+  }, [filteredData.invoices]);
+
+  const docsByCategory = useMemo(() => {
+    const counts: Record<string, number> = {};
+    filteredData.documents.forEach(doc => {
+      const cat = doc.category || "Autre";
+      counts[cat] = (counts[cat] || 0) + 1;
+    });
+    return Object.entries(counts).map(([name, value]) => ({ name, value }));
+  }, [filteredData.documents]);
+
   const doctorActivity = useMemo(() => {
     return data.doctors.map(d => {
       const docAppts = filteredData.appointments.filter(a => a.doctor_id === d.id);
+      const docInvs = filteredData.invoices.filter(i => i.doctor_id === d.id);
+      const revenue = docInvs.reduce((sum, inv) => sum + (inv.total || 0), 0);
+      
       return {
         name: d.full_name,
         appointments: docAppts.length,
         completed: docAppts.filter(a => a.status === "completed").length,
-        prescriptions: filteredData.prescriptions.filter(p => p.doctor_id === d.id).length
+        prescriptions: filteredData.prescriptions.filter(p => p.doctor_id === d.id).length,
+        revenue
       };
     }).sort((a, b) => b.appointments - a.appointments);
   }, [data.doctors, filteredData]);
