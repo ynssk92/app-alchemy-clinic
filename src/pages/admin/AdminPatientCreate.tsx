@@ -118,7 +118,7 @@ const AdminPatientCreate = () => {
         identity_document_number: parsed.data.identity_document_number || null,
         primary_doctor_id: parsed.data.primary_doctor_id || null,
         created_by: userRes.user?.id || null,
-        // Map new fields from form state (since they are not in zod schema yet)
+        // Map new fields from form state
         patient_type: form.patient_type,
         languages: form.languages,
         profession: form.profession.trim() || null,
