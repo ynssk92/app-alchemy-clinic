@@ -52,11 +52,15 @@ export const AdminReports = () => {
     appointments: any[];
     prescriptions: any[];
     doctors: any[];
+    invoices: any[];
+    documents: any[];
   }>({
     patients: [],
     appointments: [],
     prescriptions: [],
-    doctors: []
+    doctors: [],
+    invoices: [],
+    documents: []
   });
 
   const loadData = async () => {
