@@ -170,12 +170,12 @@ const AdminLandingPage = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 lg:w-[600px]">
+        <TabsList className="grid w-full grid-cols-5 lg:w-[750px]">
           <TabsTrigger value="hero">Hero Section</TabsTrigger>
           <TabsTrigger value="sections">Sections</TabsTrigger>
+          <TabsTrigger value="headers">Headers</TabsTrigger>
           <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
           <TabsTrigger value="seo">SEO & Metadata</TabsTrigger>
-          <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
         <TabsContent value="hero" className="mt-6 space-y-6">
