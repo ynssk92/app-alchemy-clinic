@@ -19,7 +19,7 @@ type Appt = {
   appointment_date: string;
   appointment_time: string;
   status: string;
-  doctors: { full_name: string; specialties: { name: string } | null } | null;
+  doctors: { full_name: string; avatar_url: string | null; specialties: { name: string } | null } | null;
 };
 
 const initials = (name?: string | null) =>
@@ -57,7 +57,7 @@ const PatientDashboard = () => {
       });
     supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, status, doctors(full_name, specialties(name))")
+      .select("id, appointment_date, appointment_time, status, doctors(full_name, avatar_url, specialties(name))")
       .order("appointment_date", { ascending: true })
       .then(({ data }) => setAppointments((data as any) || []));
   }, [user]);
@@ -253,12 +253,24 @@ const PatientDashboard = () => {
                         className="absolute inset-y-0 left-0 w-[3px] opacity-70"
                         style={{ background: `hsl(var(--${tint}))` }}
                       />
-                      <span
-                        className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold"
+                      <div 
+                        className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold overflow-hidden"
                         style={{ background: `hsl(var(--${tint}) / 0.12)`, color: `hsl(var(--${tint}))` }}
                       >
-                        {initials(a.doctors?.full_name)}
-                      </span>
+                        {a.doctors?.avatar_url ? (
+                          <img 
+                            src={a.doctors.avatar_url} 
+                            alt={a.doctors.full_name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.innerText = initials(a.doctors?.full_name);
+                            }}
+                          />
+                        ) : (
+                          initials(a.doctors?.full_name)
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
                           <span className="truncate text-[13px] font-semibold">
@@ -302,9 +314,28 @@ const PatientDashboard = () => {
                   <div className="relative mt-1.5 text-[34px] font-bold leading-none tracking-tight">
                     {(nextAppt.appointment_time || "").slice(0, 5)}
                   </div>
-                  <div className="relative mt-3 text-[13px] font-semibold">{nextAppt.doctors?.full_name || "Doctor"}</div>
-                  <div className="relative text-[11px] opacity-85">
-                    {nextAppt.doctors?.specialties?.name || "General consultation"}
+                  <div className="relative mt-3 flex items-center gap-3">
+                    <div className="h-8 w-8 shrink-0 rounded-full border border-white/20 overflow-hidden bg-white/10 flex items-center justify-center text-[10px] font-bold">
+                      {nextAppt.doctors?.avatar_url ? (
+                        <img 
+                          src={nextAppt.doctors.avatar_url} 
+                          alt={nextAppt.doctors.full_name} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).parentElement!.innerText = initials(nextAppt.doctors?.full_name);
+                          }}
+                        />
+                      ) : (
+                        initials(nextAppt.doctors?.full_name)
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-[13px] font-semibold leading-tight">{nextAppt.doctors?.full_name || "Doctor"}</div>
+                      <div className="text-[11px] opacity-85">
+                        {nextAppt.doctors?.specialties?.name || "General consultation"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -321,7 +352,21 @@ const PatientDashboard = () => {
                       <span className="absolute -left-[58px] top-0 w-[42px] text-right text-[11px] font-bold tabular-nums text-muted-foreground">
                         {(a.appointment_time || "").slice(0, 5)}
                       </span>
-                      <span className="absolute -left-[11px] top-1.5 h-2 w-2 rounded-full bg-primary ring-4 ring-card" />
+                      <div className="absolute -left-[20px] top-[2px] h-6 w-6 rounded-full border border-border bg-card overflow-hidden flex items-center justify-center text-[8px] font-bold">
+                        {a.doctors?.avatar_url ? (
+                          <img 
+                            src={a.doctors.avatar_url} 
+                            alt={a.doctors.full_name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.innerText = initials(a.doctors?.full_name);
+                            }}
+                          />
+                        ) : (
+                          initials(a.doctors?.full_name)
+                        )}
+                      </div>
                       <div className="min-w-0 rounded-lg px-2 py-1 transition-colors hover:bg-muted/60">
                         <div className="truncate text-[13px] font-semibold">{a.doctors?.full_name || "Doctor"}</div>
                         <div className="truncate text-[11px] text-muted-foreground">
