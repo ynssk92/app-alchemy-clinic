@@ -7,6 +7,10 @@ import { Database } from "@/integrations/supabase/types";
 
 type ProfileStatus = Database["public"]["Enums"]["profile_status"];
 
+// Bootstrap configuration for initial admins.
+// IMPORTANT: These emails will only be promoted if they don't already have roles assigned.
+const INITIAL_ADMIN_EMAILS = ["admin@example.com"]; // Replace with real admin emails
+
 const AuthCallback = () => {
   const navigate = useNavigate();
 
@@ -33,6 +37,19 @@ const AuthCallback = () => {
             .eq("user_id", user.id);
           
           const roleList = (roles || []).map(r => r.role);
+          
+          // Check for bootstrap promotion if no roles exist
+          if (roleList.length === 0 && INITIAL_ADMIN_EMAILS.includes(user.email || "")) {
+            const { error: promoError } = await supabase
+              .from("user_roles")
+              .insert({ user_id: user.id, role: "admin" });
+            
+            if (!promoError) {
+              roleList.push("admin");
+              console.log("Bootstrap: User promoted to admin via INITIAL_ADMIN_EMAILS");
+            }
+          }
+
           const isStaff = roleList.includes("admin") || roleList.includes("assistant") || roleList.includes("doctor");
 
           if (isStaff) {
