@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Before I approve, make these two changes:\n\nINITIAL_ADMIN_EMAILS must only be used for initial bootstrap. It must never automatically re-promote or modify an existing user's role on every login.\n\n Harden the SECURITY DEFINER is_admin() function by using a secure search_path and fully qualified table references, and ensure only the intended backend/RLS mechanism can execute it.\n\nKeep the entire migration non-destructive. Do not drop, truncate, delete, reset, recreate, or overwrite any existing tables, rows, users, appointments, patients, or backend functionality",
+  badge: "CLINIQUE LA DUNE DENTAIRE",
   heading: "Exceptional dental care.",
   highlight: "A confident smile.",
   description: "Advanced dental expertise, modern technology and personalized care, all in one place.",
