@@ -57,7 +57,7 @@ const PatientDashboard = () => {
       });
     supabase
       .from("appointments")
-      .select("id, appointment_date, appointment_time, status, doctors(full_name, specialties(name))")
+      .select("id, appointment_date, appointment_time, status, doctors(full_name, avatar_url, specialties(name))")
       .order("appointment_date", { ascending: true })
       .then(({ data }) => setAppointments((data as any) || []));
   }, [user]);
