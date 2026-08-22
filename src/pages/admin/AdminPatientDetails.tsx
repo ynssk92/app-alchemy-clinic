@@ -528,91 +528,102 @@ const AdminPatientDetails = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {patient && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="space-y-6 max-w-5xl mx-auto pb-10">
+            {/* Header Breadcrumb & Actions */}
+            <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-4">
-                <Avatar className="w-16 h-16 border-2 border-primary/20">
-                  <AvatarImage src={patient.avatar_path || ""} />
-                  <AvatarFallback className="bg-primary/5 text-primary text-xl">
+                <Button variant="ghost" size="sm" asChild className="hover:bg-slate-100 text-slate-500 rounded-xl px-2">
+                  <Link to="/admin/patients" className="flex items-center gap-2">
+                    <ArrowLeft className="w-4 h-4" />
+                    <span className="font-semibold text-sm">Patients</span>
+                  </Link>
+                </Button>
+                <div className="h-4 w-px bg-slate-200" />
+                <h2 className="text-sm font-bold text-slate-900 tracking-tight">{patient.full_name}</h2>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsEditing(true)}
+                className="rounded-xl border-slate-200 shadow-sm hover:bg-slate-50 font-semibold"
+              >
+                <Pencil className="w-4 h-4 mr-2 text-primary" />
+                Edit Profile
+              </Button>
+            </div>
+
+            {/* Profile Summary Card */}
+            <Card className="p-8 border-none shadow-sm bg-white rounded-[32px] overflow-hidden relative group">
+              <div className="absolute top-0 right-0 p-8">
+                <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-500 font-bold tracking-widest text-[10px] py-1 px-3 rounded-full uppercase">
+                  ID: {patient.profileId || patient.intakeId?.substring(0, 8)}
+                </Badge>
+              </div>
+              
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
+                <Avatar className="h-24 w-24 border-4 border-slate-50 shadow-xl rounded-[32px] group-hover:scale-105 transition-transform duration-500">
+                  <AvatarImage src={patient.avatar_path || ""} className="object-cover" />
+                  <AvatarFallback className="bg-primary/5 text-primary text-3xl font-black">
                     {patient.full_name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <div>
-                  <h1 className="text-2xl font-bold text-slate-900">{patient.full_name}</h1>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Badge variant="outline" className="text-[10px] uppercase font-bold tracking-wider">
-                      ID: {patient.profileId || patient.intakeId?.substring(0, 8)}
-                    </Badge>
+                
+                <div className="flex-1 space-y-2">
+                  <h1 className="text-4xl font-black text-slate-900 tracking-tight">{patient.full_name}</h1>
+                  <div className="flex flex-wrap items-center gap-4 text-slate-500 font-medium text-sm">
                     {patient.dob && (
-                      <span className="text-xs text-slate-500">
+                      <span className="flex items-center gap-2">
+                        <Cake className="w-4 h-4 text-slate-300" />
                         {new Date().getFullYear() - new Date(patient.dob).getFullYear()} years old
                       </span>
                     )}
+                    <span className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-slate-300" />
+                      {patient.phone || "No phone"}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-slate-300" />
+                      {patient.email || "No email"}
+                    </span>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                  <Pencil className="w-4 h-4 mr-2" />
-                  Edit Profile
-                </Button>
-                <Button 
-                  className="bg-gradient-primary" 
-                  size="sm"
-                  onClick={() => navigate(`/admin/appointments/new?patientId=${patient.profileId || id}`)}
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  New Appointment
-                </Button>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Card className="p-4 border-none shadow-sm bg-blue-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
-                    <Droplet className="w-5 h-5" />
+              {/* Vitals Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10 pt-8 border-t border-slate-50">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-blue-600 font-bold text-[10px] uppercase tracking-widest mb-1">
+                    <Droplet className="w-3.5 h-3.5" />
+                    Blood Group
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-blue-600/60 uppercase tracking-wider">Blood Group</p>
-                    <p className="text-lg font-bold text-blue-900">{patient.blood_group || "—"}</p>
-                  </div>
+                  <p className="text-2xl font-black text-slate-900">{patient.blood_group || "—"}</p>
                 </div>
-              </Card>
-              <Card className="p-4 border-none shadow-sm bg-rose-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-600">
-                    <AlertCircle className="w-5 h-5" />
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-rose-600 font-bold text-[10px] uppercase tracking-widest mb-1">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    Allergies
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-rose-600/60 uppercase tracking-wider">Allergies</p>
-                    <p className="text-lg font-bold text-rose-900">{patient.allergies ? "Yes" : "None"}</p>
-                  </div>
+                  <p className="text-2xl font-black text-slate-900">{patient.allergies ? "Detected" : "None"}</p>
                 </div>
-              </Card>
-              <Card className="p-4 border-none shadow-sm bg-amber-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-600">
-                    <Activity className="w-5 h-5" />
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-amber-600 font-bold text-[10px] uppercase tracking-widest mb-1">
+                    <Activity className="w-3.5 h-3.5" />
+                    Condition
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-amber-600/60 uppercase tracking-wider">Condition</p>
-                    <p className="text-lg font-bold text-amber-900">Stable</p>
-                  </div>
+                  <p className="text-2xl font-black text-slate-900">Stable</p>
                 </div>
-              </Card>
-              <Card className="p-4 border-none shadow-sm bg-emerald-50/50">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                    <ShieldCheck className="w-5 h-5" />
+                
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-[10px] uppercase tracking-widest mb-1">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    Insurance
                   </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-wider">Insurance</p>
-                    <p className="text-lg font-bold text-emerald-900 truncate">{patient.insurance_name || "—"}</p>
-                  </div>
+                  <p className="text-2xl font-black text-slate-900 truncate pr-2">{patient.insurance_name || "Self-Pay"}</p>
                 </div>
-              </Card>
-            </div>
+              </div>
+            </Card>
 
             <Tabs defaultValue="medical" className="w-full">
               <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
