@@ -19,7 +19,7 @@ type Appt = {
   appointment_date: string;
   appointment_time: string;
   status: string;
-  doctors: { full_name: string; specialties: { name: string } | null } | null;
+  doctors: { full_name: string; avatar_url: string | null; specialties: { name: string } | null } | null;
 };
 
 const initials = (name?: string | null) =>
