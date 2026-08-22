@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            remove",
+  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Remove any leftover prompt/instruction text from the hero badge and ensure it shows only \"LA DUNE CLINIQUE DENTAIRE\".",
   heading: "Exceptional dental care.",
   highlight: "A confident smile.",
   description: "Advanced dental expertise, modern technology and personalized care, all in one place.",
