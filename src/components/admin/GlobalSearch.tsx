@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { Search, User, Stethoscope, Calendar, Receipt, Settings, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 type SearchResult = {
@@ -35,6 +34,7 @@ export function GlobalSearch() {
     }, 300);
     return () => clearTimeout(timer);
   }, [query]);
+
   const [results, setResults] = useState<SearchGroups | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -53,57 +53,58 @@ export function GlobalSearch() {
 
   useEffect(() => {
     async function performSearch() {
-      if (!debouncedQuery || debouncedQuery.length < 2) {
+      if (!debouncedQuery || debouncedQuery.trim().length < 2) {
         setResults(null);
         setIsLoading(false);
         return;
       }
 
       setIsLoading(true);
-      
-      // Clean query and handle multi-word search
       const cleanQuery = debouncedQuery.trim();
       const searchTerm = `%${cleanQuery}%`;
       const words = cleanQuery.split(/\s+/).filter(w => w.length > 0);
-      
-      // For multi-word search, we want to match patients where name components match the words
-      // e.g. "Rabie Kenzi" matches if (first_name ilike %Rabie% AND last_name ilike %Kenzi%) OR (first_name ilike %Kenzi% AND last_name ilike %Rabie%)
-      let patientQuery = supabase.from('patients').select('id, first_name, last_name, phone, email, patient_number, national_id, nationality');
-      
-      if (words.length >= 2) {
-        const word1 = `%${words[0]}%`;
-        const word2 = `%${words[1]}%`;
-        patientQuery = patientQuery.or(`and(first_name.ilike.${word1},last_name.ilike.${word2}),and(first_name.ilike.${word2},last_name.ilike.${word1}),phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`);
-      } else {
-        patientQuery = patientQuery.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`);
-      }
 
       try {
+        // Multi-word patient search logic
+        let patientQuery = supabase
+          .from('patients')
+          .select('id, first_name, last_name, phone, email, patient_number, national_id, nationality, preferred_language');
+
+        if (words.length >= 2) {
+          const w1 = `%${words[0]}%`;
+          const w2 = `%${words[1]}%`;
+          patientQuery = patientQuery.or(`and(first_name.ilike.${w1},last_name.ilike.${w2}),and(first_name.ilike.${w2},last_name.ilike.${w1}),phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`);
+        } else {
+          patientQuery = patientQuery.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`);
+        }
+
         const [
           { data: patients },
+          { data: doctors },
+          { data: appointments },
+          { data: invoices },
+          { data: services }
+        ] = await Promise.all([
+          patientQuery.limit(5),
           
-          // Doctors Search
           supabase
             .from('doctors')
             .select('id, full_name, specialty:specialties(name)')
             .or(`full_name.ilike.${searchTerm}`)
             .limit(5),
 
-          // Appointments Search
           supabase
             .from('appointments')
             .select('id, reference, appointment_date, appointment_time, status, patient:patients(first_name, last_name)')
             .or(`reference.ilike.${searchTerm},status.ilike.${searchTerm}`)
             .limit(5),
 
-          // Invoices Search
           supabase
             .from('invoices')
             .select('id, invoice_number, status, patient:profiles(full_name)')
             .or(`invoice_number.ilike.${searchTerm},status.ilike.${searchTerm}`)
             .limit(5),
 
-          // Services Search
           supabase
             .from('services')
             .select('id, name, code, category:service_categories(name)')
@@ -116,7 +117,7 @@ export function GlobalSearch() {
             id: p.id,
             type: 'patient',
             title: `${p.first_name} ${p.last_name}`,
-            subtitle: p.phone || p.email || p.patient_number || '',
+            subtitle: p.phone || p.email || p.patient_number || p.national_id || '',
             link: `/admin/patients/details?id=${p.id}`
           })),
           doctors: (doctors || []).map(d => ({
@@ -131,14 +132,14 @@ export function GlobalSearch() {
             type: 'appointment',
             title: `${(a.patient as any)?.first_name} ${(a.patient as any)?.last_name}`,
             subtitle: `${a.appointment_date} · ${a.appointment_time} (${a.reference || a.status})`,
-            link: `/admin/appointments` // Could be improved if there's a specific details page
+            link: `/admin/appointments`
           })),
           invoices: (invoices || []).map(i => ({
             id: i.id,
             type: 'invoice',
             title: i.invoice_number,
             subtitle: `${(i.patient as any)?.full_name} (${i.status})`,
-            link: `/admin/billing/invoices` // Could be improved if there's a specific details page
+            link: `/admin/billing/invoices`
           })),
           services: (services || []).map(s => ({
             id: s.id,
@@ -213,7 +214,7 @@ export function GlobalSearch() {
         )}
       </div>
 
-      {isOpen && (query.length >= 2) && (
+      {isOpen && (query.trim().length >= 2) && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-popover border border-border rounded-xl shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {!isLoading && !hasResults ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
