@@ -372,7 +372,6 @@ const PatientDashboard = () => {
                         <div className="truncate text-[11px] text-muted-foreground">
                           {a.doctors?.specialties?.name || "Consultation"}
                         </div>
-                        </div>
                       </div>
                     </li>
                   ))}
