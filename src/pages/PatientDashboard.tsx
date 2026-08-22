@@ -352,11 +352,26 @@ const PatientDashboard = () => {
                       <span className="absolute -left-[58px] top-0 w-[42px] text-right text-[11px] font-bold tabular-nums text-muted-foreground">
                         {(a.appointment_time || "").slice(0, 5)}
                       </span>
-                      <span className="absolute -left-[11px] top-1.5 h-2 w-2 rounded-full bg-primary ring-4 ring-card" />
+                      <div className="absolute -left-[20px] top-[2px] h-6 w-6 rounded-full border border-border bg-card overflow-hidden flex items-center justify-center text-[8px] font-bold">
+                        {a.doctors?.avatar_url ? (
+                          <img 
+                            src={a.doctors.avatar_url} 
+                            alt={a.doctors.full_name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.innerText = initials(a.doctors?.full_name);
+                            }}
+                          />
+                        ) : (
+                          initials(a.doctors?.full_name)
+                        )}
+                      </div>
                       <div className="min-w-0 rounded-lg px-2 py-1 transition-colors hover:bg-muted/60">
                         <div className="truncate text-[13px] font-semibold">{a.doctors?.full_name || "Doctor"}</div>
                         <div className="truncate text-[11px] text-muted-foreground">
                           {a.doctors?.specialties?.name || "Consultation"}
+                        </div>
                         </div>
                       </div>
                     </li>
