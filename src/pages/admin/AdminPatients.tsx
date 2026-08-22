@@ -17,7 +17,10 @@ import {
   UserMinus,
   Calendar,
   Phone,
-  Mail
+  Mail,
+  ChevronRight,
+  Filter,
+  MoreVertical
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { 
@@ -26,6 +29,12 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -49,61 +58,70 @@ const AdminPatients = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "registered" | "not_registered">("all");
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const load = async () => {
-    // 1. Patient intake records
-    const { data: intake } = await supabase
-      .from("patient_intake")
-      .select("id, user_id, first_name, last_name, phone, email, created_at")
-      .order("created_at", { ascending: false });
+    setLoading(true);
+    try {
+      // 1. Patient intake records
+      const { data: intake } = await supabase
+        .from("patient_intake")
+        .select("id, user_id, first_name, last_name, phone, email, created_at")
+        .order("created_at", { ascending: false });
 
-    // 2. Registered patient profiles
-    const { data: profiles } = await supabase
-      .from("profiles")
-      .select("id, full_name, phone, created_at, avatar_url")
-      .order("created_at", { ascending: false });
+      // 2. Registered patient profiles
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name, phone, created_at, avatar_url")
+        .order("created_at", { ascending: false });
 
-    const { data: roles } = await supabase.from("user_roles").select("user_id, role");
-    const rmap = new Map<string, string[]>();
-    (roles || []).forEach((r: any) => {
-      rmap.set(r.user_id, [...(rmap.get(r.user_id) || []), r.role]);
-    });
+      const { data: roles } = await supabase.from("user_roles").select("user_id, role");
+      const rmap = new Map<string, string[]>();
+      (roles || []).forEach((r: any) => {
+        rmap.set(r.user_id, [...(rmap.get(r.user_id) || []), r.role]);
+      });
 
-    const intakeUserIds = new Set((intake || []).map((i: any) => i.user_id).filter(Boolean));
+      const intakeUserIds = new Set((intake || []).map((i: any) => i.user_id).filter(Boolean));
 
-    const intakeRows: Row[] = (intake || []).map((i: any) => ({
-      key: `intake:${i.id}`,
-      source: "intake",
-      intake_id: i.id,
-      profile_id: i.user_id || undefined,
-      full_name: [i.first_name, i.last_name].filter(Boolean).join(" ") || null,
-      phone: i.phone,
-      email: i.email,
-      created_at: i.created_at,
-    }));
-
-    const profileRows: Row[] = (profiles || [])
-      .filter((p: any) => {
-        const r = rmap.get(p.id) || [];
-        if (!r.includes("patient")) return false;
-        if (r.includes("admin") || r.includes("assistant") || r.includes("doctor")) return false;
-        if (intakeUserIds.has(p.id)) return false;
-        return true;
-      })
-      .map((p: any) => ({
-        key: `profile:${p.id}`,
-        source: "profile",
-        profile_id: p.id,
-        full_name: p.full_name,
-        phone: p.phone,
-        created_at: p.created_at,
-        avatar_url: p.avatar_url,
+      const intakeRows: Row[] = (intake || []).map((i: any) => ({
+        key: `intake:${i.id}`,
+        source: "intake",
+        intake_id: i.id,
+        profile_id: i.user_id || undefined,
+        full_name: [i.first_name, i.last_name].filter(Boolean).join(" ") || null,
+        phone: i.phone,
+        email: i.email,
+        created_at: i.created_at,
       }));
 
-    const all = [...intakeRows, ...profileRows].sort(
-      (a, b) => +new Date(b.created_at) - +new Date(a.created_at)
-    );
-    setRows(all);
+      const profileRows: Row[] = (profiles || [])
+        .filter((p: any) => {
+          const r = rmap.get(p.id) || [];
+          if (!r.includes("patient")) return false;
+          if (r.includes("admin") || r.includes("assistant") || r.includes("doctor")) return false;
+          if (intakeUserIds.has(p.id)) return false;
+          return true;
+        })
+        .map((p: any) => ({
+          key: `profile:${p.id}`,
+          source: "profile",
+          profile_id: p.id,
+          full_name: p.full_name,
+          phone: p.phone,
+          created_at: p.created_at,
+          avatar_url: p.avatar_url,
+        }));
+
+      const all = [...intakeRows, ...profileRows].sort(
+        (a, b) => +new Date(b.created_at) - +new Date(a.created_at)
+      );
+      setRows(all);
+    } catch (error) {
+      console.error("Error loading patients:", error);
+      toast.error("Failed to load patients");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -154,209 +172,281 @@ const AdminPatients = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500 max-w-[1600px] mx-auto pb-10">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 px-1">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground uppercase">Patients</h1>
-          <p className="text-muted-foreground mt-1 text-lg">
-            Manage and organize all patients registered in your clinic.
+          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 mb-2">Patients</h1>
+          <p className="text-slate-500 font-medium">
+            Manage your patient database and track registration status.
           </p>
         </div>
         <Button 
           asChild 
-          className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98] h-11 px-6 rounded-md"
+          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] active:scale-[0.98] h-12 px-8 rounded-2xl"
         >
-          <Link to="/admin/patients/create" className="flex items-center gap-2 font-medium">
+          <Link to="/admin/patients/create" className="flex items-center gap-2 font-semibold">
             <UserPlus className="w-5 h-5" />
             Add New Patient
           </Link>
         </Button>
       </div>
 
-      {/* Stats Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {[
-          { label: "Total Patients", value: counts.all, icon: Users, color: "text-primary" },
-          { label: "Registered", value: counts.registered, icon: UserCheck, color: "text-emerald-600" },
-          { label: "Not Registered", value: counts.not_registered, icon: UserMinus, color: "text-amber-600" },
+          { label: "Total Patients", value: counts.all, icon: Users, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Registered", value: counts.registered, icon: UserCheck, color: "text-emerald-600", bg: "bg-emerald-50" },
+          { label: "Pending Setup", value: counts.not_registered, icon: UserMinus, color: "text-amber-600", bg: "bg-amber-50" },
         ].map((stat, i) => (
-          <Card key={i} className="p-5 flex items-center justify-between border-border/50 shadow-sm bg-card/50 backdrop-blur-sm">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-              <p className="text-2xl font-bold mt-1">{stat.value}</p>
-            </div>
-            <div className={`p-2.5 rounded-lg bg-background border border-border/50 ${stat.color}`}>
-              <stat.icon className="w-5 h-5" />
+          <Card key={i} className="p-6 border-none shadow-sm bg-white hover:shadow-md transition-shadow duration-300 rounded-[24px]">
+            <div className="flex items-center gap-4">
+              <div className={`p-3.5 rounded-2xl ${stat.bg} ${stat.color}`}>
+                <stat.icon className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</p>
+                <p className="text-3xl font-black text-slate-900">{stat.value}</p>
+              </div>
             </div>
           </Card>
         ))}
       </div>
 
-      {/* Toolbar Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-1.5 bg-card/30 backdrop-blur-md rounded-xl border border-border/40">
-        <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="w-full md:w-auto">
-          <TabsList className="bg-transparent h-10 p-1 gap-1">
-            <TabsTrigger 
-              value="all" 
-              className="px-4 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
-            >
-              {t("patients.list.allPatients", { defaultValue: "All Patients" })}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="registered"
-              className="px-4 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
-            >
-              {t("patients.list.registered", { defaultValue: "Registered" })}
-            </TabsTrigger>
-            <TabsTrigger 
-              value="not_registered"
-              className="px-4 rounded-md data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all"
-            >
-              {t("patients.list.notRegistered", { defaultValue: "Not Registered" })}
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+      {/* Toolbar / Search Section */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 pt-4">
+        <div className="bg-white p-1 rounded-2xl shadow-sm border border-slate-100 w-full lg:w-auto overflow-x-auto">
+          <Tabs value={filter} onValueChange={(v) => setFilter(v as typeof filter)} className="w-full">
+            <TabsList className="bg-transparent h-11 p-0 gap-1 flex justify-start lg:justify-center">
+              {[
+                { value: "all", label: "All Patients" },
+                { value: "registered", label: "Registered" },
+                { value: "not_registered", label: "Pending" }
+              ].map((tab) => (
+                <TabsTrigger 
+                  key={tab.value}
+                  value={tab.value} 
+                  className="px-6 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md transition-all font-semibold text-slate-600"
+                >
+                  {tab.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
 
-        <div className="relative w-full md:w-80 group">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={t("patients.list.searchPlaceholder", { defaultValue: "Search patients..." })}
-            className="pl-10 h-10 border-border/60 bg-background/50 focus:bg-background transition-all rounded-lg"
-          />
+        <div className="flex items-center gap-3 w-full lg:w-auto">
+          <div className="relative flex-1 lg:w-96 group">
+            <Search className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name, phone or email..."
+              className="pl-12 h-12 border-slate-100 bg-white focus:ring-primary/20 focus:border-primary transition-all rounded-2xl shadow-sm text-base"
+            />
+          </div>
+          <Button variant="outline" className="h-12 w-12 rounded-2xl p-0 border-slate-100 bg-white text-slate-600 shadow-sm hover:bg-slate-50">
+            <Filter className="w-5 h-5" />
+          </Button>
         </div>
       </div>
 
-      {/* List Section */}
-      <div className="space-y-3">
-        {visibleRows.map((p) => (
-          <Card 
-            key={p.key} 
-            className="group p-4 flex flex-col sm:flex-row sm:items-center gap-4 border-border/40 bg-card hover:bg-muted/30 hover:border-border/80 transition-all duration-300 shadow-sm hover:shadow-md rounded-xl"
-          >
-            {/* Avatar & Basic Info */}
-            <div className="flex items-center gap-4 flex-1">
-              <Avatar className="h-12 w-12 border-2 border-border/50 shadow-sm group-hover:border-primary/20 transition-colors">
-                <AvatarImage src={p.avatar_url || ""} alt={p.full_name || "Patient"} />
-                <AvatarFallback className="bg-primary/5 text-primary font-bold text-sm">
-                  {getInitials(p.full_name)}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2 mb-1">
-                  <h3 className="font-semibold text-base text-foreground truncate max-w-[200px]">
-                    {p.full_name || "Unnamed Patient"}
-                  </h3>
-                  <Badge className="bg-primary/10 text-primary border-none text-[10px] uppercase font-bold tracking-wider hover:bg-primary/15">
-                    {t("nav.patients")}
-                  </Badge>
-                  {p.profile_id ? (
-                    <Badge className="bg-emerald-50 text-emerald-600 border-none text-[10px] uppercase font-bold tracking-wider hover:bg-emerald-100/50">
-                      {t("patients.list.registered", { defaultValue: "Registered" })}
-                    </Badge>
-                  ) : (
-                    <Badge className="bg-slate-100 text-slate-500 border-none text-[10px] uppercase font-bold tracking-wider hover:bg-slate-200/50">
-                      {t("patients.list.notRegistered", { defaultValue: "Not Registered" })}
-                    </Badge>
-                  )}
-                </div>
-                
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                  {p.phone && (
-                    <span className="flex items-center gap-1.5">
-                      <Phone className="w-3.5 h-3.5 opacity-60" />
-                      {p.phone}
-                    </span>
-                  )}
-                  {p.email && !p.phone && (
-                    <span className="flex items-center gap-1.5">
-                      <Mail className="w-3.5 h-3.5 opacity-60" />
-                      {p.email}
-                    </span>
-                  )}
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 opacity-60" />
-                    {new Date(p.created_at).toLocaleDateString()}
-                  </span>
+      {/* Patient List Content */}
+      <div className="space-y-4 pt-2">
+        {loading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i} className="p-6 border-none shadow-sm bg-white rounded-[24px] animate-pulse">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 bg-slate-100 rounded-2xl" />
+                <div className="space-y-2 flex-1">
+                  <div className="h-5 w-48 bg-slate-100 rounded-lg" />
+                  <div className="h-4 w-32 bg-slate-100 rounded-lg" />
                 </div>
               </div>
+            </Card>
+          ))
+        ) : visibleRows.length > 0 ? (
+          <div className="bg-white rounded-[32px] shadow-sm border border-slate-100 overflow-hidden">
+            {/* Desktop Table Header */}
+            <div className="hidden md:grid grid-cols-[1fr_200px_200px_150px_100px] gap-4 px-8 py-5 border-b border-slate-50 bg-slate-50/50 text-xs font-bold text-slate-400 uppercase tracking-widest">
+              <div>Patient</div>
+              <div>Contact</div>
+              <div>Added Date</div>
+              <div>Status</div>
+              <div className="text-right">Actions</div>
             </div>
 
-            {/* Actions */}
-            <div className="flex items-center gap-2 pt-3 sm:pt-0 sm:border-l sm:pl-4 border-border/50">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      asChild
-                      className="h-9 px-3 hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground"
-                    >
-                      <Link to={`/admin/patients/details/${p.profile_id || p.intake_id}`}>
-                        <Eye className="w-4 h-4 sm:mr-2" />
-                        <span className="hidden lg:inline text-xs font-medium">View</span>
-                      </Link>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>View patient details</TooltipContent>
-                </Tooltip>
+            <div className="divide-y divide-slate-50">
+              {visibleRows.map((p) => (
+                <div 
+                  key={p.key}
+                  className="group md:grid md:grid-cols-[1fr_200px_200px_150px_100px] gap-4 px-8 py-6 items-center hover:bg-slate-50/70 transition-all duration-300"
+                >
+                  {/* Patient Info */}
+                  <div className="flex items-center gap-5 min-w-0">
+                    <Avatar className="h-16 w-16 border-4 border-white shadow-md rounded-2xl group-hover:scale-105 transition-transform">
+                      <AvatarImage src={p.avatar_url || ""} alt={p.full_name || ""} className="object-cover" />
+                      <AvatarFallback className="bg-primary/5 text-primary font-black text-xl">
+                        {getInitials(p.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0">
+                      <h3 className="font-bold text-lg text-slate-900 truncate mb-1">
+                        {p.full_name || "Unnamed Patient"}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <Badge className="bg-slate-100 text-slate-500 border-none text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">
+                          ID: {p.profile_id?.substring(0, 8) || p.intake_id?.substring(0, 8)}
+                        </Badge>
+                      </div>
+                    </div>
+                  </div>
 
-                {p.profile_id && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
-                        onClick={() => setEditingId(p.profile_id!)}
-                        className="h-9 px-3 hover:bg-primary/10 hover:text-primary transition-colors text-muted-foreground"
-                      >
-                        <Pencil className="w-4 h-4 sm:mr-2" />
-                        <span className="hidden lg:inline text-xs font-medium">Edit</span>
+                  {/* Contact Info (Desktop Only) */}
+                  <div className="hidden md:flex flex-col gap-1 text-sm">
+                    {p.phone && (
+                      <span className="flex items-center gap-2 text-slate-600 font-medium">
+                        <Phone className="w-3.5 h-3.5 text-slate-400" />
+                        {p.phone}
+                      </span>
+                    )}
+                    {p.email && (
+                      <span className="flex items-center gap-2 text-slate-400 truncate">
+                        <Mail className="w-3.5 h-3.5" />
+                        {p.email}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Added Date (Desktop Only) */}
+                  <div className="hidden md:flex items-center gap-2 text-sm text-slate-500 font-medium">
+                    <Calendar className="w-4 h-4 text-slate-400" />
+                    {new Date(p.created_at).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </div>
+
+                  {/* Status */}
+                  <div className="hidden md:block">
+                    {p.profile_id ? (
+                      <Badge className="bg-emerald-50 text-emerald-600 border border-emerald-100/50 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                        Registered
+                      </Badge>
+                    ) : (
+                      <Badge className="bg-amber-50 text-amber-600 border border-amber-100/50 text-[10px] px-3 py-1 rounded-full font-bold uppercase tracking-wider">
+                        Pending
+                      </Badge>
+                    )}
+                  </div>
+
+                  {/* Actions (Desktop) */}
+                  <div className="hidden md:flex items-center justify-end gap-1">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            asChild
+                            className="h-10 w-10 rounded-xl hover:bg-primary/10 hover:text-primary text-slate-400"
+                          >
+                            <Link to={`/admin/patients/details/${p.profile_id || p.intake_id}`}>
+                              <Eye className="w-5 h-5" />
+                            </Link>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>View Record</TooltipContent>
+                      </Tooltip>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="icon" variant="ghost" className="h-10 w-10 rounded-xl hover:bg-slate-100 text-slate-400">
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 p-2 rounded-2xl border-slate-100 shadow-xl">
+                          {p.profile_id && (
+                            <DropdownMenuItem onClick={() => setEditingId(p.profile_id!)} className="rounded-xl p-3 cursor-pointer">
+                              <Pencil className="w-4 h-4 mr-3 text-slate-400" />
+                              <span className="font-semibold text-slate-700">Edit Profile</span>
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => remove(p)} className="rounded-xl p-3 cursor-pointer text-rose-600 focus:text-rose-600 focus:bg-rose-50">
+                            <Trash2 className="w-4 h-4 mr-3" />
+                            <span className="font-semibold">Delete Record</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TooltipProvider>
+                  </div>
+
+                  {/* Mobile Mobile View Layout */}
+                  <div className="md:hidden mt-6 space-y-4 pt-4 border-t border-slate-50">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Contact</span>
+                        <p className="text-sm font-medium text-slate-700">{p.phone || p.email || 'N/A'}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">Status</span>
+                        <div>
+                          {p.profile_id ? (
+                            <Badge className="bg-emerald-50 text-emerald-600 border-none text-[10px] font-bold uppercase">Registered</Badge>
+                          ) : (
+                            <Badge className="bg-amber-50 text-amber-600 border-none text-[10px] font-bold uppercase">Pending</Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-2">
+                      <Button asChild className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-900 border-none rounded-xl h-11">
+                        <Link to={`/admin/patients/details/${p.profile_id || p.intake_id}`}>
+                          <Eye className="w-4 h-4 mr-2" />
+                          View Record
+                        </Link>
                       </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Edit profile</TooltipContent>
-                  </Tooltip>
-                )}
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      onClick={() => remove(p)}
-                      className="h-9 px-3 hover:bg-destructive/10 hover:text-destructive transition-colors text-muted-foreground"
-                    >
-                      <Trash2 className="w-4 h-4 sm:mr-2" />
-                      <span className="hidden lg:inline text-xs font-medium">Delete</span>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Delete record</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="outline" className="h-11 w-11 rounded-xl border-slate-100 shadow-sm">
+                            <MoreVertical className="w-5 h-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-48 p-2 rounded-2xl border-slate-100">
+                          {p.profile_id && (
+                            <DropdownMenuItem onClick={() => setEditingId(p.profile_id!)} className="rounded-xl p-3">
+                              <Pencil className="w-4 h-4 mr-3" /> Edit
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => remove(p)} className="rounded-xl p-3 text-rose-600">
+                            <Trash2 className="w-4 h-4 mr-3" /> Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          </Card>
-        ))}
-
-        {visibleRows.length === 0 && (
-          <Card className="flex flex-col items-center justify-center py-20 bg-muted/20 border-dashed border-2 rounded-2xl">
-            <div className="p-4 rounded-full bg-primary/5 mb-4">
-              <Users className="w-10 h-10 text-primary/40" />
+          </div>
+        ) : (
+          <Card className="flex flex-col items-center justify-center py-24 bg-white border-dashed border-2 border-slate-200 rounded-[40px] shadow-sm">
+            <div className="p-6 rounded-3xl bg-slate-50 mb-6 group-hover:scale-110 transition-transform">
+              <Users className="w-16 h-16 text-slate-200" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-1">No patients found</h3>
-            <p className="text-muted-foreground text-center max-w-sm px-6">
+            <h3 className="text-2xl font-black text-slate-900 mb-2">No Patients Found</h3>
+            <p className="text-slate-500 text-center max-w-sm px-6 font-medium text-lg leading-relaxed">
               {rows.length === 0 
-                ? "Your patient list is currently empty. Start by adding your first patient." 
-                : "There are no patients matching your current search or filter criteria."}
+                ? "Your patient database is currently empty. Start growing your clinic today." 
+                : "We couldn't find any patients matching your current search criteria."}
             </p>
             {rows.length === 0 && (
-              <Button asChild className="mt-6">
+              <Button asChild className="mt-8 h-12 px-8 rounded-2xl shadow-lg shadow-primary/20">
                 <Link to="/admin/patients/create">
-                  <UserPlus className="w-4 h-4 mr-2" />
-                  Add New Patient
+                  <UserPlus className="w-5 h-5 mr-2" />
+                  Add Your First Patient
                 </Link>
               </Button>
             )}
