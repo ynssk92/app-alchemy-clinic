@@ -314,9 +314,28 @@ const PatientDashboard = () => {
                   <div className="relative mt-1.5 text-[34px] font-bold leading-none tracking-tight">
                     {(nextAppt.appointment_time || "").slice(0, 5)}
                   </div>
-                  <div className="relative mt-3 text-[13px] font-semibold">{nextAppt.doctors?.full_name || "Doctor"}</div>
-                  <div className="relative text-[11px] opacity-85">
-                    {nextAppt.doctors?.specialties?.name || "General consultation"}
+                  <div className="relative mt-3 flex items-center gap-3">
+                    <div className="h-8 w-8 shrink-0 rounded-full border border-white/20 overflow-hidden bg-white/10 flex items-center justify-center text-[10px] font-bold">
+                      {nextAppt.doctors?.avatar_url ? (
+                        <img 
+                          src={nextAppt.doctors.avatar_url} 
+                          alt={nextAppt.doctors.full_name} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).parentElement!.innerText = initials(nextAppt.doctors?.full_name);
+                          }}
+                        />
+                      ) : (
+                        initials(nextAppt.doctors?.full_name)
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-[13px] font-semibold leading-tight">{nextAppt.doctors?.full_name || "Doctor"}</div>
+                      <div className="text-[11px] opacity-85">
+                        {nextAppt.doctors?.specialties?.name || "General consultation"}
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
