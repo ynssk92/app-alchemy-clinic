@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "CLINIQUE LA DUNE DENTAIRE",
+  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            ┌──────────────────────────────────────────────────────────────┐\n\n│ ← Patients     Fatima El jallal              Edit Profile    │\n\n│                                                              │\n\n│  FA   Fatima El jallal                                      │\n\n│       ID: ...                                                │\n\n│                                                              │\n\n│  Blood Group    Allergies       Condition       Insurance   │\n\n│                                                              │\n\n│  Medical Profile        Patient Information                  │\n\n│  ─────────────────────────────────────────────────────────  │\n\n│                                                              │\n\n│  Medical History          Medical Archive                    │\n\n│  Prescriptions            Rendez-vous                        │\n\n│  Facturation                                                 │\n\n│                                                              │\n\n└──────────────────────────────────────────────────────────────┘",
   heading: "Exceptional dental care.",
   highlight: "A confident smile.",
   description: "Advanced dental expertise, modern technology and personalized care, all in one place.",
