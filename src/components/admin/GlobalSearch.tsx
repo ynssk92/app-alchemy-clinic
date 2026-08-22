@@ -27,7 +27,14 @@ export function GlobalSearch() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, 300);
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query]);
   const [results, setResults] = useState<SearchGroups | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
