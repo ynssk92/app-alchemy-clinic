@@ -358,10 +358,7 @@ const AdminShell = () => {
           <Link to="/" aria-label="La Dune home" className="md:hidden flex items-center shrink-0">
             <img src={mobileLogoUrl} alt="La Dune Clinique Dentaire" className="h-8 w-auto object-contain" />
           </Link>
-          <div className="relative flex-1 max-w-md">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder={t("nav.searchPlaceholder", { defaultValue: "Search patients, doctors, appointments…" })} className="pl-9 bg-muted/50 border-0" />
-          </div>
+          <GlobalSearch />
           <div className="flex-1" />
           <LanguageToggle />
           <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle theme">
