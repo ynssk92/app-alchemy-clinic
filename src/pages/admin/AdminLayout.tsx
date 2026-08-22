@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAppSettings } from "@/hooks/useAppSettings";
 import { cn } from "@/lib/utils";
 import AdminNotifications from "@/components/admin/AdminNotifications";
+import { GlobalSearch } from "@/components/admin/GlobalSearch";
 import LanguageToggle from "@/components/LanguageToggle";
 import { usePermissions } from "@/hooks/usePermissions";
 import {
