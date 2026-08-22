@@ -10,7 +10,7 @@ export const ProtectedRoute = ({
   adminOnly?: boolean;
   staffOnly?: boolean;
 }) => {
-  const { user, isAdmin, isAssistant, loading } = useAuth();
+  const { user, isAdmin, isAssistant, isStaff, loading } = useAuth();
   if (loading) {
     return (
       <div className="flex min-h-screen w-full flex-1 items-center justify-center bg-background">
@@ -23,6 +23,6 @@ export const ProtectedRoute = ({
     return <Navigate to="/verify-email" replace />;
   }
   if (adminOnly && !isAdmin) return <Navigate to="/patient-dashboard" replace />;
-  if (staffOnly && !isAdmin && !isAssistant) return <Navigate to="/patient-dashboard" replace />;
+  if (staffOnly && !isStaff) return <Navigate to="/patient-dashboard" replace />;
   return children;
 };

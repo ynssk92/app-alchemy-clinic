@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAssistant, setIsAssistant] = useState(false);
+  const [isDoctor, setIsDoctor] = useState(false);
   const [profileStatus, setProfileStatus] = useState<"pending" | "approved" | "rejected" | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,6 +41,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const list = (roles || []).map((r: any) => r.role);
     setIsAdmin(list.includes("admin"));
     setIsAssistant(list.includes("assistant"));
+    setIsDoctor(list.includes("doctor"));
     setProfileStatus(((prof as any)?.status as any) ?? null);
   };
 
@@ -52,6 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setIsAdmin(false);
         setIsAssistant(false);
+        setIsDoctor(false);
         setProfileStatus(null);
       }
     });
@@ -71,7 +74,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isStaff: isAdmin || isAssistant, profileStatus, loading, signOut }}>
+    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isStaff: isAdmin || isAssistant || isDoctor, profileStatus, loading, signOut }}>
       {children}
     </Ctx.Provider>
   );
