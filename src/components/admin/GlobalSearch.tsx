@@ -60,22 +60,27 @@ export function GlobalSearch() {
       }
 
       setIsLoading(true);
-      const searchTerm = `%${debouncedQuery}%`;
+      
+      // Clean query and handle multi-word search
+      const cleanQuery = debouncedQuery.trim();
+      const searchTerm = `%${cleanQuery}%`;
+      const words = cleanQuery.split(/\s+/).filter(w => w.length > 0);
+      
+      // For multi-word search, we want to match patients where name components match the words
+      // e.g. "Rabie Kenzi" matches if (first_name ilike %Rabie% AND last_name ilike %Kenzi%) OR (first_name ilike %Kenzi% AND last_name ilike %Rabie%)
+      let patientQuery = supabase.from('patients').select('id, first_name, last_name, phone, email, patient_number, national_id, nationality');
+      
+      if (words.length >= 2) {
+        const word1 = `%${words[0]}%`;
+        const word2 = `%${words[1]}%`;
+        patientQuery = patientQuery.or(`and(first_name.ilike.${word1},last_name.ilike.${word2}),and(first_name.ilike.${word2},last_name.ilike.${word1}),phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`);
+      } else {
+        patientQuery = patientQuery.or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`);
+      }
 
       try {
         const [
           { data: patients },
-          { data: doctors },
-          { data: appointments },
-          { data: invoices },
-          { data: services }
-        ] = await Promise.all([
-          // Patients Search
-          supabase
-            .from('patients')
-            .select('id, first_name, last_name, phone, email, patient_number, national_id')
-            .or(`first_name.ilike.${searchTerm},last_name.ilike.${searchTerm},phone.ilike.${searchTerm},email.ilike.${searchTerm},patient_number.ilike.${searchTerm},national_id.ilike.${searchTerm}`)
-            .limit(5),
           
           // Doctors Search
           supabase
