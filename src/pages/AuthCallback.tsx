@@ -9,7 +9,7 @@ type ProfileStatus = Database["public"]["Enums"]["profile_status"];
 
 // Bootstrap configuration for initial admins.
 // IMPORTANT: These emails will only be promoted if they don't already have roles assigned.
-const INITIAL_ADMIN_EMAILS = ["admin@example.com"]; // Replace with real admin emails
+const INITIAL_ADMIN_EMAILS = ["youness.skiri@gmail.com"];
 
 const AuthCallback = () => {
   const navigate = useNavigate();
