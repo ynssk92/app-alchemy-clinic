@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "CLINIQUE LA DUNE DENTAIRE",
+  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            const INITIAL_ADMIN_EMAILS = [\n  \"youness.skiri@gmail.com\",\n];",
   heading: "Exceptional dental care.",
   highlight: "A confident smile.",
   description: "Advanced dental expertise, modern technology and personalized care, all in one place.",
