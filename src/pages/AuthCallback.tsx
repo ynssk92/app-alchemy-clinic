@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+
+type ProfileStatus = Database["public"]["Enums"]["profile_status"];
 
 const AuthCallback = () => {
   const navigate = useNavigate();
@@ -23,14 +26,14 @@ const AuthCallback = () => {
         if (session) {
           const user = session.user;
 
-          // 1. Check if user has a role (admin/assistant)
+          // 1. Check if user has a role (admin/assistant/doctor)
           const { data: roles } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
           
           const roleList = (roles || []).map(r => r.role);
-          const isStaff = roleList.includes("admin") || roleList.includes("assistant");
+          const isStaff = roleList.includes("admin") || roleList.includes("assistant") || roleList.includes("doctor");
 
           if (isStaff) {
             toast.success("Welcome back!");
@@ -56,8 +59,9 @@ const AuthCallback = () => {
               .insert({
                 id: user.id,
                 full_name: user.user_metadata?.full_name || user.email?.split('@')[0],
-                email: user.email,
-                status: "approved" // Default to approved for social auth if that's the policy
+                phone: user.phone || null,
+                avatar_url: user.user_metadata?.avatar_url || null,
+                status: "approved" as ProfileStatus
               });
             
             if (createError) {
