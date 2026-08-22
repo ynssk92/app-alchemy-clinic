@@ -253,12 +253,24 @@ const PatientDashboard = () => {
                         className="absolute inset-y-0 left-0 w-[3px] opacity-70"
                         style={{ background: `hsl(var(--${tint}))` }}
                       />
-                      <span
-                        className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold"
+                      <div 
+                        className="ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold overflow-hidden"
                         style={{ background: `hsl(var(--${tint}) / 0.12)`, color: `hsl(var(--${tint}))` }}
                       >
-                        {initials(a.doctors?.full_name)}
-                      </span>
+                        {a.doctors?.avatar_url ? (
+                          <img 
+                            src={a.doctors.avatar_url} 
+                            alt={a.doctors.full_name} 
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                              (e.target as HTMLImageElement).parentElement!.innerText = initials(a.doctors?.full_name);
+                            }}
+                          />
+                        ) : (
+                          initials(a.doctors?.full_name)
+                        )}
+                      </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
                           <span className="truncate text-[13px] font-semibold">
