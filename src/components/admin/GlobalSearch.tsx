@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Search, User, Stethoscope, Calendar, Receipt, Settings, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useAuth } from "@/hooks/useAuth";
 import { cn } from "@/lib/utils";
 
 type SearchResult = {
