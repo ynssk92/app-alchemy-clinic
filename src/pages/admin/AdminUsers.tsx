@@ -169,7 +169,7 @@ const AdminUsers = () => {
 
   const toggleRole = async (id: string, role: "admin" | "assistant", has: boolean) => {
     // Self-demotion prevention
-    const { user: currentUser } = await supabase.auth.getUser();
+    const { data: { user: currentUser } } = await supabase.auth.getUser();
     if (id === currentUser?.id && role === "admin" && has) {
       return toast.error("You cannot revoke your own administrator status for security reasons.");
     }
