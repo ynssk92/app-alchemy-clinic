@@ -2908,6 +2908,13 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_clinic_staff: { Args: { _user_id: string }; Returns: boolean }
+      manage_user_role: {
+        Args: {
+          new_role: Database["public"]["Enums"]["app_role"]
+          target_user_id: string
+        }
+        Returns: undefined
+      }
       next_invoice_number: { Args: never; Returns: string }
       owns_patient_record: {
         Args: { _patient_id: string; _user_id: string }
