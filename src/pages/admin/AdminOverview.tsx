@@ -179,8 +179,10 @@ const AdminOverview = () => {
     { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green", module: "billing", action: "create" },
     { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet", module: "doctors" },
     { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber", module: "messages" },
+    { label: "Role Management", to: "/admin/verify-role", icon: ShieldAlert, tint: "stat-violet", adminOnly: true },
     { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue", adminOnly: true },
   ];
+
 
   const activity = useMemo(() => {
     const items = [
