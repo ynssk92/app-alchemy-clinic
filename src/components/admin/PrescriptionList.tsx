@@ -57,28 +57,23 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
 
   const fetchDoctors = async () => {
     try {
-      // Fetch users with the 'doctor' role from user_roles and join with profiles
+      // Use the existing 'doctors' table directly as confirmed by the user
       const { data, error } = await supabase
-        .from("user_roles")
+        .from("doctors")
         .select(`
-          user_id,
-          profiles:profiles(id, full_name)
+          id, 
+          full_name,
+          specialties:specialty_id(name)
         `)
-        .eq("role", "doctor");
+        .order("full_name");
 
       if (error) throw error;
-      
-      // Map to extract profiles and ensure unique entries if a user has multiple roles (unlikely for doctors)
-      const doctorProfiles = (data || [])
-        .map((d: any) => d.profiles)
-        .filter((p: any) => p !== null);
-      
-      setDoctors(doctorProfiles);
+      setDoctors(data || []);
     } catch (error: any) {
       console.error("Error fetching doctors:", error);
       toast({ 
         title: "Erreur", 
-        description: "Impossible de charger la liste des médecins: " + error.message, 
+        description: "Impossible de charger la liste des médecins depuis la table dédiée: " + error.message, 
         variant: "destructive" 
       });
     }
@@ -205,9 +200,10 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
       // Fetch doctor details if prescription has doctor_id
       let doctor = null;
       if (p.doctor_id) {
+        // Fetch doctor from the dedicated doctors table
         const { data: doc, error: docError } = await supabase
-          .from("profiles")
-          .select("*, specialties(*)")
+          .from("doctors")
+          .select("*, specialties:specialty_id(name)")
           .eq("id", p.doctor_id)
           .maybeSingle();
         if (docError) throw docError;
@@ -271,7 +267,7 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
                     {doctors.length > 0 ? (
                       doctors.map((doc) => (
                         <SelectItem key={doc.id} value={doc.id}>
-                          Dr. {doc.full_name || "Médecin sans nom"}
+                          Dr. {doc.full_name} {doc.specialties?.name ? `(${doc.specialties.name})` : ""}
                         </SelectItem>
                       ))
                     ) : (
