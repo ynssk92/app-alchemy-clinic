@@ -60,7 +60,7 @@ const sections: Section[] = [
         ],
       },
       {
-        to: "/admin/appointments", icon: Calendar, label: "nav.appointments", module: "Appointments", staff: true,
+        to: "/admin/appointments", icon: Calendar, label: "nav.appointments", module: "appointments", staff: true,
         children: [
           { to: "/admin/appointments", label: "nav.appointments" },
           { to: "/admin/appointments/new", label: "nav.newAppointment" },
