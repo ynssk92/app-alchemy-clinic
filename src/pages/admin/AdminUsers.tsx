@@ -180,11 +180,11 @@ const AdminUsers = () => {
       }
     }
 
-    // Delete existing roles and set new one (strictly role-based, one role per user in this implementation)
+    // Delete existing roles and set new one
     const { error: delError } = await supabase.from("user_roles").delete().eq("user_id", id);
     if (delError) return toast.error(delError.message);
     
-    const { error: insError } = await supabase.from("user_roles").insert({ user_id: id, role });
+    const { error: insError } = await supabase.from("user_roles").insert({ user_id: id, role: role as any });
     if (insError) return toast.error(insError.message);
     
     toast.success(`Role updated to ${role}`);
@@ -204,7 +204,7 @@ const AdminUsers = () => {
     const email = inviteEmail.trim().toLowerCase();
     if (!email) return;
     setBusy(true);
-    const { error } = await supabase.from("admin_invites").insert({ email, role: inviteRole });
+    const { error } = await supabase.from("admin_invites").insert({ email, role: inviteRole as any } as any);
     setBusy(false);
     if (error) return toast.error(error.message);
     toast.success(`Invite added. They'll become ${inviteRole} on next sign-in / signup.`);
