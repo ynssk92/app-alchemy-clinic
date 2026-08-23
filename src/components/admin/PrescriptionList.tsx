@@ -57,19 +57,30 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
 
   const fetchDoctors = async () => {
     try {
+      // Fetch users with the 'doctor' role from user_roles and join with profiles
       const { data, error } = await supabase
-        .from("profiles")
+        .from("user_roles")
         .select(`
-          id, 
-          full_name,
-          user_roles!inner(role)
+          user_id,
+          profiles:profiles(id, full_name)
         `)
-        .eq("user_roles.role", "doctor");
+        .eq("role", "doctor");
 
       if (error) throw error;
-      setDoctors(data || []);
+      
+      // Map to extract profiles and ensure unique entries if a user has multiple roles (unlikely for doctors)
+      const doctorProfiles = (data || [])
+        .map((d: any) => d.profiles)
+        .filter((p: any) => p !== null);
+      
+      setDoctors(doctorProfiles);
     } catch (error: any) {
       console.error("Error fetching doctors:", error);
+      toast({ 
+        title: "Erreur", 
+        description: "Impossible de charger la liste des médecins: " + error.message, 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -257,11 +268,17 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
                     <SelectValue placeholder="Sélectionner un médecin" />
                   </SelectTrigger>
                   <SelectContent>
-                    {doctors.map((doc) => (
-                      <SelectItem key={doc.id} value={doc.id}>
-                        Dr. {doc.full_name}
+                    {doctors.length > 0 ? (
+                      doctors.map((doc) => (
+                        <SelectItem key={doc.id} value={doc.id}>
+                          Dr. {doc.full_name || "Médecin sans nom"}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="none" disabled>
+                        Aucun médecin disponible
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
                 {!newPrescription.doctor_id && (
