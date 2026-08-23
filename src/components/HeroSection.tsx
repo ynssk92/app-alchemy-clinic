@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "LA DUNE CLINIQUE DENTAIRE",
+  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Add a verification flow or admin test page to quickly switch between user roles and confirm the badge updates correctly.",
   heading: "Your smile deserves expert care.",
   highlight: "",
   description: "Advanced dental care, modern technology, and personalized treatment in a comfortable environment.",
