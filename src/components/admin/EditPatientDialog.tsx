@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { UserPlus, BookOpen, ShieldCheck, Activity, Baby, Phone } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   open: boolean;
@@ -38,8 +40,10 @@ const FormItem = ({ label, children, colSpan = 1 }: { label: string; children: R
 
 export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: intakeIdProp, onSaved }: Props) => {
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const [saving, setSaving] = useState(false);
   const [intakeId, setIntakeId] = useState<string | null>(intakeIdProp ?? null);
+  const [initialEmail, setInitialEmail] = useState("");
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -116,11 +120,14 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         profileData = p;
       }
 
+      const finalEmail = profileData?.email || intake?.email || "";
+      setInitialEmail(finalEmail);
+
       setForm({
         first_name: intake?.first_name || "",
         last_name: intake?.last_name || "",
         full_name: profileData?.full_name || [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") || "",
-        email: profileData?.email || intake?.email || "",
+        email: finalEmail,
         phone: profileData?.phone || intake?.phone || "",
         nationality: profileData?.nationality || intake?.nationality || "",
         identity_document_type: profileData?.identity_document_type || intake?.identity_document_type || "",
@@ -168,6 +175,21 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
   const onSubmit = async () => {
     setSaving(true);
     try {
+      // 1. Handle secure email update if changed by Admin
+      if (isAdmin && profileId && form.email.trim().toLowerCase() !== initialEmail.trim().toLowerCase()) {
+        const { data: edgeData, error: edgeError } = await supabase.functions.invoke('admin-update-patient-email', {
+          body: {
+            target_user_id: profileId,
+            new_email: form.email.trim()
+          }
+        });
+
+        if (edgeError) throw edgeError;
+        if (edgeData?.error) throw new Error(edgeData.error);
+        
+        toast({ title: "Email d'authentification mis à jour" });
+      }
+
       if (profileId) {
         const updateData: any = {
           full_name: form.full_name.trim() || null,
@@ -206,7 +228,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       const intakePayload: any = {
         first_name: derivedFirst,
         last_name: derivedLast,
-        email: form.email, // Read only, preserved as is from load
+        email: form.email.trim().toLowerCase(), // Use potentially updated email
         phone: form.phone.trim() || null,
         nationality: form.nationality || null,
         identity_document_type: form.identity_document_type || null,
@@ -256,11 +278,12 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         if (error) throw error;
       }
 
-      toast({ title: "Patient updated" });
+      toast({ title: "Patient mis à jour" });
       onOpenChange(false);
       onSaved?.();
     } catch (e: any) {
-      toast({ title: "Update failed", description: e.message, variant: "destructive" });
+      console.error("Update failed:", e);
+      toast({ title: "La mise à jour a échoué", description: e.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
@@ -278,8 +301,17 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
               <FormItem label="Full Name">
                 <Input className="h-11 rounded-xl" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
               </FormItem>
-              <FormItem label="Email (Lecture seule)">
-                <Input className="h-11 rounded-xl bg-slate-50 text-slate-500 cursor-not-allowed" value={form.email} readOnly disabled />
+              <FormItem label="Email">
+                <Input 
+                  className={cn(
+                    "h-11 rounded-xl",
+                    !isAdmin && "bg-slate-50 text-slate-500 cursor-not-allowed"
+                  )} 
+                  value={form.email} 
+                  onChange={(e) => set("email", e.target.value)}
+                  readOnly={!isAdmin} 
+                  disabled={!isAdmin} 
+                />
               </FormItem>
               <FormItem label="Phone">
                 <Input className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
