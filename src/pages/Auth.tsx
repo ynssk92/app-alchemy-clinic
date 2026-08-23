@@ -400,7 +400,6 @@ const Auth = () => {
                         </div>
                       </motion.div>
                     </TabsContent>
-                    </TabsContent>
                   </AnimatePresence>
                 </div>
               </Tabs>
