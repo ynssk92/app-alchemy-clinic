@@ -150,8 +150,18 @@ export async function generatePrescriptionPDF(data: PrescriptionPDFData) {
   
   // Medication list
   items.forEach((item, index) => {
-    // Check for page overflow
-    if (currentY > pageHeight - 160) {
+    // Check for page overflow - Approximate block height
+    let blockHeight = 30; // Medication name
+    if (item.dosage) blockHeight += 16;
+    if (item.frequency) blockHeight += 16;
+    if (item.duration) blockHeight += 16;
+    if (item.instructions) {
+      const instrLines = doc.splitTextToSize(`Instructions: ${item.instructions}`, contentWidth - 100);
+      blockHeight += (instrLines.length * 14) + 5;
+    }
+    blockHeight += 20; // Spacing
+
+    if (currentY + blockHeight > pageHeight - 120) {
       doc.addPage();
       currentY = 130;
     }
@@ -160,30 +170,46 @@ export async function generatePrescriptionPDF(data: PrescriptionPDFData) {
     doc.setFont("helvetica", "bold");
     doc.setFontSize(11);
     doc.setTextColor(textDark[0], textDark[1], textDark[2]);
-    doc.text(`${index + 1}. ${item.medication_name}`, margin + 5, currentY);
+    doc.text(`${index + 1}. ${item.medication_name.toUpperCase()}`, margin + 5, currentY);
     
-    currentY += 20;
+    currentY += 22;
     
-    // Details
+    // Structured Details
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+    const labelX = margin + 25;
+    const valueX = margin + 100;
     
-    const details = [];
-    if (item.dosage) details.push(item.dosage);
-    if (item.frequency) details.push(item.frequency);
-    if (item.duration) details.push(item.duration);
+    if (item.dosage) {
+      doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+      doc.text("Dosage", labelX, currentY);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.text(item.dosage, valueX, currentY);
+      currentY += 16;
+    }
     
-    if (details.length > 0) {
-      doc.text(details.join("  •  "), margin + 25, currentY);
+    if (item.frequency) {
+      doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+      doc.text("Fréquence", labelX, currentY);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.text(item.frequency, valueX, currentY);
+      currentY += 16;
+    }
+
+    if (item.duration) {
+      doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+      doc.text("Durée", labelX, currentY);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      doc.text(item.duration, valueX, currentY);
       currentY += 16;
     }
     
     if (item.instructions) {
-      doc.setFont("helvetica", "italic");
       doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-      const instrLines = doc.splitTextToSize(`Note: ${item.instructions}`, contentWidth - 45);
-      doc.text(instrLines, margin + 25, currentY);
+      doc.text("Instructions", labelX, currentY);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
+      const instrLines = doc.splitTextToSize(item.instructions, contentWidth - 100);
+      doc.text(instrLines, valueX, currentY);
       currentY += (instrLines.length * 14);
     }
     
@@ -221,21 +247,38 @@ export async function generatePrescriptionPDF(data: PrescriptionPDFData) {
   
   const sigX = pageWidth - margin - 200;
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(11);
-  doc.setTextColor(textDark[0], textDark[1], textDark[2]);
-  doc.text("Signature du médecin", sigX, currentY);
+  doc.setFontSize(10);
+  doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+  doc.text("Médecin prescripteur", sigX, currentY);
   
   currentY += 20;
-  doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(12);
-  doc.text(`Dr. ${doctor?.full_name || "Non spécifié"}`, sigX, currentY);
+  doc.setTextColor(textDark[0], textDark[1], textDark[2]);
   
-  if (doctor?.specialties?.name) {
-    currentY += 15;
-    doc.setFontSize(10);
-    doc.setTextColor(textGray[0], textGray[1], textGray[2]);
-    doc.text(doctor.specialties.name, sigX, currentY);
+  if (doctor) {
+    doc.text(`Dr. ${doctor.full_name}`, sigX, currentY);
+    if (doctor.specialties?.name) {
+      currentY += 15;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+      doc.text(doctor.specialties.name, sigX, currentY);
+    }
+  } else {
+    doc.setFont("helvetica", "italic");
+    doc.text("Non renseigné", sigX, currentY);
   }
+
+  currentY += 35;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(textGray[0], textGray[1], textGray[2]);
+  doc.text("Signature du médecin", sigX, currentY);
+  currentY += 5;
+  doc.setDrawColor(textGray[0], textGray[1], textGray[2]);
+  doc.setLineWidth(0.5);
+  doc.line(sigX, currentY + 40, sigX + 180, currentY + 40);
   
   // Add skeleton to all pages
   const totalPages = (doc as any).internal.getNumberOfPages();

@@ -11,6 +11,15 @@ import {
   Dialog, DialogContent, DialogDescription, 
   DialogFooter, DialogHeader, DialogTitle, DialogTrigger 
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -31,17 +40,35 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [generatingPdf, setGeneratingPdf] = useState<string | null>(null);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const { settings, logoUrl } = useAppSettings();
   
   // New Prescription State
   const [newPrescription, setNewPrescription] = useState({
     notes: "",
+    doctor_id: "",
     items: [{ medication_name: "", dosage: "", frequency: "", duration: "", instructions: "" }]
   });
 
   useEffect(() => {
     fetchPrescriptions();
+    fetchDoctors();
   }, [patientId]);
+
+  const fetchDoctors = async () => {
+    try {
+      // Get profiles that have the 'doctor' role
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, full_name, user_roles!inner(role)")
+        .eq("user_roles.role", "doctor");
+
+      if (error) throw error;
+      setDoctors(data || []);
+    } catch (error: any) {
+      console.error("Error fetching doctors:", error);
+    }
+  };
 
   const fetchPrescriptions = async () => {
     try {
@@ -93,7 +120,8 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
         .from("prescriptions")
         .insert({
           patient_id: patientId,
-          notes: newPrescription.notes
+          notes: newPrescription.notes,
+          doctor_id: newPrescription.doctor_id || null
         })
         .select()
         .single();
@@ -122,7 +150,7 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
 
       toast({ title: "Success", description: "Prescription saved successfully" });
       setIsAddOpen(false);
-      setNewPrescription({ notes: "", items: [{ medication_name: "", dosage: "", frequency: "", duration: "", instructions: "" }] });
+      setNewPrescription({ notes: "", doctor_id: "", items: [{ medication_name: "", dosage: "", frequency: "", duration: "", instructions: "" }] });
       fetchPrescriptions();
     } catch (error: any) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
@@ -216,6 +244,33 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
             </DialogHeader>
 
             <div className="space-y-6 py-4">
+              <div className="space-y-2">
+                <Label>Médecin prescripteur</Label>
+                <Select
+                  value={newPrescription.doctor_id}
+                  onValueChange={(val) => setNewPrescription(prev => ({ ...prev, doctor_id: val }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Sélectionner un médecin" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {doctors.map((doc) => (
+                      <SelectItem key={doc.id} value={doc.id}>
+                        Dr. {doc.full_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {!newPrescription.doctor_id && (
+                  <Alert variant="destructive" className="py-2 mt-2">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-xs">
+                      Veuillez sélectionner un médecin pour cette ordonnance.
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </div>
+
               <div className="space-y-4">
                 {newPrescription.items.map((item, index) => (
                   <div key={index} className="p-4 rounded-xl border bg-muted/20 relative space-y-4">
