@@ -55,7 +55,6 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     address_1: "",
     city: "",
     country: "",
-    // New fields
     patient_type: "adult" as "adult" | "minor",
     languages: [] as string[],
     profession: "",
@@ -164,7 +163,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     })();
   }, [open, profileId, intakeIdProp]);
 
-  const set = (k: string, v: string | any) => setForm((f) => ({ ...f, [k]: v }));
+  const updateField = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
 
   const onSubmit = async () => {
     setSaving(true);
