@@ -163,7 +163,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     })();
   }, [open, profileId, intakeIdProp]);
 
-  const updateField = (k: string, v: any) => setForm((f) => ({ ...f, [k]: v }));
+  const set = (k: string, v: string | any) => setForm((f) => ({ ...f, [k]: v }));
 
   const onSubmit = async () => {
     setSaving(true);
