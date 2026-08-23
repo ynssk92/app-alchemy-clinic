@@ -382,12 +382,13 @@ const AdminUsers = () => {
                 <div className="hidden md:block w-40 text-sm text-muted-foreground">
                   {new Date(p.created_at).toLocaleDateString()}
                 </div>
-                <div className="flex items-center gap-2 justify-end">
+                <div className="flex items-center gap-2 justify-end min-w-[320px]">
+                  <div className="text-xs text-muted-foreground mr-1 hidden lg:block">Role:</div>
                   <Select 
                     value={p.roles[0] || "patient"} 
                     onValueChange={(v: any) => updateRole(p.id, v)}
                   >
-                    <SelectTrigger className="w-36 h-9">
+                    <SelectTrigger className="w-32 h-9 rounded-xl border-slate-200">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -397,7 +398,12 @@ const AdminUsers = () => {
                       <SelectItem value="patient">Patient</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button size="sm" variant="outline" onClick={() => remove(p.id)}>
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={() => remove(p.id)}
+                    className="h-9 w-9 p-0 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
