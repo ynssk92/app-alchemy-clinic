@@ -78,369 +78,78 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
-              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+              {`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
 
-                                            AUDIT AND HARDEN THE EXISTING RBAC BACKEND
+REBUILD THE ADMIN ROLE MANAGEMENT INTERFACE
 
-I need you to audit and correct the existing users, roles, permissions, invitations, and authorization architecture.
+Now that the backend RBAC architecture has been audited/hardened, rebuild the Role Management page so that an ADMIN can manage roles and configure permissions safely.
 
 IMPORTANT:
 
-This is a security-sensitive change.
+This is NOT a new authorization system.
 
-DO NOT delete, drop, truncate, reset, or recreate existing clinical data.
+Use the existing:
 
-DO NOT break:
-
-- patients
-- appointments
-- medical records
-- prescriptions
-- invoices
-- messages
-- profiles
-- authentication
-- Google OAuth
-- invitations
-- existing users
-
-Do NOT create a second competing role/permission system.
-
-Before changing anything, inspect the existing implementation and reuse the current architecture whenever possible.
-
-==================================================
-
-1. SOURCE OF TRUTH
-
-==================================================
-
-Use ONE authorization architecture:
-
-Roles:
-
-public.user_roles
-
-Permission definitions:
-
-public.permissions
-
-Role → permissions:
-
-public.role_permissions
-
-Authorization functions:
-
+- user_roles
+- permissions
+- role_permissions
 - has_role()
 - is_admin()
 - has_permission()
+- useAuth()
 
-React:
+Do not create duplicate tables or authorization logic.
+Do not modify or delete clinical data.
 
-useAuth()
+1. ADMIN ONLY
 
-Do not introduce another role table or permission system.
+Only authenticated ADMIN users may access this page. Non-admin users must be blocked by protected route and backend authorization/RLS. Do not rely only on hiding the sidebar item.
 
-Database authorization must always be the final authority.
+2. USER SEARCH
 
-==================================================
+Allow Admin to search users by name and email. After selecting a user, show Name, Email, Current role, and Account status.
 
-2. ROLES
+3. ROLE MANAGEMENT
 
-==================================================
+Admin can select Admin, Doctor, Assistant, or Patient. Admin can change another user's role. The current logged-in Admin must NOT be able to modify their own role. When viewing themselves, show role and permissions as READ ONLY.
 
-The application has exactly:
+4. PERMISSION MANAGEMENT
 
-- admin
-- doctor
-- assistant
-- patient
+Clearly separate ROLE and PERMISSIONS. For Doctor and Assistant, display a grouped permission matrix with clean checkboxes/toggles and a Save button for Patients, Appointments, Medical Records, Prescriptions, Billing, Messages, Reports, User Management, Role Management, Invitations, and Audit Logs.
 
-ADMIN:
+5. ADMIN PERMISSIONS
 
-Full access to all existing application functionality.
+Admin is FULL ACCESS. Do not require the Admin to manually enable every permission. Clearly indicate ADMIN / Full Access. Admin permissions must not accidentally be removed through normal permission editing.
 
-DOCTOR:
+6. DOCTOR
 
-Permissions must be configurable by an administrator.
+Doctor permissions are configurable by Admin and changes must be stored in role_permissions. Do not hardcode Doctor permissions in frontend code.
 
-ASSISTANT:
+7. ASSISTANT
 
-Permissions must be configurable by an administrator.
+Assistant permissions are configurable by Admin and stored in role_permissions.
 
-PATIENT:
+8. PATIENT
 
-Restricted patient-owned access only.
+Patient permissions must remain restricted. Patients must never gain users.manage, roles.manage, permissions.manage, admin_invites, administrative reports, or unrestricted clinical data access. Patient RLS must continue enforcing ownership.
 
-==================================================
+9. SAVE BEHAVIOR
 
-3. PERMISSION SYSTEM
+Update role_permissions safely, do not create duplicate mappings or delete unrelated mappings, show success/error feedback, and refresh permissions after save. Update user_roles using the secure backend mechanism. Do not allow self-role modification or removing the last Admin.
 
-==================================================
+10. UX
 
-Audit the existing permissions.
+Make the page professional and clear using the existing clinic visual identity. Do not change unrelated pages.
 
-If equivalent permissions already exist, reuse them instead of creating duplicates.
+11. SECURITY
 
-Support granular permissions such as:
+Frontend controls are NOT the security boundary. All sensitive operations must still be protected by RLS, is_admin(), has_role(), and has_permission(). A malicious user must not be able to call Supabase directly and change their own role, another user's role, or role permissions unless authorized as Admin.
 
-patients.view
-patients.create
-patients.edit
-patients.delete
-appointments.view
-appointments.create
-appointments.edit
-appointments.delete
-medical_records.view
-medical_records.create
-medical_records.edit
-medical_records.delete
-prescriptions.view
-prescriptions.create
-prescriptions.edit
-prescriptions.delete
-invoices.view
-invoices.create
-invoices.edit
-invoices.delete
-messages.view
-messages.send
-messages.delete
-reports.view
-reports.create
-users.view
-users.manage
-roles.view
-roles.manage
-permissions.view
-permissions.manage
-admin_invites.create
-admin_invites.manage
-audit_logs.view
+12. VERIFY
 
-If the app already has other valid permissions, preserve them.
+Test that Admin can manage another user and configure Doctor and Assistant permissions; Doctor, Assistant, and Patient cannot access role management; and Admin cannot accidentally remove their own Admin role.
 
-Do not overwrite existing custom role_permissions configuration unnecessarily.
-
-==================================================
-
-4. ADMIN
-
-==================================================
-
-Admin must have full access to all current permissions.
-
-Do not implement this by disabling RLS.
-
-Use the existing secure authorization functions.
-
-Admin must be able to:
-
-- manage users
-- assign roles
-- configure permissions
-- create/manage invitations
-- access all existing modules
-- access role management
-- access reports
-- access audit/history
-
-==================================================
-
-5. DOCTOR AND ASSISTANT
-
-==================================================
-
-Doctor and Assistant permissions must be stored in role_permissions.
-
-Do NOT hardcode their permissions permanently in React.
-
-An Admin must be able to change which permissions they have.
-
-Example:
-
-Doctor:
-
-patients.view = true
-patients.edit = true
-medical_records.view = true
-medical_records.edit = true
-billing.view = false
-
-Assistant:
-
-patients.view = true
-appointments.view = true
-appointments.edit = true
-medical_records.view = false
-billing.view = false
-
-These are examples only.
-
-The Admin must control the actual configuration.
-
-==================================================
-
-6. PATIENT SECURITY
-
-==================================================
-
-Patient must have a very limited permission set.
-
-Potential access:
-
-- messages.view
-- messages.send
-- appointments.view
-- appointments.create/request
-- profile.view
-- profile.edit
-
-Do NOT give patients administrative permissions.
-
-Patients must never have:
-
-users.manage
-roles.manage
-permissions.manage
-admin_invites
-reports
-administrative billing access
-access to another patient's data
-
-IMPORTANT:
-
-A permission such as appointments.view does NOT mean a patient can view every appointment.
-
-Patient access must always use:
-
-permission + ownership
-
-RLS must ensure patients can only access records belonging to themselves according to the application's existing ownership model.
-
-==================================================
-
-7. AUTHORIZATION FUNCTIONS
-
-==================================================
-
-Audit:
-
-has_role()
-is_admin()
-has_permission()
-
-Harden them using:
-
-SECURITY DEFINER
-SET search_path = public
-
-They must use auth.uid().
-
-Never trust role or permission values supplied by the frontend.
-
-has_permission(permission_name) must resolve:
-
-auth.uid()
-→ user_roles
-→ role_permissions
-→ permissions
-
-==================================================
-
-8. USER ROLE SECURITY
-
-==================================================
-
-Only Admin users may modify another user's role.
-
-Users must never be able to modify their own role.
-
-Prevent:
-
-Patient → Admin
-Doctor → Admin
-Assistant → Admin
-
-through frontend AND backend.
-
-Preserve/harden protection against removing or demoting the last Admin.
-
-If only one Admin exists, they cannot be demoted or removed.
-
-==================================================
-
-9. INVITATIONS
-
-==================================================
-
-Preserve the existing invitation system.
-
-Admin can invite:
-
-- admin
-- doctor
-- assistant
-- patient
-
-Invitation flow:
-
-Admin
-→ email + role
-→ user authenticates
-→ claim_invitation_role()
-→ invited role assigned
-→ invitation claimed
-→ permissions loaded
-
-A user cannot choose their own invitation role.
-
-A pending invitation must be matched using the authenticated verified email.
-
-==================================================
-
-10. MIGRATION SAFETY
-
-==================================================
-
-Use additive/idempotent migrations.
-
-Prefer:
-
-CREATE OR REPLACE FUNCTION
-INSERT ... ON CONFLICT DO NOTHING
-
-Do not duplicate existing permissions.
-
-Do not delete existing permission mappings unless there is a confirmed security problem.
-
-Do not modify clinical data.
-
-Do not remove RLS.
-
-Do not make protected tables publicly writable.
-
-==================================================
-
-11. IMPORTANT
-
-==================================================
-
-First inspect the current schema and implementation.
-
-If something already exists and works, EXTEND it.
-
-Do not blindly replace it.
-
-If you discover a potentially destructive or breaking migration, STOP and explain it before applying it.
-
-After implementation, report:
-
-- tables inspected
-- functions inspected/changed
-- RLS policies inspected/changed
-- migrations created
-- existing data preserved
+Do not modify clinical data.`}
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
