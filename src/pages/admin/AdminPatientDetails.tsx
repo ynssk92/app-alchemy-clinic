@@ -669,105 +669,99 @@ const AdminPatientDetails = () => {
               
               <TabsContent value="medical" className="mt-6 space-y-6 animate-in fade-in-50 duration-300">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="p-6 border-slate-100 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <Activity className="w-4 h-4 text-primary" />
-                        Medical History
+                  {/* 2. IDENTITÉ */}
+                  <Card className="p-8 border-none shadow-sm bg-white ring-1 ring-slate-100 rounded-[24px]">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <VenetianMask className="w-5 h-5 text-primary" />
+                        Identité
                       </h3>
                     </div>
-                    <div className="space-y-4">
-                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Chronic Diseases</p>
-                        <p className="text-sm text-slate-700">{patient.chronic_diseases || "No chronic diseases recorded."}</p>
-                      </div>
-                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Current Medications</p>
-                        <p className="text-sm text-slate-700">{patient.current_medications || "No current medications recorded."}</p>
-                      </div>
-                      <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Surgical History</p>
-                        <p className="text-sm text-slate-700">{patient.surgical_history || "No surgical history recorded."}</p>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                      <ValueDisplay label="Type de document" value={patient.identity_document_type} />
+                      <ValueDisplay label="Numéro du document" value={patient.identity_document_number} mono />
+                      <ValueDisplay label="Date de naissance" value={fmtDate(patient.dob)} />
+                      <ValueDisplay label="Genre" value={patient.gender} />
+                      <ValueDisplay label="Nationalité" value={patient.nationality} colSpan={2} />
                     </div>
                   </Card>
 
-                  <Card className="p-6 border-slate-100 shadow-sm">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <Info className="w-4 h-4 text-primary" />
-                        Patient Information
+                  {/* 3. CONTACT */}
+                  <Card className="p-8 border-none shadow-sm bg-white ring-1 ring-slate-100 rounded-[24px]">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <MapPin className="w-5 h-5 text-primary" />
+                        Coordonnées
                       </h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gender</p>
-                        <p className="text-sm font-medium text-slate-700 capitalize">{patient.gender || "—"}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                      <ValueDisplay label="Téléphone" value={patient.phone} icon={Phone} />
+                      <ValueDisplay label="Email" value={patient.email} icon={Mail} />
+                      <div className="sm:col-span-2">
+                        <ValueDisplay label="Adresse" value={patient.address_1} />
                       </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nationality</p>
-                        <p className="text-sm font-medium text-slate-700">{patient.nationality || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Phone</p>
-                        <p className="text-sm font-medium text-slate-700">{patient.phone || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Email</p>
-                        <p className="text-sm font-medium text-slate-700 truncate">{patient.email || "—"}</p>
-                      </div>
-                      <div className="col-span-2">
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Address</p>
-                        <p className="text-sm font-medium text-slate-700">
-                          {[patient.address_1, patient.city, patient.country].filter(Boolean).join(", ") || "—"}
-                        </p>
-                      </div>
+                      <ValueDisplay label="Ville" value={patient.city} />
+                      <ValueDisplay label="Pays" value={patient.country} />
                     </div>
                   </Card>
 
-                  <Card className="p-6 border-slate-100 shadow-sm md:col-span-2">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <VenetianMask className="w-4 h-4 text-primary" />
-                        IDENTITÉ / DOCUMENT D'IDENTITÉ
+                  {/* 4. ASSURANCE & COUVERTURE */}
+                  <Card className="p-8 border-none shadow-sm bg-white ring-1 ring-slate-100 rounded-[24px]">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-primary" />
+                        Assurance & Couverture
                       </h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Type de document</p>
-                        <p className="text-sm font-medium text-slate-700">{patient.identity_document_type || "—"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Numéro du document</p>
-                        <p className="text-sm font-medium text-slate-700 tracking-wider font-mono">{patient.identity_document_number || "—"}</p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  <Card className="p-6 border-slate-100 shadow-sm md:col-span-2">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
-                        <ShieldCheck className="w-4 h-4 text-primary" />
-                        ASSURANCE
-                      </h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Provider</p>
-                        <p className="text-sm font-medium text-slate-700">{patient.insurance_name || "Self-Pay / Sans assurance"}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">N° adhérent</p>
-                        <p className="text-sm font-medium text-slate-700 tracking-wider font-mono">{patient.insurance_number || "—"}</p>
-                      </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                      <ValueDisplay label="Organisme / Assurance" value={patient.insurance_name} />
+                      <ValueDisplay label="Numéro d'adhérent / contrat" value={patient.insurance_number} mono />
                       {patient.insurance_notes && (
-                        <div className="col-span-2">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Notes d'assurance</p>
-                          <p className="text-sm font-medium text-slate-700">{patient.insurance_notes}</p>
+                        <div className="sm:col-span-2">
+                          <ValueDisplay label="Notes éventuelles" value={patient.insurance_notes} />
                         </div>
                       )}
                     </div>
                   </Card>
+
+                  {/* 5. INFORMATIONS MÉDICALES */}
+                  <Card className="p-8 border-none shadow-sm bg-white ring-1 ring-slate-100 rounded-[24px]">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                        <Activity className="w-5 h-5 text-primary" />
+                        Informations médicales
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                      <ValueDisplay label="Groupe sanguin" value={patient.blood_group ? `${patient.blood_group}${patient.rhesus || ""}` : null} />
+                      <ValueDisplay label="Allergies" value={patient.allergies} />
+                      <ValueDisplay label="Maladies chroniques" value={patient.chronic_diseases} />
+                      <ValueDisplay label="Médicaments actuels" value={patient.current_medications} />
+                      <div className="sm:col-span-2">
+                        <ValueDisplay label="Antécédents chirurgicaux" value={patient.surgical_history} />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <ValueDisplay label="Condition / état général" value="Stable" />
+                      </div>
+                    </div>
+                  </Card>
+
+                  {/* 6. EMERGENCY CONTACT */}
+                  {(patient.emergency_contact_name || patient.emergency_contact_phone) && (
+                    <Card className="p-8 border-none shadow-sm bg-white ring-1 ring-slate-100 rounded-[24px] md:col-span-2">
+                      <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-sm font-bold text-slate-900 uppercase tracking-[0.2em] flex items-center gap-2">
+                          <ShieldAlert className="w-5 h-5 text-rose-500" />
+                          Contact d'urgence
+                        </h3>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6">
+                        <ValueDisplay label="Nom" value={patient.emergency_contact_name} />
+                        <ValueDisplay label="Relation" value={patient.emergency_contact_relation} />
+                        <ValueDisplay label="Téléphone" value={patient.emergency_contact_phone} icon={Phone} />
+                      </div>
+                    </Card>
+                  )}
                 </div>
               </TabsContent>
 
