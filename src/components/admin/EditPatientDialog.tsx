@@ -119,11 +119,14 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         profileData = p;
       }
 
+      const finalEmail = profileData?.email || intake?.email || "";
+      setInitialEmail(finalEmail);
+
       setForm({
         first_name: intake?.first_name || "",
         last_name: intake?.last_name || "",
         full_name: profileData?.full_name || [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") || "",
-        email: profileData?.email || intake?.email || "",
+        email: finalEmail,
         phone: profileData?.phone || intake?.phone || "",
         nationality: profileData?.nationality || intake?.nationality || "",
         identity_document_type: profileData?.identity_document_type || intake?.identity_document_type || "",
