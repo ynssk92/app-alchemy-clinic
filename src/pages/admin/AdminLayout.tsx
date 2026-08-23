@@ -421,7 +421,7 @@ const AdminShell = () => {
                 {adminName}
               </span>
               <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-                {isAdmin ? "Admin" : isAssistant ? "Assistant" : ""}
+                {useAuth().role ? useAuth().role.charAt(0).toUpperCase() + useAuth().role.slice(1) : ""}
               </span>
             </div>
           </Link>
