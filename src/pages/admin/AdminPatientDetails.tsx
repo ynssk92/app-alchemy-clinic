@@ -719,6 +719,24 @@ const AdminPatientDetails = () => {
                       </div>
                     </div>
                   </Card>
+
+                  <Card className="p-6 border-slate-100 shadow-sm md:col-span-2">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <VenetianMask className="w-4 h-4 text-primary" />
+                        IDENTITÉ / DOCUMENT D'IDENTITÉ
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Type de document</p>
+                        <p className="text-sm font-medium text-slate-700">{patient.identity_document_type || "—"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Numéro du document</p>
+                        <p className="text-sm font-medium text-slate-700 tracking-wider font-mono">{patient.identity_document_number || "—"}</p>
+                      </div>
+                    </div>
                 </div>
               </TabsContent>
 
