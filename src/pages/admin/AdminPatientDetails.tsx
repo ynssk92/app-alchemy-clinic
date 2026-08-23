@@ -163,8 +163,8 @@ const getAge = (dob?: string | null) => {
   return age;
 };
 
-const ValueDisplay = ({ label, value, icon: Icon, mono }: { label: string; value?: string | null; icon?: any; mono?: boolean }) => (
-  <div className="space-y-1">
+const ValueDisplay = ({ label, value, icon: Icon, mono, colSpan }: { label: string; value?: string | null; icon?: any; mono?: boolean; colSpan?: number }) => (
+  <div className={cn("space-y-1", colSpan === 2 && "sm:col-span-2")}>
     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
       {Icon && <Icon className="w-3 h-3" />}
       {label}
