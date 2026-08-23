@@ -108,34 +108,34 @@ const App = () => (
             <Route path="/cookies" element={<Cookies />} />
             <Route path="/admin" element={<ProtectedRoute staffOnly><AdminLayout /></ProtectedRoute>}>
               <Route index element={<AdminOverview />} />
-              <Route path="doctors" element={<PermissionRoute module="Doctors"><AdminDoctors /></PermissionRoute>} />
-              <Route path="doctors/new" element={<PermissionRoute module="Doctors" action="create"><AdminDoctorAdd /></PermissionRoute>} />
-              <Route path="doctors/details" element={<PermissionRoute module="Doctors"><AdminDoctorDetails /></PermissionRoute>} />
-              <Route path="doctors/details/:id" element={<PermissionRoute module="Doctors"><AdminDoctorDetails /></PermissionRoute>} />
-              <Route path="doctors/schedule" element={<PermissionRoute module="Doctors" action="edit"><AdminDoctorSchedule /></PermissionRoute>} />
+              <Route path="doctors" element={<PermissionRoute module="doctors"><AdminDoctors /></PermissionRoute>} />
+              <Route path="doctors/new" element={<PermissionRoute module="doctors" action="create"><AdminDoctorAdd /></PermissionRoute>} />
+              <Route path="doctors/details" element={<PermissionRoute module="doctors"><AdminDoctorDetails /></PermissionRoute>} />
+              <Route path="doctors/details/:id" element={<PermissionRoute module="doctors"><AdminDoctorDetails /></PermissionRoute>} />
+              <Route path="doctors/schedule" element={<PermissionRoute module="doctors" action="edit"><AdminDoctorSchedule /></PermissionRoute>} />
               <Route path="doctors/schedule/:id" element={<PermissionRoute module="Doctors" action="edit"><AdminDoctorSchedule /></PermissionRoute>} />
-              <Route path="appointments" element={<PermissionRoute module="Appointments"><AdminAppointments /></PermissionRoute>} />
-              <Route path="appointments/new" element={<PermissionRoute module="Appointments" action="create"><AdminAppointmentNew /></PermissionRoute>} />
-              <Route path="appointments/calendar" element={<PermissionRoute module="Appointments"><AdminAppointmentCalendar /></PermissionRoute>} />
-              <Route path="appointments/kanban" element={<PermissionRoute module="Appointments"><AdminAppointmentKanban /></PermissionRoute>} />
-              <Route path="appointments/requests" element={<PermissionRoute module="Appointments"><AdminAppointmentRequests /></PermissionRoute>} />
-              <Route path="patients" element={<PermissionRoute module="Patients"><AdminPatients /></PermissionRoute>} />
-              <Route path="patients/details" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
-              <Route path="patients/details/:id" element={<PermissionRoute module="Patients"><AdminPatientDetails /></PermissionRoute>} />
-              <Route path="patients/create" element={<PermissionRoute module="Patients" action="create"><AdminPatientCreate /></PermissionRoute>} />
-              <Route path="patients/approvals" element={<PermissionRoute module="Patients" action="edit"><AdminApprovals /></PermissionRoute>} />
-              <Route path="specialties" element={<PermissionRoute module="Specialties"><AdminSpecialties /></PermissionRoute>} />
-              <Route path="clinics" element={<PermissionRoute module="Clinics"><AdminClinics /></PermissionRoute>} />
-              <Route path="clinics/audit" element={<PermissionRoute module="Clinics"><AdminClinicAudit /></PermissionRoute>} />
-              <Route path="blog" element={<PermissionRoute module="Blog"><AdminBlog /></PermissionRoute>} />
-              <Route path="messages" element={<PermissionRoute module="Messages"><AdminMessages /></PermissionRoute>} />
-              <Route path="billing" element={<PermissionRoute module="Billing"><BillingDashboard /></PermissionRoute>} />
-              <Route path="billing/invoices" element={<PermissionRoute module="Billing"><Invoices /></PermissionRoute>} />
-              <Route path="billing/invoices/new" element={<PermissionRoute module="Billing" action="create"><CreateInvoice /></PermissionRoute>} />
-              <Route path="billing/invoices/:id" element={<PermissionRoute module="Billing"><InvoiceDetails /></PermissionRoute>} />
-              <Route path="billing/payments" element={<PermissionRoute module="Billing"><Payments /></PermissionRoute>} />
-              <Route path="billing/services" element={<PermissionRoute module="Billing"><Services /></PermissionRoute>} />
-              <Route path="billing/categories" element={<PermissionRoute module="Billing"><Categories /></PermissionRoute>} />
+              <Route path="appointments" element={<PermissionRoute module="appointments"><AdminAppointments /></PermissionRoute>} />
+              <Route path="appointments/new" element={<PermissionRoute module="appointments" action="create"><AdminAppointmentNew /></PermissionRoute>} />
+              <Route path="appointments/calendar" element={<PermissionRoute module="appointments"><AdminAppointmentCalendar /></PermissionRoute>} />
+              <Route path="appointments/kanban" element={<PermissionRoute module="appointments"><AdminAppointmentKanban /></PermissionRoute>} />
+              <Route path="appointments/requests" element={<PermissionRoute module="appointments"><AdminAppointmentRequests /></PermissionRoute>} />
+              <Route path="patients" element={<PermissionRoute module="patients"><AdminPatients /></PermissionRoute>} />
+              <Route path="patients/details" element={<PermissionRoute module="patients"><AdminPatientDetails /></PermissionRoute>} />
+              <Route path="patients/details/:id" element={<PermissionRoute module="patients"><AdminPatientDetails /></PermissionRoute>} />
+              <Route path="patients/create" element={<PermissionRoute module="patients" action="create"><AdminPatientCreate /></PermissionRoute>} />
+              <Route path="patients/approvals" element={<PermissionRoute module="patients" action="edit"><AdminApprovals /></PermissionRoute>} />
+              <Route path="specialties" element={<PermissionRoute module="specialties"><AdminSpecialties /></PermissionRoute>} />
+              <Route path="clinics" element={<PermissionRoute module="clinics"><AdminClinics /></PermissionRoute>} />
+              <Route path="clinics/audit" element={<PermissionRoute module="clinics"><AdminClinicAudit /></PermissionRoute>} />
+              <Route path="blog" element={<PermissionRoute module="blog"><AdminBlog /></PermissionRoute>} />
+              <Route path="messages" element={<PermissionRoute module="messages"><AdminMessages /></PermissionRoute>} />
+              <Route path="billing" element={<PermissionRoute module="billing"><BillingDashboard /></PermissionRoute>} />
+              <Route path="billing/invoices" element={<PermissionRoute module="billing"><Invoices /></PermissionRoute>} />
+              <Route path="billing/invoices/new" element={<PermissionRoute module="billing" action="create"><CreateInvoice /></PermissionRoute>} />
+              <Route path="billing/invoices/:id" element={<PermissionRoute module="billing"><InvoiceDetails /></PermissionRoute>} />
+              <Route path="billing/payments" element={<PermissionRoute module="billing"><Payments /></PermissionRoute>} />
+              <Route path="billing/services" element={<PermissionRoute module="billing"><Services /></PermissionRoute>} />
+              <Route path="billing/categories" element={<PermissionRoute module="billing"><Categories /></PermissionRoute>} />
               <Route path="verify-assistants" element={<ProtectedRoute adminOnly><AdminAssistantVerifier /></ProtectedRoute>} />
               <Route path="roles" element={<ProtectedRoute adminOnly><AdminRoles /></ProtectedRoute>} />
               <Route path="users" element={<ProtectedRoute adminOnly><AdminUsers /></ProtectedRoute>} />

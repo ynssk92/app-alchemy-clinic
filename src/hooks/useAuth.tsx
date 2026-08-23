@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Filter permissions for the user's roles
     const perms = (permData as any)
       ?.filter((p: any) => list.includes(p.role) || list.includes("admin"))
-      .map((p: any) => p.permission) || [];
+      .map((p: any) => String(p.permission)) || [];
     
     setPermissions([...new Set(perms)]);
   };
