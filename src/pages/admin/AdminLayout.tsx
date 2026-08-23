@@ -116,7 +116,7 @@ const sections: Section[] = [
       },
       { to: "/admin/reports", icon: BarChart3, label: "nav.reports", module: "reports" },
       { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "messages", staff: true },
-      { to: "/admin/history", icon: History, label: "nav.history", adminOnly: true },
+      { to: "/admin/history", icon: History, label: "Historique", adminOnly: true },
     ],
   },
   {
