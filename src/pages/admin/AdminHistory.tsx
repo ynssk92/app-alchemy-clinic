@@ -39,8 +39,9 @@ const AdminHistory = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
+      // Using 'as any' to bypass temporary type mismatch until Supabase types refresh
       let query = supabase
-        .from("audit_logs")
+        .from("audit_logs" as any)
         .select("*")
         .order("created_at", { ascending: false });
 
@@ -77,8 +78,10 @@ const AdminHistory = () => {
 
       if (error) throw error;
 
+      const auditLogs = (data || []) as AuditLog[];
+
       // Enrich with profile names
-      const actorIds = [...new Set(data.map(l => l.actor_id).filter(Boolean))];
+      const actorIds = [...new Set(auditLogs.map(l => l.actor_id).filter(Boolean))] as string[];
       if (actorIds.length > 0) {
         const { data: profiles } = await supabase
           .from("profiles")
@@ -86,13 +89,13 @@ const AdminHistory = () => {
           .in("id", actorIds);
         
         const profileMap = Object.fromEntries(profiles?.map(p => [p.id, p.full_name]) || []);
-        const enrichedLogs = data.map(l => ({
+        const enrichedLogs = auditLogs.map(l => ({
           ...l,
           actor_name: l.actor_id ? profileMap[l.actor_id] : null
         }));
         setLogs(enrichedLogs);
       } else {
-        setLogs(data);
+        setLogs(auditLogs);
       }
     } catch (error) {
       console.error("Error fetching audit logs:", error);
