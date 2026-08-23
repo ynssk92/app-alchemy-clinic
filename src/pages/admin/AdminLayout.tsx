@@ -8,7 +8,7 @@ import {
   ShieldCheck, Zap, Mail, CalendarCheck, UserPlus, History, FileText, Inbox,
   UserCheck, Search, Moon, Sun, User, BarChart3,
   FileStack, MapPin, MessageSquareQuote, HelpCircle, Receipt, Menu, Settings,
-  FolderOpen, Globe, Layers, MessageSquare, Image as ImageIcon, LayoutGrid,
+  FolderOpen, Globe, Layers, MessageSquare, Image as ImageIcon, LayoutGrid, Bell
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -124,6 +124,7 @@ const sections: Section[] = [
       { to: "/admin/languages", icon: Globe, label: "nav.languages", adminOnly: true },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "nav.verifyAssistants", adminOnly: true },
       { to: "/admin/verify-role", icon: ShieldCheck, label: "Verify Role", adminOnly: true },
+      { to: "/admin/settings/notifications", icon: Bell, label: "Notifications", staff: true },
     ],
   },
 ];
