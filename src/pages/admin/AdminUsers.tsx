@@ -187,29 +187,28 @@ const AdminUsers = () => {
   }, [loadInvites]);
 
   const updateRole = async (id: string, role: "admin" | "assistant" | "doctor" | "patient") => {
-    // Self-demotion prevention
+    // Self-demotion prevention (Client-side check)
     const { data: { user: currentUser } } = await supabase.auth.getUser();
-    if (id === currentUser?.id && role !== "admin") {
-      const { data: otherAdmins } = await supabase.from("user_roles").select("user_id").eq("role", "admin").neq("user_id", id);
-      if (!otherAdmins || otherAdmins.length === 0) {
-        return toast.error("You cannot revoke your own administrator status as you are the last admin.");
-      }
+    if (id === currentUser?.id) {
+      return toast.error("You cannot change your own role through this interface.");
     }
 
-    // Delete existing roles and set new one
-    const { error: delError } = await supabase.from("user_roles").delete().eq("user_id", id);
-    if (delError) return toast.error(delError.message);
-    
-    const { error: insError } = await supabase.from("user_roles").insert({ user_id: id, role: role as any });
-    if (insError) return toast.error(insError.message);
-    
-    toast.success(`Role updated to ${role}`);
-    // Trigger immediate auth state refresh by reloading the page or ideally re-fetching roles in useAuth
-    // Since useAuth listens to session changes, we could potentially trigger a reload or use a broadcast channel
-    // For now, reload ensures all components (sidebar, badge, etc) pick up the change
-    window.location.reload();
-    loadUsers();
+    try {
+      const { error } = await supabase.rpc("manage_user_role", {
+        target_user_id: id,
+        new_role: role
+      });
+
+      if (error) throw error;
+      
+      toast.success(`Role updated to ${role}`);
+      // Refresh user list
+      loadUsers();
+    } catch (e: any) {
+      toast.error(e.message || "Failed to update role");
+    }
   };
+
 
   const remove = async (id: string) => {
     if (!confirm("Delete this user's profile? Their auth account remains.")) return;
