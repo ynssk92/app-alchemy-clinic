@@ -477,5 +477,58 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    
+    <Dialog open={showEmailConfirm} onOpenChange={setShowEmailConfirm}>
+      <DialogContent className="max-w-md p-0 border-none shadow-2xl rounded-3xl overflow-hidden">
+        <div className="p-8 space-y-6">
+          <div className="flex items-center gap-4 text-amber-600">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Confirmation de changement d'email</h3>
+              <p className="text-sm text-slate-500">Cette action modifiera l'identifiant de connexion du patient.</p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ancien Email</span>
+              <span className="text-sm font-medium text-slate-600 truncate">{initialEmail}</span>
+            </div>
+            <div className="flex justify-center">
+              <ArrowRight className="w-5 h-5 text-slate-300" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Nouvel Email</span>
+              <span className="text-sm font-bold text-slate-900 truncate">{form.email}</span>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-500 bg-blue-50/50 p-4 rounded-xl border border-blue-100 leading-relaxed">
+            <strong>Important :</strong> Le patient devra utiliser sa nouvelle adresse email pour se connecter à son compte. Toutes ses données médicales et son historique resteront intacts.
+          </div>
+        </div>
+
+        <DialogFooter className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3 sm:gap-0">
+          <Button 
+            variant="ghost" 
+            onClick={() => setShowEmailConfirm(false)} 
+            disabled={saving}
+            className="h-11 px-6 rounded-xl hover:bg-slate-200/50"
+          >
+            Annuler
+          </Button>
+          <Button 
+            onClick={() => onSubmit(true)} 
+            disabled={saving}
+            className="h-11 px-8 rounded-xl bg-primary shadow-lg shadow-primary/20"
+          >
+            {saving ? "Mise à jour..." : "Confirmer le changement"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
