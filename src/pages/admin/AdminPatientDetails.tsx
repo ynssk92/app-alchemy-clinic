@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import { formatMoney } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 type ListRow = {
   key: string;
@@ -292,10 +293,9 @@ const AdminPatientDetails = () => {
   }, [id, navigate]);
 
   // --- Load a single patient: :id may be profile.id OR intake.id ---
-  useEffect(() => {
+  const loadPatient = useCallback(async () => {
     if (!id) return;
-    (async () => {
-      setNotFound(false);
+    setNotFound(false);
       
       // Load appointments for this patient
       const { data: appointmentData } = await supabase
@@ -494,7 +494,11 @@ const AdminPatientDetails = () => {
         development_notes: view.development_notes || "",
       });
     })();
-  }, [id]);
+  }, [id, toast]);
+
+  useEffect(() => {
+    loadPatient();
+  }, [loadPatient]);
 
   return (
     <div className="flex h-full w-full gap-6">
@@ -863,6 +867,13 @@ const AdminPatientDetails = () => {
                 </div>
               </TabsContent>
             </Tabs>
+            <EditPatientDialog
+              open={isEditing}
+              onOpenChange={setIsEditing}
+              profileId={patient.profileId}
+              intakeId={patient.intakeId}
+              onSaved={loadPatient}
+            />
           </div>
         )}
       </div>
