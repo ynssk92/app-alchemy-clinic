@@ -738,6 +738,31 @@ const AdminPatientDetails = () => {
                       </div>
                     </div>
                   </Card>
+
+                  <Card className="p-6 border-slate-100 shadow-sm md:col-span-2">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wider flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-primary" />
+                        ASSURANCE
+                      </h3>
+                    </div>
+                    <div className="grid grid-cols-2 gap-y-6 gap-x-4">
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Provider</p>
+                        <p className="text-sm font-medium text-slate-700">{patient.insurance_name || "Self-Pay / Sans assurance"}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">N° adhérent</p>
+                        <p className="text-sm font-medium text-slate-700 tracking-wider font-mono">{patient.insurance_number || "—"}</p>
+                      </div>
+                      {patient.insurance_notes && (
+                        <div className="col-span-2">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Notes d'assurance</p>
+                          <p className="text-sm font-medium text-slate-700">{patient.insurance_notes}</p>
+                        </div>
+                      )}
+                    </div>
+                  </Card>
                 </div>
               </TabsContent>
 
