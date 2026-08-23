@@ -110,7 +110,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       if (profileId) {
         const { data: p } = await supabase
           .from("profiles")
-          .select("full_name, phone, nationality, identity_document_type, identity_document_number, patient_type, languages, profession, family_situation, emergency_contact_name, emergency_contact_phone, emergency_contact_relation, insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes, rhesus")
+          .select("full_name, email, phone, address, city, country, nationality, identity_document_type, identity_document_number, patient_type, languages, profession, family_situation, emergency_contact_name, emergency_contact_phone, emergency_contact_relation, insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes, rhesus")
           .eq("id", profileId)
           .maybeSingle();
         profileData = p;
@@ -120,7 +120,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         first_name: intake?.first_name || "",
         last_name: intake?.last_name || "",
         full_name: profileData?.full_name || [intake?.first_name, intake?.last_name].filter(Boolean).join(" ") || "",
-        email: intake?.email || "",
+        email: profileData?.email || intake?.email || "",
         phone: profileData?.phone || intake?.phone || "",
         nationality: profileData?.nationality || intake?.nationality || "",
         identity_document_type: profileData?.identity_document_type || intake?.identity_document_type || "",
@@ -128,9 +128,9 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         dob: intake?.dob || "",
         gender: intake?.gender || "",
         blood_group: intake?.blood_group || "",
-        address_1: intake?.address_1 || "",
-        city: intake?.city || "",
-        country: intake?.country || "",
+        address_1: profileData?.address || intake?.address_1 || "",
+        city: profileData?.city || intake?.city || "",
+        country: profileData?.country || intake?.country || "",
         patient_type: profileData?.patient_type || intake?.patient_type || "adult",
         languages: profileData?.languages || intake?.languages || [],
         profession: profileData?.profession || intake?.profession || "",
@@ -173,7 +173,11 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           .from("profiles")
           .update({
             full_name: form.full_name.trim() || null,
+            email: form.email.trim() || null,
             phone: form.phone.trim() || null,
+            address: form.address_1.trim() || null,
+            city: form.city.trim() || null,
+            country: form.country.trim() || null,
             nationality: form.nationality.trim() || null,
             identity_document_type: form.identity_document_type || null,
             identity_document_number: form.identity_document_number.trim() || null,
@@ -297,6 +301,28 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
                   <Input className="h-11 rounded-xl" value={form.identity_document_number} onChange={(e) => set("identity_document_number", e.target.value)} />
                 </FormItem>
               </div>
+            </div>
+          </section>
+          
+          {/* SECTION 1.5: CONTACT INFO */}
+          <section>
+            <SectionHeader num="1.5" title="Coordonnées" icon={Phone} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <FormItem label="Email">
+                <Input type="email" className="h-11 rounded-xl" value={form.email} onChange={(e) => set("email", e.target.value)} />
+              </FormItem>
+              <FormItem label="Téléphone">
+                <Input type="tel" className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
+              </FormItem>
+              <FormItem label="Adresse" colSpan={2}>
+                <Input className="h-11 rounded-xl" value={form.address_1} onChange={(e) => set("address_1", e.target.value)} />
+              </FormItem>
+              <FormItem label="Ville">
+                <Input className="h-11 rounded-xl" value={form.city} onChange={(e) => set("city", e.target.value)} />
+              </FormItem>
+              <FormItem label="Pays">
+                <Input className="h-11 rounded-xl" value={form.country} onChange={(e) => set("country", e.target.value)} />
+              </FormItem>
             </div>
           </section>
 
