@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { UserPlus, BookOpen, ShieldCheck, Activity, Baby, Phone } from "lucide-react";
+import { UserPlus, BookOpen, ShieldCheck, Activity, Baby, Phone, ArrowRight, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -44,6 +44,8 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
   const [saving, setSaving] = useState(false);
   const [intakeId, setIntakeId] = useState<string | null>(intakeIdProp ?? null);
   const [initialEmail, setInitialEmail] = useState("");
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false);
+  const [pendingUpdate, setPendingUpdate] = useState(false);
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -172,11 +174,18 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
   const set = (k: string, v: string | any) => setForm((f) => ({ ...f, [k]: v }));
 
-  const onSubmit = async () => {
+  const onSubmit = async (confirmEmail = false) => {
+    const isEmailChanged = isAdmin && profileId && form.email.trim().toLowerCase() !== initialEmail.trim().toLowerCase();
+    
+    if (isEmailChanged && !confirmEmail) {
+      setShowEmailConfirm(true);
+      return;
+    }
+
     setSaving(true);
     try {
       // 1. Handle secure email update if changed by Admin
-      if (isAdmin && profileId && form.email.trim().toLowerCase() !== initialEmail.trim().toLowerCase()) {
+      if (isEmailChanged) {
         const { data: edgeData, error: edgeError } = await supabase.functions.invoke('admin-update-patient-email', {
           body: {
             target_user_id: profileId,
@@ -279,6 +288,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       }
 
       toast({ title: "Patient mis à jour" });
+      setShowEmailConfirm(false);
       onOpenChange(false);
       onSaved?.();
     } catch (e: any) {
@@ -291,6 +301,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl bg-white">
         <div className="p-10 space-y-16">
@@ -460,11 +471,64 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         </div>
         <DialogFooter className="p-8 bg-slate-50/50 border-t border-slate-100">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-8 rounded-xl">Cancel</Button>
-          <Button onClick={onSubmit} disabled={saving} className="h-11 px-10 rounded-xl shadow-lg shadow-primary/20">
+          <Button onClick={() => onSubmit(false)} disabled={saving} className="h-11 px-10 rounded-xl shadow-lg shadow-primary/20">
             {saving ? "Saving..." : "Save Patient Profile"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    
+    <Dialog open={showEmailConfirm} onOpenChange={setShowEmailConfirm}>
+      <DialogContent className="max-w-md p-0 border-none shadow-2xl rounded-3xl overflow-hidden">
+        <div className="p-8 space-y-6">
+          <div className="flex items-center gap-4 text-amber-600">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold">Confirmation de changement d'email</h3>
+              <p className="text-sm text-slate-500">Cette action modifiera l'identifiant de connexion du patient.</p>
+            </div>
+          </div>
+
+          <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 space-y-4">
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ancien Email</span>
+              <span className="text-sm font-medium text-slate-600 truncate">{initialEmail}</span>
+            </div>
+            <div className="flex justify-center">
+              <ArrowRight className="w-5 h-5 text-slate-300" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] font-bold text-primary uppercase tracking-wider">Nouvel Email</span>
+              <span className="text-sm font-bold text-slate-900 truncate">{form.email}</span>
+            </div>
+          </div>
+
+          <div className="text-xs text-slate-500 bg-blue-50/50 p-4 rounded-xl border border-blue-100 leading-relaxed">
+            <strong>Important :</strong> Le patient devra utiliser sa nouvelle adresse email pour se connecter à son compte. Toutes ses données médicales et son historique resteront intacts.
+          </div>
+        </div>
+
+        <DialogFooter className="p-6 bg-slate-50 border-t border-slate-100 flex gap-3 sm:gap-0">
+          <Button 
+            variant="ghost" 
+            onClick={() => setShowEmailConfirm(false)} 
+            disabled={saving}
+            className="h-11 px-6 rounded-xl hover:bg-slate-200/50"
+          >
+            Annuler
+          </Button>
+          <Button 
+            onClick={() => onSubmit(true)} 
+            disabled={saving}
+            className="h-11 px-8 rounded-xl bg-primary shadow-lg shadow-primary/20"
+          >
+            {saving ? "Mise à jour..." : "Confirmer le changement"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 };
