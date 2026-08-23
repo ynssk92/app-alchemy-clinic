@@ -50,11 +50,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       ]);
       
       const list = (roles || []).map((r: any) => String(r.role));
+      
+      // Prioritize roles for the UI state: admin > doctor > assistant > patient
+      let primaryRole = "patient";
+      if (list.includes("admin")) primaryRole = "admin";
+      else if (list.includes("doctor")) primaryRole = "doctor";
+      else if (list.includes("assistant")) primaryRole = "assistant";
+      else if (list.length > 0) primaryRole = list[0];
+
       const hasAdmin = list.includes("admin");
       setIsAdmin(hasAdmin);
       setIsAssistant(list.includes("assistant"));
       setIsDoctor(list.includes("doctor"));
-      setRole(list[0] || "patient");
+      setRole(primaryRole);
       setProfileStatus(((prof as any)?.status as any) ?? null);
 
       // Filter permissions for the user's roles

@@ -30,53 +30,54 @@ const AuthCallback = () => {
         if (session) {
           const user = session.user;
 
-          // 1. Check for invitations matching the email
-          const userEmail = user.email?.toLowerCase();
-          const { data: invite } = await supabase
-            .from("admin_invites")
-            .select("id, role" as any)
-            .eq("email", userEmail || "")
-            .is("claimed_at", null)
-            .maybeSingle();
-
-          const inviteData = invite as any;
-
-          if (inviteData) {
-            // Assign the invited role
-            const { error: roleError } = await supabase
-              .from("user_roles")
-              .insert({ 
-                user_id: user.id, 
-                role: inviteData.role 
-              });
-            
-            if (!roleError) {
-              // Mark invite as used
-              await supabase
-                .from("admin_invites")
-                .update({ claimed_at: new Date().toISOString(), claimed_by: user.id } as any)
-                .eq("id", inviteData.id);
-              
-              toast.success(`Role ${inviteData.role} assigned from invitation!`);
-            }
-          }
-
-          // 2. Fetch all active roles for redirection logic
-          const { data: roles } = await supabase
+          // 1. Resolve existing roles first (source of truth)
+          const { data: existingRoles } = await supabase
             .from("user_roles")
             .select("role")
             .eq("user_id", user.id);
           
-          const roleList = (roles || []).map(r => r.role);
+          let roleList = (existingRoles || []).map(r => r.role);
+          const userEmail = user.email?.toLowerCase() || "";
+
+          // 2. Check for invitations matching the email (using secure RPC)
+          // If the user already has a staff role, we might still want to process the invite
+          // but we prioritize existing staff status.
+          const { data: invite, error: inviteError } = await supabase
+            .rpc("get_my_invitation" as any);
+
+          if (!inviteError && Array.isArray(invite) && invite.length > 0) {
+            const inviteData = invite[0];
+            // Only assign if not already assigned
+            if (!roleList.includes(inviteData.role)) {
+              const { error: roleError } = await supabase
+                .from("user_roles")
+                .insert({ 
+                  user_id: user.id, 
+                  role: inviteData.role 
+                });
+              
+              if (!roleError) {
+                roleList.push(inviteData.role);
+                // Mark invite as used
+                await supabase
+                  .from("admin_invites")
+                  .update({ claimed_at: new Date().toISOString(), claimed_by: user.id } as any)
+                  .eq("id", inviteData.id);
+                
+                toast.success(`Role ${inviteData.role} assigned from invitation!`);
+              }
+            }
+          }
           
-          // Bootstrap fallback
-          if (roleList.length === 0 && INITIAL_ADMIN_EMAILS.includes(userEmail || "")) {
+          // 3. Bootstrap fallback for initial admin
+          if (roleList.length === 0 && INITIAL_ADMIN_EMAILS.includes(userEmail)) {
             const { error: promoError } = await supabase
               .from("user_roles")
               .insert({ user_id: user.id, role: "admin" });
             
             if (!promoError) {
               roleList.push("admin");
+              toast.success("Initial administrator account activated.");
             }
           }
 

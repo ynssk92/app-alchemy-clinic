@@ -133,7 +133,23 @@ const AdminUsers = () => {
       }
 
       if (rid !== reqIdRef.current) return; // stale
-      setRows((data || []).map((p: any) => ({ ...p, roles: rmap.get(p.id) || [] })));
+      
+      // Categorize users by their highest privilege role
+      const processedRows = (data || []).map((p: any) => {
+        const userRoles = rmap.get(p.id) || [];
+        // Determine primary role for display
+        let primaryRole = userRoles.includes("admin") ? "admin" : 
+                         userRoles.includes("doctor") ? "doctor" :
+                         userRoles.includes("assistant") ? "assistant" : "patient";
+        
+        return { 
+          ...p, 
+          roles: userRoles,
+          primaryRole // Add this for sorting/filtering if needed
+        };
+      });
+
+      setRows(processedRows);
       setTotal(count || 0);
     } catch (e: any) {
       toast.error(e.message || "Failed to load users");
