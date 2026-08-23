@@ -78,7 +78,134 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
-              {hero.badge}
+              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+
+                                            Redesign the authentication page to use Google authentication ONLY.
+
+IMPORTANT:
+This is a FRONTEND/AUTH UI change.
+Do not modify any existing database tables, clinical data, RLS policies, roles, permissions, invitations, or backend authorization logic.
+
+Requirements:
+
+1. LOGIN
+Keep the existing Login / Create account tabs if they are still useful.
+
+On the Login tab, show ONLY:
+
+[ Continue with Google ]
+
+Remove completely:
+- Facebook
+- X / Twitter
+- Email field
+- Password field
+- Forgot password
+- Sign in with email/password
+
+2. CREATE ACCOUNT
+
+On the Create account tab, also show ONLY:
+
+[ Continue with Google ]
+
+Remove:
+- Email registration
+- Password registration
+- Confirm password
+- Any email/password signup fields
+
+3. GOOGLE OAUTH
+
+Keep the existing Google OAuth integration exactly as it currently works.
+
+Do NOT create a new OAuth implementation.
+
+Use the existing Google sign-in function and existing redirect/callback flow.
+
+4. INVITATIONS
+
+IMPORTANT:
+Do NOT break the existing invitation-based role assignment.
+
+Google login must continue through:
+
+Google authentication
+→ AuthCallback
+→ claim_invitation_role
+→ resolve role
+→ load permissions
+→ correct dashboard
+
+An invited user must still receive the role assigned by the admin.
+
+Example:
+
+invitation:
+merchyns1@gmail.com → assistant
+
+Google login with:
+merchyns1@gmail.com
+
+Result:
+assistant role + assistant dashboard.
+
+5. DEFAULT ROLE
+
+Users who authenticate with Google and have no invitation must continue receiving the existing default patient role.
+
+6. UI
+
+Make the page cleaner and more professional.
+
+Use a single prominent Google button centered in the auth card.
+
+Suggested layout:
+
+Login
+----------------
+Continue with Google
+----------------
+
+or:
+
+Create account
+----------------
+Continue with Google
+----------------
+
+Use the existing clinic visual identity and royal-blue styling.
+
+Do not redesign unrelated pages.
+
+7. SECURITY
+
+Do not change:
+- user_roles
+- admin_invites
+- role_permissions
+- RLS
+- Supabase functions
+- permissions
+- admin authorization
+
+Only remove the unused authentication methods from the UI and keep Google OAuth working.
+
+8. IMPORTANT
+
+Before changing anything, inspect the existing Google OAuth implementation.
+
+Do not duplicate the Google login logic.
+
+Do not modify AuthCallback.tsx unless absolutely necessary.
+
+The final authentication system should be:
+
+GOOGLE ONLY
+→ existing OAuth
+→ existing AuthCallback
+→ existing invitation/role system
+→ correct dashboard
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">

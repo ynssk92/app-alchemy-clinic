@@ -289,139 +289,23 @@ const Auth = () => {
                         exit={{ opacity: 0, x: 10 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col items-center py-6">
                           <Button
                             type="button"
                             variant="outline"
-                            className="h-12 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-xl transition-all gap-3"
+                            className="w-full h-14 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-2xl transition-all gap-4 shadow-sm"
                             onClick={() => handleOAuthLogin("google")}
                             disabled={busy}
                           >
-                            <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden="true">
+                            <svg className="w-6 h-6" viewBox="0 0 48 48" aria-hidden="true">
                               <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.5 29.6 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
                               <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 7 29.6 5 24 5 16.3 5 9.6 9.3 6.3 14.7z"/>
                               <path fill="#4CAF50" d="M24 43c5.4 0 10.3-2 14-5.3l-6.5-5.3C29.4 34 26.8 35 24 35c-5.3 0-9.7-3.1-11.3-8l-6.6 5.1C9.4 38.7 16.1 43 24 43z"/>
                               <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.4-2.4 4.4-4.5 5.7l6.5 5.3C41 35 43.5 30 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
                             </svg>
-                            <span className="font-semibold text-xs sm:text-sm">Google</span>
-                          </Button>
-
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="h-12 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-xl transition-all gap-3"
-                            onClick={() => handleCustomOAuth("facebook")}
-                            disabled={busy}
-                          >
-                            <svg className="w-5 h-5 fill-[#1877F2]" viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                            </svg>
-                            <span className="font-semibold text-xs sm:text-sm">Facebook</span>
-                          </Button>
-
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="h-12 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-xl transition-all gap-3"
-                            onClick={() => handleCustomOAuth("twitter")}
-                            disabled={busy}
-                          >
-                            <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24" aria-hidden="true">
-                              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                            </svg>
-                            <span className="font-semibold text-xs sm:text-sm">X / Twitter</span>
+                            <span className="font-bold text-base sm:text-lg">Continue with Google</span>
                           </Button>
                         </div>
-                        <div className="relative my-8">
-                          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100" /></div>
-                          <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-white px-4 text-slate-400 font-medium tracking-wider">OR EMAIL</span>
-                          </div>
-                        </div>
-
-
-                        <form onSubmit={handleLogin} className="space-y-5">
-                          <div className="space-y-2">
-                            <Label htmlFor="login-email" className="text-slate-700 font-medium ml-1">Email</Label>
-                            <div className="relative">
-                              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input 
-                                id="login-email" 
-                                type="email" 
-                                placeholder="name@example.com"
-                                required
-                                className="pl-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
-                                value={loginData.email}
-                                onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} 
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center ml-1">
-                              <Label htmlFor="login-password" className="text-slate-700 font-medium">Password</Label>
-                              <button 
-                                type="button" 
-                                onClick={handleForgot}
-                                className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
-                              >
-                                Forgot password?
-                              </button>
-                            </div>
-                            <div className="relative">
-                              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input 
-                                id="login-password" 
-                                type={showPassword ? "text" : "password"} 
-                                placeholder="••••••••"
-                                required
-                                className="pl-11 pr-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
-                                value={loginData.password}
-                                onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} 
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                              >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                            </div>
-                          </div>
-
-                          <Button 
-                            type="submit" 
-                            className="w-full h-12 mt-4 text-base font-semibold rounded-xl bg-primary hover:bg-primary/95 shadow-md shadow-primary/20 transition-all active:scale-[0.98]" 
-                            disabled={busy}
-                          >
-                            {busy ? "Signing in..." : "Sign in"}
-                          </Button>
-                        </form>
-
-                        {resetSentTo && (
-                          <motion.div 
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="mt-6 rounded-2xl border border-primary/10 bg-primary/5 p-4 text-sm"
-                          >
-                            <div className="flex gap-3">
-                              <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
-                              <p className="text-slate-700">
-                                Reset link sent to <span className="font-bold text-slate-900">{resetSentTo}</span>. Didn't get it? Check spam or resend.
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              variant="link"
-                              size="sm"
-                              onClick={handleResend}
-                              disabled={busy || resendCooldown > 0}
-                              className="mt-2 p-0 h-auto font-bold text-primary hover:no-underline"
-                            >
-                              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend reset email"}
-                            </Button>
-                          </motion.div>
-                        )}
                       </motion.div>
                     </TabsContent>
 
@@ -432,74 +316,23 @@ const Auth = () => {
                         exit={{ opacity: 0, x: -10 }}
                         transition={{ duration: 0.2 }}
                       >
-                        <form onSubmit={handleSignup} className="space-y-5">
-                          <div className="space-y-2">
-                            <Label htmlFor="signup-name" className="text-slate-700 font-medium ml-1">Full Name</Label>
-                            <div className="relative">
-                              <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input 
-                                id="signup-name" 
-                                placeholder="John Doe"
-                                required
-                                className="pl-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
-                                value={signupData.name}
-                                onChange={(e) => setSignupData({ ...signupData, name: e.target.value })} 
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="signup-email" className="text-slate-700 font-medium ml-1">Email Address</Label>
-                            <div className="relative">
-                              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input 
-                                id="signup-email" 
-                                type="email" 
-                                placeholder="name@example.com"
-                                required
-                                className="pl-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
-                                value={signupData.email}
-                                onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} 
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="signup-password" className="text-slate-700 font-medium ml-1">Password</Label>
-                            <div className="relative">
-                              <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <Input 
-                                id="signup-password" 
-                                type={showPassword ? "text" : "password"} 
-                                placeholder="Min. 6 characters"
-                                required 
-                                minLength={6}
-                                className="pl-11 pr-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
-                                value={signupData.password}
-                                onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} 
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
-                              >
-                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                            </div>
-                          </div>
-
-                          <Button 
-                            type="submit" 
-                            className="w-full h-12 mt-4 text-base font-semibold rounded-xl bg-primary hover:bg-primary/95 shadow-md shadow-primary/20 transition-all active:scale-[0.98]" 
+                        <div className="flex flex-col items-center py-6">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full h-14 border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 rounded-2xl transition-all gap-4 shadow-sm"
+                            onClick={() => handleOAuthLogin("google")}
                             disabled={busy}
                           >
-                            {busy ? "Creating account..." : "Create Account"}
+                            <svg className="w-6 h-6" viewBox="0 0 48 48" aria-hidden="true">
+                              <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 6.5 29.6 4.5 24 4.5 13.2 4.5 4.5 13.2 4.5 24S13.2 43.5 24 43.5 43.5 34.8 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+                              <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.6 7 29.6 5 24 5 16.3 5 9.6 9.3 6.3 14.7z"/>
+                              <path fill="#4CAF50" d="M24 43c5.4 0 10.3-2 14-5.3l-6.5-5.3C29.4 34 26.8 35 24 35c-5.3 0-9.7-3.1-11.3-8l-6.6 5.1C9.4 38.7 16.1 43 24 43z"/>
+                              <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.4-2.4 4.4-4.5 5.7l6.5 5.3C41 35 43.5 30 43.5 24c0-1.2-.1-2.3-.4-3.5z"/>
+                            </svg>
+                            <span className="font-bold text-base sm:text-lg">Continue with Google</span>
                           </Button>
-
-                          <p className="text-center text-xs text-slate-400 mt-6 px-4">
-                            By creating an account, you agree to our <Link to="#" className="text-primary hover:underline">Terms of Service</Link> and <Link to="#" className="text-primary hover:underline">Privacy Policy</Link>.
-                          </p>
-                        </form>
+                        </div>
                       </motion.div>
                     </TabsContent>
                   </AnimatePresence>
