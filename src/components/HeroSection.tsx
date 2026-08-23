@@ -78,7 +78,53 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
-              CLINIQUE LA DUNE DENTAIRE
+              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+
+IMPORTANT CHANGE TO THE PREVIOUS REQUEST:
+
+In the "COORDONNÉES" section, DO NOT allow editing the patient's Email.
+
+The patient's Email must remain READ-ONLY and must continue to come from the existing patient/auth identity source exactly as it does today.
+
+DO NOT:
+
+- Add an email input to Edit Profile.
+
+- Update the patient's authentication email.
+
+- Update auth.users email.
+
+- Update profile email independently.
+
+- Create a second email field.
+
+- Change the existing user identity architecture.
+
+- Change Supabase Auth behavior.
+
+The Email displayed in "COORDONNÉES" should remain exactly as it currently works.
+
+EDITABLE COORDONNÉES FIELDS:
+
+- Téléphone
+
+- Adresse
+
+- Ville
+
+- Pays
+
+READ-ONLY:
+
+- Email
+
+The Edit Profile form should display the patient's email as non-editable information if useful, but the user must not be able to modify it.
+
+Preserve the existing authentication and patient identity system 100%.
+
+Also preserve the existing input-focus fix: all editable fields must allow continuous typing without losing focus after each character.
+
+Do not modify roles, permissions, RLS, authentication, user_roles, or any unrelated backend logic.
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
