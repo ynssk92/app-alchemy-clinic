@@ -305,6 +305,71 @@ const Auth = () => {
                             </svg>
                             <span className="font-bold text-base sm:text-lg">Continue with Google</span>
                           </Button>
+
+                          <div className="relative w-full my-8">
+                            <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100" /></div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                              <span className="bg-white px-4 text-slate-400 font-medium tracking-wider">OR</span>
+                            </div>
+                          </div>
+
+                          <form onSubmit={handleLogin} className="w-full space-y-5">
+                            <div className="space-y-2">
+                              <Label htmlFor="login-email" className="text-slate-700 font-medium ml-1">Email</Label>
+                              <div className="relative">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Input 
+                                  id="login-email" 
+                                  type="email" 
+                                  placeholder="name@example.com"
+                                  required
+                                  className="pl-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
+                                  value={loginData.email}
+                                  onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} 
+                                />
+                              </div>
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center ml-1">
+                                <Label htmlFor="login-password" className="text-slate-700 font-medium">Password</Label>
+                                <button 
+                                  type="button" 
+                                  onClick={handleForgot}
+                                  className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
+                                >
+                                  Forgot password?
+                                </button>
+                              </div>
+                              <div className="relative">
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Input 
+                                  id="login-password" 
+                                  type={showPassword ? "text" : "password"} 
+                                  placeholder="••••••••"
+                                  required
+                                  className="pl-11 pr-11 h-12 bg-slate-50 border-slate-100 focus:bg-white focus:border-primary/50 transition-all rounded-xl"
+                                  value={loginData.password}
+                                  onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} 
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword(!showPassword)}
+                                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                                >
+                                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                              </div>
+                            </div>
+
+                            <Button 
+                              type="submit" 
+                              className="w-full h-12 mt-4 text-base font-semibold rounded-xl bg-primary hover:bg-primary/95 shadow-md shadow-primary/20 transition-all active:scale-[0.98]" 
+                              disabled={busy}
+                            >
+                              {busy ? "Signing in..." : "Sign in"}
+                            </Button>
+                          </form>
                         </div>
                       </motion.div>
                     </TabsContent>
@@ -334,6 +399,7 @@ const Auth = () => {
                           </Button>
                         </div>
                       </motion.div>
+                    </TabsContent>
                     </TabsContent>
                   </AnimatePresence>
                 </div>

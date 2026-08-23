@@ -80,55 +80,94 @@ export const HeroSection = () => {
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
 
-                                            Redesign the authentication page to use Google authentication ONLY.
+                                            Update the authentication UX with the following exact behavior.
 
 IMPORTANT:
-This is a FRONTEND/AUTH UI change.
-Do not modify any existing database tables, clinical data, RLS policies, roles, permissions, invitations, or backend authorization logic.
+Do NOT modify the existing role, invitation, permission, RLS, or clinical-data architecture.
 
-Requirements:
+AUTHENTICATION RULES:
 
 1. LOGIN
-Keep the existing Login / Create account tabs if they are still useful.
 
-On the Login tab, show ONLY:
+The Login tab must provide TWO authentication methods:
+
+A) Continue with Google
+B) Email + Password
+
+Google should be the primary/prominent option.
+
+Email + Password should remain available for users who have previously configured a password.
+
+The Login UI should be:
 
 [ Continue with Google ]
 
-Remove completely:
-- Facebook
-- X / Twitter
-- Email field
-- Password field
-- Forgot password
-- Sign in with email/password
+        OR
+
+Email
+Password
+[ Sign in ]
+
+Remove Facebook and X/Twitter completely.
 
 2. CREATE ACCOUNT
 
-On the Create account tab, also show ONLY:
+The Create account tab should provide ONLY:
 
 [ Continue with Google ]
 
-Remove:
-- Email registration
-- Password registration
-- Confirm password
-- Any email/password signup fields
+Do NOT provide public email/password registration.
 
-3. GOOGLE OAUTH
+New users should create their account through Google.
 
-Keep the existing Google OAuth integration exactly as it currently works.
+3. PASSWORD FROM PROFILE
 
-Do NOT create a new OAuth implementation.
+A user who is already authenticated must be able to set or change their password from their Profile / Account Settings.
 
-Use the existing Google sign-in function and existing redirect/callback flow.
+Provide a secure section such as:
 
-4. INVITATIONS
+Security
+──────────────
+Password
+[ Set password ] / [ Change password ]
 
-IMPORTANT:
-Do NOT break the existing invitation-based role assignment.
+If the user already has a password:
+- allow changing it
+- require the current password if the existing authentication architecture supports it
+- otherwise use the secure Supabase password update flow
 
-Google login must continue through:
+If the user has no password yet:
+- allow setting a password
+
+After a user successfully sets a password, they must be able to log in using:
+
+their email + password
+
+4. GOOGLE USERS
+
+A Google-authenticated user can continue using Google login normally.
+
+If they set a password from their Profile, they should then have BOTH options:
+
+Google
+OR
+Email + Password
+
+5. EXISTING USERS
+
+Do not break existing accounts.
+
+Do not reset existing passwords.
+
+Do not change existing authentication providers.
+
+Do not delete authentication identities.
+
+6. INVITATION / ROLE SYSTEM
+
+This change MUST NOT break the existing invitation flow.
+
+Google:
 
 Google authentication
 → AuthCallback
@@ -137,75 +176,91 @@ Google authentication
 → load permissions
 → correct dashboard
 
-An invited user must still receive the role assigned by the admin.
+Email + Password:
+
+Email/password authentication
+→ existing auth callback / role resolution
+→ claim_invitation_role if necessary
+→ resolve role
+→ load permissions
+→ correct dashboard
+
+The same role-resolution system must be used regardless of whether the user authenticated through Google or Email/Password.
 
 Example:
 
-invitation:
-merchyns1@gmail.com → assistant
+Admin invitation:
+merchyns1@gmail.com → Assistant
 
-Google login with:
-merchyns1@gmail.com
+User signs in with Google:
+→ Assistant
+
+Later user sets a password.
+
+User signs in with:
+merchyns1@gmail.com + password
 
 Result:
-assistant role + assistant dashboard.
+→ Assistant
 
-5. DEFAULT ROLE
+The authentication method must NEVER change the user's role.
 
-Users who authenticate with Google and have no invitation must continue receiving the existing default patient role.
+7. DEFAULT PATIENT
 
-6. UI
+A new Google user with no invitation:
+→ Patient
 
-Make the page cleaner and more professional.
+A user who has an invitation:
+→ invited role
 
-Use a single prominent Google button centered in the auth card.
+An existing privileged user:
+→ preserve existing role.
 
-Suggested layout:
+8. SECURITY
 
-Login
-----------------
-Continue with Google
-----------------
+Do NOT:
+- weaken RLS
+- modify user_roles security
+- make passwords visible
+- store passwords manually
+- create a custom password table
+- expose passwords in frontend state
+- change admin permissions
+- bypass Supabase Auth
 
-or:
+Use Supabase Auth's native password functionality.
 
-Create account
-----------------
-Continue with Google
-----------------
+9. UI
 
-Use the existing clinic visual identity and royal-blue styling.
+Keep the authentication page clean and premium.
 
-Do not redesign unrelated pages.
+Login:
 
-7. SECURITY
+[ Google icon ] Continue with Google
 
-Do not change:
-- user_roles
-- admin_invites
-- role_permissions
-- RLS
-- Supabase functions
-- permissions
-- admin authorization
+──────── OR ────────
 
-Only remove the unused authentication methods from the UI and keep Google OAuth working.
+Email
+Password
+[ Sign in ]
 
-8. IMPORTANT
+Create account:
 
-Before changing anything, inspect the existing Google OAuth implementation.
+[ Google icon ] Continue with Google
 
-Do not duplicate the Google login logic.
+No Facebook.
+No X/Twitter.
+No public email/password signup.
 
-Do not modify AuthCallback.tsx unless absolutely necessary.
+10. IMPORTANT
 
-The final authentication system should be:
+Inspect the existing authentication implementation first.
 
-GOOGLE ONLY
-→ existing OAuth
-→ existing AuthCallback
-→ existing invitation/role system
-→ correct dashboard
+Reuse the existing Google OAuth and AuthCallback.
+
+Do not create duplicate authentication logic.
+
+Do not modify backend role/invitation logic unless required to support email/password authentication using the same existing role-resolution flow.
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
