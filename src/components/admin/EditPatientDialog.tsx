@@ -39,8 +39,10 @@ const FormItem = ({ label, children, colSpan = 1 }: { label: string; children: R
 
 export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: intakeIdProp, onSaved }: Props) => {
   const { toast } = useToast();
+  const { isAdmin } = useAuth();
   const [saving, setSaving] = useState(false);
   const [intakeId, setIntakeId] = useState<string | null>(intakeIdProp ?? null);
+  const [initialEmail, setInitialEmail] = useState("");
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
