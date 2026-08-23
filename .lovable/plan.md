@@ -1,43 +1,48 @@
-# Plan: Admin-Only Patient Email Editing
+# Plan: Secure Admin-Only Patient Email Update
 
-This plan implements an admin-only feature to edit a patient's email address within the "Patient Identity" section of the Edit Patient Profile dialog. The email in the "Coordonnées" section will remain read-only for all users. Changes to the email will use the application's existing authentication architecture while maintaining data synchronization between `auth.users`, `profiles`, and `patient_intake`.
+This plan implements a secure, admin-only feature to update a patient's email address using a server-side Edge Function. The email will be editable in the "Patient Identity" section for admins only, while remaining read-only in the "Coordonnées" section for all users. The implementation ensures security by using a server-side component to handle `auth.users` updates via the service role, maintaining synchronization across all related tables without duplicating identities.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> The admin-only email update will rely on the `service_role` key (via an Edge Function or RPC) to securely update `auth.users` without triggering full email confirmation flows if possible, or using the standard Supabase admin update methods. Since Lovable Cloud handles the `service_role`, I will implement this using a database function or secure logic that respects existing RLS.
+> The email update will be performed via a new Supabase Edge Function `admin-update-patient-email`. This function will use the Supabase Auth Admin API (Service Role) to securely update the target user's email.
+> 
+> **Note on Supabase Auth Behavior:** If Supabase is configured to require email confirmation for changes, the patient will receive a confirmation link. The Edge Function will follow the project's configured Auth settings.
 
-- Do you have a specific Edge Function for admin-initiated user updates already, or should I create a new secure RPC? (I will assume a new RPC `admin_update_patient_email` for maximum security and minimal impact).
+- I will proceed with creating the Edge Function `admin-update-patient-email`.
 
 ## Technical Details
 
-### Database / Backend
-1. **Create RPC Function**: `admin_update_patient_email(target_user_id uuid, new_email text)`
-   - Defined as `SECURITY DEFINER`.
-   - Checks if the executing user `public.has_role(auth.uid(), 'admin')`.
-   - Updates `auth.users` (using `update users set email = ... where id = ...`).
-   - Updates `public.profiles.email` and `public.patient_intake.email` to keep them in sync.
-   - Handles unique constraint violations (e.g., if the new email already exists).
+### Backend (Edge Function)
+1. **Create Edge Function**: `admin-update-patient-email`
+   - **Authentication**: Verifies the caller is authenticated via the JWT.
+   - **Authorization**: Checks if the caller has the `admin` role using the `public.has_role` check or checking the `user_roles` table directly via the service role client.
+   - **Input Validation**: Accepts `target_user_id` and `new_email`. Validates and normalizes the email (lowercase, trimmed).
+   - **User Verification**: Checks if the target user exists and if the new email is already in use by another account.
+   - **Update Operation**: Uses `auth.admin.updateUserById` to update the email in `auth.users`.
+   - **Synchronization**: Updates the `email` field in `public.profiles` and `public.patient_intake` to match the new authoritative source.
 
 ### Frontend
-1. **`useAuth` Hook**:
-   - Ensure `isAdmin` is available and reliable (already confirmed in `src/hooks/useAuth.tsx`).
+1. **`src/components/admin/EditPatientDialog.tsx`**:
+   - **Patient Identity Section**:
+     - Check `isAdmin` from `useAuth`.
+     - Set the Email `Input` to `readOnly={!isAdmin}` and `disabled={!isAdmin}`.
+     - Ensure the `Input` uses a stable pattern to maintain focus during continuous typing.
+   - **Coordonnées Section**:
+     - Keep the Email `Input` as `readOnly` and `disabled` for everyone.
+   - **Submission Logic (`onSubmit`)**:
+     - Detect if the email has changed from the original loaded value.
+     - If changed and user is Admin:
+       1. Call `supabase.functions.invoke('admin-update-patient-email', ...)` first.
+       2. If successful, proceed with the existing profile and intake updates.
+       3. If it fails, stop execution and show an error toast without updating the rest of the profile.
+     - If the email is unchanged, proceed with the normal update.
+   - **Persistence**: Ensure the updated email is reflected in the form state and subsequent queries.
 
-2. **`EditPatientDialog.tsx`**:
-   - Update `FormItem` for "Email" in the **Patient Identity** section:
-     - If `isAdmin`, set `readOnly={false}` and `disabled={false}`.
-     - Else, keep `readOnly={true}` and `disabled={true}`.
-   - Update `FormItem` for "Email" in the **Coordonnées** section:
-     - Always keep `readOnly={true}` and `disabled={true}` for everyone.
-   - Update `onSubmit` logic:
-     - Detect if `email` has changed.
-     - If changed and user is admin, call the `admin_update_patient_email` RPC before or during the profile/intake update.
-     - Ensure focus remains on the input while typing (already has a fix, but will verify it's not broken by the conditional `readOnly`).
-
-3. **`AdminPatientDetails.tsx`**:
-   - Ensure the view refreshes both email displays after a successful save (already triggered by `onSaved` callback).
+2. **`src/pages/admin/AdminPatientDetails.tsx`**:
+   - The `onSaved` callback already triggers a refresh of the patient data, which will pull the updated email for both sections.
 
 ## Constraints
-- No changes to existing role priorities.
-- No changes to RLS policies except what's required for the RPC.
-- Maintain premium UI and "Non renseigné" fallbacks.
+- **Security**: No service role keys in the frontend. No direct SQL updates to `auth.users`.
+- **Data Integrity**: No duplicate user accounts. No changes to existing clinical data or roles.
+- **UX**: Maintain continuous typing focus for the admin email field.
