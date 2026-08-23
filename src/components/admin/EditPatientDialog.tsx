@@ -171,7 +171,6 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       if (profileId) {
         const updateData: any = {
           full_name: form.full_name.trim() || null,
-          email: form.email.trim() || null,
           phone: form.phone.trim() || null,
           address: form.address_1.trim() || null,
           city: form.city.trim() || null,
@@ -207,7 +206,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       const intakePayload: any = {
         first_name: derivedFirst,
         last_name: derivedLast,
-        email: form.email.trim() || (profileId ? `${profileId}@placeholder.local` : "unknown@placeholder.local"),
+        email: form.email, // Read only, preserved as is from load
         phone: form.phone.trim() || null,
         nationality: form.nationality || null,
         identity_document_type: form.identity_document_type || null,
@@ -279,8 +278,8 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
               <FormItem label="Full Name">
                 <Input className="h-11 rounded-xl" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
               </FormItem>
-              <FormItem label="Email">
-                <Input className="h-11 rounded-xl" value={form.email} onChange={(e) => set("email", e.target.value)} />
+              <FormItem label="Email (Lecture seule)">
+                <Input className="h-11 rounded-xl bg-slate-50 text-slate-500 cursor-not-allowed" value={form.email} readOnly disabled />
               </FormItem>
               <FormItem label="Phone">
                 <Input className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
@@ -309,8 +308,8 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           <section>
             <SectionHeader num="1.5" title="Coordonnées" icon={Phone} />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-              <FormItem label="Email">
-                <Input type="email" className="h-11 rounded-xl" value={form.email} onChange={(e) => set("email", e.target.value)} />
+              <FormItem label="Email (Lecture seule)">
+                <Input type="email" className="h-11 rounded-xl bg-slate-50 text-slate-500 cursor-not-allowed" value={form.email} readOnly disabled />
               </FormItem>
               <FormItem label="Téléphone">
                 <Input type="tel" className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
