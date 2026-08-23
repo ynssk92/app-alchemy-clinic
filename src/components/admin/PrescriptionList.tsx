@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { generatePrescriptionPDF } from "@/utils/prescriptionPdf";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 interface PrescriptionListProps {
   patientId: string;
@@ -28,6 +30,8 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState<string | null>(null);
+  const { settings, logoUrl } = useAppSettings();
   
   // New Prescription State
   const [newPrescription, setNewPrescription] = useState({
@@ -126,6 +130,71 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
       setSaving(false);
     }
   };
+
+  const handleDownloadPdf = async (p: any) => {
+    try {
+      setGeneratingPdf(p.id);
+      
+      // Fetch patient details
+      const { data: patient, error: patientError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", patientId)
+        .maybeSingle();
+      
+      if (patientError) throw patientError;
+      
+      // If profile not found, it might be an intake/guest
+      let finalPatient: any = patient;
+      if (!finalPatient) {
+        const { data: intake, error: intakeError } = await supabase
+          .from("patient_intake")
+          .select("*")
+          .eq("id", patientId)
+          .maybeSingle();
+        if (intakeError) throw intakeError;
+        finalPatient = intake;
+      }
+
+      if (!finalPatient) {
+        throw new Error("Patient not found");
+      }
+
+      // Fetch doctor details if prescription has doctor_id
+      let doctor = null;
+      if (p.doctor_id) {
+        const { data: doc, error: docError } = await supabase
+          .from("profiles")
+          .select("*, specialties(*)")
+          .eq("id", p.doctor_id)
+          .maybeSingle();
+        if (docError) throw docError;
+        doctor = doc;
+      }
+
+      await generatePrescriptionPDF({
+        prescription: p,
+        patient: finalPatient,
+        doctor: doctor,
+        items: p.prescription_items || [],
+        settings,
+        logoUrl
+      });
+
+      toast({ title: "Succès", description: "Ordonnance générée avec succès" });
+    } catch (error: any) {
+      console.error("PDF generation error:", error);
+      toast({ title: "Erreur", description: "Impossible de générer le PDF", variant: "destructive" });
+    } finally {
+      setGeneratingPdf(null);
+    }
+  };
+
+  const handlePrint = (p: any) => {
+    // Basic print functionality for now, triggers browser print
+    window.print();
+  };
+
 
   return (
     <div className="space-y-6">
@@ -276,12 +345,22 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
                   </div>
 
                   <div className="flex items-start gap-2 shrink-0">
-                    <Button variant="outline" size="sm" className="h-9">
+                    <Button variant="outline" size="sm" className="h-9" onClick={() => handlePrint(p)}>
                       <Printer className="w-4 h-4 mr-2" />
                       Imprimer
                     </Button>
-                    <Button variant="outline" size="sm" className="h-9">
-                      <Download className="w-4 h-4 mr-2" />
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-9" 
+                      onClick={() => handleDownloadPdf(p)}
+                      disabled={generatingPdf === p.id}
+                    >
+                      {generatingPdf === p.id ? (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4 mr-2" />
+                      )}
                       PDF
                     </Button>
                   </div>
