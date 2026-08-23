@@ -17,7 +17,6 @@ const AuthCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Supabase handles the session hydration automatically
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -29,67 +28,46 @@ const AuthCallback = () => {
 
         if (session) {
           const user = session.user;
+          const userEmail = user.email?.toLowerCase().trim() || "";
 
-          // 1. Resolve existing roles first (source of truth)
-          const { data: existingRoles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id);
+          // 1. Process Role Assignment via Secure RPC
+          // This RPC follows the exact logic:
+          // Existing role? -> Keep it.
+          // Pending Invite? -> Assign invited role & mark claimed.
+          // No invite? -> Returns existing role or null.
+          const { data: roleResult, error: rpcError } = await supabase.rpc("claim_invitation_role");
           
-          let roleList = (existingRoles || []).map(r => r.role);
-          const userEmail = user.email?.toLowerCase() || "";
-
-          // 2. Check for invitations matching the email (using secure RPC)
-          // If the user already has a staff role, we might still want to process the invite
-          // but we prioritize existing staff status.
-          const { data: invite, error: inviteError } = await supabase
-            .rpc("get_my_invitation" as any);
-
-          if (!inviteError && Array.isArray(invite) && invite.length > 0) {
-            const inviteData = invite[0];
-            // Only assign if not already assigned
-            if (!roleList.includes(inviteData.role)) {
-              const { error: roleError } = await supabase
-                .from("user_roles")
-                .insert({ 
-                  user_id: user.id, 
-                  role: inviteData.role 
-                });
-              
-              if (!roleError) {
-                roleList.push(inviteData.role);
-                // Mark invite as used
-                await supabase
-                  .from("admin_invites")
-                  .update({ claimed_at: new Date().toISOString(), claimed_by: user.id } as any)
-                  .eq("id", inviteData.id);
-                
-                toast.success(`Role ${inviteData.role} assigned from invitation!`);
-              }
-            }
+          let currentRole: string | null = null;
+          if (!rpcError && Array.isArray(roleResult) && roleResult.length > 0) {
+            currentRole = (roleResult[0] as any).role;
           }
-          
-          // 3. Bootstrap fallback for initial admin
-          if (roleList.length === 0 && INITIAL_ADMIN_EMAILS.includes(userEmail)) {
+
+          // 2. Initial Admin Bootstrap Fallback
+          // Only runs if the user has NO role after the invitation check
+          if (!currentRole && INITIAL_ADMIN_EMAILS.includes(userEmail)) {
             const { error: promoError } = await supabase
               .from("user_roles")
               .insert({ user_id: user.id, role: "admin" });
             
             if (!promoError) {
-              roleList.push("admin");
+              currentRole = "admin";
               toast.success("Initial administrator account activated.");
             }
           }
 
-          const isStaff = roleList.some(r => ["admin", "assistant", "doctor"].includes(r));
-
-          if (isStaff) {
-            toast.success("Welcome back!");
-            navigate("/admin");
-            return;
+          // 3. Default Role: Patient
+          // If still no role, assign Patient.
+          if (!currentRole) {
+            const { error: patientRoleError } = await supabase
+              .from("user_roles")
+              .insert({ user_id: user.id, role: "patient" });
+            
+            if (!patientRoleError) {
+              currentRole = "patient";
+            }
           }
 
-          // 3. User is a patient. Ensure profile exists.
+          // 4. Ensure Profile exists
           const { data: profile } = await supabase
             .from("profiles")
             .select("id")
@@ -106,20 +84,18 @@ const AuthCallback = () => {
                 avatar_url: user.user_metadata?.avatar_url || null,
                 status: "approved" as ProfileStatus
               });
-            
-            // Auto-assign patient role if none exists
-            if (!roleList.includes("patient")) {
-              await supabase.from("user_roles").insert({ user_id: user.id, role: "patient" });
-            }
             toast.success("Account set up successfully!");
           } else {
             toast.success("Welcome back!");
           }
 
-          navigate("/patient-dashboard");
+          // 5. Redirect based on role
+          if (["admin", "assistant", "doctor"].includes(currentRole || "")) {
+            navigate("/admin");
+          } else {
+            navigate("/patient-dashboard");
+          }
         } else {
-          // No session found
-          console.warn("No session found in callback");
           navigate("/auth");
         }
       } catch (err) {
