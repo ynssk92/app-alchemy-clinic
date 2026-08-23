@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Stethoscope, Calendar, Users, Building2, TrendingUp,
   Plus, CalendarCheck, Clock, Activity, MessageSquare, Zap,
-  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack, ShieldAlert
+  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack, ShieldAlert, ShieldCheck
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer,
