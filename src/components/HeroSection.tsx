@@ -5,7 +5,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            Keep the permission system role-based, not user-specific. I explicitly want permissions to be assigned to roles. All users with the same role should inherit the same permissions. For example, changing Doctor permissions should affect all users with role doctor. Do NOT create per-user permission overrides or a user_permissions table. Keep role_permissions as the central permission mapping. Make sure the patient role is also handled correctly, with ownership-based RLS so patients can only access their own data. Admin remains full access.",
+  badge: "CLINIQUE LA DUNE DENTAIRE",
   heading: "Your smile deserves expert care.",
   highlight: "",
   description: "Advanced dental care, modern technology, and personalized treatment in a comfortable environment.",
