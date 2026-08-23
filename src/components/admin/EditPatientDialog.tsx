@@ -169,32 +169,33 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     setSaving(true);
     try {
       if (profileId) {
+        const updateData: any = {
+          full_name: form.full_name.trim() || null,
+          email: form.email.trim() || null,
+          phone: form.phone.trim() || null,
+          address: form.address_1.trim() || null,
+          city: form.city.trim() || null,
+          country: form.country.trim() || null,
+          nationality: form.nationality.trim() || null,
+          identity_document_type: form.identity_document_type || null,
+          identity_document_number: form.identity_document_number.trim() || null,
+          patient_type: form.patient_type,
+          languages: form.languages,
+          profession: form.profession.trim() || null,
+          family_situation: form.family_situation.trim() || null,
+          emergency_contact_name: form.emergency_contact_name.trim() || null,
+          emergency_contact_phone: form.emergency_contact_phone.trim() || null,
+          emergency_contact_relation: form.emergency_contact_relation.trim() || null,
+          insurance_name: form.insurance_name.trim() || null,
+          insurance_number: form.insurance_number.trim() || null,
+          insurance_policy: form.insurance_policy.trim() || null,
+          insurance_status: form.insurance_status.trim() || null,
+          insurance_notes: form.insurance_notes.trim() || null,
+          rhesus: form.rhesus.trim() || null,
+        };
         const { error: pErr } = await supabase
           .from("profiles")
-          .update({
-            full_name: form.full_name.trim() || null,
-            email: form.email.trim() || null,
-            phone: (form.phone as string).trim() || null,
-            address: (form.address_1 as string).trim() || null,
-            city: (form.city as string).trim() || null,
-            country: (form.country as string).trim() || null,
-            nationality: form.nationality.trim() || null,
-            identity_document_type: form.identity_document_type || null,
-            identity_document_number: form.identity_document_number.trim() || null,
-            patient_type: form.patient_type,
-            languages: form.languages,
-            profession: form.profession.trim() || null,
-            family_situation: form.family_situation.trim() || null,
-            emergency_contact_name: form.emergency_contact_name.trim() || null,
-            emergency_contact_phone: form.emergency_contact_phone.trim() || null,
-            emergency_contact_relation: form.emergency_contact_relation.trim() || null,
-            insurance_name: form.insurance_name.trim() || null,
-            insurance_number: form.insurance_number.trim() || null,
-            insurance_policy: form.insurance_policy.trim() || null,
-            insurance_status: form.insurance_status.trim() || null,
-            insurance_notes: form.insurance_notes.trim() || null,
-            rhesus: form.rhesus.trim() || null,
-          })
+          .update(updateData)
           .eq("id", profileId);
         if (pErr) throw pErr;
       }
