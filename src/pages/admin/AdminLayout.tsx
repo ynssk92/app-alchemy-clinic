@@ -42,7 +42,7 @@ const sections: Section[] = [
     title: "— CLINIQUE",
     items: [
       {
-        to: "/admin/doctors", icon: Stethoscope, label: "nav.doctors", module: "Doctors",
+        to: "/admin/doctors", icon: Stethoscope, label: "nav.doctors", module: "doctors",
         children: [
           { to: "/admin/doctors", label: "nav.doctors" },
           { to: "/admin/doctors/details", label: "nav.doctorDetails" },
@@ -51,7 +51,7 @@ const sections: Section[] = [
         ],
       },
       {
-        to: "/admin/patients", icon: Users, label: "nav.patients", module: "Patients",
+        to: "/admin/patients", icon: Users, label: "nav.patients", module: "patients",
         children: [
           { to: "/admin/patients", label: "nav.patients" },
           { to: "/admin/patients/details", label: "nav.patientDetails" },
@@ -60,7 +60,7 @@ const sections: Section[] = [
         ],
       },
       {
-        to: "/admin/appointments", icon: Calendar, label: "nav.appointments", module: "Appointments", staff: true,
+        to: "/admin/appointments", icon: Calendar, label: "nav.appointments", module: "appointments", staff: true,
         children: [
           { to: "/admin/appointments", label: "nav.appointments" },
           { to: "/admin/appointments/new", label: "nav.newAppointment" },
@@ -69,16 +69,16 @@ const sections: Section[] = [
           { to: "/admin/appointments/requests", label: "nav.requests" },
         ],
       },
-      { to: "/admin/specialties", icon: Tag, label: "nav.specialties", module: "Specialties" },
-      { to: "/admin/clinics", icon: Building2, label: "nav.clinics", module: "Clinics" },
-      { to: "/admin/clinics/audit", icon: History, label: "nav.clinicAudit", module: "Clinics" },
+      { to: "/admin/specialties", icon: Tag, label: "nav.specialties", module: "specialties" },
+      { to: "/admin/clinics", icon: Building2, label: "nav.clinics", module: "clinics" },
+      { to: "/admin/clinics/audit", icon: History, label: "nav.clinicAudit", module: "clinics" },
     ],
   },
   {
     title: "— FACTURATION",
     items: [
       {
-        to: "/admin/billing", icon: Receipt, label: "nav.billingServices", module: "Billing",
+        to: "/admin/billing", icon: Receipt, label: "nav.billingServices", module: "billing",
         children: [
           { to: "/admin/billing", label: "nav.dashboard", end: true },
           { to: "/admin/billing/services", label: "nav.servicesCatalog" },
@@ -95,8 +95,8 @@ const sections: Section[] = [
     items: [
       { to: "/admin/landing-page", icon: Globe, label: "nav.landingPage", adminOnly: true },
       { to: "/admin/pages", icon: FileStack, label: "nav.websiteCms", adminOnly: true },
-      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "Website CMS" },
-      { to: "/admin/blog", icon: FileText, label: "nav.blog", module: "Blog" },
+      { to: "/admin/faq", icon: HelpCircle, label: "nav.faq", adminOnly: true, module: "website_cms" },
+      { to: "/admin/blog", icon: FileText, label: "nav.blog", module: "blog" },
       { to: "/admin/testimonials", icon: MessageSquareQuote, label: "nav.testimonials", adminOnly: true },
       { to: "/admin/media", icon: FolderOpen, label: "nav.mediaLibrary", adminOnly: true },
       { to: "/admin/gallery", icon: LayoutGrid, label: "nav.gallery", adminOnly: true },
@@ -106,7 +106,7 @@ const sections: Section[] = [
   {
     title: "— ADMINISTRATION",
     items: [
-      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "Messages", staff: true },
+      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "messages", staff: true },
       {
         to: "/admin/users", icon: User, label: "nav.users", adminOnly: true,
         children: [
@@ -115,7 +115,7 @@ const sections: Section[] = [
           { to: "/admin/delete-requests", label: "nav.deleteRequests" },
         ],
       },
-      { to: "/admin/reports", icon: BarChart3, label: "nav.reports", module: "Reports" },
+      { to: "/admin/reports", icon: BarChart3, label: "nav.reports", module: "reports" },
     ],
   },
   {

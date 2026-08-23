@@ -10,6 +10,7 @@ type AuthCtx = {
   isDoctor: boolean;
   isStaff: boolean;
   profileStatus: "pending" | "approved" | "rejected" | null;
+  permissions: string[];
   loading: boolean;
   signOut: () => Promise<void>;
 };
@@ -22,6 +23,7 @@ const Ctx = createContext<AuthCtx>({
   isDoctor: false,
   isStaff: false,
   profileStatus: null,
+  permissions: [],
   loading: true,
   signOut: async () => {},
 });
@@ -33,18 +35,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAssistant, setIsAssistant] = useState(false);
   const [isDoctor, setIsDoctor] = useState(false);
   const [profileStatus, setProfileStatus] = useState<"pending" | "approved" | "rejected" | null>(null);
+  const [permissions, setPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   const loadRole = async (uid: string) => {
-    const [{ data: roles }, { data: prof }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("status").eq("id", uid).maybeSingle(),
-    ]);
-    const list = (roles || []).map((r: any) => r.role);
-    setIsAdmin(list.includes("admin"));
-    setIsAssistant(list.includes("assistant"));
-    setIsDoctor(list.includes("doctor"));
-    setProfileStatus(((prof as any)?.status as any) ?? null);
+    try {
+      const [{ data: roles }, { data: prof }, { data: permData }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase.from("profiles").select("status").eq("id", uid).maybeSingle(),
+        supabase.from("role_permissions" as any).select("role, permission"),
+      ]);
+      
+      const list = (roles || []).map((r: any) => String(r.role));
+      const hasAdmin = list.includes("admin");
+      setIsAdmin(hasAdmin);
+      setIsAssistant(list.includes("assistant"));
+      setIsDoctor(list.includes("doctor"));
+      setProfileStatus(((prof as any)?.status as any) ?? null);
+
+      // Filter permissions for the user's roles
+      const perms = (permData as any)
+        ?.filter((p: any) => list.includes(String(p.role)) || hasAdmin)
+        .map((p: any) => String(p.permission)) || [];
+      
+      setPermissions([...new Set(perms)] as string[]);
+    } catch (error) {
+      console.error("Error loading auth roles/permissions:", error);
+      setPermissions([]);
+    }
   };
 
   useEffect(() => {
@@ -58,14 +76,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAssistant(false);
         setIsDoctor(false);
         setProfileStatus(null);
+        setPermissions([]);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
-      if (s?.user) loadRole(s.user.id);
-      setLoading(false);
+      if (s?.user) {
+        loadRole(s.user.id).finally(() => setLoading(false));
+      } else {
+        setLoading(false);
+      }
     });
 
     return () => sub.subscription.unsubscribe();
@@ -76,7 +98,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isDoctor, isStaff: isAdmin || isAssistant || isDoctor, profileStatus, loading, signOut }}>
+    <Ctx.Provider value={{ 
+      user, 
+      session, 
+      isAdmin, 
+      isAssistant, 
+      isDoctor, 
+      isStaff: isAdmin || isAssistant || isDoctor, 
+      profileStatus, 
+      permissions, 
+      loading, 
+      signOut 
+    }}>
       {children}
     </Ctx.Provider>
   );
