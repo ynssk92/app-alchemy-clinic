@@ -163,7 +163,7 @@ export async function generatePrescriptionPDF(data: PrescriptionPDFData) {
 
     if (currentY + blockHeight > pageHeight - 120) {
       doc.addPage();
-      currentY = 130;
+      currentY = 150; // Increased to ensure space below header
     }
     
     // Medication Number & Name
@@ -218,9 +218,9 @@ export async function generatePrescriptionPDF(data: PrescriptionPDFData) {
   
   // General Notes if any
   if (prescription.notes) {
-    if (currentY > pageHeight - 160) {
+    if (currentY + 60 > pageHeight - 120) {
       doc.addPage();
-      currentY = 130;
+      currentY = 150;
     }
     
     doc.setFont("helvetica", "bold");
@@ -238,9 +238,9 @@ export async function generatePrescriptionPDF(data: PrescriptionPDFData) {
   }
   
   // Signature Area
-  if (currentY > pageHeight - 180) {
+  if (currentY + 120 > pageHeight - 120) {
     doc.addPage();
-    currentY = 130;
+    currentY = 150;
   } else {
     currentY += 40;
   }
