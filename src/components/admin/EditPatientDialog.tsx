@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { UserPlus, BookOpen, ShieldCheck, Activity, Baby, Phone } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Props = {
   open: boolean;
