@@ -81,7 +81,49 @@ export const HeroSection = () => {
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                         
                                             
-                                            Unify the legacy authentication route and /auth so both render the exact same Auth component while keeping all protected routes working.
+                                            Make one small frontend-only change.
+
+In the existing footer, next to "Version 1.1.0", add the text:
+
+Healthbook
+
+Make "Healthbook" a clickable link that navigates directly to the existing authentication page at:
+
+/auth
+
+Requirements:
+
+- Keep "Version 1.1.0" exactly as it is.
+
+- Place "Healthbook" immediately next to it with clean spacing.
+
+- Make it visually subtle and consistent with the existing footer design.
+
+- On click, navigate directly to /auth.
+
+- Prefer the existing React Router navigation/link mechanism if React Router is already used.
+
+- Do NOT open a new tab.
+
+- Do NOT modify Supabase.
+
+- Do NOT modify authentication logic.
+
+- Do NOT modify RLS, database, permissions, roles, or backend.
+
+- Do NOT change any existing routes or application functionality.
+
+- Do NOT redesign the footer.
+
+- Only make this small footer/link change.
+
+Example visual result:
+
+Version 1.1.0  ·  Healthbook
+
+Clicking "Healthbook" must take the user directly to /auth.
+
+After the change, verify that the link works both from the homepage and from other existing pages.
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
