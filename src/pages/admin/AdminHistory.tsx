@@ -39,7 +39,7 @@ const AdminHistory = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      // Using 'as any' to bypass temporary type mismatch until Supabase types refresh
+      
       let query = supabase
         .from("audit_logs" as any)
         .select("*")
@@ -78,7 +78,8 @@ const AdminHistory = () => {
 
       if (error) throw error;
 
-      const auditLogs = (data || []) as AuditLog[];
+      // Use unknown conversion to satisfy TypeScript for dynamic table
+      const auditLogs = (data as unknown) as AuditLog[];
 
       // Enrich with profile names
       const actorIds = [...new Set(auditLogs.map(l => l.actor_id).filter(Boolean))] as string[];
