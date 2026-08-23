@@ -80,51 +80,181 @@ export const HeroSection = () => {
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
 
-For the code present, I get the error below.
+                                            FIX THE "SIGN UPS ARE DISABLED" AUTHENTICATION ISSUE.
 
-Please think step-by-step in order to resolve it.
-{"\n"}
-{"  x Expected '</', got 'jsx text ('\n"}
-{"  |                   )'\n"}
-{"     ,-[/dev-server/src/pages/Auth.tsx:403:1]\n"}
-{" 400 |                             </div>\n"}
-{" 401 |                           </motion.div>\n"}
-{" 402 |                         </TabsContent>\n"}
-{" 403 | ,->                     </TabsContent>\n"}
-{" 404 | `->                   </AnimatePresence>\n"}
-{" 405 |                     </div>\n"}
-{" 406 |                   </Tabs>\n"}
-{" 407 |                 </Card>\n"}
-{"     `----\n"}
-{"\n"}
-{"\n"}
-{"Caused by:\n"}
-{"    Syntax Error\n"}
-{"\n"}
-{"Stack backtrace:\n"}
-{"   0: <unknown>\n"}
-{"   1: <unknown>\n"}
-{"   2: <unknown>\n"}
-{"   3: <unknown>\n"}
-{"   4: <unknown>\n"}
-{"   5: <unknown>\n"}
-{"   6: <unknown>\n"}
-{"   7: <unknown>\n"}
-{"   8: <unknown>\n"}
-{"   9: _ZZN4node14ThreadPoolWork12ScheduleWorkEvENUlP9uv_work_sE_4_FUNES2_\n"}
-{"  10: worker\n"}
-{"  11: start_thread\n"}
-{"  12: __clone3\n"}
-{"\n"}
-{"{\n"}
-{"  \"timestamp\": 1787507986890,\n"}
-{"  \"error_type\": \"RUNTIME_ERROR\",\n"}
-{"  \"filename\": \"/dev-server/src/pages/Auth.tsx\",\n"}
-{"  \"lineno\": 0,\n"}
-{"  \"colno\": 0,\n"}
-{"  \"stack\": \"Unavailable\",\n"}
-{"  \"has_blank_screen\": true\n"}
-{"}\n"}
+Current situation:
+
+I created an invitation:
+
+merchyns1@gmail.com → assistant
+
+The invitation is pending correctly.
+
+However, when this user tries to authenticate, the application shows:
+
+"sign ups are disabled for this website"
+
+This prevents a first-time invited user from creating their Supabase Auth account.
+
+IMPORTANT:
+
+The application MUST allow first-time authentication through Google.
+
+Our invitation system is NOT creating the Supabase Auth user in advance. The user needs to be able to authenticate for the first time, then claim the invitation and receive the assigned role.
+
+--------------------------------------------------
+REQUIRED AUTH BEHAVIOR
+--------------------------------------------------
+
+Enable/configure Supabase Auth so that NEW users can authenticate through Google.
+
+This is required for:
+
+New Google user
+→ Supabase creates Auth account
+→ AuthCallback
+→ claim_invitation_role()
+→ invitation found
+→ assistant role assigned
+→ invitation claimed
+→ assistant permissions loaded
+→ Assistant dashboard
+
+Example:
+
+Invitation:
+merchyns1@gmail.com → assistant
+
+First Google login:
+merchyns1@gmail.com
+
+Expected:
+
+Auth account created
+↓
+Invitation detected
+↓
+user_roles = assistant
+↓
+invitation = claimed
+↓
+Assistant dashboard
+
+--------------------------------------------------
+IMPORTANT SECURITY REQUIREMENT
+--------------------------------------------------
+
+Allowing Supabase Auth signups does NOT mean giving new users staff/admin access.
+
+New users WITHOUT an invitation must still receive:
+
+patient
+
+Only a pending invitation can assign:
+
+admin
+doctor
+assistant
+
+Existing privileged roles must never be overwritten.
+
+Therefore:
+
+New user + no invitation
+→ patient
+
+New user + assistant invitation
+→ assistant
+
+New user + doctor invitation
+→ doctor
+
+New user + admin invitation
+→ admin
+
+--------------------------------------------------
+EMAIL/PASSWORD
+--------------------------------------------------
+
+Do NOT enable public email/password registration.
+
+Create account page should remain:
+
+Continue with Google ONLY.
+
+Login page can have:
+
+Continue with Google
+OR
+Email + Password
+
+Email/password should only work for users who already have a password configured.
+
+Users can set/change their password from their Profile.
+
+Do NOT expose public email/password signup.
+
+--------------------------------------------------
+DO NOT CHANGE
+--------------------------------------------------
+
+Do NOT weaken:
+
+- RLS
+- user_roles policies
+- admin_invites policies
+- role_permissions
+- claim_invitation_role
+- admin authorization
+- patient isolation
+- clinical data
+
+Do NOT make admin_invites publicly writable.
+
+Do NOT allow users to choose their own role.
+
+Do NOT allow users to become admin/doctor/assistant simply because signup is enabled.
+
+--------------------------------------------------
+VERIFY
+--------------------------------------------------
+
+After fixing this, test:
+
+1. Admin creates:
+merchyns1@gmail.com → Assistant
+
+2. Logout Admin.
+
+3. Open Auth page.
+
+4. Click Continue with Google.
+
+5. Login with merchyns1@gmail.com.
+
+Expected:
+NO "sign ups are disabled" error.
+
+Expected:
+Assistant role
+Assistant permissions
+Assistant dashboard
+Invitation marked Claimed.
+
+Then test a completely new Google account with NO invitation.
+
+Expected:
+Patient role
+Patient dashboard.
+
+Finally test existing Admin:
+
+youness.skiri@gmail.com
+
+Expected:
+Admin remains Admin.
+
+Do not modify clinical data.
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
