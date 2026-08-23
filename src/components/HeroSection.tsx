@@ -5,17 +5,17 @@ import { Link, useSearchParams } from "react-router-dom";
 import { usePageContent } from "@/hooks/usePageContent";
 
 const defaultHero = {
-  badge: "'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''\n                                        \n                                            \n                                            ┌──────────────────────────────────────────────────────────────┐\n\n│ ← Patients     Fatima El jallal              Edit Profile    │\n\n│                                                              │\n\n│  FA   Fatima El jallal                                      │\n\n│       ID: ...                                                │\n\n│                                                              │\n\n│  Blood Group    Allergies       Condition       Insurance   │\n\n│                                                              │\n\n│  Medical Profile        Patient Information                  │\n\n│  ─────────────────────────────────────────────────────────  │\n\n│                                                              │\n\n│  Medical History          Medical Archive                    │\n\n│  Prescriptions            Rendez-vous                        │\n\n│  Facturation                                                 │\n\n│                                                              │\n\n└──────────────────────────────────────────────────────────────┘",
-  heading: "Exceptional dental care.",
-  highlight: "A confident smile.",
-  description: "Advanced dental expertise, modern technology and personalized care, all in one place.",
-  primaryCTA: "Book an Appointment",
+  badge: "LA DUNE CLINIQUE DENTAIRE",
+  heading: "Your smile deserves expert care.",
+  highlight: "",
+  description: "Advanced dental care, modern technology, and personalized treatment in a comfortable environment.",
+  primaryCTA: "BOOK AN APPOINTMENT",
   primaryURL: "/booking",
-  secondaryCTA: "Discover Our Care",
+  secondaryCTA: "DISCOVER OUR CARE",
   secondaryURL: "/soins",
   floatingTitle: "Modern Technology",
   floatingSubtitle: "CLINIC EXPERTISE",
-  overlayOpacity: 40,
+  overlayOpacity: 50,
   videoUrl: "https://app-clinic.lovable.app/__l5e/assets-v1/b0071650-2082-45fc-b971-064a43fda304/hero-bg.mp4"
 };
 
@@ -71,7 +71,7 @@ export const HeroSection = () => {
 
       {/* Hero Content */}
       <div className="container mx-auto px-4 relative z-20 h-full flex flex-col justify-center">
-        <div className="max-w-4xl">
+        <div className="max-w-[650px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,9 +80,14 @@ export const HeroSection = () => {
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
               {hero.badge}
             </span>
-            <h1 className="text-[48px] md:text-[84px] font-bold tracking-tight text-white leading-[1.05] mb-8">
-              {hero.heading}<br />
-              <span className="text-white/60">{hero.highlight}</span>
+            <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
+              {hero.heading}
+              {hero.highlight && (
+                <>
+                  <br />
+                  <span className="text-white/60">{hero.highlight}</span>
+                </>
+              )}
             </h1>
             <p className="max-w-xl text-lg md:text-xl text-white/80 leading-relaxed mb-10">
               {hero.description}
