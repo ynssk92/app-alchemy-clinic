@@ -493,7 +493,6 @@ const AdminPatientDetails = () => {
         psychomotor_development: view.psychomotor_development || "",
         development_notes: view.development_notes || "",
       });
-    })();
   }, [id, toast]);
 
   useEffect(() => {
