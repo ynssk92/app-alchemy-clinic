@@ -112,6 +112,8 @@ const AdminRoles = () => {
       
       toast.success("Permissions saved"); 
       setPermOpen(null); 
+      // Refresh to apply changes immediately
+      window.location.reload();
       load();
     } catch (error: any) {
       toast.error(error.message);

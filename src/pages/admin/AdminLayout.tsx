@@ -324,8 +324,9 @@ const AdminShell = () => {
           const visible = section.items.filter((l) => {
             if (isAdmin) return true;
             if (l.adminOnly) return false;
+            
+            // Central permission check using has_permission architecture via usePermissions hook
             if (l.module) {
-              // Special case: Normalize module names to match the new granular permission system format
               const moduleKey = l.module.toLowerCase().replace('_cms', '');
               return can(moduleKey, l.action ?? "view");
             }
