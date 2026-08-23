@@ -20,12 +20,14 @@ const AdminNotificationSettings = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { data, error } = await supabase
+    // Use a generic query to avoid TS errors if the table is not yet in types.ts
+    const { data, error } = await (supabase as any)
       .from("notification_preferences")
       .select("notification_type, in_app_enabled, email_enabled")
       .eq("user_id", user.id);
 
     if (error) {
+      console.error("Error loading prefs:", error);
       toast.error("Failed to load preferences");
     } else {
       setPrefs(data || []);
@@ -45,7 +47,7 @@ const AdminNotificationSettings = () => {
       ? { in_app_enabled: !currentVal } 
       : { email_enabled: !currentVal };
 
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("notification_preferences")
       .upsert({
         user_id: user.id,
