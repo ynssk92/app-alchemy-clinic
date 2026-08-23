@@ -35,7 +35,7 @@ const AuthCallback = () => {
           // Existing role? -> Keep it.
           // Pending Invite? -> Assign invited role & mark claimed.
           // No invite? -> Returns existing role or null.
-          const { data: roleResult, error: rpcError } = await supabase.rpc("claim_invitation_role");
+          const { data: roleResult, error: rpcError } = await supabase.rpc("claim_invitation_role" as any);
           
           let currentRole: string | null = null;
           if (!rpcError && Array.isArray(roleResult) && roleResult.length > 0) {
