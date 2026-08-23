@@ -5,11 +5,13 @@ Enhance the security architecture by implementing fine-grained permissions, serv
 ## Technical Details
 
 ### 1. Database Schema & Authorization (Additive)
-- **Create `public.permissions` enum**: Define permissions like `patients.view`, `patients.edit`, `billing.view`, etc.
-- **Create `public.role_permissions` table**: Map roles (`admin`, `doctor`, `assistant`) to specific permissions.
-- **Enhance `public.has_role()`**: Ensure it's hardened with `SECURITY DEFINER` and `SET search_path = public`.
-- **Create `public.has_permission(_permission text)`**: A new `SECURITY DEFINER` function to check if the current user has a specific permission based on their role.
-- **RLS Policies**: Update RLS on `patients`, `medical_records`, `prescriptions`, `appointments`, and `invoices` to check for both staff permissions AND patient ownership.
+- **Permissions Architecture**: Implement a strictly role-based permission system. Permissions are mapped to roles in `public.role_permissions`. Users inherit permissions exclusively from their assigned roles in `public.user_roles`.
+- **No Per-User Overrides**: Do not create any user-specific permission tables or overrides.
+- **Enhanced `public.has_permission(_permission text)`**: A `SECURITY DEFINER` function to check if the current user's role (via `user_roles`) has the required permission mapped in `role_permissions`.
+- **RLS Policies**: Update RLS on clinical and billing tables:
+  - **Staff**: Access granted via `has_permission()` based on their role.
+  - **Patients**: Strict ownership-based access (`uid = auth.uid()`).
+  - **Admins**: Full access bypass/override via role check.
 
 ### 2. Staff & Patient Isolation
 - **Patients**: RLS will strictly limit patients to `uid = auth.uid()` for all tables.
