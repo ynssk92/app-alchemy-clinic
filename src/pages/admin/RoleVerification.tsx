@@ -43,6 +43,19 @@ export const RoleVerification = () => {
   const [loading, setLoading] = useState(false);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingRole, setPendingRole] = useState<string | null>(null);
+  const [adminCount, setAdminCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchAdminCount = async () => {
+      const { count, error } = await supabase
+        .from("user_roles")
+        .select("*", { count: 'exact', head: true })
+        .eq("role", "admin");
+      if (!error && count !== null) setAdminCount(count);
+    };
+    if (isAdmin) fetchAdminCount();
+  }, [isAdmin]);
+
 
   const searchUsers = async () => {
     if (!searchQuery.trim()) return;
@@ -112,6 +125,8 @@ export const RoleVerification = () => {
     setConfirmDialogOpen(true);
   };
 
+
+  const isLastAdminScenario = selectedUserRole === "admin" && pendingRole !== "admin" && adminCount === 1;
 
   const confirmRoleSwitch = async () => {
     if (!selectedUser || !pendingRole) return;
@@ -342,7 +357,16 @@ export const RoleVerification = () => {
           </DialogHeader>
           
           <div className="py-6 space-y-4">
-            <div className="p-4 bg-muted/50 rounded-2xl space-y-2 border border-border">
+            {isLastAdminScenario && (
+              <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-2xl flex gap-3 text-destructive animate-pulse">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <div className="text-sm font-bold uppercase tracking-tight">
+                  CRITICAL: LAST ADMINISTRATOR WARNING
+                </div>
+              </div>
+            )}
+
+            <div className={`p-4 rounded-2xl space-y-2 border ${isLastAdminScenario ? 'bg-destructive/5 border-destructive/30' : 'bg-muted/50 border-border'}`}>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">User:</span>
                 <span className="font-bold">{selectedUser?.email}</span>
@@ -357,8 +381,11 @@ export const RoleVerification = () => {
               </div>
             </div>
             
-            <p className="text-xs text-muted-foreground italic">
-              * This change will be logged and applied immediately.
+            <p className={`text-xs italic ${isLastAdminScenario ? 'text-destructive font-bold' : 'text-muted-foreground'}`}>
+              {isLastAdminScenario 
+                ? "* The backend will reject this request if this user is the last administrator. Please promote another user to Admin first."
+                : "* This change will be logged and applied immediately."
+              }
             </p>
           </div>
 
