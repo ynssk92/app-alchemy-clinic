@@ -80,187 +80,52 @@ export const HeroSection = () => {
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
 
-                                            Update the authentication UX with the following exact behavior.
-
-IMPORTANT:
-Do NOT modify the existing role, invitation, permission, RLS, or clinical-data architecture.
-
-AUTHENTICATION RULES:
-
-1. LOGIN
-
-The Login tab must provide TWO authentication methods:
-
-A) Continue with Google
-B) Email + Password
-
-Google should be the primary/prominent option.
-
-Email + Password should remain available for users who have previously configured a password.
-
-The Login UI should be:
-
-[ Continue with Google ]
-
-        OR
-
-Email
-Password
-[ Sign in ]
-
-Remove Facebook and X/Twitter completely.
-
-2. CREATE ACCOUNT
-
-The Create account tab should provide ONLY:
-
-[ Continue with Google ]
-
-Do NOT provide public email/password registration.
-
-New users should create their account through Google.
-
-3. PASSWORD FROM PROFILE
-
-A user who is already authenticated must be able to set or change their password from their Profile / Account Settings.
-
-Provide a secure section such as:
-
-Security
-──────────────
-Password
-[ Set password ] / [ Change password ]
-
-If the user already has a password:
-- allow changing it
-- require the current password if the existing authentication architecture supports it
-- otherwise use the secure Supabase password update flow
-
-If the user has no password yet:
-- allow setting a password
-
-After a user successfully sets a password, they must be able to log in using:
-
-their email + password
-
-4. GOOGLE USERS
-
-A Google-authenticated user can continue using Google login normally.
-
-If they set a password from their Profile, they should then have BOTH options:
-
-Google
-OR
-Email + Password
-
-5. EXISTING USERS
-
-Do not break existing accounts.
-
-Do not reset existing passwords.
-
-Do not change existing authentication providers.
-
-Do not delete authentication identities.
-
-6. INVITATION / ROLE SYSTEM
-
-This change MUST NOT break the existing invitation flow.
-
-Google:
-
-Google authentication
-→ AuthCallback
-→ claim_invitation_role
-→ resolve role
-→ load permissions
-→ correct dashboard
-
-Email + Password:
-
-Email/password authentication
-→ existing auth callback / role resolution
-→ claim_invitation_role if necessary
-→ resolve role
-→ load permissions
-→ correct dashboard
-
-The same role-resolution system must be used regardless of whether the user authenticated through Google or Email/Password.
-
-Example:
-
-Admin invitation:
-merchyns1@gmail.com → Assistant
-
-User signs in with Google:
-→ Assistant
-
-Later user sets a password.
-
-User signs in with:
-merchyns1@gmail.com + password
-
-Result:
-→ Assistant
-
-The authentication method must NEVER change the user's role.
-
-7. DEFAULT PATIENT
-
-A new Google user with no invitation:
-→ Patient
-
-A user who has an invitation:
-→ invited role
-
-An existing privileged user:
-→ preserve existing role.
-
-8. SECURITY
-
-Do NOT:
-- weaken RLS
-- modify user_roles security
-- make passwords visible
-- store passwords manually
-- create a custom password table
-- expose passwords in frontend state
-- change admin permissions
-- bypass Supabase Auth
-
-Use Supabase Auth's native password functionality.
-
-9. UI
-
-Keep the authentication page clean and premium.
-
-Login:
-
-[ Google icon ] Continue with Google
-
-──────── OR ────────
-
-Email
-Password
-[ Sign in ]
-
-Create account:
-
-[ Google icon ] Continue with Google
-
-No Facebook.
-No X/Twitter.
-No public email/password signup.
-
-10. IMPORTANT
-
-Inspect the existing authentication implementation first.
-
-Reuse the existing Google OAuth and AuthCallback.
-
-Do not create duplicate authentication logic.
-
-Do not modify backend role/invitation logic unless required to support email/password authentication using the same existing role-resolution flow.
+For the code present, I get the error below.
+
+Please think step-by-step in order to resolve it.
+```
+  x Expected '</', got 'jsx text (
+  |                   )'
+     ,-[/dev-server/src/pages/Auth.tsx:403:1]
+ 400 |                             </div>
+ 401 |                           </motion.div>
+ 402 |                         </TabsContent>
+ 403 | ,->                     </TabsContent>
+ 404 | `->                   </AnimatePresence>
+ 405 |                     </div>
+ 406 |                   </Tabs>
+ 407 |                 </Card>
+     `----
+
+
+Caused by:
+    Syntax Error
+
+Stack backtrace:
+   0: <unknown>
+   1: <unknown>
+   2: <unknown>
+   3: <unknown>
+   4: <unknown>
+   5: <unknown>
+   6: <unknown>
+   7: <unknown>
+   8: <unknown>
+   9: _ZZN4node14ThreadPoolWork12ScheduleWorkEvENUlP9uv_work_sE_4_FUNES2_
+  10: worker
+  11: start_thread
+  12: __clone3
+
+{
+  "timestamp": 1787507986890,
+  "error_type": "RUNTIME_ERROR",
+  "filename": "/dev-server/src/pages/Auth.tsx",
+  "lineno": 0,
+  "colno": 0,
+  "stack": "Unavailable",
+  "has_blank_screen": true
+}
+```
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
