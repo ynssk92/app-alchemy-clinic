@@ -70,6 +70,7 @@ import Services from "./pages/admin/billing/Services";
 import Categories from "./pages/admin/billing/Categories";
 import AdminLandingPage from "./pages/admin/AdminLandingPage";
 import AdminTranslationMonitor from "./pages/admin/AdminTranslationMonitor";
+import RoleVerification from "./pages/admin/RoleVerification";
 
 const queryClient = new QueryClient();
 
@@ -150,6 +151,7 @@ const App = () => (
               <Route path="translation-monitor" element={<ProtectedRoute adminOnly><AdminTranslationMonitor /></ProtectedRoute>} />
               <Route path="languages" element={<ProtectedRoute adminOnly><AdminLanguages /></ProtectedRoute>} />
               <Route path="settings" element={<ProtectedRoute><PermissionRoute module="settings" action="edit"><AdminSettings /></PermissionRoute></ProtectedRoute>} />
+              <Route path="verify-role" element={<ProtectedRoute adminOnly><RoleVerification /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
