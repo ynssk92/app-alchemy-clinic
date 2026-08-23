@@ -145,7 +145,7 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
       if (patientError) throw patientError;
       
       // If profile not found, it might be an intake/guest
-      let finalPatient = patient;
+      let finalPatient: any = patient;
       if (!finalPatient) {
         const { data: intake, error: intakeError } = await supabase
           .from("patient_intake")
