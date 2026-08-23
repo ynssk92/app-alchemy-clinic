@@ -81,7 +81,7 @@ export const HeroSection = () => {
               '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
                                         
                                             
-                                            Verify that both /auth and the legacy authentication route load the exact same Auth component without breaking protected routes.
+                                            Unify the legacy authentication route and /auth so both render the exact same Auth component while keeping all protected routes working.
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
