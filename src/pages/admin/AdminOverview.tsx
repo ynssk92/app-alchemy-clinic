@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   Stethoscope, Calendar, Users, Building2, TrendingUp,
   Plus, CalendarCheck, Clock, Activity, MessageSquare, Zap,
-  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack, ShieldAlert
+  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack, ShieldAlert, ShieldCheck
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer,
@@ -179,8 +179,11 @@ const AdminOverview = () => {
     { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green", module: "billing", action: "create" },
     { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet", module: "doctors" },
     { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber", module: "messages" },
+    { label: "Role Management", to: "/admin/verify-role", icon: ShieldCheck, tint: "stat-violet", adminOnly: true },
     { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue", adminOnly: true },
   ];
+
+
 
   const activity = useMemo(() => {
     const items = [
@@ -390,7 +393,7 @@ const AdminOverview = () => {
           icon={Zap}
           tint="stat-amber"
         >
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
             {quickActions.map((q: any) => {
               const hasPerm = isAdmin || (q.adminOnly ? false : (q.module ? can(q.module, q.action || "view") : true));
               if (!hasPerm) return null;
@@ -405,6 +408,7 @@ const AdminOverview = () => {
                     className="flex h-8 w-8 items-center justify-center rounded-lg"
                     style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
                   >
+
                     <q.icon className="h-4 w-4" />
                   </span>
                   <span className="text-[11px] font-semibold leading-tight">{q.label}</span>
