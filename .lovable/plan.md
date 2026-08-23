@@ -1,60 +1,43 @@
-# Plan: FINAL Invitation-Based Role Assignment System (Revised)
+# Plan: Admin-Only Patient Email Editing
 
-Implement a secure, admin-controlled invitation system that serves as the source of truth for a user's initial role, with strict priority for privileged roles and protection against automatic downgrades.
+This plan implements an admin-only feature to edit a patient's email address within the "Patient Identity" section of the Edit Patient Profile dialog. The email in the "Coordonnées" section will remain read-only for all users. Changes to the email will use the application's existing authentication architecture while maintaining data synchronization between `auth.users`, `profiles`, and `patient_intake`.
 
 ## User Review Required
 
 > [!IMPORTANT]
-> - This implementation hardens the existing role system to ensure invitations are respected during authentication.
-> - **Priority Logic:** Existing privileged roles (Admin, Doctor, Assistant) are never overwritten. Pending invitations override the "Patient" role or provide the role for new users.
+> The admin-only email update will rely on the `service_role` key (via an Edge Function or RPC) to securely update `auth.users` without triggering full email confirmation flows if possible, or using the standard Supabase admin update methods. Since Lovable Cloud handles the `service_role`, I will implement this using a database function or secure logic that respects existing RLS.
 
-## Proposed Changes
-
-### Database & Backend (Supabase)
-
-#### RPC: `claim_invitation_role`
-- Implement a SECURITY DEFINER function with `SET search_path = public`.
-- **Logic (Atomic & Idempotent):**
-  1. Verify `auth.uid()` is not null.
-  2. Get the authenticated user's **verified email** directly from `auth.users`.
-  3. Normalize the email: `LOWER(TRIM(email))`.
-  4. Check existing `user_roles` for the user.
-  5. **Resolution Rules:**
-     - IF existing role is `admin`, `doctor`, or `assistant`: **KEEP IT** and return it.
-     - IF existing role is `patient` OR **NO ROLE** exists:
-       - Check `admin_invites` for a `pending` invitation matching the normalized email (and not expired).
-       - IF invitation exists:
-         - **ATOMICALLY** replace the existing role (if any) with the invited role.
-         - Mark invitation as `claimed`, set `claimed_by = auth.uid()`, and `claimed_at = now()`.
-         - Return the invited role.
-       - IF NO invitation exists:
-         - IF user had no role, assign `patient`.
-         - Return `patient`.
-  6. Return the resolved role.
-
-#### RLS & Permissions
-- Hardened `admin_invites` RLS (admin-only).
-- Grant `EXECUTE` on `claim_invitation_role` to `authenticated`.
-
-### Frontend (React)
-
-#### Auth Callback (`src/pages/AuthCallback.tsx`)
-- Call `claim_invitation_role` RPC immediately after session acquisition.
-- **Remove** all client-side logic that creates a "patient" role before the RPC.
-- Use the RPC's returned role for redirection logic.
-
-#### Auth Hook (`src/hooks/useAuth.tsx`)
-- Ensure roles and permissions are fetched based on the database state, respecting the hierarchy.
+- Do you have a specific Edge Function for admin-initiated user updates already, or should I create a new secure RPC? (I will assume a new RPC `admin_update_patient_email` for maximum security and minimal impact).
 
 ## Technical Details
 
-- **Security:** The RPC is the sole authority for role assignment during login. It does not accept parameters for `user_id` or `email`, fetching them securely from the auth context.
-- **Initial Admin:** The bootstrap for `youness.skiri@gmail.com` remains but only triggers via the RPC if no privileged role or invitation is found.
+### Database / Backend
+1. **Create RPC Function**: `admin_update_patient_email(target_user_id uuid, new_email text)`
+   - Defined as `SECURITY DEFINER`.
+   - Checks if the executing user `public.has_role(auth.uid(), 'admin')`.
+   - Updates `auth.users` (using `update users set email = ... where id = ...`).
+   - Updates `public.profiles.email` and `public.patient_intake.email` to keep them in sync.
+   - Handles unique constraint violations (e.g., if the new email already exists).
 
-## Verification Plan
+### Frontend
+1. **`useAuth` Hook**:
+   - Ensure `isAdmin` is available and reliable (already confirmed in `src/hooks/useAuth.tsx`).
 
-### Manual Verification Scenarios
-1. **Invite New User:** Invite `test@example.com` as Assistant -> Sign in -> Confirm Assistant role & claimed status.
-2. **Existing Patient Upgrade:** User is Patient -> Admin invites as Doctor -> Sign in -> Confirm Doctor role.
-3. **Privileged Protection:** User is Admin -> Admin invites as Patient -> Sign in -> Confirm **remains Admin**.
-4. **No Invite:** New user signs in -> Confirm default Patient role.
+2. **`EditPatientDialog.tsx`**:
+   - Update `FormItem` for "Email" in the **Patient Identity** section:
+     - If `isAdmin`, set `readOnly={false}` and `disabled={false}`.
+     - Else, keep `readOnly={true}` and `disabled={true}`.
+   - Update `FormItem` for "Email" in the **Coordonnées** section:
+     - Always keep `readOnly={true}` and `disabled={true}` for everyone.
+   - Update `onSubmit` logic:
+     - Detect if `email` has changed.
+     - If changed and user is admin, call the `admin_update_patient_email` RPC before or during the profile/intake update.
+     - Ensure focus remains on the input while typing (already has a fix, but will verify it's not broken by the conditional `readOnly`).
+
+3. **`AdminPatientDetails.tsx`**:
+   - Ensure the view refreshes both email displays after a successful save (already triggered by `onSaved` callback).
+
+## Constraints
+- No changes to existing role priorities.
+- No changes to RLS policies except what's required for the RPC.
+- Maintain premium UI and "Non renseigné" fallbacks.
