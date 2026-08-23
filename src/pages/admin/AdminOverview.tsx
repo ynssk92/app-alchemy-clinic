@@ -393,7 +393,7 @@ const AdminOverview = () => {
           icon={Zap}
           tint="stat-amber"
         >
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">
             {quickActions.map((q: any) => {
               const hasPerm = isAdmin || (q.adminOnly ? false : (q.module ? can(q.module, q.action || "view") : true));
               if (!hasPerm) return null;
@@ -408,6 +408,7 @@ const AdminOverview = () => {
                     className="flex h-8 w-8 items-center justify-center rounded-lg"
                     style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
                   >
+
                     <q.icon className="h-4 w-4" />
                   </span>
                   <span className="text-[11px] font-semibold leading-tight">{q.label}</span>
