@@ -174,6 +174,21 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
   const onSubmit = async () => {
     setSaving(true);
     try {
+      // 1. Handle secure email update if changed by Admin
+      if (isAdmin && profileId && form.email.trim().toLowerCase() !== initialEmail.trim().toLowerCase()) {
+        const { data: edgeData, error: edgeError } = await supabase.functions.invoke('admin-update-patient-email', {
+          body: {
+            target_user_id: profileId,
+            new_email: form.email.trim()
+          }
+        });
+
+        if (edgeError) throw edgeError;
+        if (edgeData?.error) throw new Error(edgeData.error);
+        
+        toast({ title: "Email d'authentification mis à jour" });
+      }
+
       if (profileId) {
         const updateData: any = {
           full_name: form.full_name.trim() || null,
@@ -212,7 +227,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       const intakePayload: any = {
         first_name: derivedFirst,
         last_name: derivedLast,
-        email: form.email, // Read only, preserved as is from load
+        email: form.email.trim().toLowerCase(), // Use potentially updated email
         phone: form.phone.trim() || null,
         nationality: form.nationality || null,
         identity_document_type: form.identity_document_type || null,
@@ -262,11 +277,12 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         if (error) throw error;
       }
 
-      toast({ title: "Patient updated" });
+      toast({ title: "Patient mis à jour" });
       onOpenChange(false);
       onSaved?.();
     } catch (e: any) {
-      toast({ title: "Update failed", description: e.message, variant: "destructive" });
+      console.error("Update failed:", e);
+      toast({ title: "La mise à jour a échoué", description: e.message, variant: "destructive" });
     } finally {
       setSaving(false);
     }
