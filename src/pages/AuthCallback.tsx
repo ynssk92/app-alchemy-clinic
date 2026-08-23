@@ -34,28 +34,30 @@ const AuthCallback = () => {
           const userEmail = user.email?.toLowerCase();
           const { data: invite } = await supabase
             .from("admin_invites")
-            .select("id, role")
+            .select("id, role" as any)
             .eq("email", userEmail || "")
             .is("claimed_at", null)
             .maybeSingle();
 
-          if (invite) {
+          const inviteData = invite as any;
+
+          if (inviteData) {
             // Assign the invited role
             const { error: roleError } = await supabase
               .from("user_roles")
               .insert({ 
                 user_id: user.id, 
-                role: invite.role 
+                role: inviteData.role 
               });
             
             if (!roleError) {
               // Mark invite as used
               await supabase
                 .from("admin_invites")
-                .update({ claimed_at: new Date().toISOString(), claimed_by: user.id })
-                .eq("id", invite.id);
+                .update({ claimed_at: new Date().toISOString(), claimed_by: user.id } as any)
+                .eq("id", inviteData.id);
               
-              toast.success(`Role ${invite.role} assigned from invitation!`);
+              toast.success(`Role ${inviteData.role} assigned from invitation!`);
             }
           }
 

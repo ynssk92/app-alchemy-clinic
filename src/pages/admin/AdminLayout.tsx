@@ -324,7 +324,11 @@ const AdminShell = () => {
           const visible = section.items.filter((l) => {
             if (isAdmin) return true;
             if (l.adminOnly) return false;
-            if (l.module) return can(l.module, l.action ?? "view");
+            if (l.module) {
+              // Special case: Normalize module names to match the new granular permission system format
+              const moduleKey = l.module.toLowerCase().replace('_cms', '');
+              return can(moduleKey, l.action ?? "view");
+            }
             return !!l.staff;
           });
           if (visible.length === 0) return null;

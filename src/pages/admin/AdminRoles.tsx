@@ -26,9 +26,8 @@ type Role = {
 };
 
 const MODULES = [
-  "Dashboard", "Doctors", "Patients", "Appointments",
-  "Specialties", "Clinics", "Blog", "Messages", "Reports", "Users",
-  "settings",
+  "patients", "medical_records", "prescriptions", "appointments",
+  "billing", "inventory", "settings",
 ];
 
 const AdminRoles = () => {
@@ -41,9 +40,24 @@ const AdminRoles = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("roles").select("*").order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
-    setRoles((data as any) || []);
+    const { data, error } = await supabase.from("role_permissions" as any).select("*");
+    if (error) return toast.error(error.message);
+    
+    // Group permissions by role
+    const grouped = (data || []).reduce((acc: any, curr: any) => {
+      if (!acc[curr.role]) acc[curr.role] = { id: curr.role, name: curr.role, status: 'active', permissions: {}, created_at: new Date().toISOString() };
+      const [mod, act] = curr.permission.split('.');
+      if (!acc[curr.role].permissions[mod]) acc[curr.role].permissions[mod] = {};
+      acc[curr.role].permissions[mod][act] = true;
+      return acc;
+    }, {});
+
+    // Ensure all base roles exist in the list
+    ["admin", "doctor", "assistant", "patient"].forEach(r => {
+      if (!grouped[r]) grouped[r] = { id: r, name: r, status: 'active', permissions: {}, created_at: new Date().toISOString() };
+    });
+
+    setRoles(Object.values(grouped));
     setLoading(false);
   };
 
@@ -80,9 +94,28 @@ const AdminRoles = () => {
 
   const savePermissions = async () => {
     if (!permOpen) return;
-    const { error } = await supabase.from("roles").update({ permissions: permOpen.permissions }).eq("id", permOpen.id);
-    if (error) return toast.error(error.message);
-    toast.success("Permissions saved"); setPermOpen(null); load();
+    try {
+      // Strictly role-based: replace all permissions for this role
+      await supabase.from("role_permissions" as any).delete().eq("role", permOpen.id);
+      
+      const newPerms: any[] = [];
+      Object.entries(permOpen.permissions).forEach(([mod, acts]: [string, any]) => {
+        Object.entries(acts).forEach(([act, val]) => {
+          if (val) newPerms.push({ role: permOpen.id, permission: `${mod}.${act}` });
+        });
+      });
+
+      if (newPerms.length > 0) {
+        const { error } = await supabase.from("role_permissions" as any).insert(newPerms);
+        if (error) throw error;
+      }
+      
+      toast.success("Permissions saved"); 
+      setPermOpen(null); 
+      load();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   const togglePerm = (mod: string, key: "view" | "create" | "edit" | "delete") => {
