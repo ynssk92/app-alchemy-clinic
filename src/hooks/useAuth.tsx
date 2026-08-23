@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [{ data: roles }, { data: prof }, { data: permData }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
       supabase.from("profiles").select("status").eq("id", uid).maybeSingle(),
-      supabase.from("role_permissions").select("role, permission"),
+      supabase.from("role_permissions" as any).select("role, permission"),
     ]);
     
     const list = (roles || []).map((r: any) => r.role);
@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setProfileStatus(((prof as any)?.status as any) ?? null);
 
     // Filter permissions for the user's roles
-    const perms = permData
+    const perms = (permData as any)
       ?.filter((p: any) => list.includes(p.role) || list.includes("admin"))
       .map((p: any) => p.permission) || [];
     

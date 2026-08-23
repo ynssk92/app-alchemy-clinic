@@ -5,12 +5,14 @@ export const ProtectedRoute = ({
   children,
   adminOnly = false,
   staffOnly = false,
+  requiredPermission,
 }: {
   children: JSX.Element;
   adminOnly?: boolean;
   staffOnly?: boolean;
+  requiredPermission?: string;
 }) => {
-  const { user, isAdmin, isAssistant, isStaff, loading } = useAuth();
+  const { user, isAdmin, isStaff, permissions, loading } = useAuth();
   if (loading) {
     return (
       <div className="flex min-h-screen w-full flex-1 items-center justify-center bg-background">
@@ -24,5 +26,9 @@ export const ProtectedRoute = ({
   }
   if (adminOnly && !isAdmin) return <Navigate to="/patient-dashboard" replace />;
   if (staffOnly && !isStaff) return <Navigate to="/patient-dashboard" replace />;
+  
+  if (requiredPermission && !permissions.includes(requiredPermission) && !isAdmin) {
+    return <Navigate to="/patient-dashboard" replace />;
+  }
   return children;
 };
