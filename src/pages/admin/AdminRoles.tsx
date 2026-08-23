@@ -95,7 +95,8 @@ const AdminRoles = () => {
   const savePermissions = async () => {
     if (!permOpen) return;
     try {
-      // Strictly role-based: replace all permissions for this role
+      // Note: role_permissions management is still direct but restricted by RLS to admins.
+      // This tool manages the PERMISSIONS for a role, not the users.
       await supabase.from("role_permissions" as any).delete().eq("role", permOpen.id);
       
       const newPerms: any[] = [];
@@ -109,6 +110,7 @@ const AdminRoles = () => {
         const { error } = await supabase.from("role_permissions" as any).insert(newPerms);
         if (error) throw error;
       }
+
       
       toast.success("Permissions saved"); 
       setPermOpen(null); 
