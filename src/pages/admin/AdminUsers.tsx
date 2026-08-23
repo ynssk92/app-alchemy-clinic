@@ -194,6 +194,22 @@ const AdminUsers = () => {
     }
 
     try {
+      // Last-admin protection UI check
+      if (rows.find(r => r.id === id)?.roles.includes("admin") && role !== "admin") {
+        const { count } = await supabase
+          .from("user_roles")
+          .select("*", { count: 'exact', head: true })
+          .eq("role", "admin");
+        
+        if (count === 1) {
+          return toast.error("Cannot demote the last administrator. Please promote another user to admin first.");
+        }
+        
+        if (!confirm("Are you sure you want to demote this administrator? This will remove their system-wide access.")) {
+          return;
+        }
+      }
+
       const { error } = await supabase.rpc("manage_user_role", {
         target_user_id: id,
         new_role: role
