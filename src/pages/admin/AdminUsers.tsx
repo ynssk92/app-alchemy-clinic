@@ -40,8 +40,10 @@ type Invite = {
   id: string;
   email: string;
   claimed_at: string | null;
+  claimed_by: string | null;
   created_at: string;
   full_name?: string | null;
+  role: "admin" | "assistant" | "doctor" | "patient";
 };
 
 type RoleFilter = "staff" | "all" | "admin" | "assistant" | "doctor" | "patient";
@@ -56,6 +58,7 @@ const AdminUsers = () => {
   const [invites, setInvites] = useState<Invite[]>([]);
   const [inviteEmail, setInviteEmail] = useState("");
   const [busy, setBusy] = useState(false);
+  const [inviteRole, setInviteRole] = useState<"admin" | "assistant" | "doctor" | "patient">("admin");
 
   // Server-side controls
   const [search, setSearch] = useState("");
@@ -167,22 +170,24 @@ const AdminUsers = () => {
     loadInvites();
   }, [loadInvites]);
 
-  const toggleRole = async (id: string, role: "admin" | "assistant", has: boolean) => {
+  const updateRole = async (id: string, role: "admin" | "assistant" | "doctor" | "patient") => {
     // Self-demotion prevention
     const { data: { user: currentUser } } = await supabase.auth.getUser();
-    if (id === currentUser?.id && role === "admin" && has) {
-      return toast.error("You cannot revoke your own administrator status for security reasons.");
+    if (id === currentUser?.id && role !== "admin") {
+      const { data: otherAdmins } = await supabase.from("user_roles").select("user_id").eq("role", "admin").neq("user_id", id);
+      if (!otherAdmins || otherAdmins.length === 0) {
+        return toast.error("You cannot revoke your own administrator status as you are the last admin.");
+      }
     }
 
-    if (has) {
-      const { error } = await supabase.from("user_roles").delete().eq("user_id", id).eq("role", role);
-      if (error) return toast.error(error.message);
-      toast.success(`${role} removed`);
-    } else {
-      const { error } = await supabase.from("user_roles").insert({ user_id: id, role });
-      if (error) return toast.error(error.message);
-      toast.success(`${role} granted`);
-    }
+    // Delete existing roles and set new one (strictly role-based, one role per user in this implementation)
+    const { error: delError } = await supabase.from("user_roles").delete().eq("user_id", id);
+    if (delError) return toast.error(delError.message);
+    
+    const { error: insError } = await supabase.from("user_roles").insert({ user_id: id, role });
+    if (insError) return toast.error(insError.message);
+    
+    toast.success(`Role updated to ${role}`);
     loadUsers();
   };
 
@@ -199,10 +204,10 @@ const AdminUsers = () => {
     const email = inviteEmail.trim().toLowerCase();
     if (!email) return;
     setBusy(true);
-    const { error } = await supabase.from("admin_invites").insert({ email });
+    const { error } = await supabase.from("admin_invites").insert({ email, role: inviteRole });
     setBusy(false);
     if (error) return toast.error(error.message);
-    toast.success("Invite added. They'll become admin on next sign-in / signup.");
+    toast.success(`Invite added. They'll become ${inviteRole} on next sign-in / signup.`);
     setInviteEmail("");
     loadInvites();
   };
@@ -249,22 +254,33 @@ const AdminUsers = () => {
       <Card className="p-6 mb-8 border-border bg-card">
         <div className="flex items-center gap-2 mb-4">
           <Mail className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-bold">Admin Invites</h2>
+          <h2 className="text-lg font-bold">Staff & Patient Invitations</h2>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Add an email here to automatically promote that user to admin — whether they already have
-          an account or sign up later.
+          Add an email and select a role to automatically promote that user upon registration or sign-in.
         </p>
-        <form onSubmit={sendInvite} className="flex gap-2 mb-6">
+        <form onSubmit={sendInvite} className="flex gap-2 mb-6 flex-wrap">
           <Input
             type="email"
             placeholder="person@example.com"
             value={inviteEmail}
             onChange={(e) => setInviteEmail(e.target.value)}
             required
+            className="flex-1 min-w-[200px]"
           />
+          <Select value={inviteRole} onValueChange={(v: any) => setInviteRole(v)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="admin">Administrator</SelectItem>
+              <SelectItem value="doctor">Doctor</SelectItem>
+              <SelectItem value="assistant">Assistant</SelectItem>
+              <SelectItem value="patient">Patient</SelectItem>
+            </SelectContent>
+          </Select>
           <Button type="submit" disabled={busy}>
-            {busy ? "Adding..." : "Invite as Admin"}
+            {busy ? "Inviting..." : "Send Invite"}
           </Button>
         </form>
 
@@ -273,7 +289,8 @@ const AdminUsers = () => {
             <div key={i.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/40">
               <div className="flex-1">
                 <div className="font-medium">
-                  {i.claimed_at ? i.full_name || "Unnamed admin" : i.email}
+                  {i.claimed_at ? i.full_name || "Unnamed user" : i.email}
+                  <Badge variant="outline" className="ml-2 capitalize">{i.role}</Badge>
                 </div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                   {i.claimed_at ? (
@@ -366,31 +383,20 @@ const AdminUsers = () => {
                   {new Date(p.created_at).toLocaleDateString()}
                 </div>
                 <div className="flex items-center gap-2 justify-end">
-                  <Button
-                    size="sm"
-                    variant={isAssistant ? "outline" : "secondary"}
-                    onClick={() => toggleRole(p.id, "assistant", isAssistant)}
+                  <Select 
+                    value={p.roles[0] || "patient"} 
+                    onValueChange={(v: any) => updateRole(p.id, v)}
                   >
-                    <Headset className="w-4 h-4 mr-2" />
-                    {isAssistant ? "Revoke Assistant" : "Make Assistant"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={isAdmin ? "outline" : "default"}
-                    onClick={() => toggleRole(p.id, "admin", isAdmin)}
-                  >
-                    {isAdmin ? (
-                      <>
-                        <ShieldOff className="w-4 h-4 mr-2" />
-                        Revoke Admin
-                      </>
-                    ) : (
-                      <>
-                        <Shield className="w-4 h-4 mr-2" />
-                        Make Admin
-                      </>
-                    )}
-                  </Button>
+                    <SelectTrigger className="w-36 h-9">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="doctor">Doctor</SelectItem>
+                      <SelectItem value="assistant">Assistant</SelectItem>
+                      <SelectItem value="patient">Patient</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button size="sm" variant="outline" onClick={() => remove(p.id)}>
                     <Trash2 className="w-4 h-4" />
                   </Button>
