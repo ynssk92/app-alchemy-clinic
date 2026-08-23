@@ -57,10 +57,13 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
 
   const fetchDoctors = async () => {
     try {
-      // Get profiles that have the 'doctor' role
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, user_roles!inner(role)")
+        .select(`
+          id, 
+          full_name,
+          user_roles!inner(role)
+        `)
         .eq("user_roles.role", "doctor");
 
       if (error) throw error;
