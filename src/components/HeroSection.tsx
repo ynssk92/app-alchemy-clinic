@@ -80,74 +80,60 @@ export const HeroSection = () => {
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
               {`'''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
 
-REBUILD THE ADMIN ROLE MANAGEMENT INTERFACE
+FINAL RBAC INTEGRATION AND SECURITY VERIFICATION
 
-Now that the backend RBAC architecture has been audited/hardened, rebuild the Role Management page so that an ADMIN can manage roles and configure permissions safely.
+Now integrate the RBAC system across the application and verify that frontend visibility, routes, permissions, and backend RLS all agree.
 
 IMPORTANT:
 
-This is NOT a new authorization system.
+Do not redesign unrelated pages.
+Do not delete or modify clinical data.
+Do not create a second permission system.
+Use the existing database authorization architecture.
 
-Use the existing:
+1. useAuth
 
-- user_roles
-- permissions
-- role_permissions
-- has_role()
-- is_admin()
-- has_permission()
-- useAuth()
+Audit src/hooks/useAuth.tsx. It must expose authoritative user, role, permissions, and isAdmin. Role must come from user_roles. Permissions must come from role_permissions + permissions. Do not use hardcoded role overrides. Do not let frontend state grant privileges. Refresh role/permissions correctly after login, logout, role change, permission change, and invitation claim.
 
-Do not create duplicate tables or authorization logic.
-Do not modify or delete clinical data.
+2. ROUTE PROTECTION
 
-1. ADMIN ONLY
+Audit ProtectedRoute and permission-based route protection. Routes must verify permissions: Patients patients.view; Appointments appointments.view; Medical Records medical_records.view; Prescriptions prescriptions.view; Billing invoices.view; Reports reports.view; Users users.view; Role Management roles.manage; Admin Invitations admin_invites.create. Do not rely only on sidebar visibility. Unauthorized users must be redirected or blocked.
 
-Only authenticated ADMIN users may access this page. Non-admin users must be blocked by protected route and backend authorization/RLS. Do not rely only on hiding the sidebar item.
+3. SIDEBAR
 
-2. USER SEARCH
+Sidebar items must be dynamically shown according to permissions. Keep Administration order: Users, Reports, Messages, Historique. Role Management / Roles & Permissions should only appear for users with the required admin permission. Do not show administrative modules to patients.
 
-Allow Admin to search users by name and email. After selecting a user, show Name, Email, Current role, and Account status.
+4. PATIENT ISOLATION
 
-3. ROLE MANAGEMENT
+A patient must only see their own appointments, messages, profile, and medical information currently exposed to them. Do not allow Patient A to access Patient B data. RLS must enforce ownership; do not rely on frontend filtering.
 
-Admin can select Admin, Doctor, Assistant, or Patient. Admin can change another user's role. The current logged-in Admin must NOT be able to modify their own role. When viewing themselves, show role and permissions as READ ONLY.
+5. STAFF ACCESS
 
-4. PERMISSION MANAGEMENT
+Doctor and Assistant access must be controlled by has_permission(). A Doctor without patients.edit must not update patients, and an Assistant without medical_records.view must not read medical records directly through the backend. Frontend hiding is not enough.
 
-Clearly separate ROLE and PERMISSIONS. For Doctor and Assistant, display a grouped permission matrix with clean checkboxes/toggles and a Save button for Patients, Appointments, Medical Records, Prescriptions, Billing, Messages, Reports, User Management, Role Management, Invitations, and Audit Logs.
+6. ADMIN
 
-5. ADMIN PERMISSIONS
+Admin must retain full access to Users, Patients, Appointments, Medical Records, Prescriptions, Billing, Messages, Reports, Invitations, Role Management, Permissions, and Audit/History. Do not remove RLS; use existing secure admin functions.
 
-Admin is FULL ACCESS. Do not require the Admin to manually enable every permission. Clearly indicate ADMIN / Full Access. Admin permissions must not accidentally be removed through normal permission editing.
+7. INVITATION TEST
 
-6. DOCTOR
+Test Admin invites test-doctor@example.com → Doctor and first Google login → Doctor; Admin invites test-assistant@example.com → Assistant and first Google login → Assistant; new Google user without invitation → Patient; existing Admin remains Admin. An invitation must never be overridden by the default patient role, and existing privileged roles must never be downgraded automatically.
 
-Doctor permissions are configurable by Admin and changes must be stored in role_permissions. Do not hardcode Doctor permissions in frontend code.
+8. SECURITY TESTS
 
-7. ASSISTANT
+Verify Patient insert into user_roles fails; Patient cannot update their own role to admin; Doctor cannot update their own role; Assistant cannot create an admin invitation unless explicitly granted; non-admin cannot modify role_permissions; Patient cannot read another patient's appointment or medical record; frontend manipulation cannot grant backend access.
 
-Assistant permissions are configurable by Admin and stored in role_permissions.
+9. LAST ADMIN
 
-8. PATIENT
+If only one Admin exists, demotion or deletion of that Admin must fail. The system must never reach zero administrators.
 
-Patient permissions must remain restricted. Patients must never gain users.manage, roles.manage, permissions.manage, admin_invites, administrative reports, or unrestricted clinical data access. Patient RLS must continue enforcing ownership.
+10. FINAL DATA SAFETY
 
-9. SAVE BEHAVIOR
+Confirm no patients, appointments, medical records, prescriptions, invoices, messages, profiles, or authentication users were deleted. Existing data remains intact.
 
-Update role_permissions safely, do not create duplicate mappings or delete unrelated mappings, show success/error feedback, and refresh permissions after save. Update user_roles using the secure backend mechanism. Do not allow self-role modification or removing the last Admin.
+11. FINAL REPORT
 
-10. UX
-
-Make the page professional and clear using the existing clinic visual identity. Do not change unrelated pages.
-
-11. SECURITY
-
-Frontend controls are NOT the security boundary. All sensitive operations must still be protected by RLS, is_admin(), has_role(), and has_permission(). A malicious user must not be able to call Supabase directly and change their own role, another user's role, or role permissions unless authorized as Admin.
-
-12. VERIFY
-
-Test that Admin can manage another user and configure Doctor and Assistant permissions; Doctor, Assistant, and Patient cannot access role management; and Admin cannot accidentally remove their own Admin role.
+After implementation, report: RBAC tables used; functions changed; RLS policies changed; frontend files changed; routes protected; sidebar permissions implemented; patient ownership protections verified; invitation flow verified; admin protections verified; tests performed; and confirmation that no clinical data was deleted or reset. If any test fails, do not hide the failure: explain exactly what failed and where.
 
 Do not modify clinical data.`}
             </span>
