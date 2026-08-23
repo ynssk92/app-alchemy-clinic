@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -24,6 +24,7 @@ import { formatMoney } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { EditPatientDialog } from "@/components/admin/EditPatientDialog";
 
 type ListRow = {
   key: string;
@@ -292,209 +293,211 @@ const AdminPatientDetails = () => {
   }, [id, navigate]);
 
   // --- Load a single patient: :id may be profile.id OR intake.id ---
-  useEffect(() => {
+  const loadPatient = useCallback(async () => {
     if (!id) return;
-    (async () => {
-      setNotFound(false);
-      
-      // Load appointments for this patient
-      const { data: appointmentData } = await supabase
-        .from("appointments")
-        .select("id, appointment_date, appointment_time, status, reason, doctors(full_name), services(name, duration, price)")
-        .eq("patient_id", id)
-        .order("appointment_date", { ascending: false });
-      setAppts(appointmentData || []);
+    setNotFound(false);
+    
+    // Load appointments for this patient
+    const { data: appointmentData } = await supabase
+      .from("appointments")
+      .select("id, appointment_date, appointment_time, status, reason, doctors(full_name), services(name, duration, price)")
+      .eq("patient_id", id)
+      .order("appointment_date", { ascending: false });
+    setAppts(appointmentData || []);
 
-      // Load invoices for this patient
-      setLoadingInvoices(true);
-      const { data: invoiceData, error: invErr } = await supabase
-        .from("invoices")
-        .select("id, invoice_number, total, paid, due, status, issue_date")
-        .eq("patient_id", id)
-        .order("created_at", { ascending: false });
-      
-      if (invErr) {
-        setInvoiceError(true);
-      } else {
-        setInvoices(invoiceData || []);
-      }
-      setLoadingInvoices(false);
+    // Load invoices for this patient
+    setLoadingInvoices(true);
+    const { data: invoiceData, error: invErr } = await supabase
+      .from("invoices")
+      .select("id, invoice_number, total, paid, due, status, issue_date")
+      .eq("patient_id", id)
+      .order("created_at", { ascending: false });
+    
+    if (invErr) {
+      setInvoiceError(true);
+    } else {
+      setInvoices(invoiceData || []);
+    }
+    setLoadingInvoices(false);
 
-      // 1) Try as profile
-      const { data: prof } = await supabase
-        .from("profiles")
-        .select(`
-          id, full_name, phone, created_at, avatar_url, nationality, 
-          identity_document_type, identity_document_number,
-          patient_type, languages, profession, family_situation,
-          emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
-          insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes,
-          rhesus
-        `)
+    // 1) Try as profile
+    const { data: prof } = await supabase
+      .from("profiles")
+      .select(`
+        id, full_name, phone, created_at, avatar_url, nationality, 
+        identity_document_type, identity_document_number,
+        patient_type, languages, profession, family_situation,
+        emergency_contact_name, emergency_contact_phone, emergency_contact_relation,
+        insurance_name, insurance_number, insurance_policy, insurance_status, insurance_notes,
+        rhesus
+      `)
+      .eq("id", id)
+      .maybeSingle();
+    let profileIsPatient = false;
+    if (prof) {
+      const { data: pr } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", id);
+      const rs = new Set((pr || []).map((r: any) => r.role));
+      profileIsPatient =
+        rs.has("patient") && !rs.has("admin") && !rs.has("assistant") && !rs.has("doctor");
+    }
+
+    let intakeRow: any = null;
+    let profileRow: any = profileIsPatient ? prof : null;
+
+    if (profileIsPatient) {
+      const { data } = await supabase
+        .from("patient_intake")
+        .select("*")
+        .eq("user_id", id)
+        .maybeSingle();
+      intakeRow = data;
+    } else {
+      // 2) Fallback: treat :id as intake.id (not-registered patient)
+      const { data } = await supabase
+        .from("patient_intake")
+        .select("*")
         .eq("id", id)
         .maybeSingle();
-      let profileIsPatient = false;
-      if (prof) {
-        const { data: pr } = await supabase
+      intakeRow = data;
+      if (intakeRow?.user_id) {
+        const { data: linked } = await supabase
+          .from("profiles")
+          .select("id, full_name, phone, created_at, avatar_url")
+          .eq("id", intakeRow.user_id)
+          .maybeSingle();
+        // verify linked account is patient-only too
+        const { data: lr } = await supabase
           .from("user_roles")
           .select("role")
-          .eq("user_id", id);
-        const rs = new Set((pr || []).map((r: any) => r.role));
-        profileIsPatient =
-          rs.has("patient") && !rs.has("admin") && !rs.has("assistant") && !rs.has("doctor");
-      }
-
-      let intakeRow: any = null;
-      let profileRow: any = profileIsPatient ? prof : null;
-
-      if (profileIsPatient) {
-        const { data } = await supabase
-          .from("patient_intake")
-          .select("*")
-          .eq("user_id", id)
-          .maybeSingle();
-        intakeRow = data;
-      } else {
-        // 2) Fallback: treat :id as intake.id (not-registered patient)
-        const { data } = await supabase
-          .from("patient_intake")
-          .select("*")
-          .eq("id", id)
-          .maybeSingle();
-        intakeRow = data;
-        if (intakeRow?.user_id) {
-          const { data: linked } = await supabase
-            .from("profiles")
-            .select("id, full_name, phone, created_at, avatar_url")
-            .eq("id", intakeRow.user_id)
-            .maybeSingle();
-          // verify linked account is patient-only too
-          const { data: lr } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", intakeRow.user_id);
-          const lrs = new Set((lr || []).map((r: any) => r.role));
-          if (lrs.has("patient") && !lrs.has("admin") && !lrs.has("assistant") && !lrs.has("doctor")) {
-            profileRow = linked;
-          }
+          .eq("user_id", intakeRow.user_id);
+        const lrs = new Set((lr || []).map((r: any) => r.role));
+        if (lrs.has("patient") && !lrs.has("admin") && !lrs.has("assistant") && !lrs.has("doctor")) {
+          profileRow = linked;
         }
       }
+    }
 
-      if (!profileRow && !intakeRow) {
-        setPatient(null);
-        setNotFound(true);
-        setAppts([]);
-        return;
-      }
+    if (!profileRow && !intakeRow) {
+      setPatient(null);
+      setNotFound(true);
+      setAppts([]);
+      return;
+    }
 
-      const full_name =
-        profileRow?.full_name ||
-        [intakeRow?.first_name, intakeRow?.last_name].filter(Boolean).join(" ") ||
-        "Unnamed patient";
+    const full_name =
+      profileRow?.full_name ||
+      [intakeRow?.first_name, intakeRow?.last_name].filter(Boolean).join(" ") ||
+      "Unnamed patient";
 
-      const avatarPath = profileRow?.avatar_url || intakeRow?.avatar_url || null;
+    const avatarPath = profileRow?.avatar_url || intakeRow?.avatar_url || null;
 
-      const view: PatientView = {
-        routeId: id,
-        profileId: profileRow?.id || null,
-        intakeId: intakeRow?.id || null,
-        full_name,
-        phone: profileRow?.phone || intakeRow?.phone || null,
-        email:
-          intakeRow?.email && !intakeRow.email.endsWith("@placeholder.local")
-            ? intakeRow.email
-            : null,
-        nationality: profileRow?.nationality || intakeRow?.nationality || null,
-        identity_document_type: profileRow?.identity_document_type || intakeRow?.identity_document_type || null,
-        identity_document_number: profileRow?.identity_document_number || intakeRow?.identity_document_number || null,
-        dob: intakeRow?.dob || null,
-        gender: intakeRow?.gender || null,
-        blood_group: intakeRow?.blood_group || null,
-        address_1: intakeRow?.address_1 || null,
-        city: intakeRow?.city || null,
-        country: intakeRow?.country || null,
-        avatar_path: avatarPath,
-        registered_at: profileRow?.created_at || null,
-        added_at: intakeRow?.created_at || profileRow?.created_at,
-        // New fields
-        patient_type: profileRow?.patient_type || intakeRow?.patient_type || "adult",
-        languages: profileRow?.languages || intakeRow?.languages || [],
-        profession: profileRow?.profession || intakeRow?.profession || null,
-        family_situation: profileRow?.family_situation || intakeRow?.family_situation || null,
-        emergency_contact_name: profileRow?.emergency_contact_name || intakeRow?.emergency_contact_name || null,
-        emergency_contact_phone: profileRow?.emergency_contact_phone || intakeRow?.emergency_contact_phone || null,
-        emergency_contact_relation: profileRow?.emergency_contact_relation || intakeRow?.emergency_contact_relation || null,
-        insurance_name: profileRow?.insurance_name || intakeRow?.insurance_name || null,
-        insurance_number: profileRow?.insurance_number || intakeRow?.insurance_number || null,
-        insurance_policy: profileRow?.insurance_policy || intakeRow?.insurance_policy || null,
-        insurance_status: profileRow?.insurance_status || intakeRow?.insurance_status || null,
-        insurance_notes: profileRow?.insurance_notes || intakeRow?.insurance_notes || null,
-        rhesus: profileRow?.rhesus || intakeRow?.rhesus || null,
-        allergies: intakeRow?.allergies || null,
-        chronic_diseases: intakeRow?.chronic_diseases || null,
-        current_medications: intakeRow?.current_medications || null,
-        medical_history: intakeRow?.medical_history || null,
-        family_history: intakeRow?.family_history || null,
-        surgical_history: intakeRow?.surgical_history || null,
-        previous_hospitalizations: intakeRow?.previous_hospitalizations || null,
-        birth_type: intakeRow?.birth_type,
-        birth_weight: intakeRow?.birth_weight,
-        birth_height: intakeRow?.birth_height,
-        apgar_score: intakeRow?.apgar_score,
-        breastfeeding: intakeRow?.breastfeeding,
-        birth_complications: intakeRow?.birth_complications,
-        psychomotor_development: intakeRow?.psychomotor_development,
-        development_notes: intakeRow?.development_notes,
-      };
-      setPatient(view);
+    const view: PatientView = {
+      routeId: id,
+      profileId: profileRow?.id || null,
+      intakeId: intakeRow?.id || null,
+      full_name,
+      phone: profileRow?.phone || intakeRow?.phone || null,
+      email:
+        intakeRow?.email && !intakeRow.email.endsWith("@placeholder.local")
+          ? intakeRow.email
+          : null,
+      nationality: profileRow?.nationality || intakeRow?.nationality || null,
+      identity_document_type: profileRow?.identity_document_type || intakeRow?.identity_document_type || null,
+      identity_document_number: profileRow?.identity_document_number || intakeRow?.identity_document_number || null,
+      dob: intakeRow?.dob || null,
+      gender: intakeRow?.gender || null,
+      blood_group: intakeRow?.blood_group || null,
+      address_1: intakeRow?.address_1 || null,
+      city: intakeRow?.city || null,
+      country: intakeRow?.country || null,
+      avatar_path: avatarPath,
+      registered_at: profileRow?.created_at || null,
+      added_at: intakeRow?.created_at || profileRow?.created_at,
+      // New fields
+      patient_type: profileRow?.patient_type || intakeRow?.patient_type || "adult",
+      languages: profileRow?.languages || intakeRow?.languages || [],
+      profession: profileRow?.profession || intakeRow?.profession || null,
+      family_situation: profileRow?.family_situation || intakeRow?.family_situation || null,
+      emergency_contact_name: profileRow?.emergency_contact_name || intakeRow?.emergency_contact_name || null,
+      emergency_contact_phone: profileRow?.emergency_contact_phone || intakeRow?.emergency_contact_phone || null,
+      emergency_contact_relation: profileRow?.emergency_contact_relation || intakeRow?.emergency_contact_relation || null,
+      insurance_name: profileRow?.insurance_name || intakeRow?.insurance_name || null,
+      insurance_number: profileRow?.insurance_number || intakeRow?.insurance_number || null,
+      insurance_policy: profileRow?.insurance_policy || intakeRow?.insurance_policy || null,
+      insurance_status: profileRow?.insurance_status || intakeRow?.insurance_status || null,
+      insurance_notes: profileRow?.insurance_notes || intakeRow?.insurance_notes || null,
+      rhesus: profileRow?.rhesus || intakeRow?.rhesus || null,
+      allergies: intakeRow?.allergies || null,
+      chronic_diseases: intakeRow?.chronic_diseases || null,
+      current_medications: intakeRow?.current_medications || null,
+      medical_history: intakeRow?.medical_history || null,
+      family_history: intakeRow?.family_history || null,
+      surgical_history: intakeRow?.surgical_history || null,
+      previous_hospitalizations: intakeRow?.previous_hospitalizations || null,
+      birth_type: intakeRow?.birth_type,
+      birth_weight: intakeRow?.birth_weight,
+      birth_height: intakeRow?.birth_height,
+      apgar_score: intakeRow?.apgar_score,
+      breastfeeding: intakeRow?.breastfeeding,
+      birth_complications: intakeRow?.birth_complications,
+      psychomotor_development: intakeRow?.psychomotor_development,
+      development_notes: intakeRow?.development_notes,
+    };
+    setPatient(view);
 
-      setForm({
-        first_name: intakeRow?.first_name || "",
-        last_name: intakeRow?.last_name || "",
-        full_name: view.full_name,
-        email: view.email || "",
-        phone: view.phone || "",
-        nationality: view.nationality || "",
-        identity_document_type: view.identity_document_type || "",
-        identity_document_number: view.identity_document_number || "",
-        dob: view.dob || "",
-        gender: view.gender || "",
-        blood_group: view.blood_group || "",
-        address_1: view.address_1 || "",
-        city: view.city || "",
-        country: view.country || "",
-        status: (profileRow?.status as any) || "approved",
-        patient_type: view.patient_type,
-        languages: view.languages,
-        profession: view.profession || "",
-        family_situation: view.family_situation || "",
-        emergency_contact_name: view.emergency_contact_name || "",
-        emergency_contact_phone: view.emergency_contact_phone || "",
-        emergency_contact_relation: view.emergency_contact_relation || "",
-        insurance_name: view.insurance_name || "",
-        insurance_number: view.insurance_number || "",
-        insurance_policy: view.insurance_policy || "",
-        insurance_status: view.insurance_status || "",
-        insurance_notes: view.insurance_notes || "",
-        rhesus: view.rhesus || "",
-        allergies: view.allergies || "",
-        chronic_diseases: view.chronic_diseases || "",
-        current_medications: view.current_medications || "",
-        medical_history: view.medical_history || "",
-        family_history: view.family_history || "",
-        surgical_history: view.surgical_history || "",
-        previous_hospitalizations: view.previous_hospitalizations || "",
-        birth_type: view.birth_type || "",
-        birth_weight: view.birth_weight || "",
-        birth_height: view.birth_height || "",
-        apgar_score: view.apgar_score || "",
-        breastfeeding: view.breastfeeding || "",
-        birth_complications: view.birth_complications || "",
-        psychomotor_development: view.psychomotor_development || "",
-        development_notes: view.development_notes || "",
-      });
-    })();
-  }, [id]);
+    setForm({
+      first_name: intakeRow?.first_name || "",
+      last_name: intakeRow?.last_name || "",
+      full_name: view.full_name,
+      email: view.email || "",
+      phone: view.phone || "",
+      nationality: view.nationality || "",
+      identity_document_type: view.identity_document_type || "",
+      identity_document_number: view.identity_document_number || "",
+      dob: view.dob || "",
+      gender: view.gender || "",
+      blood_group: view.blood_group || "",
+      address_1: view.address_1 || "",
+      city: view.city || "",
+      country: view.country || "",
+      status: (profileRow?.status as any) || "approved",
+      patient_type: view.patient_type,
+      languages: view.languages,
+      profession: view.profession || "",
+      family_situation: view.family_situation || "",
+      emergency_contact_name: view.emergency_contact_name || "",
+      emergency_contact_phone: view.emergency_contact_phone || "",
+      emergency_contact_relation: view.emergency_contact_relation || "",
+      insurance_name: view.insurance_name || "",
+      insurance_number: view.insurance_number || "",
+      insurance_policy: view.insurance_policy || "",
+      insurance_status: view.insurance_status || "",
+      insurance_notes: view.insurance_notes || "",
+      rhesus: view.rhesus || "",
+      allergies: view.allergies || "",
+      chronic_diseases: view.chronic_diseases || "",
+      current_medications: view.current_medications || "",
+      medical_history: view.medical_history || "",
+      family_history: view.family_history || "",
+      surgical_history: view.surgical_history || "",
+      previous_hospitalizations: view.previous_hospitalizations || "",
+      birth_type: view.birth_type || "",
+      birth_weight: view.birth_weight || "",
+      birth_height: view.birth_height || "",
+      apgar_score: view.apgar_score || "",
+      breastfeeding: view.breastfeeding || "",
+      birth_complications: view.birth_complications || "",
+      psychomotor_development: view.psychomotor_development || "",
+      development_notes: view.development_notes || "",
+    });
+  }, [id, toast]);
+
+  useEffect(() => {
+    loadPatient();
+  }, [loadPatient]);
 
   return (
     <div className="flex h-full w-full gap-6">
@@ -863,6 +866,13 @@ const AdminPatientDetails = () => {
                 </div>
               </TabsContent>
             </Tabs>
+            <EditPatientDialog
+              open={isEditing}
+              onOpenChange={setIsEditing}
+              profileId={patient.profileId}
+              intakeId={patient.intakeId}
+              onSaved={loadPatient}
+            />
           </div>
         )}
       </div>
