@@ -7,6 +7,7 @@ type AuthCtx = {
   session: Session | null;
   isAdmin: boolean;
   isAssistant: boolean;
+  isDoctor: boolean;
   isStaff: boolean;
   profileStatus: "pending" | "approved" | "rejected" | null;
   loading: boolean;
@@ -18,6 +19,7 @@ const Ctx = createContext<AuthCtx>({
   session: null,
   isAdmin: false,
   isAssistant: false,
+  isDoctor: false,
   isStaff: false,
   profileStatus: null,
   loading: true,
@@ -74,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isStaff: isAdmin || isAssistant || isDoctor, profileStatus, loading, signOut }}>
+    <Ctx.Provider value={{ user, session, isAdmin, isAssistant, isDoctor, isStaff: isAdmin || isAssistant || isDoctor, profileStatus, loading, signOut }}>
       {children}
     </Ctx.Provider>
   );
