@@ -1020,6 +1020,30 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          email_enabled: boolean | null
+          id: string
+          in_app_enabled: boolean | null
+          notification_type: string
+          user_id: string
+        }
+        Insert: {
+          email_enabled?: boolean | null
+          id?: string
+          in_app_enabled?: boolean | null
+          notification_type: string
+          user_id: string
+        }
+        Update: {
+          email_enabled?: boolean | null
+          id?: string
+          in_app_enabled?: boolean | null
+          notification_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           app_dm_enabled: boolean | null
