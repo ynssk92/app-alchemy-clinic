@@ -103,7 +103,7 @@ export const RoleVerification = () => {
   };
 
   const handleSwitchRole = (role: string) => {
-    if (!selectedUser) return;
+    if (!selectedUser || role === selectedUserRole) return;
     if (selectedUser.id === currentUser?.id) {
       toast.error("You cannot change your own role through this tool.");
       return;
@@ -111,6 +111,7 @@ export const RoleVerification = () => {
     setPendingRole(role);
     setConfirmDialogOpen(true);
   };
+
 
   const confirmRoleSwitch = async () => {
     if (!selectedUser || !pendingRole) return;
