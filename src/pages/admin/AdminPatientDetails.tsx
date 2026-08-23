@@ -623,33 +623,15 @@ const AdminPatientDetails = () => {
                   Condition
                 </div>
                 <p className="text-3xl font-black text-slate-900">Stable</p>
-              </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-rose-600 font-bold text-[10px] uppercase tracking-widest mb-1">
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    Allergies
-                  </div>
-                  <p className="text-2xl font-black text-slate-900">{patient.allergies ? "Detected" : "None"}</p>
+              </Card>
+              <Card className="p-6 border-none shadow-sm bg-white ring-1 ring-slate-100 space-y-4 rounded-[24px]">
+                <div className="flex items-center gap-2 text-emerald-500 font-bold text-[10px] uppercase tracking-widest">
+                  <ShieldCheck className="w-4 h-4" />
+                  Assurance
                 </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-amber-600 font-bold text-[10px] uppercase tracking-widest mb-1">
-                    <Activity className="w-3.5 h-3.5" />
-                    Condition
-                  </div>
-                  <p className="text-2xl font-black text-slate-900">Stable</p>
-                </div>
-                
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-emerald-600 font-bold text-[10px] uppercase tracking-widest mb-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    Insurance
-                  </div>
-                  <p className="text-2xl font-black text-slate-900 truncate pr-2">{patient.insurance_name || "Self-Pay"}</p>
-                </div>
-              </div>
-            </Card>
+                <p className="text-lg font-black text-slate-900 truncate pr-2">{patient.insurance_name || "Self-Pay"}</p>
+              </Card>
+            </div>
 
             <Tabs defaultValue="medical" className="w-full">
               <TabsList className="bg-transparent border-b rounded-none w-full justify-start h-auto p-0 gap-8">
