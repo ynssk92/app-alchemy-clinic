@@ -47,7 +47,8 @@
     "reports": "Reports",
     "languages": "Languages",
     "settings": "Settings",
-    "verifyAssistants": "Verify Assistants"
+    "verifyAssistants": "Verify Assistants",
+    "history": "History"
   },
   "hero": {
     "title": "Book Your\u00a0\nAppointments\u00a0\nin Seconds",
