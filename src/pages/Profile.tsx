@@ -225,14 +225,53 @@ const Profile = () => {
 
             <Card className="p-8 rounded-[20px] shadow-soft border-slate-200/60 bg-white">
               <h3 className="text-lg font-bold text-slate-900 mb-1">Security</h3>
-              <p className="text-sm text-slate-500 mb-6">Keep your account secure with a strong password.</p>
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <Input type="password" placeholder="New password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
-                  <Input type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+              <p className="text-sm text-slate-500 mb-6">Manage your account security and password.</p>
+              
+              <div className="space-y-6">
+                <div className="p-4 rounded-2xl border border-slate-100 bg-slate-50/50">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-4 h-4 text-primary" />
+                      <span className="font-semibold text-slate-900">Password</span>
+                    </div>
+                  </div>
+                  
+                  <form onSubmit={handleChangePassword} className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="new-password">New password</Label>
+                        <Input 
+                          id="new-password"
+                          type="password" 
+                          placeholder="••••••••" 
+                          value={newPassword} 
+                          onChange={e => setNewPassword(e.target.value)} 
+                          required 
+                          className="bg-white"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirm new password</Label>
+                        <Input 
+                          id="confirm-password"
+                          type="password" 
+                          placeholder="••••••••" 
+                          value={confirmPassword} 
+                          onChange={e => setConfirmPassword(e.target.value)} 
+                          required 
+                          className="bg-white"
+                        />
+                      </div>
+                    </div>
+                    <Button type="submit" className="bg-primary text-white rounded-full px-6" disabled={changingPassword}>
+                      {changingPassword ? "Updating..." : "Set/Change password"}
+                    </Button>
+                  </form>
+                  <p className="text-[11px] text-slate-400 mt-4 italic">
+                    Setting a password allows you to sign in with your email address in addition to Google.
+                  </p>
                 </div>
-                <Button type="submit" variant="secondary" className="rounded-full" disabled={changingPassword}><Lock className="w-4 h-4 mr-2" /> Change password</Button>
-              </form>
+              </div>
             </Card>
           </div>
 
