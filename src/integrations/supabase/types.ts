@@ -358,6 +358,39 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_email: string | null
+          actor_id: string | null
+          created_at: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_email?: string | null
+          actor_id?: string | null
+          created_at?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           author_id: string | null
@@ -2917,6 +2950,16 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_clinic_staff: { Args: { _user_id: string }; Returns: boolean }
+      log_action: {
+        Args: {
+          _action: string
+          _actor_id?: string
+          _details?: Json
+          _target_id?: string
+          _target_type?: string
+        }
+        Returns: undefined
+      }
       manage_user_role: {
         Args: {
           new_role: Database["public"]["Enums"]["app_role"]
