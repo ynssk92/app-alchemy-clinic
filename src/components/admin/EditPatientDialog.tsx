@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { UserPlus, BookOpen, ShieldCheck, Activity, Baby, Phone } from "lucide-react";
+import { UserPlus, BookOpen, ShieldCheck, Activity, Baby, Phone, ArrowRight, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -44,6 +44,8 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
   const [saving, setSaving] = useState(false);
   const [intakeId, setIntakeId] = useState<string | null>(intakeIdProp ?? null);
   const [initialEmail, setInitialEmail] = useState("");
+  const [showEmailConfirm, setShowEmailConfirm] = useState(false);
+  const [pendingUpdate, setPendingUpdate] = useState(false);
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -172,11 +174,18 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
   const set = (k: string, v: string | any) => setForm((f) => ({ ...f, [k]: v }));
 
-  const onSubmit = async () => {
+  const onSubmit = async (confirmEmail = false) => {
+    const isEmailChanged = isAdmin && profileId && form.email.trim().toLowerCase() !== initialEmail.trim().toLowerCase();
+    
+    if (isEmailChanged && !confirmEmail) {
+      setShowEmailConfirm(true);
+      return;
+    }
+
     setSaving(true);
     try {
       // 1. Handle secure email update if changed by Admin
-      if (isAdmin && profileId && form.email.trim().toLowerCase() !== initialEmail.trim().toLowerCase()) {
+      if (isEmailChanged) {
         const { data: edgeData, error: edgeError } = await supabase.functions.invoke('admin-update-patient-email', {
           body: {
             target_user_id: profileId,
@@ -279,6 +288,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
       }
 
       toast({ title: "Patient mis à jour" });
+      setShowEmailConfirm(false);
       onOpenChange(false);
       onSaved?.();
     } catch (e: any) {
@@ -291,6 +301,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
 
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[92vh] overflow-y-auto p-0 border-none shadow-2xl rounded-3xl bg-white">
         <div className="p-10 space-y-16">
