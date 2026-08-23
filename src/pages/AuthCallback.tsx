@@ -43,9 +43,9 @@ const AuthCallback = () => {
           // If the user already has a staff role, we might still want to process the invite
           // but we prioritize existing staff status.
           const { data: invite, error: inviteError } = await supabase
-            .rpc("get_my_invitation");
+            .rpc("get_my_invitation" as any);
 
-          if (!inviteError && invite && invite.length > 0) {
+          if (!inviteError && Array.isArray(invite) && invite.length > 0) {
             const inviteData = invite[0];
             // Only assign if not already assigned
             if (!roleList.includes(inviteData.role)) {
