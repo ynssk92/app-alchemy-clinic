@@ -16,6 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { generatePrescriptionPDF } from "@/utils/prescriptionPdf";
+import { useAppSettings } from "@/hooks/useAppSettings";
 
 interface PrescriptionListProps {
   patientId: string;
@@ -28,6 +30,8 @@ const PrescriptionList = ({ patientId }: PrescriptionListProps) => {
   const [loading, setLoading] = useState(true);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState<string | null>(null);
+  const { settings, logoUrl } = useAppSettings();
   
   // New Prescription State
   const [newPrescription, setNewPrescription] = useState({
