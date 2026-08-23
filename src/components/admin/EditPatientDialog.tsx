@@ -243,25 +243,28 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
     }
   };
 
-  const SectionHeader = ({ num, title, icon: Icon }: { num: string; title: string; icon?: any }) => (
-    <div className="flex items-center gap-4 mb-6">
-      <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 text-primary text-xs font-bold ring-1 ring-primary/20">
-        {num}
-      </span>
-      <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
-        {Icon && <Icon className="w-4 h-4 text-primary/60" />}
-        {title}
-      </h3>
-      <div className="h-px bg-slate-100 flex-1" />
-    </div>
   );
+};
 
-  const FormItem = ({ label, children, colSpan = 1 }: { label: string; children: React.ReactNode; colSpan?: number }) => (
-    <div className={`space-y-2 ${colSpan === 2 ? "md:col-span-2" : ""}`}>
-      <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
-      {children}
-    </div>
-  );
+const SectionHeader = ({ num, title, icon: Icon }: { num: string; title: string; icon?: any }) => (
+  <div className="flex items-center gap-4 mb-6">
+    <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-primary/10 text-primary text-xs font-bold ring-1 ring-primary/20">
+      {num}
+    </span>
+    <h3 className="text-sm font-bold text-slate-900 uppercase tracking-widest flex items-center gap-2">
+      {Icon && <Icon className="w-4 h-4 text-primary/60" />}
+      {title}
+    </h3>
+    <div className="h-px bg-slate-100 flex-1" />
+  </div>
+);
+
+const FormItem = ({ label, children, colSpan = 1 }: { label: string; children: React.ReactNode; colSpan?: number }) => (
+  <div className={`space-y-2 ${colSpan === 2 ? "md:col-span-2" : ""}`}>
+    <Label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</Label>
+    {children}
+  </div>
+);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
