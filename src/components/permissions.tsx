@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { usePermissions, PermAction } from "@/hooks/usePermissions";
+import { AccessDenied } from "@/pages/AccessDenied";
 import { Card } from "@/components/ui/card";
 import { ShieldAlert } from "lucide-react";
 
@@ -23,7 +24,7 @@ export const PermissionRoute = ({
     );
   }
   if (isAdmin || can(module, action)) return children;
-  return <Navigate to="/admin" replace />;
+  return <AccessDenied />;
 };
 
 /** Inline guard: render children only if the user has permission. */

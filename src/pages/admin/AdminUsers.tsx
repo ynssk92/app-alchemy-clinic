@@ -188,6 +188,10 @@ const AdminUsers = () => {
     if (insError) return toast.error(insError.message);
     
     toast.success(`Role updated to ${role}`);
+    // Trigger immediate auth state refresh by reloading the page or ideally re-fetching roles in useAuth
+    // Since useAuth listens to session changes, we could potentially trigger a reload or use a broadcast channel
+    // For now, reload ensures all components (sidebar, badge, etc) pick up the change
+    window.location.reload();
     loadUsers();
   };
 

@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "@/hooks/useAuth";
+import { usePermissions } from "@/hooks/usePermissions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Stethoscope, Calendar, Users, Building2, TrendingUp,
   Plus, CalendarCheck, Clock, Activity, MessageSquare, Zap,
-  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack,
+  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack, ShieldAlert
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer,
@@ -35,6 +37,8 @@ const initials = (name?: string | null) =>
     .toUpperCase();
 
 const AdminOverview = () => {
+  const { isAdmin } = useAuth();
+  const { can } = usePermissions();
   const { t, i18n } = useTranslation();
   const [stats, setStats] = useState<Stats>({
     doctors: 0, appts: 0, patients: 0, clinics: 0, upcoming: 0, messages: 0,
@@ -170,12 +174,12 @@ const AdminOverview = () => {
   ];
 
   const quickActions = [
-    { label: t("nav.createPatient"), to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
-    { label: t("nav.newAppointment"), to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan" },
-    { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green" },
-    { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet" },
-    { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber" },
-    { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue" },
+    { label: t("nav.createPatient"), to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue", module: "patients", action: "create" },
+    { label: t("nav.newAppointment"), to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan", module: "appointments", action: "create" },
+    { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green", module: "billing", action: "create" },
+    { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet", module: "doctors" },
+    { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber", module: "messages" },
+    { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue", adminOnly: true },
   ];
 
   const activity = useMemo(() => {
@@ -387,21 +391,26 @@ const AdminOverview = () => {
           tint="stat-amber"
         >
           <div className="grid grid-cols-2 gap-2">
-            {quickActions.map((q) => (
-              <Link
-                key={q.label}
-                to={q.to}
-                className="flex flex-col items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card hover:shadow-soft"
-              >
-                <span
-                  className="flex h-8 w-8 items-center justify-center rounded-lg"
-                  style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
+            {quickActions.map((q: any) => {
+              const hasPerm = isAdmin || (q.adminOnly ? false : (q.module ? can(q.module, q.action || "view") : true));
+              if (!hasPerm) return null;
+              
+              return (
+                <Link
+                  key={q.label}
+                  to={q.to}
+                  className="flex flex-col items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card hover:shadow-soft"
                 >
-                  <q.icon className="h-4 w-4" />
-                </span>
-                <span className="text-[11px] font-semibold leading-tight">{q.label}</span>
-              </Link>
-            ))}
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-lg"
+                    style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
+                  >
+                    <q.icon className="h-4 w-4" />
+                  </span>
+                  <span className="text-[11px] font-semibold leading-tight">{q.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </WidgetCard>
       </div>

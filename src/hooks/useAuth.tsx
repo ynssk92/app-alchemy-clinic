@@ -10,6 +10,7 @@ type AuthCtx = {
   isDoctor: boolean;
   isStaff: boolean;
   profileStatus: "pending" | "approved" | "rejected" | null;
+  role: string | null;
   permissions: string[];
   loading: boolean;
   signOut: () => Promise<void>;
@@ -23,6 +24,7 @@ const Ctx = createContext<AuthCtx>({
   isDoctor: false,
   isStaff: false,
   profileStatus: null,
+  role: null,
   permissions: [],
   loading: true,
   signOut: async () => {},
@@ -35,6 +37,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAssistant, setIsAssistant] = useState(false);
   const [isDoctor, setIsDoctor] = useState(false);
   const [profileStatus, setProfileStatus] = useState<"pending" | "approved" | "rejected" | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [permissions, setPermissions] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,6 +54,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsAdmin(hasAdmin);
       setIsAssistant(list.includes("assistant"));
       setIsDoctor(list.includes("doctor"));
+      setRole(list[0] || "patient");
       setProfileStatus(((prof as any)?.status as any) ?? null);
 
       // Filter permissions for the user's roles
@@ -75,6 +79,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setIsAdmin(false);
         setIsAssistant(false);
         setIsDoctor(false);
+        setRole(null);
         setProfileStatus(null);
         setPermissions([]);
       }
@@ -106,6 +111,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isDoctor, 
       isStaff: isAdmin || isAssistant || isDoctor, 
       profileStatus, 
+      role,
       permissions, 
       loading, 
       signOut 

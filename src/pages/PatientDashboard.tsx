@@ -38,7 +38,7 @@ const statusTone = (status: string) =>
     : "bg-positive/10 text-positive ring-1 ring-positive/20";
 
 const PatientDashboard = () => {
-  const { user, isAdmin, isAssistant, isDoctor, signOut } = useAuth();
+  const { user, isAdmin, isAssistant, isDoctor, role, loading: authLoading, signOut } = useAuth();
   const [appointments, setAppointments] = useState<Appt[]>([]);
   const [profileName, setProfileName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -165,7 +165,7 @@ const PatientDashboard = () => {
                     <CircleDot className="h-3 w-3" /> Clinic Open
                   </span>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
-                    <ShieldCheck className="h-3 w-3" /> {isAdmin ? "Admin" : isDoctor ? "Doctor" : isAssistant ? "Assistant" : "Patient"}
+                    <ShieldCheck className="h-3 w-3" /> {authLoading ? "Loading..." : (role ? role.charAt(0).toUpperCase() + role.slice(1) : "User")}
                   </span>
                 </div>
               </div>
