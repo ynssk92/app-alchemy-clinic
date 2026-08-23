@@ -391,21 +391,26 @@ const AdminOverview = () => {
           tint="stat-amber"
         >
           <div className="grid grid-cols-2 gap-2">
-            {quickActions.map((q) => (
-              <Link
-                key={q.label}
-                to={q.to}
-                className="flex flex-col items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card hover:shadow-soft"
-              >
-                <span
-                  className="flex h-8 w-8 items-center justify-center rounded-lg"
-                  style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
+            {quickActions.map((q: any) => {
+              const hasPerm = isAdmin || (q.adminOnly ? false : (q.module ? can(q.module, q.action || "view") : true));
+              if (!hasPerm) return null;
+              
+              return (
+                <Link
+                  key={q.label}
+                  to={q.to}
+                  className="flex flex-col items-start gap-2 rounded-xl border border-border bg-muted/30 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-card hover:shadow-soft"
                 >
-                  <q.icon className="h-4 w-4" />
-                </span>
-                <span className="text-[11px] font-semibold leading-tight">{q.label}</span>
-              </Link>
-            ))}
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-lg"
+                    style={{ background: `hsl(var(--${q.tint}) / 0.12)`, color: `hsl(var(--${q.tint}))` }}
+                  >
+                    <q.icon className="h-4 w-4" />
+                  </span>
+                  <span className="text-[11px] font-semibold leading-tight">{q.label}</span>
+                </Link>
+              );
+            })}
           </div>
         </WidgetCard>
       </div>
