@@ -29,12 +29,12 @@ const AuthCallback = () => {
         if (session) {
           const user = session.user;
           const userEmail = user.email?.toLowerCase().trim() || "";
-
+          
           // 1. Process Role Assignment via Secure RPC
-          // This RPC follows the exact logic:
-          // Existing role? -> Keep it.
-          // Pending Invite? -> Assign invited role & mark claimed.
-          // No invite? -> Returns existing role or null.
+          // This RPC handles the atomic logic:
+          // Privileged Role? -> Keep it.
+          // Pending Invite? -> Upgrade/Assign invited role & mark claimed.
+          // No role? -> Assign Patient.
           const { data: roleResult, error: rpcError } = await supabase.rpc("claim_invitation_role" as any);
           
           let currentRole: string | null = null;
@@ -42,28 +42,17 @@ const AuthCallback = () => {
             currentRole = (roleResult[0] as any).role;
           }
 
-          // 2. Initial Admin Bootstrap Fallback
-          // Only runs if the user has NO role after the invitation check
-          if (!currentRole && INITIAL_ADMIN_EMAILS.includes(userEmail)) {
-            const { error: promoError } = await supabase
-              .from("user_roles")
-              .insert({ user_id: user.id, role: "admin" });
+          // 2. Initial Admin Bootstrap Fallback (Safety mechanism)
+          // Only runs if the user has NO privileged role or invite
+          if (currentRole === "patient" && INITIAL_ADMIN_EMAILS.includes(userEmail)) {
+            const { error: promoError } = await supabase.rpc("manage_user_role", {
+              target_user_id: user.id,
+              new_role: "admin"
+            });
             
             if (!promoError) {
               currentRole = "admin";
               toast.success("Initial administrator account activated.");
-            }
-          }
-
-          // 3. Default Role: Patient
-          // If still no role, assign Patient.
-          if (!currentRole) {
-            const { error: patientRoleError } = await supabase
-              .from("user_roles")
-              .insert({ user_id: user.id, role: "patient" });
-            
-            if (!patientRoleError) {
-              currentRole = "patient";
             }
           }
 
