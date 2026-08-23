@@ -123,7 +123,7 @@ const sections: Section[] = [
     items: [
       { to: "/admin/languages", icon: Globe, label: "nav.languages", adminOnly: true },
       { to: "/admin/verify-assistants", icon: UserCheck, label: "nav.verifyAssistants", adminOnly: true },
-      { to: "/admin/verify-role", icon: ShieldCheck, label: "Verify Role", adminOnly: true },
+      { to: "/admin/verify-role", icon: ShieldCheck, label: "Role Management", adminOnly: true },
       { to: "/admin/settings/notifications", icon: Bell, label: "Notifications", staff: true },
     ],
   },
