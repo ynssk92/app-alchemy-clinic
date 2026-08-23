@@ -449,9 +449,35 @@ const AdminPatientCreate = () => {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold text-slate-500 uppercase">Insurance Provider</Label>
+                  <Select value={form.insurance_name} onValueChange={set("insurance_name")}>
+                    <SelectTrigger className="h-[46px] rounded-[10px] bg-white border-slate-200 shadow-sm focus:ring-indigo-500/5 transition-all">
+                      <SelectValue placeholder="Select Provider" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[
+                        "CNSS / AMO", "CNOPS / AMO", "Wafa Assurance", "RMA", "Sanlam Maroc",
+                        "AXA Assurance Maroc", "AtlantaSanad", "Allianz Maroc", "MCMA", "MAMDA",
+                        "Mutuelle Centrale Marocaine d'Assurance (MCMA)", "Mutuelle Attamine Chaabi",
+                        "Marocaine Vie", "Other", "Self-Pay / Sans assurance"
+                      ].map((p) => (
+                        <SelectItem key={p} value={p}>{p}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Insurance Policy / Membership Number</Label>
                   <Input 
-                    value={form.insurance_name} 
-                    onChange={(e) => set("insurance_name")(e.target.value)}
+                    value={form.insurance_number} 
+                    onChange={(e) => set("insurance_number")(e.target.value)}
+                    className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <Label className="text-xs font-semibold text-slate-500 uppercase">Optional Insurance Notes</Label>
+                  <Input 
+                    value={form.insurance_notes} 
+                    onChange={(e) => set("insurance_notes")(e.target.value)}
                     className="h-[46px] rounded-[10px] bg-white border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/5 transition-all shadow-sm"
                   />
                 </div>

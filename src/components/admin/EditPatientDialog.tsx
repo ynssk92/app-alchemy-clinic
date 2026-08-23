@@ -335,15 +335,27 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
           {/* SECTION 3: INSURANCE */}
           <section>
             <SectionHeader num="03" title="Insurance & Billing" icon={ShieldCheck} />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-6">
-              <FormItem label="Provider Name">
-                <Input className="h-11 rounded-xl" value={form.insurance_name} onChange={(e) => set("insurance_name", e.target.value)} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              <FormItem label="Assurance / Provider">
+                <Select value={form.insurance_name} onValueChange={(v) => set("insurance_name", v)}>
+                  <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>
+                    {[
+                      "CNSS / AMO", "CNOPS / AMO", "Wafa Assurance", "RMA", "Sanlam Maroc",
+                      "AXA Assurance Maroc", "AtlantaSanad", "Allianz Maroc", "MCMA", "MAMDA",
+                      "Mutuelle Centrale Marocaine d'Assurance (MCMA)", "Mutuelle Attamine Chaabi",
+                      "Marocaine Vie", "Other", "Self-Pay / Sans assurance"
+                    ].map((p) => (
+                      <SelectItem key={p} value={p}>{p}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormItem>
-              <FormItem label="Policy Number">
+              <FormItem label="N° adhérent / Policy Number">
                 <Input className="h-11 rounded-xl" value={form.insurance_number} onChange={(e) => set("insurance_number", e.target.value)} />
               </FormItem>
-              <FormItem label="Status">
-                <Input className="h-11 rounded-xl" value={form.insurance_status} onChange={(e) => set("insurance_status", e.target.value)} />
+              <FormItem label="Optional Insurance Notes" colSpan={2}>
+                <Input className="h-11 rounded-xl" value={form.insurance_notes} onChange={(e) => set("insurance_notes", e.target.value)} />
               </FormItem>
             </div>
           </section>
