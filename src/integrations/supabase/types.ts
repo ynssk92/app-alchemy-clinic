@@ -2510,6 +2510,24 @@ export type Database = {
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          id: string
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          id?: string
+          permission: Database["public"]["Enums"]["app_permission"]
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          id?: string
+          permission?: Database["public"]["Enums"]["app_permission"]
+          role?: Database["public"]["Enums"]["app_role"]
+        }
+        Relationships: []
+      }
       roles: {
         Row: {
           created_at: string
@@ -2844,10 +2862,15 @@ export type Database = {
         }
         Returns: Json
       }
-      has_permission: {
-        Args: { _action: string; _module: string; _user_id: string }
-        Returns: boolean
-      }
+      has_permission:
+        | {
+            Args: { _permission: Database["public"]["Enums"]["app_permission"] }
+            Returns: boolean
+          }
+        | {
+            Args: { _action: string; _module: string; _user_id: string }
+            Returns: boolean
+          }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2867,6 +2890,21 @@ export type Database = {
       show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
+      app_permission:
+        | "patients.view"
+        | "patients.edit"
+        | "medical_records.view"
+        | "medical_records.edit"
+        | "prescriptions.view"
+        | "prescriptions.edit"
+        | "appointments.view"
+        | "appointments.edit"
+        | "billing.view"
+        | "billing.edit"
+        | "inventory.view"
+        | "inventory.edit"
+        | "settings.view"
+        | "settings.edit"
       app_role: "admin" | "doctor" | "patient" | "assistant"
       content_status: "draft" | "published"
       invoice_status:
@@ -3005,6 +3043,22 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_permission: [
+        "patients.view",
+        "patients.edit",
+        "medical_records.view",
+        "medical_records.edit",
+        "prescriptions.view",
+        "prescriptions.edit",
+        "appointments.view",
+        "appointments.edit",
+        "billing.view",
+        "billing.edit",
+        "inventory.view",
+        "inventory.edit",
+        "settings.view",
+        "settings.edit",
+      ],
       app_role: ["admin", "doctor", "patient", "assistant"],
       content_status: ["draft", "published"],
       invoice_status: [
