@@ -471,7 +471,7 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
         </div>
         <DialogFooter className="p-8 bg-slate-50/50 border-t border-slate-100">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="h-11 px-8 rounded-xl">Cancel</Button>
-          <Button onClick={onSubmit} disabled={saving} className="h-11 px-10 rounded-xl shadow-lg shadow-primary/20">
+          <Button onClick={() => onSubmit(false)} disabled={saving} className="h-11 px-10 rounded-xl shadow-lg shadow-primary/20">
             {saving ? "Saving..." : "Save Patient Profile"}
           </Button>
         </DialogFooter>
