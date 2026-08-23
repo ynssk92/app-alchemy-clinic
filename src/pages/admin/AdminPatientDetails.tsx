@@ -737,6 +737,7 @@ const AdminPatientDetails = () => {
                         <p className="text-sm font-medium text-slate-700 tracking-wider font-mono">{patient.identity_document_number || "—"}</p>
                       </div>
                     </div>
+                  </Card>
                 </div>
               </TabsContent>
 
