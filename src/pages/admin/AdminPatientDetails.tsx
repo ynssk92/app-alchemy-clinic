@@ -151,7 +151,33 @@ const statusPill = (status: string) => {
 };
 
 const fmtDate = (d?: string | null) =>
-  d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+  d ? new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" }) : "Non renseigné";
+
+const getAge = (dob?: string | null) => {
+  if (!dob) return null;
+  const birth = new Date(dob);
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+  return age;
+};
+
+const ValueDisplay = ({ label, value, icon: Icon, mono }: { label: string; value?: string | null; icon?: any; mono?: boolean }) => (
+  <div className="space-y-1">
+    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+      {Icon && <Icon className="w-3 h-3" />}
+      {label}
+    </p>
+    <p className={cn(
+      "text-sm font-medium text-slate-700",
+      mono && "font-mono tracking-wider",
+      !value && "text-slate-400 italic font-normal"
+    )}>
+      {value || "Non renseigné"}
+    </p>
+  </div>
+);
 
 const AdminPatientDetails = () => {
   const { t } = useTranslation();
