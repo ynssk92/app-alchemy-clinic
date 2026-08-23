@@ -78,7 +78,70 @@ export const HeroSection = () => {
             transition={{ duration: 0.6 }}
           >
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
-              CLINIQUE LA DUNE DENTAIRE
+              '''Do not make any visual modifications. The phrases I write are commands to understand what I want, not to be written down. Understand their content well, then execute what is required.'''
+                                        
+                                            
+                                            Fix the production routing for the React + Vite application deployed from GitHub to Vercel.
+
+IMPORTANT:
+
+- Do NOT modify the Supabase database.
+
+- Do NOT modify RLS policies.
+
+- Do NOT modify authentication logic.
+
+- Do NOT change existing application features or UI.
+
+- This task is ONLY about frontend routing and Vercel deployment compatibility.
+
+Problem:
+
+The application works from the root URL, but when deployed to Vercel, directly opening the authentication route such as /auth does not work correctly. I need /auth to be accessible directly from the browser.
+
+First inspect the existing routing implementation and determine whether the project uses React Router / BrowserRouter.
+
+Then:
+
+1. Make sure the existing Auth page is actually registered on the correct frontend route, preferably /auth.
+
+2. Preserve the existing Auth component and its current functionality.
+
+3. If the application currently uses a different route for authentication, support /auth as an alias without breaking the existing route.
+
+4. Add the correct Vercel SPA fallback configuration so direct browser requests to client-side routes are served through the application's index.html.
+
+5. Create or update vercel.json only if necessary.
+
+6. Do not introduce Next.js routing or any server-side routing architecture.
+
+7. Do not change Supabase authentication providers or environment variables.
+
+8. Make sure internal navigation to /auth and direct navigation by typing /auth in the browser both work.
+
+9. Make sure refreshing /auth does not produce a Vercel 404.
+
+10. Make sure other existing frontend routes continue working exactly as before.
+
+Expected result:
+
+https://YOUR-VERCEL-DOMAIN/auth
+
+must load the existing authentication page directly, including after a browser refresh.
+
+Also verify:
+
+- /
+
+- /auth
+
+- existing protected/admin routes
+
+- existing patient routes
+
+Do not redesign anything. Do not touch backend/database/security logic.
+
+After implementation, explain exactly which files were changed and why.
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
