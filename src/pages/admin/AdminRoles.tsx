@@ -26,9 +26,8 @@ type Role = {
 };
 
 const MODULES = [
-  "Dashboard", "Doctors", "Patients", "Appointments",
-  "Specialties", "Clinics", "Blog", "Messages", "Reports", "Users",
-  "settings",
+  "patients", "medical_records", "prescriptions", "appointments",
+  "billing", "inventory", "settings",
 ];
 
 const AdminRoles = () => {
@@ -41,9 +40,24 @@ const AdminRoles = () => {
 
   const load = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from("roles").select("*").order("created_at", { ascending: false });
-    if (error) toast.error(error.message);
-    setRoles((data as any) || []);
+    const { data, error } = await supabase.from("role_permissions" as any).select("*");
+    if (error) return toast.error(error.message);
+    
+    // Group permissions by role
+    const grouped = (data || []).reduce((acc: any, curr: any) => {
+      if (!acc[curr.role]) acc[curr.role] = { id: curr.role, name: curr.role, status: 'active', permissions: {}, created_at: new Date().toISOString() };
+      const [mod, act] = curr.permission.split('.');
+      if (!acc[curr.role].permissions[mod]) acc[curr.role].permissions[mod] = {};
+      acc[curr.role].permissions[mod][act] = true;
+      return acc;
+    }, {});
+
+    // Ensure all base roles exist in the list
+    ["admin", "doctor", "assistant", "patient"].forEach(r => {
+      if (!grouped[r]) grouped[r] = { id: r, name: r, status: 'active', permissions: {}, created_at: new Date().toISOString() };
+    });
+
+    setRoles(Object.values(grouped));
     setLoading(false);
   };
 
@@ -80,9 +94,28 @@ const AdminRoles = () => {
 
   const savePermissions = async () => {
     if (!permOpen) return;
-    const { error } = await supabase.from("roles").update({ permissions: permOpen.permissions }).eq("id", permOpen.id);
-    if (error) return toast.error(error.message);
-    toast.success("Permissions saved"); setPermOpen(null); load();
+    try {
+      // Strictly role-based: replace all permissions for this role
+      await supabase.from("role_permissions" as any).delete().eq("role", permOpen.id);
+      
+      const newPerms: any[] = [];
+      Object.entries(permOpen.permissions).forEach(([mod, acts]: [string, any]) => {
+        Object.entries(acts).forEach(([act, val]) => {
+          if (val) newPerms.push({ role: permOpen.id, permission: `${mod}.${act}` });
+        });
+      });
+
+      if (newPerms.length > 0) {
+        const { error } = await supabase.from("role_permissions" as any).insert(newPerms);
+        if (error) throw error;
+      }
+      
+      toast.success("Permissions saved"); 
+      setPermOpen(null); 
+      load();
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   const togglePerm = (mod: string, key: "view" | "create" | "edit" | "delete") => {
@@ -99,33 +132,19 @@ const AdminRoles = () => {
           <h1 className="text-2xl font-bold">Roles</h1>
           <p className="text-sm text-muted-foreground">Manage roles and their access permissions.</p>
         </div>
-        <Dialog open={openNew} onOpenChange={setOpenNew}>
-          <DialogTrigger asChild>
-            <Button className="gap-2 bg-gradient-primary text-primary-foreground">
-              <Plus className="w-4 h-4" /> New Role
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Create new role</DialogTitle></DialogHeader>
-            <div className="space-y-2">
-              <Label>Role name</Label>
-              <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder="e.g. Nurse" />
-            </div>
-            <DialogFooter>
-              <Button variant="ghost" onClick={() => setOpenNew(false)}>Cancel</Button>
-              <Button onClick={createRole}>Create</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <div className="bg-amber-50 border border-amber-200 p-4 rounded-xl text-xs text-amber-800 flex items-start gap-2 max-w-2xl">
+          <Shield className="w-4 h-4 mt-0.5 shrink-0" />
+          <p>
+            Permissions are strictly role-based. Modifications here affect all users assigned to the respective role. 
+            Administrators have full system access regardless of mapped permissions.
+          </p>
+        </div>
       </div>
 
       <Card className="overflow-hidden">
-        <div className="grid grid-cols-[1fr_1fr_1fr_auto_auto] items-center gap-4 px-6 py-3 bg-muted/40 border-b text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-          <div>Role</div>
-          <div>Created On</div>
-          <div>Status</div>
-          <div className="w-32"></div>
-          <div className="w-10"></div>
+        <div className="grid grid-cols-[1fr_auto] items-center gap-4 px-6 py-3 bg-muted/40 border-b text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          <div>System Role</div>
+          <div className="w-32 text-right pr-4">Actions</div>
         </div>
 
         {loading ? (
@@ -136,50 +155,31 @@ const AdminRoles = () => {
           roles.map((r) => (
             <div
               key={r.id}
-              className="grid grid-cols-[1fr_1fr_1fr_auto_auto] items-center gap-4 px-6 py-4 border-b last:border-0 hover:bg-muted/30 transition-colors"
+              className="grid grid-cols-[1fr_auto] items-center gap-4 px-6 py-5 border-b last:border-0 hover:bg-muted/30 transition-colors"
             >
-              <div className="font-medium">{r.name}</div>
-              <div className="text-sm text-muted-foreground">
-                {format(new Date(r.created_at), "dd MMM yyyy")}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                  <Shield className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="font-bold text-lg capitalize">{r.name}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {r.id === 'admin' ? 'Full system access (Bypass permissions)' : `Manage granular ${r.name} permissions`}
+                  </div>
+                </div>
               </div>
-              <div>
-                {r.status === "active" ? (
-                  <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 bg-emerald-500/5">
-                    Active
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="border-destructive/40 text-destructive bg-destructive/5">
-                    Inactive
-                  </Badge>
-                )}
+              <div className="flex items-center justify-end gap-2 pr-2">
+                <Button
+                  variant={r.id === 'admin' ? "ghost" : "outline"}
+                  size="sm"
+                  className="gap-2 rounded-xl"
+                  onClick={() => setPermOpen(r)}
+                  disabled={r.id === 'admin'}
+                >
+                  <ShieldCheck className="w-4 h-4" /> 
+                  {r.id === 'admin' ? 'Full Access' : 'Manage Permissions'}
+                </Button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2"
-                onClick={() => setPermOpen(r)}
-              >
-                <Shield className="w-4 h-4" /> Permissions
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover">
-                  <DropdownMenuItem onClick={() => setEditOpen({ ...r })}>
-                    <Pencil className="w-4 h-4 mr-2" /> Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => toggleStatus(r)}>
-                    <ShieldCheck className="w-4 h-4 mr-2" />
-                    Mark {r.status === "active" ? "Inactive" : "Active"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive" onClick={() => deleteRole(r)}>
-                    <Trash2 className="w-4 h-4 mr-2" /> Delete
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </div>
           ))
         )}
@@ -189,61 +189,54 @@ const AdminRoles = () => {
       <Dialog open={!!permOpen} onOpenChange={(o) => !o && setPermOpen(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Permissions — {permOpen?.name}</DialogTitle>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2 capitalize">
+              <ShieldCheck className="w-6 h-6 text-primary" />
+              {permOpen?.name} Permissions
+            </DialogTitle>
           </DialogHeader>
-          <div className="max-h-[60vh] overflow-auto">
-            <div className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 items-center px-2 py-2 text-xs uppercase tracking-wide text-muted-foreground border-b">
+          <div className="max-h-[60vh] overflow-auto px-1">
+            <div className="grid grid-cols-[1fr_auto_auto] gap-6 items-center px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-muted-foreground border-b bg-muted/20 rounded-t-xl">
               <div>Module</div>
-              <div className="w-16 text-center">View</div>
-              <div className="w-16 text-center">Create</div>
-              <div className="w-16 text-center">Edit</div>
-              <div className="w-16 text-center">Delete</div>
+              <div className="w-20 text-center">View</div>
+              <div className="w-20 text-center">Edit / Create</div>
             </div>
             {MODULES.map((mod) => {
               const p = permOpen?.permissions?.[mod] || {};
               return (
-                <div key={mod} className="grid grid-cols-[1fr_auto_auto_auto_auto] gap-3 items-center px-2 py-2 border-b last:border-0">
-                  <div className="font-medium text-sm">{mod}</div>
-                  {(["view", "create", "edit", "delete"] as const).map((k) => (
-                    <div key={k} className="w-16 flex justify-center">
-                      <Checkbox checked={!!p[k]} onCheckedChange={() => togglePerm(mod, k)} />
-                    </div>
-                  ))}
+                <div key={mod} className="grid grid-cols-[1fr_auto_auto] gap-6 items-center px-4 py-4 border-b last:border-0 hover:bg-muted/10 transition-colors">
+                  <div>
+                    <div className="font-bold text-slate-900 capitalize">{mod.replace('_', ' ')}</div>
+                    <div className="text-[10px] text-muted-foreground">Access controls for {mod} module</div>
+                  </div>
+                  <div className="w-20 flex justify-center">
+                    <Checkbox 
+                      checked={!!p.view} 
+                      onCheckedChange={() => togglePerm(mod, 'view')}
+                      className="h-5 w-5 rounded-md border-2" 
+                    />
+                  </div>
+                  <div className="w-20 flex justify-center">
+                    <Checkbox 
+                      checked={!!p.edit || !!p.create} 
+                      onCheckedChange={() => {
+                        togglePerm(mod, 'edit');
+                        togglePerm(mod, 'create');
+                      }}
+                      className="h-5 w-5 rounded-md border-2" 
+                    />
+                  </div>
                 </div>
               );
             })}
           </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setPermOpen(null)}>Cancel</Button>
-            <Button onClick={savePermissions}>Save permissions</Button>
+          <DialogFooter className="bg-muted/10 p-4 -mx-6 -mb-6 border-t rounded-b-lg">
+            <Button variant="ghost" onClick={() => setPermOpen(null)} className="rounded-xl">Cancel</Button>
+            <Button onClick={savePermissions} className="rounded-xl px-8">Save Role Permissions</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Rename dialog */}
-      <Dialog open={!!editOpen} onOpenChange={(o) => !o && setEditOpen(null)}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Rename role</DialogTitle></DialogHeader>
-          <div className="space-y-2">
-            <Label>Role name</Label>
-            <Input
-              value={editOpen?.name || ""}
-              onChange={(e) => editOpen && setEditOpen({ ...editOpen, name: e.target.value })}
-            />
-            <div className="flex items-center justify-between pt-2">
-              <Label>Active</Label>
-              <Switch
-                checked={editOpen?.status === "active"}
-                onCheckedChange={(v) => editOpen && setEditOpen({ ...editOpen, status: v ? "active" : "inactive" })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setEditOpen(null)}>Cancel</Button>
-            <Button onClick={renameRole}>Save</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Removed rename dialog as roles are now fixed system roles */}
     </div>
   );
 };

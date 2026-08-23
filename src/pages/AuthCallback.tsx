@@ -30,7 +30,38 @@ const AuthCallback = () => {
         if (session) {
           const user = session.user;
 
-          // 1. Check if user has a role (admin/assistant/doctor)
+          // 1. Check for invitations matching the email
+          const userEmail = user.email?.toLowerCase();
+          const { data: invite } = await supabase
+            .from("admin_invites")
+            .select("id, role" as any)
+            .eq("email", userEmail || "")
+            .is("claimed_at", null)
+            .maybeSingle();
+
+          const inviteData = invite as any;
+
+          if (inviteData) {
+            // Assign the invited role
+            const { error: roleError } = await supabase
+              .from("user_roles")
+              .insert({ 
+                user_id: user.id, 
+                role: inviteData.role 
+              });
+            
+            if (!roleError) {
+              // Mark invite as used
+              await supabase
+                .from("admin_invites")
+                .update({ claimed_at: new Date().toISOString(), claimed_by: user.id } as any)
+                .eq("id", inviteData.id);
+              
+              toast.success(`Role ${inviteData.role} assigned from invitation!`);
+            }
+          }
+
+          // 2. Fetch all active roles for redirection logic
           const { data: roles } = await supabase
             .from("user_roles")
             .select("role")
@@ -38,19 +69,18 @@ const AuthCallback = () => {
           
           const roleList = (roles || []).map(r => r.role);
           
-          // Check for bootstrap promotion if no roles exist
-          if (roleList.length === 0 && INITIAL_ADMIN_EMAILS.includes(user.email || "")) {
+          // Bootstrap fallback
+          if (roleList.length === 0 && INITIAL_ADMIN_EMAILS.includes(userEmail || "")) {
             const { error: promoError } = await supabase
               .from("user_roles")
               .insert({ user_id: user.id, role: "admin" });
             
             if (!promoError) {
               roleList.push("admin");
-              console.log("Bootstrap: User promoted to admin via INITIAL_ADMIN_EMAILS");
             }
           }
 
-          const isStaff = roleList.includes("admin") || roleList.includes("assistant") || roleList.includes("doctor");
+          const isStaff = roleList.some(r => ["admin", "assistant", "doctor"].includes(r));
 
           if (isStaff) {
             toast.success("Welcome back!");
@@ -58,20 +88,15 @@ const AuthCallback = () => {
             return;
           }
 
-          // 2. User is likely a patient. Check if profile exists.
-          const { data: profile, error: profileError } = await supabase
+          // 3. User is a patient. Ensure profile exists.
+          const { data: profile } = await supabase
             .from("profiles")
             .select("id")
             .eq("id", user.id)
             .maybeSingle();
 
-          if (profileError) {
-            console.error("Profile check error:", profileError);
-          }
-
           if (!profile) {
-            // Create profile for new Google patient
-            const { error: createError } = await supabase
+            await supabase
               .from("profiles")
               .insert({
                 id: user.id,
@@ -81,17 +106,15 @@ const AuthCallback = () => {
                 status: "approved" as ProfileStatus
               });
             
-            if (createError) {
-              console.error("Profile creation error:", createError);
-              toast.error("Failed to set up patient profile.");
-            } else {
-              toast.success("Account set up successfully!");
+            // Auto-assign patient role if none exists
+            if (!roleList.includes("patient")) {
+              await supabase.from("user_roles").insert({ user_id: user.id, role: "patient" });
             }
+            toast.success("Account set up successfully!");
           } else {
             toast.success("Welcome back!");
           }
 
-          // Always redirect patients to patient-dashboard
           navigate("/patient-dashboard");
         } else {
           // No session found
