@@ -71,7 +71,7 @@ export const HeroSection = () => {
 
       {/* Hero Content */}
       <div className="container mx-auto px-4 relative z-20 h-full flex flex-col justify-center">
-        <div className="max-w-4xl">
+        <div className="max-w-[650px]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,9 +80,14 @@ export const HeroSection = () => {
             <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[10px] font-bold uppercase tracking-[0.2em] text-white mb-6">
               {hero.badge}
             </span>
-            <h1 className="text-[48px] md:text-[84px] font-bold tracking-tight text-white leading-[1.05] mb-8">
-              {hero.heading}<br />
-              <span className="text-white/60">{hero.highlight}</span>
+            <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
+              {hero.heading}
+              {hero.highlight && (
+                <>
+                  <br />
+                  <span className="text-white/60">{hero.highlight}</span>
+                </>
+              )}
             </h1>
             <p className="max-w-xl text-lg md:text-xl text-white/80 leading-relaxed mb-10">
               {hero.description}
