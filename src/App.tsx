@@ -72,6 +72,7 @@ import AdminLandingPage from "./pages/admin/AdminLandingPage";
 import AdminTranslationMonitor from "./pages/admin/AdminTranslationMonitor";
 import RoleVerification from "./pages/admin/RoleVerification";
 import AdminNotificationSettings from "./pages/admin/AdminNotificationSettings";
+import AdminHistory from "./pages/admin/AdminHistory";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +155,7 @@ const App = () => (
               <Route path="settings" element={<ProtectedRoute><PermissionRoute module="settings" action="edit"><AdminSettings /></PermissionRoute></ProtectedRoute>} />
               <Route path="settings/notifications" element={<ProtectedRoute><AdminNotificationSettings /></ProtectedRoute>} />
               <Route path="verify-role" element={<ProtectedRoute adminOnly><RoleVerification /></ProtectedRoute>} />
+              <Route path="history" element={<ProtectedRoute adminOnly><AdminHistory /></ProtectedRoute>} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>
