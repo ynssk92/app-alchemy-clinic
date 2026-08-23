@@ -106,7 +106,6 @@ const sections: Section[] = [
   {
     title: "— ADMINISTRATION",
     items: [
-      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "messages", staff: true },
       {
         to: "/admin/users", icon: User, label: "nav.users", adminOnly: true,
         children: [
@@ -116,6 +115,8 @@ const sections: Section[] = [
         ],
       },
       { to: "/admin/reports", icon: BarChart3, label: "nav.reports", module: "reports" },
+      { to: "/admin/messages", icon: Inbox, label: "nav.messages", module: "messages", staff: true },
+      { to: "/admin/history", icon: History, label: "nav.history", adminOnly: true },
     ],
   },
   {
