@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Stethoscope, Calendar, Users, Building2, TrendingUp,
   Plus, CalendarCheck, Clock, Activity, MessageSquare, Zap,
-  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack,
+  UserPlus, FileText, FlaskConical, Boxes, CircleDot, MoreHorizontal, FileStack, ShieldAlert
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, ResponsiveContainer,
@@ -35,6 +35,8 @@ const initials = (name?: string | null) =>
     .toUpperCase();
 
 const AdminOverview = () => {
+  const { isAdmin } = useAuth();
+  const { can } = usePermissions();
   const { t, i18n } = useTranslation();
   const [stats, setStats] = useState<Stats>({
     doctors: 0, appts: 0, patients: 0, clinics: 0, upcoming: 0, messages: 0,
@@ -170,12 +172,12 @@ const AdminOverview = () => {
   ];
 
   const quickActions = [
-    { label: t("nav.createPatient"), to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue" },
-    { label: t("nav.newAppointment"), to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan" },
-    { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green" },
-    { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet" },
-    { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber" },
-    { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue" },
+    { label: t("nav.createPatient"), to: "/admin/patients/create", icon: UserPlus, tint: "stat-blue", module: "patients", action: "create" },
+    { label: t("nav.newAppointment"), to: "/admin/appointments/new", icon: CalendarCheck, tint: "stat-cyan", module: "appointments", action: "create" },
+    { label: t("nav.newInvoice"), to: "/admin/billing/invoices", icon: FileText, tint: "stat-green", module: "billing", action: "create" },
+    { label: t("nav.doctors"), to: "/admin/doctors", icon: Stethoscope, tint: "stat-violet", module: "doctors" },
+    { label: t("nav.messages"), to: "/admin/messages", icon: MessageSquare, tint: "stat-amber", module: "messages" },
+    { label: t("nav.websiteCms"), to: "/admin/pages", icon: FileStack, tint: "stat-blue", adminOnly: true },
   ];
 
   const activity = useMemo(() => {
