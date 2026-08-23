@@ -557,76 +557,73 @@ const AdminPatientDetails = () => {
       {/* Main Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {patient && (
-          <div className="space-y-6 max-w-5xl mx-auto pb-10">
-            {/* Header Breadcrumb & Actions */}
-            <div className="flex items-center justify-between px-1">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm" asChild className="hover:bg-slate-100 text-slate-500 rounded-xl px-2">
-                  <Link to="/admin/patients" className="flex items-center gap-2">
-                    <ArrowLeft className="w-4 h-4" />
-                    <span className="font-semibold text-sm">Patients</span>
-                  </Link>
-                </Button>
-                <div className="h-4 w-px bg-slate-200" />
-                <h2 className="text-sm font-bold text-slate-900 tracking-tight">{patient.full_name}</h2>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setIsEditing(true)}
-                className="rounded-xl border-slate-200 shadow-sm hover:bg-slate-50 font-semibold"
-              >
-                <Pencil className="w-4 h-4 mr-2 text-primary" />
-                Edit Profile
-              </Button>
-            </div>
-
-            {/* Profile Summary Card */}
-            <Card className="p-8 border-none shadow-sm bg-white rounded-[32px] overflow-hidden relative group">
-              <div className="absolute top-0 right-0 p-8">
-                <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-500 font-bold tracking-widest text-[10px] py-1 px-3 rounded-full uppercase">
-                  ID: {patient.profileId || patient.intakeId?.substring(0, 8)}
-                </Badge>
-              </div>
-              
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-8">
-                <Avatar className="h-24 w-24 border-4 border-slate-50 shadow-xl rounded-[32px] group-hover:scale-105 transition-transform duration-500">
+          <div className="space-y-8 max-w-6xl mx-auto pb-10 px-4">
+            {/* 1. PATIENT PROFILE HEADER */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-8">
+                <Avatar className="w-28 h-28 border-4 border-white shadow-2xl ring-1 ring-slate-100 rounded-[36px]">
                   <AvatarImage src={patient.avatar_path || ""} className="object-cover" />
-                  <AvatarFallback className="bg-primary/5 text-primary text-3xl font-black">
-                    {patient.full_name.substring(0, 2).toUpperCase()}
+                  <AvatarFallback className="bg-primary text-white text-4xl font-black">
+                    {patient.full_name.split(" ").map((n) => n[0]).join("").toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                
-                <div className="flex-1 space-y-2">
-                  <h1 className="text-4xl font-black text-slate-900 tracking-tight">{patient.full_name}</h1>
-                  <div className="flex flex-wrap items-center gap-4 text-slate-500 font-medium text-sm">
-                    {patient.dob && (
-                      <span className="flex items-center gap-2">
-                        <Cake className="w-4 h-4 text-slate-300" />
-                        {new Date().getFullYear() - new Date(patient.dob).getFullYear()} years old
-                      </span>
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight">{patient.full_name}</h1>
+                    {patient.registered_at && (
+                      <Badge className="bg-emerald-50 text-[10px] text-emerald-600 border-emerald-100 uppercase tracking-widest font-bold px-3 py-1 rounded-full">
+                        Patient Enregistré
+                      </Badge>
                     )}
-                    <span className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-slate-300" />
-                      {patient.phone || "No phone"}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-slate-300" />
-                      {patient.email || "No email"}
-                    </span>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-500 font-semibold tracking-tight">
+                    <span className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary/60" /> ID: {patient.profileId?.slice(0, 8) || patient.intakeId?.slice(0, 8)}</span>
+                    <span className="flex items-center gap-2"><Cake className="w-4 h-4 text-primary/60" /> {fmtDate(patient.dob)} ({getAge(patient.dob)} ans)</span>
+                    <span className="flex items-center gap-2 capitalize"><UserCheck className="w-4 h-4 text-primary/60" /> {patient.gender || "Non renseigné"}</span>
                   </div>
                 </div>
               </div>
+              <div className="flex items-center gap-3">
+                <Button 
+                  onClick={() => setIsEditing(true)}
+                  className="bg-white hover:bg-slate-50 text-slate-900 border border-slate-200 shadow-sm font-bold uppercase text-[10px] tracking-[0.2em] h-12 px-8 rounded-2xl transition-all"
+                >
+                  <Pencil className="w-4 h-4 mr-2 text-primary" />
+                  Modifier le profil
+                </Button>
+                <Button 
+                  onClick={() => navigate(`/admin/appointments/new?patientId=${patient.profileId || id}`)}
+                  className="bg-primary hover:bg-primary/90 text-white shadow-xl shadow-primary/20 font-bold uppercase text-[10px] tracking-[0.2em] h-12 px-8 rounded-2xl transition-all"
+                >
+                  <CalendarPlus className="w-4 h-4 mr-2" />
+                  Nouveau RDV
+                </Button>
+              </div>
+            </div>
 
-              {/* Vitals Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-10 pt-8 border-t border-slate-50">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2 text-blue-600 font-bold text-[10px] uppercase tracking-widest mb-1">
-                    <Droplet className="w-3.5 h-3.5" />
-                    Blood Group
-                  </div>
-                  <p className="text-2xl font-black text-slate-900">{patient.blood_group || "—"}</p>
+            {/* Quick Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="p-6 border-none shadow-sm bg-white ring-1 ring-slate-100 space-y-4 rounded-[24px]">
+                <div className="flex items-center gap-2 text-primary font-bold text-[10px] uppercase tracking-widest">
+                  <Droplet className="w-4 h-4" />
+                  Groupe Sanguin
                 </div>
+                <p className="text-3xl font-black text-slate-900">{patient.blood_group || "—"}{patient.rhesus || ""}</p>
+              </Card>
+              <Card className="p-6 border-none shadow-sm bg-white ring-1 ring-slate-100 space-y-4 rounded-[24px]">
+                <div className="flex items-center gap-2 text-rose-500 font-bold text-[10px] uppercase tracking-widest">
+                  <AlertCircle className="w-4 h-4" />
+                  Allergies
+                </div>
+                <p className="text-3xl font-black text-slate-900">{patient.allergies ? "Détectées" : "Aucune"}</p>
+              </Card>
+              <Card className="p-6 border-none shadow-sm bg-white ring-1 ring-slate-100 space-y-4 rounded-[24px]">
+                <div className="flex items-center gap-2 text-amber-500 font-bold text-[10px] uppercase tracking-widest">
+                  <Activity className="w-4 h-4" />
+                  Condition
+                </div>
+                <p className="text-3xl font-black text-slate-900">Stable</p>
+              </div>
                 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-rose-600 font-bold text-[10px] uppercase tracking-widest mb-1">
