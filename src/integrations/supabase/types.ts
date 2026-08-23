@@ -2870,6 +2870,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_invitation_role: {
+        Args: never
+        Returns: {
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
       create_guest_booking: {
         Args: {
           _custom_reason?: string
