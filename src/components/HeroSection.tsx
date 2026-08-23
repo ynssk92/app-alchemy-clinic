@@ -83,49 +83,48 @@ export const HeroSection = () => {
 For the code present, I get the error below.
 
 Please think step-by-step in order to resolve it.
-```
-  x Expected '</', got 'jsx text (
-  |                   )'
-     ,-[/dev-server/src/pages/Auth.tsx:403:1]
- 400 |                             </div>
- 401 |                           </motion.div>
- 402 |                         </TabsContent>
- 403 | ,->                     </TabsContent>
- 404 | `->                   </AnimatePresence>
- 405 |                     </div>
- 406 |                   </Tabs>
- 407 |                 </Card>
-     `----
-
-
-Caused by:
-    Syntax Error
-
-Stack backtrace:
-   0: <unknown>
-   1: <unknown>
-   2: <unknown>
-   3: <unknown>
-   4: <unknown>
-   5: <unknown>
-   6: <unknown>
-   7: <unknown>
-   8: <unknown>
-   9: _ZZN4node14ThreadPoolWork12ScheduleWorkEvENUlP9uv_work_sE_4_FUNES2_
-  10: worker
-  11: start_thread
-  12: __clone3
-
-{
-  "timestamp": 1787507986890,
-  "error_type": "RUNTIME_ERROR",
-  "filename": "/dev-server/src/pages/Auth.tsx",
-  "lineno": 0,
-  "colno": 0,
-  "stack": "Unavailable",
-  "has_blank_screen": true
-}
-```
+{"\n"}
+{"  x Expected '</', got 'jsx text ('\n"}
+{"  |                   )'\n"}
+{"     ,-[/dev-server/src/pages/Auth.tsx:403:1]\n"}
+{" 400 |                             </div>\n"}
+{" 401 |                           </motion.div>\n"}
+{" 402 |                         </TabsContent>\n"}
+{" 403 | ,->                     </TabsContent>\n"}
+{" 404 | `->                   </AnimatePresence>\n"}
+{" 405 |                     </div>\n"}
+{" 406 |                   </Tabs>\n"}
+{" 407 |                 </Card>\n"}
+{"     `----\n"}
+{"\n"}
+{"\n"}
+{"Caused by:\n"}
+{"    Syntax Error\n"}
+{"\n"}
+{"Stack backtrace:\n"}
+{"   0: <unknown>\n"}
+{"   1: <unknown>\n"}
+{"   2: <unknown>\n"}
+{"   3: <unknown>\n"}
+{"   4: <unknown>\n"}
+{"   5: <unknown>\n"}
+{"   6: <unknown>\n"}
+{"   7: <unknown>\n"}
+{"   8: <unknown>\n"}
+{"   9: _ZZN4node14ThreadPoolWork12ScheduleWorkEvENUlP9uv_work_sE_4_FUNES2_\n"}
+{"  10: worker\n"}
+{"  11: start_thread\n"}
+{"  12: __clone3\n"}
+{"\n"}
+{"{\n"}
+{"  \"timestamp\": 1787507986890,\n"}
+{"  \"error_type\": \"RUNTIME_ERROR\",\n"}
+{"  \"filename\": \"/dev-server/src/pages/Auth.tsx\",\n"}
+{"  \"lineno\": 0,\n"}
+{"  \"colno\": 0,\n"}
+{"  \"stack\": \"Unavailable\",\n"}
+{"  \"has_blank_screen\": true\n"}
+{"}\n"}
             </span>
 
             <h1 className="text-[34px] sm:text-[42px] md:text-[56px] lg:text-[72px] font-bold tracking-tight text-white leading-[1.1] mb-8">
