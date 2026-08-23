@@ -118,8 +118,9 @@ export const RoleVerification = () => {
     try {
       const { error } = await supabase.rpc("manage_user_role", {
         target_user_id: selectedUser.id,
-        new_role: pendingRole
+        new_role: pendingRole as "admin" | "assistant" | "doctor" | "patient"
       });
+
 
       if (error) throw error;
 
