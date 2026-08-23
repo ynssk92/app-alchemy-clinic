@@ -269,7 +269,7 @@ const AdminPatientCreate = () => {
                       <SelectContent>
                         <SelectItem value="CIN">CIN</SelectItem>
                         <SelectItem value="Passport">Passport</SelectItem>
-                        <SelectItem value="Other">Other</SelectItem>
+                        
                       </SelectContent>
                     </Select>
                   </div>

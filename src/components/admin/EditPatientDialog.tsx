@@ -283,6 +283,20 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
               <FormItem label="Nationality">
                 <Input className="h-11 rounded-xl" value={form.nationality} onChange={(e) => set("nationality", e.target.value)} />
               </FormItem>
+              <div className="grid grid-cols-2 gap-4">
+                <FormItem label="Type de document">
+                  <Select value={form.identity_document_type} onValueChange={(v) => set("identity_document_type", v)}>
+                    <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="CIN">CIN</SelectItem>
+                      <SelectItem value="Passport">Passport</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+                <FormItem label="Numéro du document">
+                  <Input className="h-11 rounded-xl" value={form.identity_document_number} onChange={(e) => set("identity_document_number", e.target.value)} />
+                </FormItem>
+              </div>
             </div>
           </section>
 
