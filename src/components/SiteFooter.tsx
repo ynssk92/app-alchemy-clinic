@@ -73,7 +73,13 @@ export const SiteFooter = () => {
             © {year} {settings.site_name}. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase">Version {APP_VERSION}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-bold tracking-widest text-slate-300 uppercase">Version {APP_VERSION}</span>
+              <span className="text-[10px] text-slate-300">·</span>
+              <Link to="/auth" className="text-[10px] font-bold tracking-widest text-slate-300 uppercase hover:text-primary transition-colors">
+                Healthbook
+              </Link>
+            </div>
           </div>
         </div>
       </div>
