@@ -300,8 +300,17 @@ export const EditPatientDialog = ({ open, onOpenChange, profileId, intakeId: int
               <FormItem label="Full Name">
                 <Input className="h-11 rounded-xl" value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
               </FormItem>
-              <FormItem label="Email (Lecture seule)">
-                <Input className="h-11 rounded-xl bg-slate-50 text-slate-500 cursor-not-allowed" value={form.email} readOnly disabled />
+              <FormItem label="Email">
+                <Input 
+                  className={cn(
+                    "h-11 rounded-xl",
+                    !isAdmin && "bg-slate-50 text-slate-500 cursor-not-allowed"
+                  )} 
+                  value={form.email} 
+                  onChange={(e) => set("email", e.target.value)}
+                  readOnly={!isAdmin} 
+                  disabled={!isAdmin} 
+                />
               </FormItem>
               <FormItem label="Phone">
                 <Input className="h-11 rounded-xl" value={form.phone} onChange={(e) => set("phone", e.target.value)} />
