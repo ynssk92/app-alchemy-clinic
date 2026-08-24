@@ -100,7 +100,7 @@ export const DoctorCard = ({ doctor }: { doctor: DoctorCardData }) => {
         </p>
 
         <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
-          Consultation - (012)3456789
+          Consultation - (+212)528939999
         </p>
       </div>
 
